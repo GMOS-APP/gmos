@@ -1,0 +1,207 @@
+import React, { useState, useEffect } from 'react';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { base44 } from '@/api/base44Client';
+import { Button } from '@/components/ui/button';
+import { Textarea } from '@/components/ui/textarea';
+import { Input } from '@/components/ui/input';
+import { Sparkles, Save, Loader2, Plus, X, CheckCircle2, Clock, CalendarDays, Wand2 } from 'lucide-react';
+
+export default function SessionDebrief({ session, notes = [], entities = [], campaignId }) {
+  const queryClient = useQueryClient();
+
+  const [summary, setSummary] = useState(session?.summary || '');
+  const [keyEvents, setKeyEvents] = useState(session?.key_events || []);
+  const [nextPrimer, setNextPrimer] = useState(session?.next_session_primer || '');
+  const [newEvent, setNewEvent] = useState('');
+  const [generating, setGenerating] = useState(false);
+  const [saved, setSaved] = useState(false);
+
+  useEffect(() => {
+    setSummary(session?.summary || '');
+    setKeyEvents(session?.key_events || []);
+    setNextPrimer(session?.next_session_primer || '');
+  }, [session?.id]);
+
+  const saveMutation = useMutation({
+    mutationFn: () => base44.entities.Session.update(session.id, {
+      summary,
+      key_events: keyEvents,
+      next_session_primer: nextPrimer,
+      status: 'debriefed',
+    }),
+    onSuccess: () => {
+      queryClient.invalidateQueries();
+      setSaved(true);
+      setTimeout(() => setSaved(false), 2500);
+    },
+  });
+
+  const handleGenerate = async () => {
+    setGenerating(true);
+    const notesText = notes.map((n) => n.content).join('\n');
+    const linkedNames = (session?.linked_entities || []).map((e) => e.entity_name).join(', ');
+
+    const result = await base44.integrations.Core.InvokeLLM({
+      prompt: `You are a D&D session chronicler. Given the following session data, generate:
+1. A vivid 2-3 paragraph narrative summary of the session
+2. 4-6 bullet-point key events (short, punchy, present-tense)
+3. A 1-2 sentence "next session primer" teaser for players
+
+Session title: ${session?.title || 'Untitled'}
+Quick notes captured during session:
+${notesText || '(none)'}
+Linked entities/characters: ${linkedNames || '(none)'}
+Session goals: ${(session?.session_goals || []).map((g) => g.text).join(', ') || '(none)'}
+
+Respond as JSON.`,
+      response_json_schema: {
+        type: 'object',
+        properties: {
+          summary: { type: 'string' },
+          key_events: { type: 'array', items: { type: 'string' } },
+          next_session_primer: { type: 'string' },
+        },
+      },
+    });
+
+    if (result.summary) setSummary(result.summary);
+    if (result.key_events?.length) setKeyEvents(result.key_events);
+    if (result.next_session_primer) setNextPrimer(result.next_session_primer);
+    setGenerating(false);
+  };
+
+  const addEvent = () => {
+    if (!newEvent.trim()) return;
+    setKeyEvents((prev) => [...prev, newEvent.trim()]);
+    setNewEvent('');
+  };
+
+  const removeEvent = (i) => setKeyEvents((prev) => prev.filter((_, idx) => idx !== i));
+
+  const duration = session?.start_time && session?.end_time
+    ? Math.round((new Date(session.end_time) - new Date(session.start_time)) / 60000)
+    : null;
+
+  return (
+    <div className="p-4 lg:p-6 max-w-2xl mx-auto space-y-6">
+      {/* Header */}
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <h2 className="text-lg font-bold dark:text-zinc-100 text-zinc-900">
+            Session Debrief
+          </h2>
+          <div className="flex items-center gap-3 mt-1 text-xs dark:text-zinc-500 text-zinc-500">
+            {session?.date && (
+              <span className="flex items-center gap-1">
+                <CalendarDays className="w-3 h-3" />
+                {new Date(session.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+              </span>
+            )}
+            {duration && (
+              <span className="flex items-center gap-1">
+                <Clock className="w-3 h-3" />
+                {duration >= 60 ? `${Math.floor(duration / 60)}h ${duration % 60}m` : `${duration}m`}
+              </span>
+            )}
+          </div>
+        </div>
+        <Button
+          onClick={handleGenerate}
+          disabled={generating}
+          size="sm"
+          className="bg-violet-600 hover:bg-violet-500 text-white flex-shrink-0"
+        >
+          {generating ? <Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" /> : <Wand2 className="w-3.5 h-3.5 mr-1.5" />}
+          AI Generate
+        </Button>
+      </div>
+
+      {/* Summary */}
+      <div className="space-y-2">
+        <label className="text-xs font-semibold uppercase tracking-wider dark:text-zinc-400 text-zinc-500">
+          Session Summary
+        </label>
+        <Textarea
+          value={summary}
+          onChange={(e) => setSummary(e.target.value)}
+          placeholder="What happened this session? Write a narrative summary…"
+          className="min-h-32 text-sm dark:bg-zinc-900 dark:border-zinc-800 dark:text-zinc-200 bg-zinc-50 border-zinc-200 resize-none"
+        />
+      </div>
+
+      {/* Key Events */}
+      <div className="space-y-2">
+        <label className="text-xs font-semibold uppercase tracking-wider dark:text-zinc-400 text-zinc-500">
+          Key Events
+        </label>
+        <div className="space-y-1.5">
+          {keyEvents.map((ev, i) => (
+            <div key={i} className="flex items-start gap-2 group">
+              <CheckCircle2 className="w-3.5 h-3.5 mt-0.5 flex-shrink-0 text-amber-500" />
+              <span className="flex-1 text-sm dark:text-zinc-300 text-zinc-700">{ev}</span>
+              <button
+                onClick={() => removeEvent(i)}
+                className="opacity-0 group-hover:opacity-100 text-zinc-400 hover:text-red-500 transition-opacity"
+              >
+                <X className="w-3 h-3" />
+              </button>
+            </div>
+          ))}
+        </div>
+        <div className="flex gap-2 mt-2">
+          <Input
+            value={newEvent}
+            onChange={(e) => setNewEvent(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && addEvent()}
+            placeholder="Add a key event…"
+            className="text-sm dark:bg-zinc-900 dark:border-zinc-800 dark:text-zinc-200 bg-zinc-50 border-zinc-200 h-8"
+          />
+          <Button onClick={addEvent} size="sm" variant="outline" className="h-8 dark:border-zinc-700 dark:text-zinc-400">
+            <Plus className="w-3.5 h-3.5" />
+          </Button>
+        </div>
+      </div>
+
+      {/* Quick Notes Reference */}
+      {notes.length > 0 && (
+        <div className="space-y-2">
+          <label className="text-xs font-semibold uppercase tracking-wider dark:text-zinc-400 text-zinc-500">
+            Session Notes ({notes.length})
+          </label>
+          <div className="space-y-1.5 max-h-40 overflow-y-auto pr-1">
+            {notes.map((n) => (
+              <div key={n.id} className="px-3 py-2 rounded-lg dark:bg-zinc-900/50 dark:border dark:border-zinc-800/40 bg-zinc-50 border border-zinc-200">
+                <p className="text-xs dark:text-zinc-400 text-zinc-600 whitespace-pre-wrap">{n.content}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Next Session Primer */}
+      <div className="space-y-2">
+        <label className="text-xs font-semibold uppercase tracking-wider dark:text-zinc-400 text-zinc-500">
+          Next Session Primer
+        </label>
+        <Textarea
+          value={nextPrimer}
+          onChange={(e) => setNextPrimer(e.target.value)}
+          placeholder="Tease what's coming next session for your players…"
+          className="min-h-20 text-sm dark:bg-zinc-900 dark:border-zinc-800 dark:text-zinc-200 bg-zinc-50 border-zinc-200 resize-none"
+        />
+      </div>
+
+      {/* Save */}
+      <div className="flex justify-end pt-2">
+        <Button
+          onClick={() => saveMutation.mutate()}
+          disabled={saveMutation.isPending || saved}
+          className="bg-amber-500 hover:bg-amber-400 text-zinc-950 font-semibold"
+        >
+          {saveMutation.isPending ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Save className="w-4 h-4 mr-2" />}
+          {saved ? 'Saved!' : 'Save Debrief'}
+        </Button>
+      </div>
+    </div>
+  );
+}
