@@ -24,7 +24,7 @@ export default function Layout({ children, currentPageName }) {
         base44.auth.redirectToLogin(returnUrl);
       } else {
         base44.auth.me().then((u) => setUser(u)).catch(() => {});
-        const hasBooted = sessionStorage.getItem('dmos_booted');
+        const hasBooted = sessionStorage.getItem('gmos_booted');
         if (!hasBooted) {
           setBooting(true);
         }
@@ -34,7 +34,7 @@ export default function Layout({ children, currentPageName }) {
   }, []);
 
   const handleBootComplete = () => {
-    sessionStorage.setItem('dmos_booted', '1');
+    sessionStorage.setItem('gmos_booted', '1');
     setBooting(false);
   };
 

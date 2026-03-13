@@ -79,7 +79,7 @@ export default function NewSessionDialog({ open, onClose, campaignId, campaign }
   const generateWithAI = async () => {
     setGenerating(true);
     const result = await base44.integrations.Core.InvokeLLM({
-      prompt: `You are helping a Dungeon Master plan session ${nextSessionNum} of their campaign "${campaign?.name}". Setting: ${campaign?.setting || 'a fantasy world'}. Generate a compelling session title, a strong opening hook (2-3 sentences), 3 session goals, and 3 potential scenes. Keep it concise and evocative.`,
+      prompt: `You are helping a Game Master plan session ${nextSessionNum} of their campaign "${campaign?.name}". Setting: ${campaign?.setting || 'a fantasy world'}. Generate a compelling session title, a strong opening hook (2-3 sentences), 3 session goals, and 3 potential scenes. Keep it concise and evocative.`,
       response_json_schema: {
         type: 'object',
         properties: {

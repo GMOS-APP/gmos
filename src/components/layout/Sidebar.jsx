@@ -112,7 +112,7 @@ export default function Sidebar({ campaign, collapsed, onToggle, onNavClick }) {
             to={createPageUrl('CampaignList')}
             className="text-xs text-zinc-500 dark:text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 uppercase tracking-widest font-semibold"
           >
-            DM/OS
+            GM/OS
           </Link>
         )}
         <button
@@ -223,7 +223,7 @@ export default function Sidebar({ campaign, collapsed, onToggle, onNavClick }) {
               <p className="text-xs font-medium text-zinc-900 dark:text-zinc-200 truncate">{user.full_name || user.email}</p>
             </div>
             <button
-              onClick={() => { sessionStorage.removeItem('dmos_booted'); base44.auth.logout(); }}
+              onClick={() => { sessionStorage.removeItem('gmos_booted'); base44.auth.logout(); }}
               title="Sign out"
               className="p-1 rounded text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 hover:bg-zinc-200 dark:hover:bg-zinc-700"
             >
@@ -233,7 +233,7 @@ export default function Sidebar({ campaign, collapsed, onToggle, onNavClick }) {
         )}
         {user && collapsed && (
           <button
-            onClick={() => { sessionStorage.removeItem('dmos_booted'); base44.auth.logout(); }}
+            onClick={() => { sessionStorage.removeItem('gmos_booted'); base44.auth.logout(); }}
             title="Sign out"
             className="w-full flex items-center justify-center p-2 rounded-lg text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800/50"
           >
