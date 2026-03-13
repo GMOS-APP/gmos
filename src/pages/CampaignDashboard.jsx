@@ -15,6 +15,7 @@ import PartyInventory from '@/components/dashboard/PartyInventory';
 import RulesSearch from '@/components/dashboard/RulesSearch';
 import PrivateScratchpad from '@/components/dashboard/PrivateScratchpad';
 import StandaloneTimer from '@/components/dashboard/StandaloneTimer';
+import WeatherGenerator from '@/components/dashboard/WeatherGenerator';
 import SessionCalendar from '@/components/dashboard/SessionCalendar';
 
 const ENTITY_TYPES = [
@@ -359,6 +360,9 @@ export default function CampaignDashboard() {
         </div>
         <div style={{ minHeight: '220px' }}>
           <PrivateScratchpad campaignId={campaignId} />
+        </div>
+        <div style={{ minHeight: '220px' }}>
+          <WeatherGenerator />
         </div>
       </div>
 

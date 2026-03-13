@@ -57,6 +57,7 @@ import SessionBrowser from './pages/SessionBrowser';
 import SessionPage from './pages/SessionPage';
 import RandomTableBrowser from './pages/RandomTableBrowser';
 import CampaignTimeline from './pages/CampaignTimeline';
+import PlayerView from './pages/PlayerView';
 import __Layout from './Layout.jsx';
 
 
@@ -71,6 +72,7 @@ export const PAGES = {
     "SessionPage": SessionPage,
     "RandomTableBrowser": RandomTableBrowser,
     "CampaignTimeline": CampaignTimeline,
+    "PlayerView": PlayerView,
 }
 
 export const pagesConfig = {
