@@ -36,10 +36,12 @@ VITE_SUPABASE_URL=<project_url>
 VITE_SUPABASE_ANON_KEY=<anon_key>
 ```
 
-Supabase project: `suofaewpbrzbixplwzvs` (us-east-1). Tables: `campaigns`, `world_entities`, `sessions`, `relationships`, `quick_notes`, `campaign_maps`. RLS on all tables (owner-based: `created_by = auth.uid()`).
+Supabase project: `suofaewpbrzbixplwzvs` (us-east-1). Tables: `campaigns`, `world_entities`, `sessions`, `relationships`, `quick_notes`, `campaign_maps`, `random_tables`. RLS on all tables (owner-based: `created_by = auth.uid()`).
 
 ### Routing
-Pages are auto-registered from `src/pages/` via `src/pages.config.js` (auto-generated — do not manually edit). The 8 main routes are: CampaignList, CampaignDashboard, CampaignMap, EntityBrowser, EntityDetail, RelationshipMap, SessionBrowser, SessionPage.
+Pages are auto-registered from `src/pages/` via `src/pages.config.js` (auto-generated — do not manually edit). Current routes: CampaignList, CampaignDashboard, CampaignMap, EntityBrowser, EntityDetail, RelationshipMap, SessionBrowser, SessionPage, RandomTableBrowser, CampaignTimeline, PlayerView.
+
+**Important:** `CAMPAIGN_PAGES` array in `src/Layout.jsx` controls which pages get the sidebar layout. Any new campaign-scoped page must be added to this array or it will load without a sidebar.
 
 ### Component Organization
 ```
@@ -52,15 +54,18 @@ src/components/
 ├── layout/        # Sidebar + navigation
 ├── relationships/ # Relationship graph/mapping
 ├── map/           # React Leaflet map components
-└── encounter/     # Encounter builder
+├── encounter/     # Encounter builder
+└── tables/        # Random table card + dialog
 ```
 
 Entity types: NPCs, Player Characters, Creatures, Locations, Factions, Deities, Items, Shops, Events, Encounters, Lore/Threads.
 
 ### Serverless Functions
-`functions/` contains TypeScript/Deno functions:
-- `importCampaign.ts` / `exportCampaign.ts` — full campaign backup/restore with ID remapping
-- `importDndBeyondCharacter.ts` — D&D Beyond character import
+`functions/` contains TypeScript/Deno Edge Functions deployed to Supabase. Deployed slugs → local files:
+- `invoke-llm` (`invoke-llm.ts`) — calls Anthropic claude-haiku; requires `ANTHROPIC_API_KEY` secret in Supabase
+- `export-campaign` (`exportCampaign.ts`) — full campaign backup (all tables) using service role
+- `import-campaign` (`importCampaign.ts`) — full campaign restore with ID remapping; new records owned by importing user
+- `import-dndbeyond` (`importDndBeyondCharacter.ts`) — fetches public D&D Beyond character and maps to WorldEntity shape
 
 ### Path Aliases
 `@/*` maps to `src/*` (configured in `jsconfig.json` and `vite.config.js`).
