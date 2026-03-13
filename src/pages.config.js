@@ -55,6 +55,7 @@ import EntityDetail from './pages/EntityDetail';
 import RelationshipMap from './pages/RelationshipMap';
 import SessionBrowser from './pages/SessionBrowser';
 import SessionPage from './pages/SessionPage';
+import RandomTableBrowser from './pages/RandomTableBrowser';
 import __Layout from './Layout.jsx';
 
 
@@ -67,6 +68,7 @@ export const PAGES = {
     "RelationshipMap": RelationshipMap,
     "SessionBrowser": SessionBrowser,
     "SessionPage": SessionPage,
+    "RandomTableBrowser": RandomTableBrowser,
 }
 
 export const pagesConfig = {

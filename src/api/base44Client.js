@@ -8,6 +8,7 @@ const TABLE_MAP = {
   Relationship: 'relationships',
   CampaignMap: 'campaign_maps',
   QuickNote: 'quick_notes',
+  RandomTable: 'random_tables',
 };
 
 // Maps Base44 function names → Supabase Edge Function names
