@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { createPageUrl } from '@/utils';
+import { useAuth } from '@/lib/AuthContext';
 import Sidebar from '@/components/layout/Sidebar';
 import Breadcrumbs from '@/components/layout/Breadcrumbs';
 import GlobalSearch from '@/components/layout/GlobalSearch';
@@ -13,25 +14,8 @@ const CAMPAIGN_PAGES = ['CampaignDashboard', 'EntityDetail', 'EntityBrowser', 'R
 export default function Layout({ children, currentPageName }) {
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [authChecked, setAuthChecked] = useState(false);
-  const [user, setUser] = useState(null);
-  const [booting, setBooting] = useState(false);
-
-  useEffect(() => {
-    base44.auth.isAuthenticated().then((authenticated) => {
-      if (!authenticated) {
-        const returnUrl = window.location.href.includes('/login') ? undefined : window.location.href;
-        base44.auth.redirectToLogin(returnUrl);
-      } else {
-        base44.auth.me().then((u) => setUser(u)).catch(() => {});
-        const hasBooted = sessionStorage.getItem('gmos_booted');
-        if (!hasBooted) {
-          setBooting(true);
-        }
-        setAuthChecked(true);
-      }
-    });
-  }, []);
+  const [booting, setBooting] = useState(() => !sessionStorage.getItem('gmos_booted'));
+  const { user, isLoadingAuth } = useAuth();
 
   const handleBootComplete = () => {
     sessionStorage.setItem('gmos_booted', '1');
@@ -45,11 +29,11 @@ export default function Layout({ children, currentPageName }) {
   const { data: campaign } = useQuery({
     queryKey: ['campaign', campaignId],
     queryFn: () => base44.entities.Campaign.filter({ id: campaignId }),
-    enabled: !!campaignId && isCampaignPage && authChecked,
+    enabled: !!campaignId && isCampaignPage && !isLoadingAuth,
     select: (data) => data?.[0],
   });
 
-  if (!authChecked) {
+  if (isLoadingAuth) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-black">
         <Loader2 className="w-6 h-6 text-green-500 animate-spin" />
