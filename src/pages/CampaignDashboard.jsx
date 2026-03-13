@@ -11,6 +11,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import PassiveStatsHub from '@/components/dashboard/PassiveStatsHub';
+import PartyInventory from '@/components/dashboard/PartyInventory';
 import RulesSearch from '@/components/dashboard/RulesSearch';
 import PrivateScratchpad from '@/components/dashboard/PrivateScratchpad';
 import StandaloneTimer from '@/components/dashboard/StandaloneTimer';
@@ -218,6 +219,23 @@ export default function CampaignDashboard() {
             </div>
           </div>
 
+          {/* Party Inventory */}
+          {entities.filter(e => e.entity_type === 'item').length > 0 && (
+            <div>
+              <div className="flex items-center justify-between mb-3">
+                <h2 className="text-xs font-semibold text-zinc-600 dark:text-zinc-500 uppercase tracking-widest">Party Inventory</h2>
+                <Link
+                  to={createPageUrl('EntityBrowser') + `?campaign_id=${campaignId}&type=item`}
+                  className="text-xs text-zinc-600 dark:text-zinc-500 hover:text-amber-600 dark:hover:text-amber-400 transition-colors"
+                >
+                  All items →
+                </Link>
+              </div>
+              <div className="bg-white dark:bg-zinc-900/40 border border-zinc-200 dark:border-zinc-800/50 rounded-xl p-3">
+                <PartyInventory items={entities.filter(e => e.entity_type === 'item')} campaignId={campaignId} />
+              </div>
+            </div>
+          )}
 
         </div>
 

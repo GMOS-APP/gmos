@@ -23,6 +23,7 @@ import {
   Map,
   CalendarDays,
   Dices,
+  History,
   Moon,
   Sun,
   LogOut,
@@ -141,6 +142,7 @@ export default function Sidebar({ campaign, collapsed, onToggle, onNavClick }) {
           { page: 'CampaignMap', label: 'Campaign Map', icon: Map, query: `?campaign_id=${campaign.id}` },
           { page: 'SessionBrowser', label: 'Sessions', icon: CalendarDays, query: `?campaign_id=${campaign.id}` },
           { page: 'RandomTableBrowser', label: 'Random Tables', icon: Dices, query: `?campaign_id=${campaign.id}` },
+          { page: 'CampaignTimeline', label: 'Timeline', icon: History, query: `?campaign_id=${campaign.id}` },
         ].map(({ page, label, icon: Icon, query }) => {
           const isActive = location.pathname.includes(page.toLowerCase()) || location.search.includes(page.toLowerCase());
           const href = createPageUrl(page) + query;

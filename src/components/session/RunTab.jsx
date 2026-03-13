@@ -10,6 +10,7 @@ import DiceRoller from '@/components/session/DiceRoller';
 import AutoLinkerSuggestions from '@/components/session/AutoLinkerSuggestions';
 import SessionNotesDisplay from '@/components/session/SessionNotesDisplay';
 import EntityLinker from '@/components/session/EntityLinker';
+import ResourceTracker from '@/components/session/ResourceTracker';
 
 export default function RunTab({ session, notes, entities, campaignId, onAddNote, isAddingNote }) {
   const [npcSearchOpen, setNpcSearchOpen] = useState(false);
@@ -33,6 +34,7 @@ export default function RunTab({ session, notes, entities, campaignId, onAddNote
               </span>
             )}
           </TabsTrigger>
+          <TabsTrigger value="resources" className="text-xs">Resources</TabsTrigger>
         </TabsList>
 
         {/* Quick Notes */}
@@ -93,6 +95,13 @@ export default function RunTab({ session, notes, entities, campaignId, onAddNote
         {/* Linked Entities */}
         <TabsContent value="entities" className="flex-1 m-0 overflow-y-auto">
           {session && <EntityLinker session={session} campaignId={campaignId} />}
+        </TabsContent>
+
+        {/* Resources */}
+        <TabsContent value="resources" className="flex-1 m-0 overflow-y-auto">
+          <div className="p-4">
+            <ResourceTracker session={session} entities={entities} campaignId={campaignId} />
+          </div>
         </TabsContent>
       </Tabs>
     </div>

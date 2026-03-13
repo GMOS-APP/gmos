@@ -56,6 +56,7 @@ import RelationshipMap from './pages/RelationshipMap';
 import SessionBrowser from './pages/SessionBrowser';
 import SessionPage from './pages/SessionPage';
 import RandomTableBrowser from './pages/RandomTableBrowser';
+import CampaignTimeline from './pages/CampaignTimeline';
 import __Layout from './Layout.jsx';
 
 
@@ -69,6 +70,7 @@ export const PAGES = {
     "SessionBrowser": SessionBrowser,
     "SessionPage": SessionPage,
     "RandomTableBrowser": RandomTableBrowser,
+    "CampaignTimeline": CampaignTimeline,
 }
 
 export const pagesConfig = {

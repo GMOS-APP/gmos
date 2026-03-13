@@ -3,8 +3,9 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
-import { BookOpen, Swords, FileText, Loader2 } from 'lucide-react';
+import { BookOpen, Swords, FileText, Loader2, Printer } from 'lucide-react';
 import PrepTab from '@/components/session/PrepTab';
+import { printSessionPrep } from '@/utils/printSessionPrep';
 import RunTab from '@/components/session/RunTab';
 import SessionDebrief from '@/components/session/SessionDebrief';
 import SessionHeader from '@/components/session/SessionHeader';
@@ -169,6 +170,17 @@ export default function SessionPage() {
           {/* PREP */}
           <TabsContent value="prep" className="m-0">
             <div className="p-4 lg:p-6">
+              <div className="flex justify-end mb-3">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => printSessionPrep(session, formData, entities)}
+                  className="dark:border-zinc-700 dark:text-zinc-400 text-xs gap-1.5"
+                >
+                  <Printer className="w-3.5 h-3.5" />
+                  Print Prep Sheet
+                </Button>
+              </div>
               <PrepTab
                 session={session}
                 campaign={campaign}

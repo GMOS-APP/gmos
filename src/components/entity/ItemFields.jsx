@@ -76,6 +76,9 @@ export default function ItemFields({ extraData, onChange }) {
       <SectionDivider label="Mechanics" />
       <div className="md:col-span-2"><Field label="Properties & Mechanics"><TextArea value={get('properties')} onChange={(v) => set('properties', v)} placeholder="What does it do? Bonuses, charges, abilities..." rows={4} /></Field></div>
 
+      <SectionDivider label="Ownership" />
+      <div className="md:col-span-2"><Field label="Held By"><TextInput value={get('holder')} onChange={(v) => set('holder', v)} placeholder="Which PC currently holds this item?" /></Field></div>
+
       <SectionDivider label="Lore" />
       <div className="md:col-span-2"><Field label="History & Lore"><TextArea value={get('history')} onChange={(v) => set('history', v)} placeholder="Origin, previous owners, legends surrounding it..." /></Field></div>
       <div className="md:col-span-2"><Field label="Physical Description"><TextArea value={get('appearance')} onChange={(v) => set('appearance', v)} placeholder="What does it look like? Size, materials, markings..." /></Field></div>
