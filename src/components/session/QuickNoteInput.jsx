@@ -35,7 +35,7 @@ export default function QuickNoteInput({ onSubmit, isSubmitting, placeholder = "
       >
         {isSubmitting ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Send className="w-3.5 h-3.5" />}
       </Button>
-      <p className="text-[10px] dark:text-zinc-700 text-gray-400 mt-1">⌘+Enter to send</p>
+      <p className="text-[10px] dark:text-zinc-500 text-gray-400 mt-1">⌘+Enter to send</p>
     </div>
   );
 }

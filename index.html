@@ -6,6 +6,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>GM/OS</title>
     <script>
+      // Apply saved theme before React loads to prevent flash
+      (function() {
+        var saved = localStorage.getItem('theme');
+        var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        if (saved === 'dark' || (!saved && prefersDark)) {
+          document.documentElement.classList.add('dark');
+        }
+      })();
+    </script>
+    <script>
       // Restore path encoded by 404.html for GitHub Pages SPA routing
       (function(l) {
         if (l.search[1] === '/') {

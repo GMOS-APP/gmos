@@ -158,7 +158,7 @@ export default function EntityMentionTextarea({
       />
 
       {/* Hint */}
-      <div className="flex items-center gap-1 mt-1.5 text-[11px] dark:text-zinc-700 text-gray-600">
+      <div className="flex items-center gap-1 mt-1.5 text-[11px] dark:text-zinc-500 text-gray-600">
         <AtSign className="w-3 h-3" />
         <span>Type @ to link a world entity</span>
       </div>

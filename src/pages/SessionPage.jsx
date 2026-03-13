@@ -203,7 +203,7 @@ export default function SessionPage() {
               />
             ) : (
               <div className="p-6 flex flex-col items-center justify-center gap-4 min-h-64">
-                <FileText className="w-10 h-10 dark:text-zinc-700 text-gray-400" />
+                <FileText className="w-10 h-10 dark:text-zinc-600 text-gray-400" />
                 <div className="text-center">
                   <p className="text-sm font-semibold dark:text-zinc-300 text-gray-900">Ready to debrief?</p>
                   <p className="text-xs dark:text-zinc-600 text-gray-600 mt-1">Process your session notes and update your world.</p>

@@ -54,7 +54,7 @@ export default function SessionBrowser() {
         </div>
       ) : sessions.length === 0 ? (
         <div className="text-center py-20">
-          <CalendarDays className="w-10 h-10 dark:text-zinc-700 text-gray-400 mx-auto mb-3" />
+          <CalendarDays className="w-10 h-10 dark:text-zinc-600 text-gray-400 mx-auto mb-3" />
           <p className="dark:text-zinc-500 text-gray-600 text-sm">No sessions yet</p>
           <Button variant="outline" size="sm" onClick={() => setShowNewDialog(true)} className="mt-4 dark:border-zinc-700 dark:text-zinc-400 border-gray-300 text-gray-700">
               Start First Session

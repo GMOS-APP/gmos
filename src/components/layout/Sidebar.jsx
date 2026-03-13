@@ -170,7 +170,7 @@ export default function Sidebar({ campaign, collapsed, onToggle, onNavClick }) {
           <div key={group.label}>
             {!collapsed && (
               <div className="pt-2 pb-0.5 px-3">
-                <span className="text-[10px] uppercase tracking-widest text-zinc-600 dark:text-zinc-700 font-semibold">{group.label}</span>
+                <span className="text-[10px] uppercase tracking-widest text-zinc-500 dark:text-zinc-500 font-semibold">{group.label}</span>
               </div>
             )}
             {group.items.map((item) => {

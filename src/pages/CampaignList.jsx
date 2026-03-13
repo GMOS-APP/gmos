@@ -138,7 +138,7 @@ export default function CampaignList() {
           </div>
         ) : campaigns.length === 0 ? (
           <div className="text-center py-24 border border-dashed border-zinc-300 dark:border-zinc-800 rounded-xl">
-            <FolderOpen className="w-10 h-10 text-zinc-500 dark:text-zinc-700 mx-auto mb-3" />
+            <FolderOpen className="w-10 h-10 text-zinc-500 dark:text-zinc-600 mx-auto mb-3" />
             <p className="text-zinc-600 dark:text-zinc-500 text-sm">No campaigns yet</p>
             <p className="text-zinc-500 dark:text-zinc-600 text-xs mt-1">Create one to get started</p>
           </div>

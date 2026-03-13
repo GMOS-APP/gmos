@@ -187,7 +187,7 @@ export default function CampaignMap() {
             <div className="text-center">
               <ImageOff className="w-12 h-12 dark:text-zinc-800 text-gray-400 mx-auto mb-3" />
               <p className="dark:text-zinc-500 text-gray-600 text-sm">No map selected</p>
-              <p className="dark:text-zinc-700 text-gray-500 text-xs mt-1">Create a new map to get started</p>
+              <p className="dark:text-zinc-500 text-gray-500 text-xs mt-1">Create a new map to get started</p>
               <Button
                 size="sm"
                 onClick={() => setShowNewMapDialog(true)}
@@ -242,7 +242,7 @@ export default function CampaignMap() {
               <p className="text-[10px] dark:text-zinc-600 text-gray-600 uppercase tracking-widest font-semibold">
                 Pin Locations
               </p>
-              <p className="text-[10px] dark:text-zinc-700 text-gray-600 mt-1">
+              <p className="text-[10px] dark:text-zinc-500 text-gray-600 mt-1">
                 {placingLocation ? `Placing: ${placingLocation.name}` : 'Select a location to place'}
               </p>
             </div>
@@ -267,7 +267,7 @@ export default function CampaignMap() {
                       <span className="truncate">{p.entity_name}</span>
                       <button
                         onClick={() => handleRemovePin(p.entity_id)}
-                        className="dark:text-zinc-700 dark:hover:text-red-400 text-gray-500 hover:text-red-500 ml-2 flex-shrink-0"
+                        className="dark:text-zinc-500 dark:hover:text-red-400 text-gray-500 hover:text-red-500 ml-2 flex-shrink-0"
                       >
                         <Trash2 className="w-3 h-3" />
                       </button>

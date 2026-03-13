@@ -88,7 +88,7 @@ export default function Breadcrumbs({ currentPageName, campaign }) {
         to={createPageUrl('CampaignList')}
         className="text-zinc-500 dark:text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-300 font-semibold flex-shrink-0"
       >
-        DM OS
+        GM/OS
       </Link>
       {crumbs.map((crumb, i) => (
         <React.Fragment key={i}>
