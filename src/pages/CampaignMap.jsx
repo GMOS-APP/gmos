@@ -1,7 +1,6 @@
 import React, { useState, useRef, useCallback } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
-import { createPageUrl } from '@/utils';
 import {
   Plus, Pencil, Check, Trash2, Upload, Map, ChevronDown, ImageOff
 } from 'lucide-react';

@@ -4,18 +4,15 @@ import { base44 } from '@/api/base44Client';
 import { createPageUrl } from '@/utils';
 import { Link, useLocation } from 'react-router-dom';
 import {
-  ArrowLeft, Save, Trash2, Plus, X, Eye, EyeOff, AlertTriangle,
-  Users, MapPin, Shield, Waypoints, Package, Sparkles, Scroll, BookOpen, Loader2, Wand2, Search, Download,
+  ArrowLeft, Save, Trash2, Plus, X, BookOpen, Loader2, Wand2, Search, Download,
 } from 'lucide-react';
 import StatBlock from '@/components/entity/StatBlock';
 import DndBeyondImport from '@/components/entity/DndBeyondImport';
 import InitiativeTracker from '@/components/encounter/InitiativeTracker';
-import NPCBuilder from '@/components/entity/NPCBuilder';
 import TypeSpecificFields from '@/components/entity/TypeSpecificFields.jsx';
 import EntityMentionTextarea from '@/components/common/EntityMentionTextarea';
 import EntityMentionRenderer from '@/components/common/EntityMentionRenderer';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';

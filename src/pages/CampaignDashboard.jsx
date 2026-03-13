@@ -6,10 +6,9 @@ import { createPageUrl } from '@/utils';
 import {
   Users, MapPin, Shield, Waypoints, Package, Sparkles, Scroll,
   BookOpen, Plus, ArrowRight, Swords, Church, Flame, ShoppingBag,
-  CalendarDays, Clock, CheckSquare, Activity,
+  CalendarDays, Activity,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import PassiveStatsHub from '@/components/dashboard/PassiveStatsHub';
 import RulesSearch from '@/components/dashboard/RulesSearch';

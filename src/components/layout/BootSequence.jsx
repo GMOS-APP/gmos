@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Loader2 } from 'lucide-react';
 
 const BOOT_SEQUENCES = [
   // Sequence 1: Campaign & World Systems

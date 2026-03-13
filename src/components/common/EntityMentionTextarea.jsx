@@ -1,7 +1,6 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
-import { createPageUrl } from '@/utils';
 import { AtSign, Plus, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 

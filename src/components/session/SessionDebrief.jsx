@@ -4,7 +4,7 @@ import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
-import { Sparkles, Save, Loader2, Plus, X, CheckCircle2, Clock, CalendarDays, Wand2 } from 'lucide-react';
+import { Save, Loader2, Plus, X, CheckCircle2, Clock, CalendarDays, Wand2 } from 'lucide-react';
 
 export default function SessionDebrief({ session, notes = [], entities = [], campaignId }) {
   const queryClient = useQueryClient();

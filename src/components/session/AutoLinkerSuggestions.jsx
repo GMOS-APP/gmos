@@ -2,7 +2,6 @@ import React, { useMemo, useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { Link2, X, Check } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 
 const LINKABLE_TYPES = ['npc', 'location', 'creature', 'faction', 'item', 'event'];
 

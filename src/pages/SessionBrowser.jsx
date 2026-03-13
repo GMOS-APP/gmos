@@ -5,7 +5,6 @@ import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { CalendarDays, Plus, CheckCircle2, Clock, PlayCircle, BookOpen } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import NewSessionDialog from '@/components/session/NewSessionDialog';
 

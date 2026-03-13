@@ -5,7 +5,6 @@ import { Search, X } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
-import { cn } from '@/lib/utils';
 
 export default function EntityLookup({ campaignId }) {
   const [query, setQuery] = useState('');

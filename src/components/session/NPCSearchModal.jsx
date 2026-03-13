@@ -4,7 +4,7 @@ import { base44 } from '@/api/base44Client';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Loader2, Search, MapPin, Users } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 
 export default function NPCSearchModal({ campaignId, isOpen, onOpenChange }) {
   const [searchTerm, setSearchTerm] = useState('');
