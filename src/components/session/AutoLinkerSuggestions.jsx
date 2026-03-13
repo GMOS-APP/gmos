@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import { Session } from '@/api/entities';
 import { Link2, X, Check } from 'lucide-react';
 
 const LINKABLE_TYPES = ['npc', 'location', 'creature', 'faction', 'item', 'event'];
@@ -31,7 +31,7 @@ export default function AutoLinkerSuggestions({ notes, entities, session }) {
   const linkMutation = useMutation({
     mutationFn: (entity) => {
       const existing = session?.linked_entities || [];
-      return base44.entities.Session.update(session.id, {
+      return Session.update(session.id, {
         linked_entities: [
           ...existing,
           { entity_id: entity.id, entity_name: entity.name, entity_type: entity.entity_type, context: 'auto-linked from notes' },

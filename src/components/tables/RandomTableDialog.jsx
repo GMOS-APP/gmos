@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import { RandomTable, InvokeLLM } from '@/api/entities';
 import { Sparkles, Plus, X, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -42,8 +42,8 @@ export default function RandomTableDialog({ open, onClose, campaignId, campaign,
 
   const saveMutation = useMutation({
     mutationFn: (data) => table
-      ? base44.entities.RandomTable.update(table.id, data)
-      : base44.entities.RandomTable.create({ ...data, campaign_id: campaignId }),
+      ? RandomTable.update(table.id, data)
+      : RandomTable.create({ ...data, campaign_id: campaignId }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['random_tables', campaignId] });
       onClose();
@@ -75,7 +75,7 @@ export default function RandomTableDialog({ open, onClose, campaignId, campaign,
     setGenerating(true);
     try {
       const categoryLabel = CATEGORIES.find(c => c.value === form.category)?.label || form.category;
-      const result = await base44.integrations.Core.InvokeLLM({
+      const result = await InvokeLLM({
         prompt: `You are helping a Game Master populate a random "${categoryLabel}" table for a D&D campaign called "${campaign?.name || 'an unnamed campaign'}". Setting: ${campaign?.setting || 'a fantasy world'}. Table name: "${form.name}". Generate 10 varied, evocative entries suitable for this table. Return only the entries array.`,
         response_json_schema: {
           type: 'object',

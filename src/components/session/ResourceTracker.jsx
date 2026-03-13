@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import { Session } from '@/api/entities';
 import { Plus, Minus, X, ChevronDown, ChevronRight, Heart, Zap } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -221,7 +221,7 @@ export default function ResourceTracker({ session, entities, campaignId }) {
   }, [session?.id]);
 
   const saveMutation = useMutation({
-    mutationFn: (resources) => base44.entities.Session.update(session.id, { resources }),
+    mutationFn: (resources) => Session.update(session.id, { resources }),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['session'] }),
   });
 

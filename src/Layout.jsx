@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import { Campaign } from '@/api/entities';
 import { useAuth } from '@/lib/AuthContext';
 import Sidebar from '@/components/layout/Sidebar';
 import Breadcrumbs from '@/components/layout/Breadcrumbs';
@@ -27,7 +27,7 @@ export default function Layout({ children, currentPageName }) {
 
   const { data: campaign } = useQuery({
     queryKey: ['campaign', campaignId],
-    queryFn: () => base44.entities.Campaign.filter({ id: campaignId }),
+    queryFn: () => Campaign.filter({ id: campaignId }),
     enabled: !!campaignId && isCampaignPage && !isLoadingAuth,
     select: (data) => data?.[0],
   });

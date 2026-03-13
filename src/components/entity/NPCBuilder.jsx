@@ -4,7 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Wand2, Loader2 } from 'lucide-react';
-import { base44 } from '@/api/base44Client';
+import { InvokeLLM } from '@/api/entities';
 
 const SRD_RACES = ['Human', 'Elf', 'Dwarf', 'Halfling', 'Dragonborn', 'Gnome', 'Half-Elf', 'Half-Orc', 'Tiefling'];
 const SRD_CLASSES = ['Barbarian', 'Bard', 'Cleric', 'Druid', 'Fighter', 'Monk', 'Paladin', 'Ranger', 'Rogue', 'Sorcerer', 'Warlock', 'Wizard'];
@@ -73,7 +73,7 @@ export default function NPCBuilder({ npcData, onUpdate }) {
     };
 
     try {
-      const result = await base44.integrations.Core.InvokeLLM({
+      const result = await InvokeLLM({
         prompt: prompts[field],
       });
       handleChange(field, result);

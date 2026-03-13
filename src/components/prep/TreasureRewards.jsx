@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { base44 } from '@/api/base44Client';
+import { InvokeLLM } from '@/api/entities';
 import { Sparkles, Loader2 } from 'lucide-react';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
@@ -9,7 +9,7 @@ export default function TreasureRewards({ notes, onChange, campaign }) {
 
   const generate = async () => {
     setGenerating(true);
-    const result = await base44.integrations.Core.InvokeLLM({
+    const result = await InvokeLLM({
       prompt: `Generate treasure and magic item rewards for a D&D 5e session.
 
 Campaign: ${campaign?.name || 'Unknown'}

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import { Campaign, Session, WorldEntity, QuickNote } from '@/api/entities';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { BookOpen, Swords, FileText, Loader2, Printer } from 'lucide-react';
@@ -25,7 +25,7 @@ export default function SessionPage() {
 
   const { data: campaign } = useQuery({
     queryKey: ['campaign', campaignId],
-    queryFn: () => base44.entities.Campaign.filter({ id: campaignId }),
+    queryFn: () => Campaign.filter({ id: campaignId }),
     enabled: !!campaignId,
     select: (d) => d?.[0],
   });
@@ -35,15 +35,15 @@ export default function SessionPage() {
   const { data: session } = useQuery({
     queryKey: ['session', sessionId || `${campaignId}-${sessionNum}`],
     queryFn: () => sessionId
-      ? base44.entities.Session.filter({ id: sessionId })
-      : base44.entities.Session.filter({ campaign_id: campaignId, session_number: sessionNum }),
+      ? Session.filter({ id: sessionId })
+      : Session.filter({ campaign_id: campaignId, session_number: sessionNum }),
     enabled: !!campaignId && !isNewSession,
     select: (d) => d?.[0],
   });
 
   const { data: previousSession } = useQuery({
     queryKey: ['prev-session', campaignId, sessionNum],
-    queryFn: () => base44.entities.Session.filter(
+    queryFn: () => Session.filter(
       { campaign_id: campaignId, session_number: sessionNum - 1 },
       '-session_number', 1
     ),
@@ -53,13 +53,13 @@ export default function SessionPage() {
 
   const { data: entities = [] } = useQuery({
     queryKey: ['entities', campaignId],
-    queryFn: () => base44.entities.WorldEntity.filter({ campaign_id: campaignId }, '-updated_date', 200),
+    queryFn: () => WorldEntity.filter({ campaign_id: campaignId }, '-updated_date', 200),
     enabled: !!campaignId,
   });
 
   const { data: notes = [], refetch: refetchNotes } = useQuery({
     queryKey: ['quick-notes', campaignId, session?.id],
-    queryFn: () => base44.entities.QuickNote.filter(
+    queryFn: () => QuickNote.filter(
       { campaign_id: campaignId, session_id: session?.id },
       '-created_date', 50
     ),
@@ -92,7 +92,7 @@ export default function SessionPage() {
   }, [session?.id, previousSession?.id, sessionId]);
 
   const addNoteMutation = useMutation({
-    mutationFn: (content) => base44.entities.QuickNote.create({
+    mutationFn: (content) => QuickNote.create({
       campaign_id: campaignId,
       session_id: session?.id,
       content,
@@ -104,15 +104,15 @@ export default function SessionPage() {
   const saveMutation = useMutation({
     mutationFn: async () => {
       if (session) {
-        return base44.entities.Session.update(session.id, formData);
+        return Session.update(session.id, formData);
       }
-      const created = await base44.entities.Session.create({
+      const created = await Session.create({
         campaign_id: campaignId,
         session_number: sessionNum + 1,
         status: 'planned',
         ...formData,
       });
-      await base44.entities.Campaign.update(campaignId, { current_session_number: sessionNum + 1 });
+      await Campaign.update(campaignId, { current_session_number: sessionNum + 1 });
       return created;
     },
     onSuccess: () => {
@@ -226,17 +226,17 @@ export default function SessionPage() {
                     try {
                       let targetSession = session;
                       if (!targetSession) {
-                        targetSession = await base44.entities.Session.create({
+                        targetSession = await Session.create({
                           campaign_id: campaignId,
                           session_number: sessionNum + 1,
                           status: 'completed',
                           end_time: new Date().toISOString(),
                           ...formData,
                         });
-                        await base44.entities.Campaign.update(campaignId, { current_session_number: sessionNum + 1, active_mode: 'debrief' });
+                        await Campaign.update(campaignId, { current_session_number: sessionNum + 1, active_mode: 'debrief' });
                       } else {
-                        await base44.entities.Session.update(targetSession.id, { status: 'completed', end_time: new Date().toISOString() });
-                        await base44.entities.Campaign.update(campaignId, { active_mode: 'debrief' });
+                        await Session.update(targetSession.id, { status: 'completed', end_time: new Date().toISOString() });
+                        await Campaign.update(campaignId, { active_mode: 'debrief' });
                       }
                       queryClient.invalidateQueries();
                       setDebriefStarted(true);

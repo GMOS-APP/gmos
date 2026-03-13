@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import { Session } from '@/api/entities';
 import { ChevronDown, ChevronRight, Eye, EyeOff, Check, Zap, FileText, ScrollText, Swords, Gem, Users, Waypoints } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -101,7 +101,7 @@ export default function SessionReference({ session, threads = [] }) {
       const goals = (session.session_goals || []).map((g, i) =>
         i === index ? { ...g, completed: !g.completed } : g
       );
-      return base44.entities.Session.update(session.id, { session_goals: goals });
+      return Session.update(session.id, { session_goals: goals });
     },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['current-session'] }),
   });

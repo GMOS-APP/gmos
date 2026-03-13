@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import { WorldEntity, Session } from '@/api/entities';
 import { createPageUrl } from '@/utils';
 import { useNavigate } from 'react-router-dom';
 import { Search, X, Users, MapPin, Shield, Waypoints, Package, Sparkles, Scroll,
@@ -30,14 +30,14 @@ export default function GlobalSearch({ campaignId }) {
 
   const { data: entities = [] } = useQuery({
     queryKey: ['global-search-entities', campaignId],
-    queryFn: () => base44.entities.WorldEntity.filter({ campaign_id: campaignId }, '-updated_date', 500),
+    queryFn: () => WorldEntity.filter({ campaign_id: campaignId }, '-updated_date', 500),
     enabled: !!campaignId,
     staleTime: 30000,
   });
 
   const { data: sessions = [] } = useQuery({
     queryKey: ['global-search-sessions', campaignId],
-    queryFn: () => base44.entities.Session.filter({ campaign_id: campaignId }, '-session_number', 100),
+    queryFn: () => Session.filter({ campaign_id: campaignId }, '-session_number', 100),
     enabled: !!campaignId,
     staleTime: 30000,
   });

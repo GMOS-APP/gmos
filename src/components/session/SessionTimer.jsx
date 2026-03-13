@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import { Session } from '@/api/entities';
 import { Clock, Play, Square } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
@@ -28,7 +28,7 @@ export default function SessionTimer({ session }) {
   }, [isRunning, session?.start_time, session?.end_time]);
 
   const startMutation = useMutation({
-    mutationFn: () => base44.entities.Session.update(session.id, { 
+    mutationFn: () => Session.update(session.id, { 
       start_time: new Date().toISOString(),
       status: 'in_progress'
     }),
@@ -38,7 +38,7 @@ export default function SessionTimer({ session }) {
   });
 
   const endMutation = useMutation({
-    mutationFn: () => base44.entities.Session.update(session.id, { 
+    mutationFn: () => Session.update(session.id, { 
       end_time: new Date().toISOString(),
       status: 'completed'
     }),

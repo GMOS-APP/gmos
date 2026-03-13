@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { base44 } from '@/api/base44Client';
+import { InvokeLLM } from '@/api/entities';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
@@ -16,7 +16,7 @@ export default function QuickDialogueGenerator() {
     
     setGenerating(true);
     try {
-      const response = await base44.integrations.Core.InvokeLLM({
+      const response = await InvokeLLM({
         prompt: `Generate quick dialogue for an NPC in a D&D 5e session.
 
 NPC Name: ${npcName}

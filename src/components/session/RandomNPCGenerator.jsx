@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { base44 } from '@/api/base44Client';
+import { WorldEntity, InvokeLLM } from '@/api/entities';
 import { Button } from '@/components/ui/button';
 import { Loader2, Wand2, Save, Check } from 'lucide-react';
 
@@ -12,7 +12,7 @@ export default function RandomNPCGenerator({ campaignId }) {
   const saveNPC = async () => {
     if (!campaignId || !generatedNPC) return;
     setSaving(true);
-    await base44.entities.WorldEntity.create({
+    await WorldEntity.create({
       campaign_id: campaignId,
       name: generatedNPC.name,
       entity_type: 'npc',
@@ -33,7 +33,7 @@ export default function RandomNPCGenerator({ campaignId }) {
   const generateNPC = async () => {
     setGenerating(true);
     try {
-      const response = await base44.integrations.Core.InvokeLLM({
+      const response = await InvokeLLM({
         prompt: `Generate a random D&D 5e NPC with the following JSON schema:
 {
   "name": "A unique fantasy NPC name",

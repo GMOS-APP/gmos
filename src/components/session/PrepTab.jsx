@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { base44 } from '@/api/base44Client';
+import { InvokeLLM } from '@/api/entities';
 import { Button } from '@/components/ui/button';
 import { Plus, MapPin, Users, Swords, Flame, Scroll, Gem, X } from 'lucide-react';
 import AIGenerateTextarea from './AIGenerateTextarea';
@@ -114,7 +114,7 @@ export default function PrepTab({ session, campaign, entities, formData, setForm
           placeholder="What happened last session? This is read aloud to set the stage..."
           rows={4}
           onGenerate={async () => {
-            const result = await base44.integrations.Core.InvokeLLM({
+            const result = await InvokeLLM({
               prompt: `Write a short "previously on" recap (2-3 sentences, past tense, dramatic tone) for a D&D session.
 ${ctx()}
 Base it on the previous session recap if available, otherwise use campaign context.`,
@@ -134,7 +134,7 @@ Base it on the previous session recap if available, otherwise use campaign conte
           placeholder="Read-aloud opening scene. Something is already happening when players arrive..."
           rows={5}
           onGenerate={async () => {
-            const result = await base44.integrations.Core.InvokeLLM({
+            const result = await InvokeLLM({
               prompt: `Generate a strong session opening for a D&D game using the Sly Flourish Lazy DM method.
 ${ctx()}
 The strong start should:
@@ -182,7 +182,7 @@ Keep it punchy: 2 short paragraphs max.`,
           placeholder={`e.g.\n- 4x Bandits + 1 Bandit Captain (ambush on the road)\n- Boss: Vampire Spawn Voss`}
           rows={4}
           onGenerate={async () => {
-            const result = await base44.integrations.Core.InvokeLLM({
+            const result = await InvokeLLM({
               prompt: `Generate a list of relevant monsters/encounters for a D&D session, formatted as bullet points.
 ${ctx()}
 Focus on monsters that fit the setting and current story threads. Include quantity and brief encounter context.`,
@@ -213,7 +213,7 @@ Focus on monsters that fit the setting and current story threads. Include quanti
           placeholder="e.g. Bridge of Teeth — crumbling stone, troll-carved faces, rushing rapids below..."
           rows={3}
           onGenerate={async () => {
-            const result = await base44.integrations.Core.InvokeLLM({
+            const result = await InvokeLLM({
               prompt: `Generate 2-3 evocative fantastic locations for a D&D session, with brief descriptive bullet points (name + 2-3 sensory details each).
 ${ctx()}`,
             });
@@ -243,7 +243,7 @@ ${ctx()}`,
           placeholder={`e.g.\n- Lady Voss (gravelly voice, never makes eye contact) — wants the deed to the mill`}
           rows={4}
           onGenerate={async () => {
-            const result = await base44.integrations.Core.InvokeLLM({
+            const result = await InvokeLLM({
               prompt: `Generate a list of 3-5 important NPCs for a D&D session, formatted as bullet points.
 ${ctx()}
 For each NPC include: name, one physical/vocal trait, and their motivation in this session.`,
@@ -264,7 +264,7 @@ For each NPC include: name, one physical/vocal trait, and their motivation in th
           placeholder="Rumors the players might hear around town, from travelers, in taverns..."
           rows={4}
           onGenerate={async () => {
-            const result = await base44.integrations.Core.InvokeLLM({
+            const result = await InvokeLLM({
               prompt: `Generate 4-6 interesting rumors for a D&D session, as bullet points. Mix true, false, and half-true rumors.
 ${ctx()}
 Each rumor should be 1-2 sentences and feel like something a local or traveler would say.`,
@@ -285,7 +285,7 @@ Each rumor should be 1-2 sentences and feel like something a local or traveler w
           placeholder="Treasure hoards, magic items, story rewards..."
           rows={4}
           onGenerate={async () => {
-            const result = await base44.integrations.Core.InvokeLLM({
+            const result = await InvokeLLM({
               prompt: `Generate appropriate treasure and magic item rewards for a D&D session, as bullet points.
 ${ctx()}
 Include a mix of: coin/gems, consumables (potions, scrolls), and 1-2 interesting magic items that fit the current story.`,

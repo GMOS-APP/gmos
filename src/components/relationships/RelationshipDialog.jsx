@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import { Relationship } from '@/api/entities';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -72,9 +72,9 @@ export default function RelationshipDialog({ open, onOpenChange, relationship, c
       };
 
       if (isEdit) {
-        return base44.entities.Relationship.update(relationship.id, payload);
+        return Relationship.update(relationship.id, payload);
       }
-      return base44.entities.Relationship.create(payload);
+      return Relationship.create(payload);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['relationships'] });
@@ -83,7 +83,7 @@ export default function RelationshipDialog({ open, onOpenChange, relationship, c
   });
 
   const deleteMutation = useMutation({
-    mutationFn: () => base44.entities.Relationship.delete(relationship.id),
+    mutationFn: () => Relationship.delete(relationship.id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['relationships'] });
       onOpenChange(false);

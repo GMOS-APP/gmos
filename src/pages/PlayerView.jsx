@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import { Campaign, WorldEntity, Session } from '@/api/entities';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { Users, MapPin, Shield, Package, Waypoints, Scroll, BookOpen, Church, Eye, EyeOff } from 'lucide-react';
@@ -29,20 +29,20 @@ export default function PlayerView() {
 
   const { data: campaign } = useQuery({
     queryKey: ['campaign', campaignId],
-    queryFn: () => base44.entities.Campaign.filter({ id: campaignId }),
+    queryFn: () => Campaign.filter({ id: campaignId }),
     select: d => d?.[0],
     enabled: !!campaignId,
   });
 
   const { data: entities = [] } = useQuery({
     queryKey: ['entities', campaignId],
-    queryFn: () => base44.entities.WorldEntity.filter({ campaign_id: campaignId }, '-updated_date', 200),
+    queryFn: () => WorldEntity.filter({ campaign_id: campaignId }, '-updated_date', 200),
     enabled: !!campaignId,
   });
 
   const { data: sessions = [] } = useQuery({
     queryKey: ['sessions', campaignId],
-    queryFn: () => base44.entities.Session.filter({ campaign_id: campaignId }, '-session_number', 5),
+    queryFn: () => Session.filter({ campaign_id: campaignId }, '-session_number', 5),
     enabled: !!campaignId,
   });
 

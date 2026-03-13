@@ -1,6 +1,6 @@
 import React, { useState, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import { WorldEntity } from '@/api/entities';
 import { Plus, Trash2, ChevronUp, ChevronDown, SkipForward, RotateCcw, Swords, Shield, User, Minus, Dice5, Search, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -273,7 +273,7 @@ export default function InitiativeTracker({ campaignId }) {
 
   const { data: campaignEntities = [] } = useQuery({
     queryKey: ['entities-initiative', campaignId],
-    queryFn: () => base44.entities.WorldEntity.filter({ campaign_id: campaignId }),
+    queryFn: () => WorldEntity.filter({ campaign_id: campaignId }),
     enabled: !!campaignId,
     staleTime: 60000,
     select: (data) => data.filter((e) => ['player_character', 'npc', 'creature'].includes(e.entity_type)),

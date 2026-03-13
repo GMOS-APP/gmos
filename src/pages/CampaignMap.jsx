@@ -1,6 +1,6 @@
 import React, { useState, useRef, useCallback } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import { CampaignMap as CampaignMapEntity, WorldEntity, UploadFile } from '@/api/entities';
 import {
   Plus, Pencil, Check, Trash2, Upload, Map, ChevronDown, ImageOff
 } from 'lucide-react';
@@ -33,13 +33,13 @@ export default function CampaignMap() {
   // ── Queries ──────────────────────────────────────────────────────────────
   const { data: maps = [] } = useQuery({
     queryKey: ['campaign-maps', campaignId],
-    queryFn: () => base44.entities.CampaignMap.filter({ campaign_id: campaignId }),
+    queryFn: () => CampaignMapEntity.filter({ campaign_id: campaignId }),
     enabled: !!campaignId,
   });
 
   const { data: locations = [] } = useQuery({
     queryKey: ['locations', campaignId],
-    queryFn: () => base44.entities.WorldEntity.filter(
+    queryFn: () => WorldEntity.filter(
       { campaign_id: campaignId, entity_type: 'location' }, 'name', 100
     ),
     enabled: !!campaignId,
@@ -51,7 +51,7 @@ export default function CampaignMap() {
 
   // ── Mutations ─────────────────────────────────────────────────────────────
   const createMapMutation = useMutation({
-    mutationFn: (data) => base44.entities.CampaignMap.create({ ...data, campaign_id: campaignId, pins: [] }),
+    mutationFn: (data) => CampaignMapEntity.create({ ...data, campaign_id: campaignId, pins: [] }),
     onSuccess: (created) => {
       queryClient.invalidateQueries({ queryKey: ['campaign-maps', campaignId] });
       setSelectedMapId(created.id);
@@ -61,7 +61,7 @@ export default function CampaignMap() {
   });
 
   const deleteMapMutation = useMutation({
-    mutationFn: (id) => base44.entities.CampaignMap.delete(id),
+    mutationFn: (id) => CampaignMapEntity.delete(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['campaign-maps', campaignId] });
       setSelectedMapId(null);
@@ -69,7 +69,7 @@ export default function CampaignMap() {
   });
 
   const updatePinsMutation = useMutation({
-    mutationFn: ({ mapId, pins }) => base44.entities.CampaignMap.update(mapId, { pins }),
+    mutationFn: ({ mapId, pins }) => CampaignMapEntity.update(mapId, { pins }),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['campaign-maps', campaignId] }),
   });
 
@@ -101,7 +101,7 @@ export default function CampaignMap() {
     const file = e.target.files?.[0];
     if (!file) return;
     setUploading(true);
-    const { file_url } = await base44.integrations.Core.UploadFile({ file });
+    const { file_url } = await UploadFile({ file });
     setNewMapForm(f => ({ ...f, image_url: file_url }));
     setUploading(false);
   };

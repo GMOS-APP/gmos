@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import { WorldEntity } from '@/api/entities';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -18,7 +18,7 @@ export default function EntityPickerModal({ open, onClose, campaignId, entityTyp
   );
 
   const createMutation = useMutation({
-    mutationFn: (name) => base44.entities.WorldEntity.create({
+    mutationFn: (name) => WorldEntity.create({
       campaign_id: campaignId,
       name,
       entity_type: entityType,

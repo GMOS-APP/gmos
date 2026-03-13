@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import { Campaign, functions } from '@/api/entities';
 import { createPageUrl } from '@/utils';
 import { Link } from 'react-router-dom';
 import { Plus, FolderOpen, MoreHorizontal, Trash2, Download, Upload, FileText, Sparkles } from 'lucide-react';
@@ -32,7 +32,7 @@ export default function CampaignList() {
     setImporting(true);
     const text = await file.text();
     const data = JSON.parse(text);
-    const response = await base44.functions.invoke('importCampaign', data);
+    const response = await functions.invoke('importCampaign', data);
     queryClient.invalidateQueries({ queryKey: ['campaigns'] });
     setImporting(false);
     e.target.value = '';
@@ -41,7 +41,7 @@ export default function CampaignList() {
   const handleExport = async (e, campaign) => {
     e.preventDefault();
     setExportingId(campaign.id);
-    const response = await base44.functions.invoke('exportCampaign', { campaign_id: campaign.id });
+    const response = await functions.invoke('exportCampaign', { campaign_id: campaign.id });
     const data = response.data;
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
@@ -55,11 +55,11 @@ export default function CampaignList() {
 
   const { data: campaigns = [], isLoading } = useQuery({
     queryKey: ['campaigns'],
-    queryFn: () => base44.entities.Campaign.list('-created_date'),
+    queryFn: () => Campaign.list('-created_date'),
   });
 
   const createMutation = useMutation({
-    mutationFn: (data) => base44.entities.Campaign.create(data),
+    mutationFn: (data) => Campaign.create(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['campaigns'] });
       setShowCreate(false);
@@ -68,7 +68,7 @@ export default function CampaignList() {
   });
 
   const deleteMutation = useMutation({
-    mutationFn: (id) => base44.entities.Campaign.delete(id),
+    mutationFn: (id) => Campaign.delete(id),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['campaigns'] }),
   });
 

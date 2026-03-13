@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import { Session, InvokeLLM } from '@/api/entities';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
@@ -23,7 +23,7 @@ export default function SessionDebrief({ session, notes = [], entities = [], cam
   }, [session?.id]);
 
   const saveMutation = useMutation({
-    mutationFn: () => base44.entities.Session.update(session.id, {
+    mutationFn: () => Session.update(session.id, {
       summary,
       key_events: keyEvents,
       next_session_primer: nextPrimer,
@@ -41,7 +41,7 @@ export default function SessionDebrief({ session, notes = [], entities = [], cam
     const notesText = notes.map((n) => n.content).join('\n');
     const linkedNames = (session?.linked_entities || []).map((e) => e.entity_name).join(', ');
 
-    const result = await base44.integrations.Core.InvokeLLM({
+    const result = await InvokeLLM({
       prompt: `You are a D&D session chronicler. Given the following session data, generate:
 1. A vivid 2-3 paragraph narrative summary of the session
 2. 4-6 bullet-point key events (short, punchy, present-tense)

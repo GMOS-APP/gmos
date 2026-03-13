@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import { WorldEntity, Session } from '@/api/entities';
 import { createPageUrl } from '@/utils';
 import { ChevronRight } from 'lucide-react';
 
@@ -21,7 +21,7 @@ export default function Breadcrumbs({ currentPageName, campaign }) {
 
   const { data: entity } = useQuery({
     queryKey: ['bc-entity', entityId],
-    queryFn: () => base44.entities.WorldEntity.filter({ id: entityId }),
+    queryFn: () => WorldEntity.filter({ id: entityId }),
     enabled: !!entityId && !isNew,
     select: (d) => d?.[0],
     staleTime: 60000,
@@ -29,7 +29,7 @@ export default function Breadcrumbs({ currentPageName, campaign }) {
 
   const { data: session } = useQuery({
     queryKey: ['bc-session', sessionId],
-    queryFn: () => base44.entities.Session.filter({ id: sessionId }),
+    queryFn: () => Session.filter({ id: sessionId }),
     enabled: !!sessionId,
     select: (d) => d?.[0],
     staleTime: 60000,

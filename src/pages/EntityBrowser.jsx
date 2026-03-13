@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import { WorldEntity } from '@/api/entities';
 import { Link, useLocation } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { Search, Plus } from 'lucide-react';
@@ -41,7 +41,7 @@ export default function EntityBrowser() {
 
   const { data: entities = [], isLoading } = useQuery({
     queryKey: ['entities', campaignId, typeFilter],
-    queryFn: () => base44.entities.WorldEntity.filter(query, '-updated_date', 100),
+    queryFn: () => WorldEntity.filter(query, '-updated_date', 100),
     enabled: !!campaignId,
   });
 

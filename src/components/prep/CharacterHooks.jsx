@@ -1,6 +1,6 @@
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import { WorldEntity, InvokeLLM } from '@/api/entities';
 import { Sparkles, Loader2 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 export default function CharacterHooks({ campaignId, hooks, onChange }) {
   const { data: pcs = [] } = useQuery({
     queryKey: ['pcs', campaignId],
-    queryFn: () => base44.entities.WorldEntity.filter({ campaign_id: campaignId, entity_type: 'player_character' }),
+    queryFn: () => WorldEntity.filter({ campaign_id: campaignId, entity_type: 'player_character' }),
     enabled: !!campaignId,
   });
 
@@ -24,7 +24,7 @@ export default function CharacterHooks({ campaignId, hooks, onChange }) {
 
   const generateHook = async (pc) => {
     setGenerating(pc.name);
-    const result = await base44.integrations.Core.InvokeLLM({
+    const result = await InvokeLLM({
       prompt: `Generate a specific, compelling session hook for this D&D player character:
 
 Character: ${pc.name}

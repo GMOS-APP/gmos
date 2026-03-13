@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import { WorldEntity } from '@/api/entities';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -21,7 +21,7 @@ export default function NPCSearchModal({ campaignId, isOpen, onOpenChange }) {
   const { data: searchResults = [], isLoading } = useQuery({
     queryKey: ['npcSearch', debouncedSearchTerm, campaignId],
     queryFn: async () => {
-      const results = await base44.entities.WorldEntity.filter(
+      const results = await WorldEntity.filter(
         { campaign_id: campaignId, entity_type: 'npc' },
         'name',
         50

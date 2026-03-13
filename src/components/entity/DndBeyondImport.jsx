@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { base44 } from '@/api/base44Client';
+import { functions } from '@/api/entities';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Loader2, Download, ExternalLink, AlertTriangle } from 'lucide-react';
@@ -14,7 +14,7 @@ export default function DndBeyondImport({ onImport, onCancel }) {
     setLoading(true);
     setError('');
     try {
-      const response = await base44.functions.invoke('importDndBeyondCharacter', { characterId: characterId.trim() });
+      const response = await functions.invoke('importDndBeyondCharacter', { characterId: characterId.trim() });
       onImport(response.data.character);
     } catch (err) {
       const msg = err?.response?.data?.error || err.message || 'Failed to import character.';

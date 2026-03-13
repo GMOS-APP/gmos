@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Search, Loader } from 'lucide-react';
 import { Input } from '@/components/ui/input';
-import { base44 } from '@/api/base44Client';
+import { InvokeLLM } from '@/api/entities';
 
 export default function RulesSearch() {
   const [search, setSearch] = useState('');
@@ -20,7 +20,7 @@ export default function RulesSearch() {
     debounceTimer.current = setTimeout(async () => {
       setLoading(true);
       try {
-        const response = await base44.integrations.Core.InvokeLLM({
+        const response = await InvokeLLM({
           prompt: `Search the D&D 5e SRD for information about: "${search}". Provide a concise explanation of the rule or mechanic. Format as: [RULE_NAME]: [brief explanation]`,
           add_context_from_internet: true,
         });

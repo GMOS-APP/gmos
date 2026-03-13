@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import { Session, Campaign } from '@/api/entities';
 import { createPageUrl } from '@/utils';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -40,8 +40,8 @@ export default function SessionHeader({ formData, setFormData, saving, saved, ha
         {!isRunMode && session && (
           <Button
             onClick={async () => {
-              await base44.entities.Session.update(session.id, { status: 'in_progress', start_time: new Date().toISOString() });
-              await base44.entities.Campaign.update(campaignId, { active_mode: 'session' });
+              await Session.update(session.id, { status: 'in_progress', start_time: new Date().toISOString() });
+              await Campaign.update(campaignId, { active_mode: 'session' });
               queryClient.invalidateQueries();
             }}
             size="sm"
@@ -54,8 +54,8 @@ export default function SessionHeader({ formData, setFormData, saving, saved, ha
         {isRunMode && (
           <Button
             onClick={async () => {
-              await base44.entities.Session.update(session.id, { status: 'completed', end_time: new Date().toISOString() });
-              await base44.entities.Campaign.update(campaignId, { active_mode: 'debrief' });
+              await Session.update(session.id, { status: 'completed', end_time: new Date().toISOString() });
+              await Campaign.update(campaignId, { active_mode: 'debrief' });
               queryClient.invalidateQueries();
             }}
             size="sm"

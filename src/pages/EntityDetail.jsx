@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import { WorldEntity, Relationship, InvokeLLM } from '@/api/entities';
 import { createPageUrl } from '@/utils';
 import { Link, useLocation } from 'react-router-dom';
 import {
@@ -70,14 +70,14 @@ export default function EntityDetail() {
 
   const { data: entity, isLoading } = useQuery({
     queryKey: ['entity', entityId],
-    queryFn: () => base44.entities.WorldEntity.filter({ id: entityId }),
+    queryFn: () => WorldEntity.filter({ id: entityId }),
     enabled: !!entityId && !isNew,
     select: (d) => d?.[0],
   });
 
   const { data: campaignEntities = [] } = useQuery({
     queryKey: ['entities', form.campaign_id],
-    queryFn: () => base44.entities.WorldEntity.filter({ campaign_id: form.campaign_id }),
+    queryFn: () => WorldEntity.filter({ campaign_id: form.campaign_id }),
     enabled: !!form.campaign_id,
     staleTime: 30000,
   });
@@ -86,8 +86,8 @@ export default function EntityDetail() {
     queryKey: ['relationships', entityId],
     queryFn: async () => {
       const [asSource, asTarget] = await Promise.all([
-        base44.entities.Relationship.filter({ source_entity_id: entityId }),
-        base44.entities.Relationship.filter({ target_entity_id: entityId }),
+        Relationship.filter({ source_entity_id: entityId }),
+        Relationship.filter({ target_entity_id: entityId }),
       ]);
       return [...asSource, ...asTarget];
     },
@@ -117,9 +117,9 @@ export default function EntityDetail() {
   const saveMutation = useMutation({
     mutationFn: async (data) => {
       if (isNew || !entityId) {
-        return base44.entities.WorldEntity.create(data);
+        return WorldEntity.create(data);
       }
-      return base44.entities.WorldEntity.update(entityId, data);
+      return WorldEntity.update(entityId, data);
     },
     onSuccess: (result) => {
       queryClient.invalidateQueries({ queryKey: ['entity'] });
@@ -133,7 +133,7 @@ export default function EntityDetail() {
   });
 
   const deleteMutation = useMutation({
-    mutationFn: () => base44.entities.WorldEntity.delete(entityId),
+    mutationFn: () => WorldEntity.delete(entityId),
     onSuccess: () => {
       window.location.href = createPageUrl('EntityBrowser') + `?campaign_id=${form.campaign_id}`;
     },
@@ -260,7 +260,7 @@ ${prompt}
 
 Keep content practical for table use. Use markdown formatting. Focus on actionable information for the GM.`;
 
-    const result = await base44.integrations.Core.InvokeLLM({
+    const result = await InvokeLLM({
       prompt: context,
     });
 
@@ -288,7 +288,7 @@ Return a JSON array of matching creatures with this exact schema:
 
 If no exact matches, find similar creatures. Return up to 5 matches.`;
 
-    const result = await base44.integrations.Core.InvokeLLM({
+    const result = await InvokeLLM({
       prompt: prompt,
       add_context_from_internet: true,
       response_json_schema: {
@@ -330,7 +330,7 @@ Include:
 
 Format with markdown for readability.`;
 
-    const content = await base44.integrations.Core.InvokeLLM({
+    const content = await InvokeLLM({
       prompt: prompt,
       add_context_from_internet: true,
     });

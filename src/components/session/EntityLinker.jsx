@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import { WorldEntity, Session } from '@/api/entities';
 import { Link as LinkIcon, X, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -34,7 +34,7 @@ export default function EntityLinker({ session, campaignId }) {
 
   const { data: entities = [] } = useQuery({
     queryKey: ['entities', campaignId],
-    queryFn: () => base44.entities.WorldEntity.filter({ campaign_id: campaignId }),
+    queryFn: () => WorldEntity.filter({ campaign_id: campaignId }),
     enabled: !!campaignId,
   });
 
@@ -51,7 +51,7 @@ export default function EntityLinker({ session, campaignId }) {
           context: context,
         }
       ];
-      return base44.entities.Session.update(session.id, { linked_entities: newLinked });
+      return Session.update(session.id, { linked_entities: newLinked });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['session'] });
@@ -65,7 +65,7 @@ export default function EntityLinker({ session, campaignId }) {
   const unlinkMutation = useMutation({
     mutationFn: async (entityId) => {
       const newLinked = linkedEntities.filter(e => e.entity_id !== entityId);
-      return base44.entities.Session.update(session.id, { linked_entities: newLinked });
+      return Session.update(session.id, { linked_entities: newLinked });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['session'] });

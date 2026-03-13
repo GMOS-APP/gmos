@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import { WorldEntity, Relationship } from '@/api/entities';
 import { Network, Calendar, Plus, Filter, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -54,13 +54,13 @@ export default function RelationshipMap() {
 
   const { data: entities = [] } = useQuery({
     queryKey: ['entities', campaignId],
-    queryFn: () => base44.entities.WorldEntity.filter({ campaign_id: campaignId }),
+    queryFn: () => WorldEntity.filter({ campaign_id: campaignId }),
     enabled: !!campaignId,
   });
 
   const { data: relationships = [] } = useQuery({
     queryKey: ['relationships', campaignId],
-    queryFn: () => base44.entities.Relationship.filter({ campaign_id: campaignId }),
+    queryFn: () => Relationship.filter({ campaign_id: campaignId }),
     enabled: !!campaignId,
   });
 

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { base44 } from '@/api/base44Client';
+import { InvokeLLM, Campaign, WorldEntity } from '@/api/entities';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -19,7 +19,7 @@ export default function RawImportDialog({ open, onOpenChange, onImported }) {
 
     addLog('Analyzing raw data...');
 
-    const result = await base44.integrations.Core.InvokeLLM({
+    const result = await InvokeLLM({
       prompt: `You are a D&D campaign organizer. The user has pasted raw campaign notes, wiki content, or world-building text below. Extract and structure this into a full campaign with entities.
 
 RAW DATA:
@@ -64,7 +64,7 @@ Be thorough — extract every named person, place, organization, creature, item,
     });
 
     addLog(`Creating campaign: "${result.campaign.name}"...`);
-    const campaign = await base44.entities.Campaign.create({
+    const campaign = await Campaign.create({
       name: result.campaign.name,
       description: result.campaign.description,
       setting: result.campaign.setting,
@@ -73,13 +73,15 @@ Be thorough — extract every named person, place, organization, creature, item,
 
     addLog(`Building ${result.entities?.length || 0} world entities...`);
     if (result.entities?.length) {
-      await base44.entities.WorldEntity.bulkCreate(
-        result.entities.map((e) => ({
-          ...e,
-          campaign_id: campaign.id,
-          status: e.status || 'active',
-          visibility: 'dm_only',
-        }))
+      await Promise.all(
+        result.entities.map((e) =>
+          WorldEntity.create({
+            ...e,
+            campaign_id: campaign.id,
+            status: e.status || 'active',
+            visibility: 'dm_only',
+          })
+        )
       );
     }
 

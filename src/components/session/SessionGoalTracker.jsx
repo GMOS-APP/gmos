@@ -1,6 +1,6 @@
 import React from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import { Session } from '@/api/entities';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Target, CheckCircle2 } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
@@ -17,7 +17,7 @@ export default function SessionGoalTracker({ session }) {
       const updatedGoals = goals.map((g, i) => 
         i === index ? { ...g, completed: !g.completed } : g
       );
-      return base44.entities.Session.update(session.id, { session_goals: updatedGoals });
+      return Session.update(session.id, { session_goals: updatedGoals });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['session'] });

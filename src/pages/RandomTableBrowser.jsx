@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import { Campaign, RandomTable } from '@/api/entities';
 import { Plus, Dices } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -27,19 +27,19 @@ export default function RandomTableBrowser() {
 
   const { data: campaign } = useQuery({
     queryKey: ['campaign', campaignId],
-    queryFn: () => base44.entities.Campaign.filter({ id: campaignId }),
+    queryFn: () => Campaign.filter({ id: campaignId }),
     select: d => d?.[0],
     enabled: !!campaignId,
   });
 
   const { data: tables = [], isLoading } = useQuery({
     queryKey: ['random_tables', campaignId],
-    queryFn: () => base44.entities.RandomTable.filter({ campaign_id: campaignId }, '-created_date'),
+    queryFn: () => RandomTable.filter({ campaign_id: campaignId }, '-created_date'),
     enabled: !!campaignId,
   });
 
   const deleteMutation = useMutation({
-    mutationFn: (id) => base44.entities.RandomTable.delete(id),
+    mutationFn: (id) => RandomTable.delete(id),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['random_tables', campaignId] }),
   });
 

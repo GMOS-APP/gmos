@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
-import { base44 } from '@/api/base44Client';
+import { Session, Campaign, InvokeLLM } from '@/api/entities';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -34,7 +34,7 @@ export default function NewSessionDialog({ open, onClose, campaignId, campaign }
 
   const createMutation = useMutation({
     mutationFn: async () => {
-      const session = await base44.entities.Session.create({
+      const session = await Session.create({
         campaign_id: campaignId,
         session_number: nextSessionNum,
         status: 'planned',
@@ -45,7 +45,7 @@ export default function NewSessionDialog({ open, onClose, campaignId, campaign }
         potential_scenes: form.potential_scenes,
         secrets_and_clues: form.secrets_and_clues,
       });
-      await base44.entities.Campaign.update(campaignId, { current_session_number: nextSessionNum });
+      await Campaign.update(campaignId, { current_session_number: nextSessionNum });
       return session;
     },
     onSuccess: (session) => {
@@ -78,7 +78,7 @@ export default function NewSessionDialog({ open, onClose, campaignId, campaign }
 
   const generateWithAI = async () => {
     setGenerating(true);
-    const result = await base44.integrations.Core.InvokeLLM({
+    const result = await InvokeLLM({
       prompt: `You are helping a Game Master plan session ${nextSessionNum} of their campaign "${campaign?.name}". Setting: ${campaign?.setting || 'a fantasy world'}. Generate a compelling session title, a strong opening hook (2-3 sentences), 3 session goals, and 3 potential scenes. Keep it concise and evocative.`,
       response_json_schema: {
         type: 'object',

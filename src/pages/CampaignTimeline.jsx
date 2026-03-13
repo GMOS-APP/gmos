@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import { Session, WorldEntity } from '@/api/entities';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { CalendarDays, Scroll, ChevronDown, ChevronRight } from 'lucide-react';
@@ -101,13 +101,13 @@ export default function CampaignTimeline() {
 
   const { data: sessions = [], isLoading: loadingSessions } = useQuery({
     queryKey: ['sessions', campaignId],
-    queryFn: () => base44.entities.Session.filter({ campaign_id: campaignId }, 'session_number'),
+    queryFn: () => Session.filter({ campaign_id: campaignId }, 'session_number'),
     enabled: !!campaignId,
   });
 
   const { data: events = [] } = useQuery({
     queryKey: ['events', campaignId],
-    queryFn: () => base44.entities.WorldEntity.filter({ campaign_id: campaignId, entity_type: 'event' }),
+    queryFn: () => WorldEntity.filter({ campaign_id: campaignId, entity_type: 'event' }),
     enabled: !!campaignId,
   });
 

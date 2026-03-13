@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import { Session } from '@/api/entities';
 import { Save, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import EntityMentionTextarea from '@/components/common/EntityMentionTextarea';
@@ -18,7 +18,7 @@ export default function SessionNotes({ session, campaignId, entities }) {
   }, [session?.raw_notes]);
 
   const saveMutation = useMutation({
-    mutationFn: (content) => base44.entities.Session.update(session.id, { raw_notes: content }),
+    mutationFn: (content) => Session.update(session.id, { raw_notes: content }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['session'] });
       setLastSaved(new Date());

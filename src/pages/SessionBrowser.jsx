@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import { Campaign, Session } from '@/api/entities';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { CalendarDays, Plus, CheckCircle2, Clock, PlayCircle, BookOpen } from 'lucide-react';
@@ -22,14 +22,14 @@ export default function SessionBrowser() {
 
   const { data: campaign } = useQuery({
     queryKey: ['campaign', campaignId],
-    queryFn: () => base44.entities.Campaign.filter({ id: campaignId }),
+    queryFn: () => Campaign.filter({ id: campaignId }),
     enabled: !!campaignId,
     select: d => d?.[0],
   });
 
   const { data: sessions = [], isLoading } = useQuery({
     queryKey: ['sessions', campaignId],
-    queryFn: () => base44.entities.Session.filter({ campaign_id: campaignId }, '-session_number', 100),
+    queryFn: () => Session.filter({ campaign_id: campaignId }, '-session_number', 100),
     enabled: !!campaignId,
   });
 

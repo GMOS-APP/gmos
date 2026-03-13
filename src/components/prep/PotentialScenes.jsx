@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { base44 } from '@/api/base44Client';
+import { InvokeLLM } from '@/api/entities';
 import { Plus, X, Sparkles, Loader2 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -19,7 +19,7 @@ export default function PotentialScenes({ scenes, onChange, campaign, threads })
 
   const generate = async () => {
     setGenerating(true);
-    const result = await base44.integrations.Core.InvokeLLM({
+    const result = await InvokeLLM({
       prompt: `Generate 5 potential scenes for a D&D session using the Sly Flourish Lazy DM method.
 
 Campaign: ${campaign?.name || 'Unknown'}

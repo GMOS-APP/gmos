@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import { WorldEntity } from '@/api/entities';
 import { Swords, X, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -17,7 +17,7 @@ export default function EncounterPicker({ campaignId, selectedIds = [], onChange
 
   const { data: allEncounters = [] } = useQuery({
     queryKey: ['encounters', campaignId],
-    queryFn: () => base44.entities.WorldEntity.filter({ campaign_id: campaignId, entity_type: 'encounter' }),
+    queryFn: () => WorldEntity.filter({ campaign_id: campaignId, entity_type: 'encounter' }),
     enabled: !!campaignId,
   });
 

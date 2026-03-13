@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import { WorldEntity } from '@/api/entities';
 import { AtSign, Plus, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -28,7 +28,7 @@ export default function EntityMentionTextarea({
   // Fetch all entities for this campaign (cached)
   const { data: allEntities = [] } = useQuery({
     queryKey: ['entities', campaignId],
-    queryFn: () => base44.entities.WorldEntity.filter({ campaign_id: campaignId }),
+    queryFn: () => WorldEntity.filter({ campaign_id: campaignId }),
     enabled: !!campaignId,
     staleTime: 30000,
   });
@@ -117,7 +117,7 @@ export default function EntityMentionTextarea({
   const createAndInsert = async () => {
     if (!query.trim() || !campaignId) return;
     setCreating(true);
-    const newEntity = await base44.entities.WorldEntity.create({
+    const newEntity = await WorldEntity.create({
       campaign_id: campaignId,
       name: query.trim(),
       entity_type: 'npc',
