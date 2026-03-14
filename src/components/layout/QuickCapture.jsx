@@ -1,6 +1,17 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { QuickNote } from '@/api/entities';
-import { Pencil, X, Check } from 'lucide-react';
+import { Pencil, X, Check, Trash2 } from 'lucide-react';
+
+function timeAgo(dateStr) {
+  const diff = Date.now() - new Date(dateStr).getTime();
+  const mins = Math.floor(diff / 60000);
+  if (mins < 1) return 'just now';
+  if (mins < 60) return `${mins}m ago`;
+  const hrs = Math.floor(mins / 60);
+  if (hrs < 24) return `${hrs}h ago`;
+  return `${Math.floor(hrs / 24)}d ago`;
+}
 
 export default function QuickCapture({ campaignId }) {
   const [open, setOpen] = useState(false);
@@ -8,6 +19,13 @@ export default function QuickCapture({ campaignId }) {
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const textareaRef = useRef(null);
+  const queryClient = useQueryClient();
+
+  const { data: recentNotes = [] } = useQuery({
+    queryKey: ['quick-notes', campaignId],
+    queryFn: () => QuickNote.filter({ campaign_id: campaignId }, '-created_date', 10),
+    enabled: open && !!campaignId,
+  });
 
   useEffect(() => {
     if (open && textareaRef.current) {
@@ -22,6 +40,7 @@ export default function QuickCapture({ campaignId }) {
     setSaving(true);
     try {
       await QuickNote.create({ campaign_id: campaignId, content: content.trim() });
+      queryClient.invalidateQueries({ queryKey: ['quick-notes', campaignId] });
       setContent('');
       setSaved(true);
       setTimeout(() => {
@@ -33,6 +52,11 @@ export default function QuickCapture({ campaignId }) {
     } finally {
       setSaving(false);
     }
+  }
+
+  async function handleDelete(id) {
+    await QuickNote.delete(id);
+    queryClient.invalidateQueries({ queryKey: ['quick-notes', campaignId] });
   }
 
   function handleKeyDown(e) {
@@ -84,6 +108,28 @@ export default function QuickCapture({ campaignId }) {
                 {saving ? 'Saving…' : 'Save'}
                 <span className="ml-1.5 opacity-50 text-[10px]">⌘↵</span>
               </button>
+              {recentNotes.length > 0 && (
+                <div className="mt-1 border-t border-zinc-200 dark:border-zinc-700 pt-2">
+                  <p className="text-[10px] font-semibold uppercase tracking-wider text-zinc-400 dark:text-zinc-500 mb-1.5">Recent</p>
+                  <ul className="flex flex-col gap-1.5 max-h-40 overflow-y-auto">
+                    {recentNotes.map(note => (
+                      <li key={note.id} className="flex items-start gap-1.5 group">
+                        <div className="flex-1 min-w-0">
+                          <p className="text-xs text-zinc-700 dark:text-zinc-300 line-clamp-2 leading-snug">{note.content}</p>
+                          <p className="text-[10px] text-zinc-400 dark:text-zinc-500 mt-0.5">{timeAgo(note.created_date)}</p>
+                        </div>
+                        <button
+                          onClick={() => handleDelete(note.id)}
+                          className="opacity-0 group-hover:opacity-100 p-0.5 rounded text-zinc-400 hover:text-red-500 dark:hover:text-red-400 transition-all shrink-0 mt-0.5"
+                          title="Delete note"
+                        >
+                          <Trash2 className="w-3 h-3" />
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
             </>
           )}
         </div>
