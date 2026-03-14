@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Session, InvokeLLM } from '@/api/entities';
+import { useCampaign } from '@/lib/CampaignContext';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
@@ -8,6 +9,7 @@ import { Save, Loader2, Plus, X, CheckCircle2, Clock, CalendarDays, Wand2 } from
 import AiGate from '@/components/ui/AiGate';
 
 export default function SessionDebrief({ session, notes = [], entities = [], campaignId }) {
+  const { system } = useCampaign();
   const queryClient = useQueryClient();
 
   const [summary, setSummary] = useState(session?.summary || '');
@@ -43,7 +45,7 @@ export default function SessionDebrief({ session, notes = [], entities = [], cam
     const linkedNames = (session?.linked_entities || []).map((e) => e.entity_name).join(', ');
 
     const result = await InvokeLLM({
-      prompt: `You are a D&D session chronicler. Given the following session data, generate:
+      prompt: `You are a ${system.promptName} session chronicler. Given the following session data, generate:
 1. A vivid 2-3 paragraph narrative summary of the session
 2. 4-6 bullet-point key events (short, punchy, present-tense)
 3. A 1-2 sentence "next session primer" teaser for players

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { CampaignProvider } from '@/lib/CampaignContext';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Campaign, WorldEntity, Session } from '@/api/entities';
 import { Link } from 'react-router-dom';
@@ -116,6 +117,7 @@ export default function CampaignDashboard() {
   }
 
   return (
+    <CampaignProvider campaign={campaign}>
     <div className="p-4 sm:p-6 lg:p-8 max-w-6xl space-y-8">
 
       {/* ── Header ─────────────────────────────────────────────────── */}
@@ -439,5 +441,6 @@ export default function CampaignDashboard() {
       </div>
 
     </div>
+    </CampaignProvider>
   );
 }

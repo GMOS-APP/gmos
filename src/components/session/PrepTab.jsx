@@ -8,8 +8,9 @@ import EntityPickerModal from './EntityPickerModal';
 import CharacterHooks from '@/components/prep/CharacterHooks';
 import PotentialScenes from '@/components/prep/PotentialScenes';
 import SecretsClues from '@/components/prep/SecretsClues';
+import { useCampaign } from '@/lib/CampaignContext';
 
-function buildSessionContext(campaign, session, entities) {
+function buildSessionContext(campaign, session, entities, systemName) {
   const linkedEntities = entities
     .filter(e => [
       ...(session?.npc_ids || []),
@@ -20,7 +21,8 @@ function buildSessionContext(campaign, session, entities) {
     .map(e => `${e.name} (${e.entity_type}): ${e.summary || ''}`)
     .join('\n');
 
-  return `Campaign: ${campaign?.name || 'Unknown'}
+  return `System: ${systemName}
+Campaign: ${campaign?.name || 'Unknown'}
 Setting: ${campaign?.setting || 'Standard fantasy'}
 Session #${session?.session_number || '?'}
 Previous Recap: ${session?.previous_session_recap || 'None'}
@@ -98,8 +100,9 @@ function LinkedEntitiesSection({ title, icon: Icon, color, entityType, linkedIds
 }
 
 export default function PrepTab({ session, campaign, entities, formData, setFormData, campaignId }) {
+  const { system } = useCampaign();
   const [newGoal, setNewGoal] = useState('');
-  const ctx = () => buildSessionContext(campaign, { ...session, ...formData }, entities);
+  const ctx = () => buildSessionContext(campaign, { ...session, ...formData }, entities, system.promptName);
 
   const setField = (key) => (val) => setFormData(prev => ({ ...prev, [key]: val }));
   const setIds = (key) => (updater) => setFormData(prev => ({
@@ -150,7 +153,7 @@ export default function PrepTab({ session, campaign, entities, formData, setForm
           rows={4}
           onGenerate={async () => {
             const result = await InvokeLLM({
-              prompt: `Write a short "previously on" recap (2-3 sentences, past tense, dramatic tone) for a D&D session.
+              prompt: `Write a short "previously on" recap (2-3 sentences, past tense, dramatic tone) for a ${system.promptName} session.
 ${ctx()}
 Base it on the previous session recap if available, otherwise use campaign context.`,
             });
@@ -170,7 +173,7 @@ Base it on the previous session recap if available, otherwise use campaign conte
           rows={5}
           onGenerate={async () => {
             const result = await InvokeLLM({
-              prompt: `Generate a strong session opening for a D&D game using the Sly Flourish Lazy DM method.
+              prompt: `Generate a strong session opening for a ${system.promptName} game using the Sly Flourish Lazy DM method.
 ${ctx()}
 The strong start should:
 - Open with "something happening" — not a monologue or recap
@@ -269,7 +272,7 @@ Keep it punchy: 2 short paragraphs max.`,
           rows={4}
           onGenerate={async () => {
             const result = await InvokeLLM({
-              prompt: `Generate a list of 3-5 important NPCs for a D&D session, formatted as bullet points.
+              prompt: `Generate a list of 3-5 important NPCs for a ${system.promptName} session, formatted as bullet points.
 ${ctx()}
 For each NPC include: name, one physical/vocal trait, and their motivation in this session.`,
             });
@@ -312,7 +315,7 @@ For each NPC include: name, one physical/vocal trait, and their motivation in th
           rows={4}
           onGenerate={async () => {
             const result = await InvokeLLM({
-              prompt: `Generate a list of relevant monsters/encounters for a D&D session, formatted as bullet points.
+              prompt: `Generate a list of relevant monsters/encounters for a ${system.promptName} session, formatted as bullet points.
 ${ctx()}
 Focus on monsters that fit the setting and current story threads. Include quantity and brief encounter context.`,
             });
@@ -343,7 +346,7 @@ Focus on monsters that fit the setting and current story threads. Include quanti
           rows={3}
           onGenerate={async () => {
             const result = await InvokeLLM({
-              prompt: `Generate 2-3 evocative fantastic locations for a D&D session, with brief descriptive bullet points (name + 2-3 sensory details each).
+              prompt: `Generate 2-3 evocative locations for a ${system.promptName} session, with brief descriptive bullet points (name + 2-3 sensory details each).
 ${ctx()}`,
             });
             return result;
@@ -363,7 +366,7 @@ ${ctx()}`,
           rows={4}
           onGenerate={async () => {
             const result = await InvokeLLM({
-              prompt: `Generate 4-6 interesting rumors for a D&D session, as bullet points. Mix true, false, and half-true rumors.
+              prompt: `Generate 4-6 interesting rumors for a ${system.promptName} session, as bullet points. Mix true, false, and half-true rumors.
 ${ctx()}
 Each rumor should be 1-2 sentences and feel like something a local or traveler would say.`,
             });
@@ -384,7 +387,7 @@ Each rumor should be 1-2 sentences and feel like something a local or traveler w
           rows={4}
           onGenerate={async () => {
             const result = await InvokeLLM({
-              prompt: `Generate appropriate treasure and magic item rewards for a D&D session, as bullet points.
+              prompt: `Generate appropriate treasure and rewards for a ${system.promptName} session, as bullet points.
 ${ctx()}
 Include a mix of: coin/gems, consumables (potions, scrolls), and 1-2 interesting magic items that fit the current story.`,
             });

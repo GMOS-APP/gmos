@@ -2,6 +2,7 @@ import React from 'react';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { useCampaign } from '@/lib/CampaignContext';
 
 function Field({ label, children }) {
   return (
@@ -44,9 +45,8 @@ function SectionDivider({ label }) {
   );
 }
 
-const LOCATION_TYPES = ['City', 'Town', 'Village', 'Dungeon', 'Wilderness', 'Building', 'Ruins', 'Landmark', 'Region', 'Plane'];
-
 export default function LocationFields({ extraData, onChange }) {
+  const { system } = useCampaign();
   const get = (key) => extraData?.[key] || '';
   const set = (key, val) => onChange({ ...(extraData || {}), [key]: val });
 
@@ -57,7 +57,7 @@ export default function LocationFields({ extraData, onChange }) {
         <Select value={get('location_type')} onValueChange={(v) => set('location_type', v)}>
           <SelectTrigger className="bg-gray-100 border-gray-300 text-gray-700 text-sm h-9 dark:bg-zinc-900/60 dark:border-zinc-800 dark:text-zinc-300"><SelectValue placeholder="Select type" /></SelectTrigger>
           <SelectContent className="bg-white border-gray-200 dark:bg-zinc-900 dark:border-zinc-800">
-            {LOCATION_TYPES.map((t) => <SelectItem key={t} value={t} className="text-zinc-300 text-xs">{t}</SelectItem>)}
+            {system.locationTypes.map((t) => <SelectItem key={t} value={t} className="text-zinc-300 text-xs">{t}</SelectItem>)}
           </SelectContent>
         </Select>
       </Field>

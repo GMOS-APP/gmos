@@ -9,6 +9,7 @@ import { printSessionPrep } from '@/utils/printSessionPrep';
 import RunTab from '@/components/session/RunTab';
 import SessionDebrief from '@/components/session/SessionDebrief';
 import SessionHeader from '@/components/session/SessionHeader';
+import { CampaignProvider } from '@/lib/CampaignContext';
 
 export default function SessionPage() {
   const params = new URLSearchParams(window.location.search);
@@ -141,6 +142,7 @@ export default function SessionPage() {
   }, [isRunMode]);
 
   return (
+    <CampaignProvider campaign={campaign}>
     <div className={activeTab === 'run' ? "h-full flex flex-col" : "min-h-full flex flex-col"}>
 
       <SessionHeader
@@ -263,5 +265,6 @@ export default function SessionPage() {
       </div>
 
     </div>
+    </CampaignProvider>
   );
 }

@@ -2,6 +2,7 @@ import React from 'react';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { ExternalLink } from 'lucide-react';
+import { useCampaign } from '@/lib/CampaignContext';
 
 function Field({ label, children }) {
   return (
@@ -68,6 +69,8 @@ function AbilityScoreBox({ name, value, onChange }) {
 }
 
 export default function PlayerCharacterFields({ extraData, onChange }) {
+  const { system } = useCampaign();
+  const fields = system.characterFields;
   const get = (key) => extraData?.[key] ?? '';
   const set = (key, val) => onChange({ ...(extraData || {}), [key]: val });
 
@@ -90,8 +93,8 @@ export default function PlayerCharacterFields({ extraData, onChange }) {
               </div>
             )}
             <div className="flex-1">
-              <TextInput value={get('image_url')} onChange={(v) => set('image_url', v)} placeholder="Image URL from D&D Beyond or elsewhere" />
-              <p className="text-xs text-zinc-600 mt-2">Paste an image URL. D&D Beyond avatars import automatically.</p>
+                      <TextInput value={get('image_url')} onChange={(v) => set('image_url', v)} placeholder="Image URL" />
+              <p className="text-xs text-zinc-600 mt-2">Paste an image URL for the character.</p>
             </div>
           </div>
         </Field>
@@ -102,37 +105,39 @@ export default function PlayerCharacterFields({ extraData, onChange }) {
       <Field label="Player Name">
         <TextInput value={get('player_name')} onChange={(v) => set('player_name', v)} placeholder="Real name of the player" />
       </Field>
-      <Field label="Race">
-        <TextInput value={get('race')} onChange={(v) => set('race', v)} placeholder="e.g. Half-Elf, Mountain Dwarf" />
+      <Field label={fields.species}>
+        <TextInput value={get('race')} onChange={(v) => set('race', v)} placeholder={`e.g. ${fields.species}`} />
       </Field>
-      <Field label="Class">
-        <TextInput value={get('class')} onChange={(v) => set('class', v)} placeholder="e.g. Fighter 5 / Rogue 2" />
+      <Field label={fields.role}>
+        <TextInput value={get('class')} onChange={(v) => set('class', v)} placeholder={`e.g. ${fields.role}`} />
       </Field>
       <Field label="Level">
         <TextInput type="number" value={get('level')} onChange={(v) => set('level', v)} placeholder="e.g. 5" />
       </Field>
-      <Field label="Background">
-        <TextInput value={get('background')} onChange={(v) => set('background', v)} placeholder="e.g. Soldier, Outlander, Noble" />
+      <Field label={fields.background}>
+        <TextInput value={get('background')} onChange={(v) => set('background', v)} placeholder={`e.g. ${fields.background}`} />
       </Field>
       <Field label="Gender">
         <TextInput value={get('gender')} onChange={(v) => set('gender', v)} placeholder="e.g. Male, Female, Non-binary" />
       </Field>
-      {get('dndbeyond_id') ? (
-        <Field label="D&D Beyond">
-          <a
-            href={`https://www.dndbeyond.com/characters/${get('dndbeyond_id')}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-1.5 text-sm text-purple-400 hover:text-purple-300 transition-colors"
-          >
-            <ExternalLink className="w-3.5 h-3.5" />
-            View Character Sheet
-          </a>
-        </Field>
-      ) : (
-        <Field label="D&D Beyond ID">
-          <TextInput value={get('dndbeyond_id')} onChange={(v) => set('dndbeyond_id', v)} placeholder="e.g. 155724296" />
-        </Field>
+      {system.hasDndBeyondImport && (
+        get('dndbeyond_id') ? (
+          <Field label="D&D Beyond">
+            <a
+              href={`https://www.dndbeyond.com/characters/${get('dndbeyond_id')}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 text-sm text-purple-400 hover:text-purple-300 transition-colors"
+            >
+              <ExternalLink className="w-3.5 h-3.5" />
+              View Character Sheet
+            </a>
+          </Field>
+        ) : (
+          <Field label="D&D Beyond ID">
+            <TextInput value={get('dndbeyond_id')} onChange={(v) => set('dndbeyond_id', v)} placeholder="e.g. 155724296" />
+          </Field>
+        )
       )}
 
       {/* Combat Stats */}
@@ -147,30 +152,33 @@ export default function PlayerCharacterFields({ extraData, onChange }) {
         <TextInput type="number" value={get('walking_speed')} onChange={(v) => set('walking_speed', v)} placeholder="e.g. 30" />
       </Field>
 
-      {/* Ability Scores */}
-      <SectionDivider label="Ability Scores" />
-      <div className="md:col-span-2 grid grid-cols-3 md:grid-cols-6 gap-3">
-        {ABILITY_NAMES.map((name) => (
-          <AbilityScoreBox
-            key={name}
-            name={name}
-            value={abilities[name]}
-            onChange={(val) => setAbility(name, val)}
-          />
-        ))}
-      </div>
+      {/* Ability Scores — D&D/PF2e only */}
+      {system.hasAbilityScores && (
+        <>
+          <SectionDivider label="Ability Scores" />
+          <div className="md:col-span-2 grid grid-cols-3 md:grid-cols-6 gap-3">
+            {ABILITY_NAMES.map((name) => (
+              <AbilityScoreBox
+                key={name}
+                name={name}
+                value={abilities[name]}
+                onChange={(val) => setAbility(name, val)}
+              />
+            ))}
+          </div>
 
-      {/* Passive Skills */}
-      <SectionDivider label="Passive Skills" />
-      <Field label="Passive Perception">
-        <TextInput type="number" value={get('passive_perception')} onChange={(v) => set('passive_perception', v)} placeholder="e.g. 14" />
-      </Field>
-      <Field label="Passive Investigation">
-        <TextInput type="number" value={get('passive_investigation')} onChange={(v) => set('passive_investigation', v)} placeholder="e.g. 11" />
-      </Field>
-      <Field label="Passive Insight">
-        <TextInput type="number" value={get('passive_insight')} onChange={(v) => set('passive_insight', v)} placeholder="e.g. 13" />
-      </Field>
+          <SectionDivider label="Passive Skills" />
+          <Field label="Passive Perception">
+            <TextInput type="number" value={get('passive_perception')} onChange={(v) => set('passive_perception', v)} placeholder="e.g. 14" />
+          </Field>
+          <Field label="Passive Investigation">
+            <TextInput type="number" value={get('passive_investigation')} onChange={(v) => set('passive_investigation', v)} placeholder="e.g. 11" />
+          </Field>
+          <Field label="Passive Insight">
+            <TextInput type="number" value={get('passive_insight')} onChange={(v) => set('passive_insight', v)} placeholder="e.g. 13" />
+          </Field>
+        </>
+      )}
 
       <Field label="Languages">
         <TextInput value={get('languages')} onChange={(v) => set('languages', v)} placeholder="e.g. Common, Elvish, Draconic" />

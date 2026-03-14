@@ -14,13 +14,17 @@ import {
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import {
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+} from '@/components/ui/select';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
+import { SYSTEM_OPTIONS, DEFAULT_SYSTEM_ID, getSystem } from '@/lib/systems';
 
 export default function CampaignList() {
   const queryClient = useQueryClient();
   const [showCreate, setShowCreate] = useState(false);
-  const [form, setForm] = useState({ name: '', description: '', setting: '' });
+  const [form, setForm] = useState({ name: '', description: '', setting: '', system: DEFAULT_SYSTEM_ID });
   const [exportingId, setExportingId] = useState(null);
   const [importing, setImporting] = useState(false);
   const [showRawImport, setShowRawImport] = useState(false);
@@ -63,7 +67,7 @@ export default function CampaignList() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['campaigns'] });
       setShowCreate(false);
-      setForm({ name: '', description: '', setting: '' });
+      setForm({ name: '', description: '', setting: '', system: DEFAULT_SYSTEM_ID });
     },
   });
 
@@ -196,6 +200,8 @@ export default function CampaignList() {
                     <div className="flex items-center gap-3 mt-4 text-xs text-zinc-600 dark:text-zinc-600">
                       <span>Session #{c.current_session_number || 0}</span>
                       <span className="w-1 h-1 rounded-full bg-zinc-300 dark:bg-zinc-700" />
+                      <span className="text-zinc-500 dark:text-zinc-500">{getSystem(c.system).shortLabel}</span>
+                      <span className="w-1 h-1 rounded-full bg-zinc-300 dark:bg-zinc-700" />
                       <span className={cn(
                         "flex items-center gap-1 capitalize",
                         c.status === 'active' || !c.status ? 'text-emerald-600 dark:text-emerald-500' :
@@ -247,6 +253,16 @@ export default function CampaignList() {
               rows={2}
               className="bg-white dark:bg-zinc-950 border-zinc-300 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 resize-none"
             />
+            <Select value={form.system} onValueChange={(v) => setForm({ ...form, system: v })}>
+              <SelectTrigger className="bg-white dark:bg-zinc-950 border-zinc-300 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100">
+                <SelectValue placeholder="Select game system" />
+              </SelectTrigger>
+              <SelectContent>
+                {SYSTEM_OPTIONS.map((s) => (
+                  <SelectItem key={s.id} value={s.id}>{s.label}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
             <Textarea
               placeholder="World setting notes (optional)"
               value={form.setting}

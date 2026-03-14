@@ -5,10 +5,12 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import AiGate from '@/components/ui/AiGate';
+import { useCampaign } from '@/lib/CampaignContext';
 
 const SECRET_TYPES = ['Character', 'Villain', 'Story', 'NPC', 'Location'];
 
 export default function SecretsClues({ campaignId, secrets, onChange, campaign, threads }) {
+  const { system } = useCampaign();
   const [newSecret, setNewSecret] = useState('');
   const [generating, setGenerating] = useState(false);
 
@@ -24,7 +26,7 @@ export default function SecretsClues({ campaignId, secrets, onChange, campaign, 
   const generateSecrets = async () => {
     setGenerating(true);
     const result = await InvokeLLM({
-      prompt: `Generate 10 secrets and clues for a D&D session using the Sly Flourish Lazy DM method.
+      prompt: `Generate 10 secrets and clues for a ${system.promptName} session using the Sly Flourish Lazy DM method.
 
 Campaign: ${campaign?.name || 'Unknown'}
 Active plot threads: ${threads?.map(t => t.name + ': ' + (t.summary || '')).join('\n') || 'None'}

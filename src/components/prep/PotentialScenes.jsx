@@ -4,8 +4,10 @@ import { Plus, X, Sparkles, Loader2 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import AiGate from '@/components/ui/AiGate';
+import { useCampaign } from '@/lib/CampaignContext';
 
 export default function PotentialScenes({ scenes, onChange, campaign, threads }) {
+  const { system } = useCampaign();
   const [newScene, setNewScene] = useState('');
   const [generating, setGenerating] = useState(false);
 
@@ -21,7 +23,7 @@ export default function PotentialScenes({ scenes, onChange, campaign, threads })
   const generate = async () => {
     setGenerating(true);
     const result = await InvokeLLM({
-      prompt: `Generate 5 potential scenes for a D&D session using the Sly Flourish Lazy DM method.
+      prompt: `Generate 5 potential scenes for a ${system.promptName} session using the Sly Flourish Lazy DM method.
 
 Campaign: ${campaign?.name || 'Unknown'}
 Setting: ${campaign?.setting || 'Standard fantasy'}

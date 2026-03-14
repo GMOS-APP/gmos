@@ -3,11 +3,20 @@ import { createClient } from 'npm:@supabase/supabase-js@2';
 
 const anthropic = new Anthropic({ apiKey: Deno.env.get('ANTHROPIC_API_KEY') });
 
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+};
+
 Deno.serve(async (req) => {
+  if (req.method === 'OPTIONS') {
+    return new Response('ok', { headers: corsHeaders });
+  }
+
   try {
     const authHeader = req.headers.get('Authorization');
     if (!authHeader) {
-      return Response.json({ error: 'Unauthorized' }, { status: 401 });
+      return Response.json({ error: 'Unauthorized' }, { status: 401, headers: corsHeaders });
     }
 
     // Verify JWT and check plan via service role
@@ -19,7 +28,7 @@ Deno.serve(async (req) => {
 
     const { data: { user }, error: authError } = await supabaseAdmin.auth.getUser(token);
     if (authError || !user) {
-      return Response.json({ error: 'Unauthorized' }, { status: 401 });
+      return Response.json({ error: 'Unauthorized' }, { status: 401, headers: corsHeaders });
     }
 
     const { data: profile } = await supabaseAdmin
@@ -29,12 +38,12 @@ Deno.serve(async (req) => {
       .single();
 
     if (profile?.plan !== 'plus') {
-      return Response.json({ error: 'upgrade_required' }, { status: 403 });
+      return Response.json({ error: 'upgrade_required' }, { status: 403, headers: corsHeaders });
     }
 
     const { prompt, response_json_schema } = await req.json();
     if (!prompt) {
-      return Response.json({ error: 'prompt is required' }, { status: 400 });
+      return Response.json({ error: 'prompt is required' }, { status: 400, headers: corsHeaders });
     }
 
     let system = 'You are a helpful assistant for tabletop RPG game masters.';
@@ -44,7 +53,7 @@ Deno.serve(async (req) => {
 
     const message = await anthropic.messages.create({
       model: 'claude-haiku-4-5-20251001',
-      max_tokens: 1024,
+      max_tokens: 4096,
       system,
       messages: [{ role: 'user', content: prompt }],
     });
@@ -55,14 +64,14 @@ Deno.serve(async (req) => {
       try {
         const jsonMatch = text.match(/\{[\s\S]*\}/);
         const parsed = JSON.parse(jsonMatch ? jsonMatch[0] : text);
-        return Response.json(parsed);
+        return Response.json(parsed, { headers: corsHeaders });
       } catch {
-        return Response.json({ error: 'Failed to parse JSON response', raw: text }, { status: 500 });
+        return Response.json({ error: 'Failed to parse JSON response', raw: text }, { status: 500, headers: corsHeaders });
       }
     }
 
-    return Response.json({ result: text });
+    return Response.json({ result: text }, { headers: corsHeaders });
   } catch (error) {
-    return Response.json({ error: error.message }, { status: 500 });
+    return Response.json({ error: error.message }, { status: 500, headers: corsHeaders });
   }
 });

@@ -5,8 +5,10 @@ import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
 import { Loader2, MessageSquare } from 'lucide-react';
 import AiGate from '@/components/ui/AiGate';
+import { useCampaign } from '@/lib/CampaignContext';
 
 export default function QuickDialogueGenerator() {
+  const { system } = useCampaign();
   const [generating, setGenerating] = useState(false);
   const [npcName, setNpcName] = useState('');
   const [context, setContext] = useState('');
@@ -18,7 +20,7 @@ export default function QuickDialogueGenerator() {
     setGenerating(true);
     try {
       const response = await InvokeLLM({
-        prompt: `Generate quick dialogue for an NPC in a D&D 5e session.
+        prompt: `Generate quick dialogue for an NPC in a ${system.promptName} session.
 
 NPC Name: ${npcName}
 Context: ${context || 'General conversation'}

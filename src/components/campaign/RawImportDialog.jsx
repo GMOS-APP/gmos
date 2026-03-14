@@ -23,7 +23,7 @@ export default function RawImportDialog({ open, onOpenChange, onImported }) {
     let result;
     try {
       result = await InvokeLLM({
-      prompt: `You are a D&D campaign organizer. The user has pasted raw campaign notes, wiki content, or world-building text below. Extract and structure this into a full campaign with entities.
+      prompt: `You are a tabletop RPG campaign organizer. The user has pasted raw campaign notes, wiki content, or world-building text below. Extract and structure this into a full campaign with entities.
 
 RAW DATA:
 ${rawText}

@@ -4,6 +4,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ChevronDown, ChevronRight, Plus, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useCampaign } from '@/lib/CampaignContext';
 
 // D&D 5e XP thresholds per character level [Easy, Medium, Hard, Deadly]
 const XP_THRESHOLDS = {
@@ -197,6 +198,7 @@ function SectionDivider({ label }) {
 const DIFFICULTIES = ['Trivial', 'Easy', 'Medium', 'Hard', 'Deadly'];
 
 export default function EncounterFields({ extraData, onChange }) {
+  const { system } = useCampaign();
   const get = (key) => extraData?.[key] || '';
   const set = (key, val) => onChange({ ...(extraData || {}), [key]: val });
 
@@ -211,14 +213,16 @@ export default function EncounterFields({ extraData, onChange }) {
           </SelectContent>
         </Select>
       </Field>
-      <Field label="XP Budget"><TextInput value={get('xp')} onChange={(v) => set('xp', v)} placeholder="e.g. 1,800 XP" /></Field>
+      {system.hasXpCrSystem && (
+        <Field label="XP Budget"><TextInput value={get('xp')} onChange={(v) => set('xp', v)} placeholder="e.g. 1,800 XP" /></Field>
+      )}
 
       <SectionDivider label="Setup" />
       <div className="md:col-span-2"><Field label="Enemy Composition"><TextArea value={get('enemies')} onChange={(v) => set('enemies', v)} placeholder="What enemies? How many? Variants?" /></Field></div>
       <div className="md:col-span-2"><Field label="Terrain & Environment"><TextArea value={get('terrain')} onChange={(v) => set('terrain', v)} placeholder="Where does this take place? Environmental hazards, features?" /></Field></div>
       <div className="md:col-span-2"><Field label="Enemy Tactics"><TextArea value={get('tactics')} onChange={(v) => set('tactics', v)} placeholder="How do enemies fight? Morale? Retreat conditions?" /></Field></div>
 
-      <EncounterBalancer />
+      {system.hasXpCrSystem && <EncounterBalancer />}
 
       <SectionDivider label="Presentation" />
       <div className="md:col-span-2"><Field label="Read-Aloud Description"><TextArea value={get('read_aloud')} onChange={(v) => set('read_aloud', v)} placeholder="The text you read to players when the encounter begins..." /></Field></div>

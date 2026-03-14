@@ -3,8 +3,10 @@ import { WorldEntity, InvokeLLM } from '@/api/entities';
 import { Button } from '@/components/ui/button';
 import { Loader2, Wand2, Save, Check } from 'lucide-react';
 import AiGate from '@/components/ui/AiGate';
+import { useCampaign } from '@/lib/CampaignContext';
 
 export default function RandomNPCGenerator({ campaignId }) {
+  const { system } = useCampaign();
   const [generating, setGenerating] = useState(false);
   const [generatedNPC, setGeneratedNPC] = useState(null);
   const [saving, setSaving] = useState(false);
@@ -35,11 +37,11 @@ export default function RandomNPCGenerator({ campaignId }) {
     setGenerating(true);
     try {
       const response = await InvokeLLM({
-        prompt: `Generate a random D&D 5e NPC with the following JSON schema:
+        prompt: `Generate a random ${system.promptName} NPC with the following JSON schema:
 {
-  "name": "A unique fantasy NPC name",
-  "race": "D&D 5e race",
-  "class": "D&D 5e class or profession",
+  "name": "A unique NPC name appropriate for the setting",
+  "race": "Species or ancestry appropriate for ${system.promptName}",
+  "class": "Class, role, or profession",
   "summary": "One sentence description",
   "personality": "Brief personality traits",
   "secret": "A hidden secret or motivation",

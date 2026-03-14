@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { WorldEntity, Relationship, InvokeLLM } from '@/api/entities';
+import { WorldEntity, Relationship, InvokeLLM, Campaign } from '@/api/entities';
 import { createPageUrl } from '@/utils';
 import { Link, useLocation } from 'react-router-dom';
 import {
@@ -21,12 +21,14 @@ import {
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import AiGate from '@/components/ui/AiGate';
+import { CampaignProvider, useCampaign } from '@/lib/CampaignContext';
 
 const entityTypes = ['npc', 'creature', 'location', 'faction', 'thread', 'item', 'player_character', 'event', 'lore', 'deity', 'encounter', 'shop'];
 const statuses = ['active', 'inactive', 'dead', 'destroyed', 'resolved', 'unknown'];
 const visibilities = ['gm_only', 'players_know', 'players_suspect', 'false_info'];
 
-export default function EntityDetail() {
+function EntityDetailInner() {
+  const { system } = useCampaign();
   const location = useLocation();
   const params = new URLSearchParams(location.search);
   const entityId = params.get('id');
@@ -82,6 +84,8 @@ export default function EntityDetail() {
     enabled: !!form.campaign_id,
     staleTime: 30000,
   });
+
+  const { campaign: campaignData } = useCampaign();
 
   const { data: relationships = [] } = useQuery({
     queryKey: ['relationships', entityId],
@@ -156,94 +160,81 @@ export default function EntityDetail() {
 
   const generateContent = async () => {
     setGenerating(true);
-    
+    const systemName = system.promptName;
+
     const typePrompts = {
-      npc: `Generate D&D 5e SRD 5.2.1 compliant content for this NPC, including:
-- Full stat block (CR, AC, HP, Speed, ability scores, skills, senses)
+      npc: `Generate content for this NPC suitable for ${systemName}, including:
+- Stat block or equivalent mechanics
 - Traits and special abilities
 - Actions and reactions
 - Personality traits, ideals, bonds, flaws
 - Physical description and mannerisms
 - Roleplay suggestions`,
-      creature: `Generate D&D 5e SRD 5.2.1 compliant content for this creature, including:
-- Full stat block (CR, AC, HP, Speed, ability scores, skills, senses)
+      creature: `Generate content for this creature suitable for ${systemName}, including:
+- Stat block or equivalent mechanics
 - Traits and special abilities
 - Actions and reactions
-- Personality traits, ideals, bonds, flaws
 - Physical description and mannerisms
 - Roleplay suggestions`,
-      location: `Generate D&D 5e SRD 5.2.1 compliant content for this location, including:
+      location: `Generate content for this location suitable for ${systemName}, including:
 - Detailed physical description
 - Notable features and points of interest
 - Inhabitants and their motivations
 - Potential encounters or hazards
 - Secrets and hidden elements
 - Hooks for adventure`,
-      item: `Generate D&D 5e SRD 5.2.1 compliant content for this item, including:
+      item: `Generate content for this item suitable for ${systemName}, including:
 - Item type and rarity
 - Properties and mechanics
-- Attunement requirements (if any)
-- Charges and usage limits
 - History and lore
 - Potential side effects or drawbacks`,
-      faction: `Generate D&D 5e SRD 5.2.1 compliant content for this faction, including:
+      faction: `Generate content for this faction suitable for ${systemName}, including:
 - Organizational structure
 - Goals and motivations
 - Resources and capabilities
-- Key NPCs and their roles
-- Faction activities in the region
+- Key figures and their roles
 - Joining requirements and ranks`,
-      thread: `Generate D&D 5e SRD 5.2.1 compliant content for this plot thread, including:
+      thread: `Generate content for this plot thread suitable for ${systemName}, including:
 - Current situation and stakes
-- Key NPCs involved
+- Key figures involved
 - Potential developments and branches
 - Success/failure outcomes
-- Connections to other threads
-- Suggested DCs and challenges`,
-      event: `Generate D&D 5e SRD 5.2.1 compliant content for this event, including:
+- Connections to other threads`,
+      event: `Generate content for this event suitable for ${systemName}, including:
 - Timeline and trigger conditions
 - Key participants and witnesses
-- Environmental effects and hazards
-- Mechanical implications (saving throws, skill checks)
 - Aftermath and consequences
 - Ways players can influence the outcome`,
-      lore: `Generate D&D 5e SRD 5.2.1 compliant content for this lore element, including:
+      lore: `Generate content for this lore element suitable for ${systemName}, including:
 - Historical context and timeline
 - Key figures and their contributions
 - Impact on the current world state
-- Common knowledge vs. secret information
-- Sources where this can be learned (skill checks, locations)
-- Mechanical benefits of knowing this lore`,
-      player_character: `Generate D&D 5e SRD 5.2.1 compliant content for this PC, including:
+- Common knowledge vs. secret information`,
+      player_character: `Generate content for this player character suitable for ${systemName}, including:
 - Background suggestions
 - Personality traits, ideals, bonds, flaws
 - Character arc possibilities
-- Relationships with other PCs
 - Personal quest hooks
 - Roleplay suggestions`,
-      deity: `Generate D&D 5e SRD 5.2.1 compliant content for this deity, including:
+      deity: `Generate content for this deity suitable for ${systemName}, including:
 - Domain(s) and alignment
 - Holy symbol and iconography
 - Tenets and commandments
 - Worshippers and clergy structure
-- Divine boons and blessings
 - Temples and sacred sites
 - Myths and legends`,
-      encounter: `Generate D&D 5e SRD 5.2.1 compliant content for this encounter, including:
-- Encounter difficulty and XP budget
+      encounter: `Generate content for this encounter suitable for ${systemName}, including:
+- Encounter difficulty
 - Terrain and environmental features
 - Enemy composition and tactics
 - Treasure and rewards
-- Scaling options for different party sizes
 - Read-aloud description
 - Potential complications`,
-      shop: `Generate D&D 5e SRD 5.2.1 compliant content for this shop, including:
+      shop: `Generate content for this shop suitable for ${systemName}, including:
 - Shop type and specialty
 - Shopkeeper personality and appearance
 - Available inventory with prices
-- Special or rare items
 - Services offered
-- Business hours and location
 - Quest hooks or rumors`,
     };
 
@@ -251,12 +242,12 @@ export default function EntityDetail() {
 
     const context = `Entity: ${form.name || 'Unnamed'}
 Type: ${form.entity_type}
+System: ${systemName}
 Current Summary: ${form.summary || 'None'}
 Current Description: ${form.description || 'None'}
 Key Facts: ${form.key_facts?.join(', ') || 'None'}
 Tags: ${form.tags?.join(', ') || 'None'}
 
-Using the D&D 5e System Reference Document 5.2.1 as your foundation:
 ${prompt}
 
 Keep content practical for table use. Use markdown formatting. Focus on actionable information for the GM.`;
@@ -273,7 +264,7 @@ Keep content practical for table use. Use markdown formatting. Focus on actionab
     if (!srdSearch.trim()) return;
     setSearching(true);
     
-    const prompt = `Search the D&D 5e System Reference Document 5.2.1 for creatures matching: "${srdSearch}"
+    const prompt = `Search ${system.promptName} rules for creatures/adversaries matching: "${srdSearch}"
 
 Return a JSON array of matching creatures with this exact schema:
 {
@@ -318,7 +309,7 @@ If no exact matches, find similar creatures. Return up to 5 matches.`;
   const importCreature = async (creature) => {
     setGenerating(true);
     
-    const prompt = `Import the complete D&D 5e SRD 5.2.1 stat block and information for: ${creature.name}
+    const prompt = `Import the complete stat block and information for: ${creature.name} (from ${system.promptName})
 
 Include:
 - Full stat block (AC, HP, Speed, ability scores, skills, senses, languages)
@@ -390,13 +381,13 @@ Format with markdown for readability.`;
                 </div>
                 <div className="text-center">
                   <h3 className="font-semibold dark:text-zinc-100 text-gray-900 mb-1">Auto Generate</h3>
-                  <p className="text-xs dark:text-zinc-500 text-gray-600">AI generates SRD 5.2.1 compliant content</p>
+                  <p className="text-xs dark:text-zinc-500 text-gray-600">AI generates content for your system</p>
                 </div>
               </div>
             </button>
             </AiGate>
 
-            {defaultType === 'creature' && (
+            {defaultType === 'creature' && system.hasSrdImport && (
               <button
                 onClick={() => setEntryMode('srd_import')}
                 className="group p-6 rounded-xl dark:border-2 dark:border-zinc-800 dark:bg-zinc-900/40 border-2 border-gray-300 bg-gray-50 dark:hover:border-green-500/50 dark:hover:bg-green-500/5 hover:border-green-500/50 hover:bg-green-500/5 transition-all"
@@ -407,7 +398,7 @@ Format with markdown for readability.`;
                   </div>
                   <div className="text-center">
                     <h3 className="font-semibold dark:text-zinc-100 text-gray-900 mb-1">Import from SRD</h3>
-                    <p className="text-xs dark:text-zinc-500 text-gray-600">Search and import creatures from SRD 5.2.1</p>
+                    <p className="text-xs dark:text-zinc-500 text-gray-600">Search and import from the rulebook</p>
                   </div>
                 </div>
               </button>
@@ -429,7 +420,7 @@ Format with markdown for readability.`;
             </button>
           </div>
 
-          {defaultType === 'player_character' && (
+          {defaultType === 'player_character' && system.hasDndBeyondImport && (
             <div className="mt-4">
               <button
                 onClick={() => setEntryMode('dnd_import')}
@@ -451,7 +442,7 @@ Format with markdown for readability.`;
           {generating && (
             <div className="mt-8 text-center">
               <Loader2 className="w-6 h-6 animate-spin text-blue-400 mx-auto mb-2" />
-              <p className="text-sm dark:text-zinc-500 text-gray-600">Generating SRD content...</p>
+              <p className="text-sm dark:text-zinc-500 text-gray-600">Generating content...</p>
             </div>
           )}
         </div>
@@ -852,5 +843,26 @@ Format with markdown for readability.`;
         )}
       </div>
     </div>
+  );
+}
+
+export default function EntityDetail() {
+  const location = useLocation();
+  const params = new URLSearchParams(location.search);
+  const campaignId = params.get('campaign_id');
+  const entityId = params.get('id');
+
+  const { data: campaignData } = useQuery({
+    queryKey: ['campaign', campaignId],
+    queryFn: () => Campaign.filter({ id: campaignId }),
+    enabled: !!campaignId,
+    select: (d) => d?.[0],
+    staleTime: 60000,
+  });
+
+  return (
+    <CampaignProvider campaign={campaignData}>
+      <EntityDetailInner />
+    </CampaignProvider>
   );
 }

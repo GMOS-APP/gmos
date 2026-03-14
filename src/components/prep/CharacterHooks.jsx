@@ -5,8 +5,10 @@ import { Sparkles, Loader2 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import AiGate from '@/components/ui/AiGate';
+import { useCampaign } from '@/lib/CampaignContext';
 
 export default function CharacterHooks({ campaignId, hooks, onChange }) {
+  const { system } = useCampaign();
   const { data: pcs = [] } = useQuery({
     queryKey: ['pcs', campaignId],
     queryFn: () => WorldEntity.filter({ campaign_id: campaignId, entity_type: 'player_character' }),
@@ -26,7 +28,7 @@ export default function CharacterHooks({ campaignId, hooks, onChange }) {
   const generateHook = async (pc) => {
     setGenerating(pc.name);
     const result = await InvokeLLM({
-      prompt: `Generate a specific, compelling session hook for this D&D player character:
+      prompt: `Generate a specific, compelling session hook for this ${system.promptName} player character:
 
 Character: ${pc.name}
 Description: ${pc.summary || pc.description || 'No details available'}
