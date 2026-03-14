@@ -165,9 +165,6 @@ Written as present-tense narration the GM reads aloud. 2 short paragraphs max.`,
 
       {/* Events */}
       <section className="space-y-3">
-        <h3 className="text-xs font-semibold uppercase tracking-widest text-purple-400/80 flex items-center gap-1.5">
-          <Zap className="w-3.5 h-3.5" /> Events
-        </h3>
         <p className="text-xs text-zinc-600">World-level occurrences and timed triggers that happen during this session regardless of player action.</p>
         <LinkedEntitiesSection
           title="Events"
@@ -198,9 +195,6 @@ Format as bullet points. Each event should move the world forward and create pre
 
       {/* Locations */}
       <section className="space-y-3">
-        <h3 className="text-xs font-semibold uppercase tracking-widest text-zinc-500 flex items-center gap-1.5">
-          <MapPin className="w-3.5 h-3.5" /> Locations
-        </h3>
         <p className="text-xs text-zinc-600">Select primary and secondary settings. Note one distinct sensory detail for each to make scene transitions feel visceral.</p>
         <LinkedEntitiesSection
           title="Locations"
@@ -231,9 +225,6 @@ Format as a concise list: location name + 1 sensory detail.`,
 
       {/* NPCs */}
       <section className="space-y-3">
-        <h3 className="text-xs font-semibold uppercase tracking-widest text-zinc-500 flex items-center gap-1.5">
-          <Users className="w-3.5 h-3.5" /> NPCs
-        </h3>
         <p className="text-xs text-zinc-600">Choose the characters appearing tonight. Define each one's immediate goal and a quick roleplay quirk to keep their performance consistent.</p>
         <LinkedEntitiesSection
           title="NPCs"
@@ -263,9 +254,6 @@ ${ctx()}`,
 
       {/* Encounters */}
       <section className="space-y-3">
-        <h3 className="text-xs font-semibold uppercase tracking-widest text-zinc-500 flex items-center gap-1.5">
-          <Swords className="w-3.5 h-3.5" /> Encounters
-        </h3>
         <p className="text-xs text-zinc-600">Determine the specific challenges — combat, social negotiations, or environmental hazards. Link entities so stat blocks and DC checks are ready to go.</p>
         <LinkedEntitiesSection
           title="Encounters"
@@ -305,9 +293,6 @@ ${ctx()}`,
 
       {/* Threads */}
       <section className="space-y-3">
-        <h3 className="text-xs font-semibold uppercase tracking-widest text-purple-400/80 flex items-center gap-1.5">
-          <GitBranch className="w-3.5 h-3.5" /> Threads
-        </h3>
         <p className="text-xs text-zinc-600">Note which ongoing plot hooks and mysteries are active tonight. Track current progress and how much closer players get to resolution.</p>
         <LinkedEntitiesSection
           title="Threads"
