@@ -18,6 +18,8 @@ async function fetchOrCreateProfile(userId, setPlan) {
   } else {
     await supabase.from('user_profiles').insert({ id: userId });
     setPlan('free');
+    // Fire-and-forget: seed demo campaign for new users
+    supabase.functions.invoke('create-demo').catch(console.error);
   }
 }
 

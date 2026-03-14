@@ -3,7 +3,8 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Campaign, functions } from '@/api/entities';
 import { createPageUrl } from '@/utils';
 import { Link } from 'react-router-dom';
-import { Plus, FolderOpen, MoreHorizontal, Trash2, Download, Upload, FileText, Sparkles } from 'lucide-react';
+import { Plus, FolderOpen, MoreHorizontal, Trash2, Download, Upload, FileText, Sparkles, LogOut } from 'lucide-react';
+import { useAuth } from '@/lib/AuthContext';
 import RawImportDialog from '@/components/campaign/RawImportDialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -23,6 +24,7 @@ import { SYSTEM_OPTIONS, DEFAULT_SYSTEM_ID, getSystem } from '@/lib/systems';
 
 export default function CampaignList() {
   const queryClient = useQueryClient();
+  const { user, isPlus, logout } = useAuth();
   const [showCreate, setShowCreate] = useState(false);
   const [form, setForm] = useState({ name: '', description: '', setting: '', system: DEFAULT_SYSTEM_ID });
   const [exportingId, setExportingId] = useState(null);
@@ -78,11 +80,32 @@ export default function CampaignList() {
 
   return (
     <div className="min-h-screen flex flex-col items-center px-6 py-16">
+      {/* User bar */}
+      <div className="w-full max-w-3xl flex justify-end items-center gap-3 mb-10">
+        {user?.email && (
+          <span className="text-xs text-zinc-500 dark:text-zinc-600">{user.email}</span>
+        )}
+        <button
+          onClick={logout}
+          className="flex items-center gap-1.5 text-xs text-zinc-500 dark:text-zinc-600 hover:text-zinc-700 dark:hover:text-zinc-300 transition-colors"
+        >
+          <LogOut className="w-3.5 h-3.5" />
+          Sign out
+        </button>
+      </div>
+
       {/* Hero */}
       <div className="text-center mb-16 max-w-lg">
         <h1 className="text-4xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100 mb-3">
           GM<span className="text-amber-600 dark:text-amber-400">/OS</span>
         </h1>
+        {isPlus && (
+          <div className="flex justify-center mb-3">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-500 dark:text-amber-400 text-xs font-semibold tracking-wide">
+              ✦ GM/OS+
+            </span>
+          </div>
+        )}
         <p className="text-zinc-600 dark:text-zinc-500 text-sm leading-relaxed">
           The operating system for Game Masters. Manage your world, run your sessions, stay in control.
         </p>
@@ -162,9 +185,16 @@ export default function CampaignList() {
                   >
                     <div className="flex items-start justify-between">
                       <div className="flex-1 min-w-0">
-                        <h3 className="font-semibold text-zinc-900 dark:text-zinc-100 group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors truncate">
-                          {c.name}
-                        </h3>
+                        <div className="flex items-center gap-2 min-w-0">
+                          <h3 className="font-semibold text-zinc-900 dark:text-zinc-100 group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors truncate">
+                            {c.name}
+                          </h3>
+                          {c.is_demo && (
+                            <span className="shrink-0 text-xs font-medium px-1.5 py-0.5 rounded bg-zinc-200 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-500 border border-zinc-300 dark:border-zinc-700">
+                              Demo
+                            </span>
+                          )}
+                        </div>
                         {c.description && (
                           <p className="text-xs text-zinc-600 dark:text-zinc-500 mt-1 line-clamp-2">{c.description}</p>
                         )}
