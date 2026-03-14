@@ -18,7 +18,7 @@ function TextInput({ value, onChange, placeholder }) {
       value={value || ''}
       onChange={(e) => onChange(e.target.value)}
       placeholder={placeholder}
-      className="bg-zinc-900/60 border-zinc-800 text-zinc-200 placeholder:text-zinc-600"
+      className="bg-gray-100 border-gray-300 text-gray-900 placeholder:text-gray-500 dark:bg-zinc-900/60 dark:border-zinc-800 dark:text-zinc-200 dark:placeholder:text-zinc-600"
     />
   );
 }
