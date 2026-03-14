@@ -165,7 +165,6 @@ Written as present-tense narration the GM reads aloud. 2 short paragraphs max.`,
 
       {/* Events */}
       <section className="space-y-3">
-        <p className="text-xs text-zinc-600">World-level occurrences and timed triggers that happen during this session regardless of player action.</p>
         <LinkedEntitiesSection
           title="Events"
           icon={Zap}
@@ -176,6 +175,7 @@ Written as present-tense narration the GM reads aloud. 2 short paragraphs max.`,
           entities={entities}
           campaignId={campaignId}
         />
+        <p className="text-xs text-zinc-600">World-level occurrences and timed triggers that happen during this session regardless of player action.</p>
         <AIGenerateTextarea
           value={formData.event_notes || ''}
           onChange={setField('event_notes')}
@@ -195,7 +195,6 @@ Format as bullet points. Each event should move the world forward and create pre
 
       {/* Locations */}
       <section className="space-y-3">
-        <p className="text-xs text-zinc-600">Select primary and secondary settings. Note one distinct sensory detail for each to make scene transitions feel visceral.</p>
         <LinkedEntitiesSection
           title="Locations"
           icon={MapPin}
@@ -206,6 +205,7 @@ Format as bullet points. Each event should move the world forward and create pre
           entities={entities}
           campaignId={campaignId}
         />
+        <p className="text-xs text-zinc-600">Select primary and secondary settings. Note one distinct sensory detail for each to make scene transitions feel visceral.</p>
         <AIGenerateTextarea
           value={formData.location_notes || ''}
           onChange={setField('location_notes')}
@@ -225,7 +225,6 @@ Format as a concise list: location name + 1 sensory detail.`,
 
       {/* NPCs */}
       <section className="space-y-3">
-        <p className="text-xs text-zinc-600">Choose the characters appearing tonight. Define each one's immediate goal and a quick roleplay quirk to keep their performance consistent.</p>
         <LinkedEntitiesSection
           title="NPCs"
           icon={Users}
@@ -236,6 +235,7 @@ Format as a concise list: location name + 1 sensory detail.`,
           entities={entities}
           campaignId={campaignId}
         />
+        <p className="text-xs text-zinc-600">Choose the characters appearing tonight. Define each one's immediate goal and a quick roleplay quirk to keep their performance consistent.</p>
         <AIGenerateTextarea
           value={formData.npc_notes || ''}
           onChange={setField('npc_notes')}
@@ -254,7 +254,6 @@ ${ctx()}`,
 
       {/* Encounters */}
       <section className="space-y-3">
-        <p className="text-xs text-zinc-600">Determine the specific challenges — combat, social negotiations, or environmental hazards. Link entities so stat blocks and DC checks are ready to go.</p>
         <LinkedEntitiesSection
           title="Encounters"
           icon={Flame}
@@ -275,6 +274,7 @@ ${ctx()}`,
           entities={entities}
           campaignId={campaignId}
         />
+        <p className="text-xs text-zinc-600">Determine the specific challenges — combat, social negotiations, or environmental hazards. Link entities so stat blocks and DC checks are ready to go.</p>
         <AIGenerateTextarea
           value={formData.monster_notes || ''}
           onChange={setField('monster_notes')}
@@ -293,7 +293,6 @@ ${ctx()}`,
 
       {/* Threads */}
       <section className="space-y-3">
-        <p className="text-xs text-zinc-600">Note which ongoing plot hooks and mysteries are active tonight. Track current progress and how much closer players get to resolution.</p>
         <LinkedEntitiesSection
           title="Threads"
           icon={GitBranch}
@@ -304,6 +303,7 @@ ${ctx()}`,
           entities={entities}
           campaignId={campaignId}
         />
+        <p className="text-xs text-zinc-600">Note which ongoing plot hooks and mysteries are active tonight. Track current progress and how much closer players get to resolution.</p>
         <AIGenerateTextarea
           value={formData.thread_notes || ''}
           onChange={setField('thread_notes')}
