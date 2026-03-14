@@ -1,9 +1,10 @@
 import React, { useState, useRef } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Campaign, functions } from '@/api/entities';
+import { supabase } from '@/api/supabaseClient';
 import { createPageUrl } from '@/utils';
 import { Link } from 'react-router-dom';
-import { Plus, FolderOpen, MoreHorizontal, Trash2, Download, Upload, FileText, Sparkles, LogOut } from 'lucide-react';
+import { Plus, FolderOpen, MoreHorizontal, Trash2, Download, Upload, FileText, Sparkles, LogOut, BookOpen } from 'lucide-react';
 import { useAuth } from '@/lib/AuthContext';
 import RawImportDialog from '@/components/campaign/RawImportDialog';
 import { Button } from '@/components/ui/button';
@@ -59,6 +60,14 @@ export default function CampaignList() {
     setExportingId(null);
   };
 
+  const [loadingDemo, setLoadingDemo] = useState(false);
+  const handleLoadDemo = async () => {
+    setLoadingDemo(true);
+    await supabase.functions.invoke('create-demo');
+    await queryClient.invalidateQueries({ queryKey: ['campaigns'] });
+    setLoadingDemo(false);
+  };
+
   const { data: campaigns = [], isLoading } = useQuery({
     queryKey: ['campaigns'],
     queryFn: () => Campaign.list('-created_date'),
@@ -97,15 +106,8 @@ export default function CampaignList() {
       {/* Hero */}
       <div className="text-center mb-16 max-w-lg">
         <h1 className="text-4xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100 mb-3">
-          GM<span className="text-amber-600 dark:text-amber-400">/OS</span>
+          GM<span className="text-amber-600 dark:text-amber-400">/OS{isPlus ? '+' : ''}</span>
         </h1>
-        {isPlus && (
-          <div className="flex justify-center mb-3">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-500 dark:text-amber-400 text-xs font-semibold tracking-wide">
-              ✦ GM/OS+
-            </span>
-          </div>
-        )}
         <p className="text-zinc-600 dark:text-zinc-500 text-sm leading-relaxed">
           The operating system for Game Masters. Manage your world, run your sessions, stay in control.
         </p>
@@ -143,6 +145,14 @@ export default function CampaignList() {
                 >
                   <Sparkles className="w-3.5 h-3.5 mr-2" />
                   From Raw Data (AI)
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={handleLoadDemo}
+                  disabled={loadingDemo}
+                  className="text-zinc-700 dark:text-zinc-300 focus:text-zinc-900 dark:focus:text-zinc-100"
+                >
+                  <BookOpen className="w-3.5 h-3.5 mr-2" />
+                  {loadingDemo ? 'Loading...' : 'Load Demo Campaign'}
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
