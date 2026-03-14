@@ -79,6 +79,8 @@ export async function InvokeLLM({ prompt, response_json_schema, add_context_from
     body: { prompt, response_json_schema, add_context_from_internet },
   });
   if (error) throw error;
+  // Plain-text responses are wrapped in { result: "..." }; unwrap for callers expecting a string
+  if (!response_json_schema && data?.result !== undefined) return data.result;
   return data;
 }
 
