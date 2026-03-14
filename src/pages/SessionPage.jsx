@@ -70,6 +70,7 @@ export default function SessionPage() {
     if (session) {
       setFormData({
         title: session.title || '',
+        date: session.date || '',
         previous_session_recap: session.previous_session_recap ||
           (previousSession ? (previousSession.next_session_primer || previousSession.summary || '') : ''),
         strong_start: session.strong_start || '',

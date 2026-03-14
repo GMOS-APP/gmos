@@ -25,6 +25,12 @@ export default function SessionHeader({ formData, setFormData, saving, saved, ha
           placeholder={`Session #${sessionNum}`}
           className="bg-transparent border-0 dark:border-b dark:border-zinc-700 border-b border-gray-300 rounded-none px-0 text-sm font-semibold dark:text-zinc-200 dark:placeholder:text-zinc-600 text-gray-900 placeholder:text-gray-500 focus-visible:ring-0 focus-visible:dark:border-amber-500/50 focus-visible:border-amber-600/50 w-28 sm:w-48"
         />
+        <Input
+          type="date"
+          value={formData.date || ''}
+          onChange={(e) => setFormData(prev => ({ ...prev, date: e.target.value }))}
+          className="bg-transparent border-0 dark:border-b dark:border-zinc-700 border-b border-gray-300 rounded-none px-0 text-xs dark:text-zinc-400 text-gray-500 focus-visible:ring-0 focus-visible:dark:border-amber-500/50 focus-visible:border-amber-600/50 w-32 dark:[color-scheme:dark]"
+        />
       </div>
       <div className="flex items-center gap-2 flex-shrink-0">
         <Button
