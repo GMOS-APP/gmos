@@ -79,7 +79,11 @@ export async function InvokeLLM({ prompt, response_json_schema, add_context_from
     body: { prompt, response_json_schema, add_context_from_internet },
   });
   if (error) {
-    const detail = data?.detail || data?.error || error.message;
+    let detail = error.message;
+    try {
+      const body = await error.context?.json?.();
+      detail = body?.detail || body?.error || error.message;
+    } catch { /* ignore */ }
     throw new Error(detail);
   }
   // Plain-text responses are wrapped in { result: "..." }; unwrap for callers expecting a string
