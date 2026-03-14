@@ -30,7 +30,7 @@ function TextArea({ value, onChange, placeholder, rows = 3 }) {
       onChange={(e) => onChange(e.target.value)}
       placeholder={placeholder}
       rows={rows}
-      className="bg-zinc-900/60 border-zinc-800 text-zinc-200 placeholder:text-zinc-600 resize-none"
+      className="bg-gray-100 border-gray-300 text-gray-900 placeholder:text-gray-500 dark:bg-zinc-900/60 dark:border-zinc-800 dark:text-zinc-200 dark:placeholder:text-zinc-600 resize-none"
     />
   );
 }
@@ -55,8 +55,8 @@ export default function ThreadFields({ extraData, onChange }) {
       <SectionDivider label="Status" />
       <Field label="Urgency">
         <Select value={get('urgency')} onValueChange={(v) => set('urgency', v)}>
-          <SelectTrigger className="bg-zinc-900/60 border-zinc-800 text-zinc-300 text-sm h-9"><SelectValue placeholder="Select urgency" /></SelectTrigger>
-          <SelectContent className="bg-zinc-900 border-zinc-800">
+          <SelectTrigger className="bg-gray-100 border-gray-300 text-gray-700 text-sm h-9 dark:bg-zinc-900/60 dark:border-zinc-800 dark:text-zinc-300"><SelectValue placeholder="Select urgency" /></SelectTrigger>
+          <SelectContent className="bg-white border-gray-200 dark:bg-zinc-900 dark:border-zinc-800">
             {URGENCIES.map((u) => <SelectItem key={u} value={u} className="text-zinc-300 text-xs">{u}</SelectItem>)}
           </SelectContent>
         </Select>

@@ -101,17 +101,17 @@ export default function NPCBuilder({ npcData, onUpdate }) {
             value={data.gender}
             onChange={(e) => handleChange('gender', e.target.value)}
             placeholder="Male, Female, Non-binary, etc."
-            className="bg-zinc-900/60 border-zinc-800 text-zinc-200"
+            className="bg-gray-100 border-gray-300 text-gray-900 dark:bg-zinc-900/60 dark:border-zinc-800 dark:text-zinc-200"
           />
         </div>
 
         <div>
           <label className="text-xs text-zinc-500 uppercase tracking-widest font-semibold mb-2 block">Race</label>
           <Select value={data.race} onValueChange={(v) => handleChange('race', v)}>
-            <SelectTrigger className="bg-zinc-900/60 border-zinc-800 text-zinc-200">
+            <SelectTrigger className="bg-gray-100 border-gray-300 text-gray-900 dark:bg-zinc-900/60 dark:border-zinc-800 dark:text-zinc-200">
               <SelectValue placeholder="Select race" />
             </SelectTrigger>
-            <SelectContent className="bg-zinc-900 border-zinc-800">
+            <SelectContent className="bg-white border-gray-200 dark:bg-zinc-900 dark:border-zinc-800">
               {SRD_RACES.map((r) => (
                 <SelectItem key={r} value={r} className="text-zinc-300">{r}</SelectItem>
               ))}
@@ -122,10 +122,10 @@ export default function NPCBuilder({ npcData, onUpdate }) {
         <div>
           <label className="text-xs text-zinc-500 uppercase tracking-widest font-semibold mb-2 block">Class</label>
           <Select value={data.class} onValueChange={(v) => handleChange('class', v)}>
-            <SelectTrigger className="bg-zinc-900/60 border-zinc-800 text-zinc-200">
+            <SelectTrigger className="bg-gray-100 border-gray-300 text-gray-900 dark:bg-zinc-900/60 dark:border-zinc-800 dark:text-zinc-200">
               <SelectValue placeholder="Select class" />
             </SelectTrigger>
-            <SelectContent className="bg-zinc-900 border-zinc-800">
+            <SelectContent className="bg-white border-gray-200 dark:bg-zinc-900 dark:border-zinc-800">
               {SRD_CLASSES.map((c) => (
                 <SelectItem key={c} value={c} className="text-zinc-300">{c}</SelectItem>
               ))}
@@ -136,10 +136,10 @@ export default function NPCBuilder({ npcData, onUpdate }) {
         <div>
           <label className="text-xs text-zinc-500 uppercase tracking-widest font-semibold mb-2 block">Alignment</label>
           <Select value={data.alignment} onValueChange={(v) => handleChange('alignment', v)}>
-            <SelectTrigger className="bg-zinc-900/60 border-zinc-800 text-zinc-200">
+            <SelectTrigger className="bg-gray-100 border-gray-300 text-gray-900 dark:bg-zinc-900/60 dark:border-zinc-800 dark:text-zinc-200">
               <SelectValue placeholder="Select alignment" />
             </SelectTrigger>
-            <SelectContent className="bg-zinc-900 border-zinc-800">
+            <SelectContent className="bg-white border-gray-200 dark:bg-zinc-900 dark:border-zinc-800">
               {SRD_ALIGNMENTS.map((a) => (
                 <SelectItem key={a} value={a} className="text-zinc-300">{a}</SelectItem>
               ))}
@@ -181,7 +181,7 @@ export default function NPCBuilder({ npcData, onUpdate }) {
           onChange={(e) => handleChange('appearance', e.target.value)}
           placeholder="Physical description, clothing, distinctive features..."
           rows={3}
-          className="bg-zinc-900/60 border-zinc-800 text-zinc-200 placeholder:text-zinc-600 text-sm"
+          className="bg-gray-100 border-gray-300 text-gray-900 placeholder:text-gray-500 dark:bg-zinc-900/60 dark:border-zinc-800 dark:text-zinc-200 dark:placeholder:text-zinc-600 text-sm"
         />
       </div>
 
@@ -204,7 +204,7 @@ export default function NPCBuilder({ npcData, onUpdate }) {
           onChange={(e) => handleChange('traits', e.target.value)}
           placeholder="Personality traits, mannerisms, speech patterns..."
           rows={3}
-          className="bg-zinc-900/60 border-zinc-800 text-zinc-200 placeholder:text-zinc-600 text-sm"
+          className="bg-gray-100 border-gray-300 text-gray-900 placeholder:text-gray-500 dark:bg-zinc-900/60 dark:border-zinc-800 dark:text-zinc-200 dark:placeholder:text-zinc-600 text-sm"
         />
       </div>
 
@@ -227,7 +227,7 @@ export default function NPCBuilder({ npcData, onUpdate }) {
           onChange={(e) => handleChange('rumors', e.target.value)}
           placeholder="Rumors about this NPC (true, false, or partially true)..."
           rows={3}
-          className="bg-zinc-900/60 border-zinc-800 text-zinc-200 placeholder:text-zinc-600 text-sm"
+          className="bg-gray-100 border-gray-300 text-gray-900 placeholder:text-gray-500 dark:bg-zinc-900/60 dark:border-zinc-800 dark:text-zinc-200 dark:placeholder:text-zinc-600 text-sm"
         />
       </div>
 
@@ -250,7 +250,7 @@ export default function NPCBuilder({ npcData, onUpdate }) {
           onChange={(e) => handleChange('quests', e.target.value)}
           placeholder="Potential quest hooks involving this NPC..."
           rows={3}
-          className="bg-zinc-900/60 border-zinc-800 text-zinc-200 placeholder:text-zinc-600 text-sm"
+          className="bg-gray-100 border-gray-300 text-gray-900 placeholder:text-gray-500 dark:bg-zinc-900/60 dark:border-zinc-800 dark:text-zinc-200 dark:placeholder:text-zinc-600 text-sm"
         />
       </div>
 
@@ -273,7 +273,7 @@ export default function NPCBuilder({ npcData, onUpdate }) {
           onChange={(e) => handleChange('motives', e.target.value)}
           placeholder="Hidden goals, secret agendas, true motivations..."
           rows={3}
-          className="bg-zinc-900/60 border-zinc-800 text-zinc-200 placeholder:text-zinc-600 text-sm"
+          className="bg-gray-100 border-gray-300 text-gray-900 placeholder:text-gray-500 dark:bg-zinc-900/60 dark:border-zinc-800 dark:text-zinc-200 dark:placeholder:text-zinc-600 text-sm"
         />
       </div>
 
@@ -296,7 +296,7 @@ export default function NPCBuilder({ npcData, onUpdate }) {
           onChange={(e) => handleChange('sample_dialogue', e.target.value)}
           placeholder="First meeting dialogue, example quotes..."
           rows={4}
-          className="bg-zinc-900/60 border-zinc-800 text-zinc-200 placeholder:text-zinc-600 text-sm font-mono"
+          className="bg-gray-100 border-gray-300 text-gray-900 placeholder:text-gray-500 dark:bg-zinc-900/60 dark:border-zinc-800 dark:text-zinc-200 dark:placeholder:text-zinc-600 text-sm font-mono"
         />
       </div>
     </div>
