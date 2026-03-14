@@ -6,20 +6,12 @@ import Sidebar from '@/components/layout/Sidebar';
 import Breadcrumbs from '@/components/layout/Breadcrumbs';
 import GlobalSearch from '@/components/layout/GlobalSearch';
 import { Menu, Loader2 } from 'lucide-react';
-import BootSequence from '@/components/layout/BootSequence';
-
 const CAMPAIGN_PAGES = ['CampaignDashboard', 'EntityDetail', 'EntityBrowser', 'RelationshipMap', 'CampaignMap', 'SessionPage', 'SessionBrowser', 'RandomTableBrowser', 'CampaignTimeline', 'PlayerView'];
 
 export default function Layout({ children, currentPageName }) {
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [booting, setBooting] = useState(() => !sessionStorage.getItem('gmos_booted'));
   const { user, isLoadingAuth } = useAuth();
-
-  const handleBootComplete = () => {
-    sessionStorage.setItem('gmos_booted', '1');
-    setBooting(false);
-  };
 
   const params = new URLSearchParams(window.location.search);
   const campaignId = params.get('campaign_id') || (CAMPAIGN_PAGES.includes(currentPageName) && !params.get('campaign_id') ? params.get('id') : null);
@@ -38,10 +30,6 @@ export default function Layout({ children, currentPageName }) {
         <Loader2 className="w-6 h-6 text-green-500 animate-spin" />
       </div>
     );
-  }
-
-  if (booting) {
-    return <BootSequence userName={user?.full_name || user?.email} onComplete={handleBootComplete} />;
   }
 
   // Full-bleed layout
