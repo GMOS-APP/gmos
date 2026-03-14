@@ -82,12 +82,12 @@
   }
 
   html {
-    font-size: 16px;
+    font-size: 18px;
   }
 
   body {
     @apply bg-background text-foreground;
-    font-size: 16px;
+    font-size: 18px;
   }
 }
 
