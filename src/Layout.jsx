@@ -5,6 +5,7 @@ import { useAuth } from '@/lib/AuthContext';
 import Sidebar from '@/components/layout/Sidebar';
 import Breadcrumbs from '@/components/layout/Breadcrumbs';
 import GlobalSearch from '@/components/layout/GlobalSearch';
+import QuickCapture from '@/components/layout/QuickCapture';
 import { Menu, Loader2 } from 'lucide-react';
 const CAMPAIGN_PAGES = ['CampaignDashboard', 'EntityDetail', 'EntityBrowser', 'RelationshipMap', 'CampaignMap', 'SessionPage', 'SessionBrowser', 'RandomTableBrowser', 'CampaignTimeline', 'PlayerView'];
 
@@ -88,6 +89,7 @@ export default function Layout({ children, currentPageName }) {
           {children}
         </div>
       </main>
+      <QuickCapture campaignId={campaignId} />
     </div>
   );
 }
