@@ -3,6 +3,7 @@ import { InvokeLLM } from '@/api/entities';
 import { Plus, X, Sparkles, Loader2 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import AiGate from '@/components/ui/AiGate';
 
 export default function PotentialScenes({ scenes, onChange, campaign, threads }) {
   const [newScene, setNewScene] = useState('');
@@ -51,19 +52,21 @@ Return 5 scenes as a JSON array of short strings.`,
         Brief list of scenes that <em>might</em> occur — keep it short. Be ready to throw these away if players go elsewhere.
       </p>
 
-      <Button
-        onClick={generate}
-        disabled={generating}
-        size="sm"
-        variant="outline"
-        className="border-blue-500/30 text-blue-400 hover:bg-blue-500/10 mb-2"
-      >
-        {generating ? (
-          <><Loader2 className="w-3 h-3 mr-1.5 animate-spin" /> Generating...</>
-        ) : (
-          <><Sparkles className="w-3 h-3 mr-1.5" /> Suggest Scenes</>
-        )}
-      </Button>
+      <AiGate>
+        <Button
+          onClick={generate}
+          disabled={generating}
+          size="sm"
+          variant="outline"
+          className="border-blue-500/30 text-blue-400 hover:bg-blue-500/10 mb-2"
+        >
+          {generating ? (
+            <><Loader2 className="w-3 h-3 mr-1.5 animate-spin" /> Generating...</>
+          ) : (
+            <><Sparkles className="w-3 h-3 mr-1.5" /> Suggest Scenes</>
+          )}
+        </Button>
+      </AiGate>
 
       <div className="space-y-2">
         {scenes.map((scene, i) => (

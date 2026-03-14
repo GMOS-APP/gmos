@@ -5,6 +5,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Wand2, Loader2 } from 'lucide-react';
 import { InvokeLLM } from '@/api/entities';
+import AiGate from '@/components/ui/AiGate';
 
 const SRD_RACES = ['Human', 'Elf', 'Dwarf', 'Halfling', 'Dragonborn', 'Gnome', 'Half-Elf', 'Half-Orc', 'Tiefling'];
 const SRD_CLASSES = ['Barbarian', 'Bard', 'Cleric', 'Druid', 'Fighter', 'Monk', 'Paladin', 'Ranger', 'Rogue', 'Sorcerer', 'Warlock', 'Wizard'];
@@ -149,32 +150,36 @@ export default function NPCBuilder({ npcData, onUpdate }) {
       </div>
 
       {/* Generate All Button */}
-      <Button
-        onClick={generateAllFields}
-        disabled={generating !== null}
-        variant="outline"
-        className="w-full border-blue-500/30 text-blue-400 hover:bg-blue-500/10"
-      >
-        {generating ? (
-          <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Generating...</>
-        ) : (
-          <><Wand2 className="w-4 h-4 mr-2" /> Generate All NPC Details</>
-        )}
-      </Button>
+      <AiGate>
+        <Button
+          onClick={generateAllFields}
+          disabled={generating !== null}
+          variant="outline"
+          className="w-full border-blue-500/30 text-blue-400 hover:bg-blue-500/10"
+        >
+          {generating ? (
+            <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Generating...</>
+          ) : (
+            <><Wand2 className="w-4 h-4 mr-2" /> Generate All NPC Details</>
+          )}
+        </Button>
+      </AiGate>
 
       {/* Appearance */}
       <div>
         <div className="flex items-center justify-between mb-2">
           <label className="text-xs text-zinc-500 uppercase tracking-widest font-semibold">Appearance</label>
-          <Button
-            onClick={() => generateField('appearance')}
-            disabled={generating !== null}
-            size="sm"
-            variant="ghost"
-            className="text-zinc-500 hover:text-blue-400 h-7 text-xs"
-          >
-            {generating === 'appearance' ? <Loader2 className="w-3 h-3 animate-spin" /> : <Wand2 className="w-3 h-3" />}
-          </Button>
+          <AiGate>
+            <Button
+              onClick={() => generateField('appearance')}
+              disabled={generating !== null}
+              size="sm"
+              variant="ghost"
+              className="text-zinc-500 hover:text-blue-400 h-7 text-xs"
+            >
+              {generating === 'appearance' ? <Loader2 className="w-3 h-3 animate-spin" /> : <Wand2 className="w-3 h-3" />}
+            </Button>
+          </AiGate>
         </div>
         <Textarea
           value={data.appearance}
@@ -189,15 +194,17 @@ export default function NPCBuilder({ npcData, onUpdate }) {
       <div>
         <div className="flex items-center justify-between mb-2">
           <label className="text-xs text-zinc-500 uppercase tracking-widest font-semibold">Traits</label>
-          <Button
-            onClick={() => generateField('traits')}
-            disabled={generating !== null}
-            size="sm"
-            variant="ghost"
-            className="text-zinc-500 hover:text-blue-400 h-7 text-xs"
-          >
-            {generating === 'traits' ? <Loader2 className="w-3 h-3 animate-spin" /> : <Wand2 className="w-3 h-3" />}
-          </Button>
+          <AiGate>
+            <Button
+              onClick={() => generateField('traits')}
+              disabled={generating !== null}
+              size="sm"
+              variant="ghost"
+              className="text-zinc-500 hover:text-blue-400 h-7 text-xs"
+            >
+              {generating === 'traits' ? <Loader2 className="w-3 h-3 animate-spin" /> : <Wand2 className="w-3 h-3" />}
+            </Button>
+          </AiGate>
         </div>
         <Textarea
           value={data.traits}
@@ -212,15 +219,17 @@ export default function NPCBuilder({ npcData, onUpdate }) {
       <div>
         <div className="flex items-center justify-between mb-2">
           <label className="text-xs text-zinc-500 uppercase tracking-widest font-semibold">Rumors</label>
-          <Button
-            onClick={() => generateField('rumors')}
-            disabled={generating !== null}
-            size="sm"
-            variant="ghost"
-            className="text-zinc-500 hover:text-blue-400 h-7 text-xs"
-          >
-            {generating === 'rumors' ? <Loader2 className="w-3 h-3 animate-spin" /> : <Wand2 className="w-3 h-3" />}
-          </Button>
+          <AiGate>
+            <Button
+              onClick={() => generateField('rumors')}
+              disabled={generating !== null}
+              size="sm"
+              variant="ghost"
+              className="text-zinc-500 hover:text-blue-400 h-7 text-xs"
+            >
+              {generating === 'rumors' ? <Loader2 className="w-3 h-3 animate-spin" /> : <Wand2 className="w-3 h-3" />}
+            </Button>
+          </AiGate>
         </div>
         <Textarea
           value={data.rumors}
@@ -235,15 +244,17 @@ export default function NPCBuilder({ npcData, onUpdate }) {
       <div>
         <div className="flex items-center justify-between mb-2">
           <label className="text-xs text-zinc-500 uppercase tracking-widest font-semibold">Quests</label>
-          <Button
-            onClick={() => generateField('quests')}
-            disabled={generating !== null}
-            size="sm"
-            variant="ghost"
-            className="text-zinc-500 hover:text-blue-400 h-7 text-xs"
-          >
-            {generating === 'quests' ? <Loader2 className="w-3 h-3 animate-spin" /> : <Wand2 className="w-3 h-3" />}
-          </Button>
+          <AiGate>
+            <Button
+              onClick={() => generateField('quests')}
+              disabled={generating !== null}
+              size="sm"
+              variant="ghost"
+              className="text-zinc-500 hover:text-blue-400 h-7 text-xs"
+            >
+              {generating === 'quests' ? <Loader2 className="w-3 h-3 animate-spin" /> : <Wand2 className="w-3 h-3" />}
+            </Button>
+          </AiGate>
         </div>
         <Textarea
           value={data.quests}
@@ -258,15 +269,17 @@ export default function NPCBuilder({ npcData, onUpdate }) {
       <div>
         <div className="flex items-center justify-between mb-2">
           <label className="text-xs text-zinc-500 uppercase tracking-widest font-semibold">Motives</label>
-          <Button
-            onClick={() => generateField('motives')}
-            disabled={generating !== null}
-            size="sm"
-            variant="ghost"
-            className="text-zinc-500 hover:text-blue-400 h-7 text-xs"
-          >
-            {generating === 'motives' ? <Loader2 className="w-3 h-3 animate-spin" /> : <Wand2 className="w-3 h-3" />}
-          </Button>
+          <AiGate>
+            <Button
+              onClick={() => generateField('motives')}
+              disabled={generating !== null}
+              size="sm"
+              variant="ghost"
+              className="text-zinc-500 hover:text-blue-400 h-7 text-xs"
+            >
+              {generating === 'motives' ? <Loader2 className="w-3 h-3 animate-spin" /> : <Wand2 className="w-3 h-3" />}
+            </Button>
+          </AiGate>
         </div>
         <Textarea
           value={data.motives}
@@ -281,15 +294,17 @@ export default function NPCBuilder({ npcData, onUpdate }) {
       <div>
         <div className="flex items-center justify-between mb-2">
           <label className="text-xs text-zinc-500 uppercase tracking-widest font-semibold">Sample Dialogue</label>
-          <Button
-            onClick={() => generateField('sample_dialogue')}
-            disabled={generating !== null}
-            size="sm"
-            variant="ghost"
-            className="text-zinc-500 hover:text-blue-400 h-7 text-xs"
-          >
-            {generating === 'sample_dialogue' ? <Loader2 className="w-3 h-3 animate-spin" /> : <Wand2 className="w-3 h-3" />}
-          </Button>
+          <AiGate>
+            <Button
+              onClick={() => generateField('sample_dialogue')}
+              disabled={generating !== null}
+              size="sm"
+              variant="ghost"
+              className="text-zinc-500 hover:text-blue-400 h-7 text-xs"
+            >
+              {generating === 'sample_dialogue' ? <Loader2 className="w-3 h-3 animate-spin" /> : <Wand2 className="w-3 h-3" />}
+            </Button>
+          </AiGate>
         </div>
         <Textarea
           value={data.sample_dialogue}

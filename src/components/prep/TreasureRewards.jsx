@@ -3,6 +3,7 @@ import { InvokeLLM } from '@/api/entities';
 import { Sparkles, Loader2 } from 'lucide-react';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
+import AiGate from '@/components/ui/AiGate';
 
 export default function TreasureRewards({ notes, onChange, campaign }) {
   const [generating, setGenerating] = useState(false);
@@ -34,19 +35,21 @@ Format as a concise, practical list. Keep it brief.`,
         <p className="text-xs text-zinc-500">
           What loot might the players discover? Mix character-specific items with random rewards.
         </p>
-        <Button
-          onClick={generate}
-          disabled={generating}
-          size="sm"
-          variant="outline"
-          className="border-orange-500/30 text-orange-400 hover:bg-orange-500/10 flex-shrink-0"
-        >
-          {generating ? (
-            <><Loader2 className="w-3 h-3 mr-1.5 animate-spin" /> Generating...</>
-          ) : (
-            <><Sparkles className="w-3 h-3 mr-1.5" /> Generate Loot</>
-          )}
-        </Button>
+        <AiGate>
+          <Button
+            onClick={generate}
+            disabled={generating}
+            size="sm"
+            variant="outline"
+            className="border-orange-500/30 text-orange-400 hover:bg-orange-500/10 flex-shrink-0"
+          >
+            {generating ? (
+              <><Loader2 className="w-3 h-3 mr-1.5 animate-spin" /> Generating...</>
+            ) : (
+              <><Sparkles className="w-3 h-3 mr-1.5" /> Generate Loot</>
+            )}
+          </Button>
+        </AiGate>
       </div>
       <Textarea
         value={notes}

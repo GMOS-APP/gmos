@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
 import { Save, Loader2, Plus, X, CheckCircle2, Clock, CalendarDays, Wand2 } from 'lucide-react';
+import AiGate from '@/components/ui/AiGate';
 
 export default function SessionDebrief({ session, notes = [], entities = [], campaignId }) {
   const queryClient = useQueryClient();
@@ -105,15 +106,17 @@ Respond as JSON.`,
             )}
           </div>
         </div>
-        <Button
-          onClick={handleGenerate}
-          disabled={generating}
-          size="sm"
-          className="bg-violet-600 hover:bg-violet-500 text-white flex-shrink-0"
-        >
-          {generating ? <Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" /> : <Wand2 className="w-3.5 h-3.5 mr-1.5" />}
-          AI Generate
-        </Button>
+        <AiGate>
+          <Button
+            onClick={handleGenerate}
+            disabled={generating}
+            size="sm"
+            className="bg-violet-600 hover:bg-violet-500 text-white flex-shrink-0"
+          >
+            {generating ? <Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" /> : <Wand2 className="w-3.5 h-3.5 mr-1.5" />}
+            AI Generate
+          </Button>
+        </AiGate>
       </div>
 
       {/* Summary */}

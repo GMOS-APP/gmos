@@ -1,4 +1,5 @@
 import Anthropic from 'npm:@anthropic-ai/sdk@0.36.3';
+import { createClient } from 'npm:@supabase/supabase-js@2';
 
 const anthropic = new Anthropic({ apiKey: Deno.env.get('ANTHROPIC_API_KEY') });
 
@@ -7,6 +8,28 @@ Deno.serve(async (req) => {
     const authHeader = req.headers.get('Authorization');
     if (!authHeader) {
       return Response.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    // Verify JWT and check plan via service role
+    const token = authHeader.replace('Bearer ', '');
+    const supabaseAdmin = createClient(
+      Deno.env.get('SUPABASE_URL')!,
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!,
+    );
+
+    const { data: { user }, error: authError } = await supabaseAdmin.auth.getUser(token);
+    if (authError || !user) {
+      return Response.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const { data: profile } = await supabaseAdmin
+      .from('user_profiles')
+      .select('plan')
+      .eq('id', user.id)
+      .single();
+
+    if (profile?.plan !== 'plus') {
+      return Response.json({ error: 'upgrade_required' }, { status: 403 });
     }
 
     const { prompt, response_json_schema } = await req.json();

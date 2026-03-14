@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Wand2, PenLine, ChevronRight, ChevronLeft, Plus, X, Loader2, Sparkles } from 'lucide-react';
+import AiGate from '@/components/ui/AiGate';
 import { cn } from '@/lib/utils';
 
 const STEPS = ['Basics', 'Goals', 'Opening', 'Scenes'];
@@ -177,16 +178,18 @@ export default function NewSessionDialog({ open, onClose, campaignId, campaign }
                   className="dark:bg-zinc-800 dark:border-zinc-700 dark:text-zinc-200"
                 />
               </div>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={generateWithAI}
-                disabled={generating}
-                className="dark:border-amber-500/30 dark:text-amber-400 dark:hover:bg-amber-500/10 border-amber-300 text-amber-600 hover:bg-amber-50"
-              >
-                {generating ? <Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" /> : <Sparkles className="w-3.5 h-3.5 mr-1.5" />}
-                AI Generate All Fields
-              </Button>
+              <AiGate>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={generateWithAI}
+                  disabled={generating}
+                  className="dark:border-amber-500/30 dark:text-amber-400 dark:hover:bg-amber-500/10 border-amber-300 text-amber-600 hover:bg-amber-50"
+                >
+                  {generating ? <Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" /> : <Sparkles className="w-3.5 h-3.5 mr-1.5" />}
+                  AI Generate All Fields
+                </Button>
+              </AiGate>
             </div>
           )}
 

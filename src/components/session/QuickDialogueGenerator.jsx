@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
 import { Loader2, MessageSquare } from 'lucide-react';
+import AiGate from '@/components/ui/AiGate';
 
 export default function QuickDialogueGenerator() {
   const [generating, setGenerating] = useState(false);
@@ -56,6 +57,7 @@ Make it immediately usable for a DM to speak aloud.`,
         />
       </div>
 
+      <AiGate>
       <Button
         onClick={generateDialogue}
         disabled={generating || !npcName.trim()}
@@ -74,6 +76,7 @@ Make it immediately usable for a DM to speak aloud.`,
           </>
         )}
       </Button>
+      </AiGate>
 
       {dialogue && (
         <div className="dark:bg-zinc-800/40 dark:border-zinc-800 bg-gray-100 border-gray-300 rounded-lg p-3 space-y-2 border">

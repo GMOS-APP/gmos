@@ -20,6 +20,7 @@ import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
+import AiGate from '@/components/ui/AiGate';
 
 const entityTypes = ['npc', 'creature', 'location', 'faction', 'thread', 'item', 'player_character', 'event', 'lore', 'deity', 'encounter', 'shop'];
 const statuses = ['active', 'inactive', 'dead', 'destroyed', 'resolved', 'unknown'];
@@ -373,6 +374,7 @@ Format with markdown for readability.`;
           <p className="text-sm dark:text-zinc-500 text-gray-600 text-center mb-8">Choose how you'd like to create this {defaultType.replace('_', ' ')}</p>
           
           <div className={`grid gap-4 ${defaultType === 'creature' ? 'grid-cols-3' : 'grid-cols-2'}`}>
+            <AiGate>
             <button
               onClick={async () => {
                 setEntryMode('auto');
@@ -392,6 +394,7 @@ Format with markdown for readability.`;
                 </div>
               </div>
             </button>
+            </AiGate>
 
             {defaultType === 'creature' && (
               <button
@@ -495,13 +498,15 @@ Format with markdown for readability.`;
               placeholder="Search for creature (e.g., Goblin, Ancient Red Dragon)..."
               className="dark:bg-zinc-900/60 dark:border-zinc-800 dark:text-zinc-200 bg-gray-100 border-gray-300 text-gray-900"
             />
-            <Button
-              onClick={searchSRD}
-              disabled={searching || !srdSearch.trim()}
-              className="bg-green-500 hover:bg-green-400 text-zinc-950"
-            >
-              {searching ? <Loader2 className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
-            </Button>
+            <AiGate>
+              <Button
+                onClick={searchSRD}
+                disabled={searching || !srdSearch.trim()}
+                className="bg-green-500 hover:bg-green-400 text-zinc-950"
+              >
+                {searching ? <Loader2 className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
+              </Button>
+            </AiGate>
           </div>
 
           {searching && (
@@ -754,19 +759,21 @@ Format with markdown for readability.`;
                 </button>
               </div>
             </div>
-            <Button
-              onClick={generateContent}
-              disabled={generating || !form.name.trim()}
-              size="sm"
-              variant="outline"
-              className="border-blue-500/30 text-blue-400 hover:bg-blue-500/10 h-7 text-xs"
-            >
-              {generating ? (
-                <><Loader2 className="w-3 h-3 mr-1.5 animate-spin" /> Generating...</>
-              ) : (
-                <><Wand2 className="w-3 h-3 mr-1.5" /> Generate SRD Content</>
-              )}
-            </Button>
+            <AiGate>
+              <Button
+                onClick={generateContent}
+                disabled={generating || !form.name.trim()}
+                size="sm"
+                variant="outline"
+                className="border-blue-500/30 text-blue-400 hover:bg-blue-500/10 h-7 text-xs"
+              >
+                {generating ? (
+                  <><Loader2 className="w-3 h-3 mr-1.5 animate-spin" /> Generating...</>
+                ) : (
+                  <><Wand2 className="w-3 h-3 mr-1.5" /> Generate SRD Content</>
+                )}
+              </Button>
+            </AiGate>
           </div>
 
           {descriptionMode === 'edit' ? (

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { WorldEntity, InvokeLLM } from '@/api/entities';
 import { Button } from '@/components/ui/button';
 import { Loader2, Wand2, Save, Check } from 'lucide-react';
+import AiGate from '@/components/ui/AiGate';
 
 export default function RandomNPCGenerator({ campaignId }) {
   const [generating, setGenerating] = useState(false);
@@ -69,6 +70,7 @@ Make the NPC interesting and ready to roleplay with immediately.`,
 
   return (
     <div className="space-y-3">
+      <AiGate>
       <Button
         onClick={generateNPC}
         disabled={generating}
@@ -87,6 +89,7 @@ Make the NPC interesting and ready to roleplay with immediately.`,
           </>
         )}
       </Button>
+      </AiGate>
 
       {generatedNPC && (
         <div className="dark:bg-zinc-800/40 dark:border-zinc-800 bg-gray-100 border-gray-300 rounded-lg p-3 space-y-2 border">

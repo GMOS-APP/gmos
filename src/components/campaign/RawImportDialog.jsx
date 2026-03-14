@@ -4,6 +4,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Loader2, Sparkles, CheckCircle2 } from 'lucide-react';
+import AiGate from '@/components/ui/AiGate';
 
 export default function RawImportDialog({ open, onOpenChange, onImported }) {
   const [rawText, setRawText] = useState('');
@@ -144,14 +145,16 @@ Be thorough — extract every named person, place, organization, creature, item,
             {status === 'done' ? 'Close' : 'Cancel'}
           </Button>
           {status === 'idle' && (
-            <Button
-              onClick={handleBuild}
-              disabled={!rawText.trim()}
-              className="bg-amber-500 hover:bg-amber-400 text-zinc-950 font-semibold"
-            >
-              <Sparkles className="w-4 h-4 mr-1.5" />
-              Build Campaign
-            </Button>
+            <AiGate>
+              <Button
+                onClick={handleBuild}
+                disabled={!rawText.trim()}
+                className="bg-amber-500 hover:bg-amber-400 text-zinc-950 font-semibold"
+              >
+                <Sparkles className="w-4 h-4 mr-1.5" />
+                Build Campaign
+              </Button>
+            </AiGate>
           )}
         </DialogFooter>
       </DialogContent>

@@ -4,6 +4,7 @@ import { Plus, X, Sparkles, Loader2 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import AiGate from '@/components/ui/AiGate';
 
 const SECRET_TYPES = ['Character', 'Villain', 'Story', 'NPC', 'Location'];
 
@@ -56,19 +57,21 @@ Return exactly 10 secrets as a JSON array of strings.`,
         <p className="text-xs text-zinc-500 max-w-lg">
           Write up to <span className="text-amber-400 font-semibold">10 secrets</span> — short, abstracted clues players might discover. Don't decide how they're found; improvise that at the table.
         </p>
-        <Button
-          onClick={generateSecrets}
-          disabled={generating}
-          size="sm"
-          variant="outline"
-          className="border-purple-500/30 text-purple-400 hover:bg-purple-500/10 flex-shrink-0"
-        >
-          {generating ? (
-            <><Loader2 className="w-3 h-3 mr-1.5 animate-spin" /> Generating...</>
-          ) : (
-            <><Sparkles className="w-3 h-3 mr-1.5" /> Generate 10 Secrets</>
-          )}
-        </Button>
+        <AiGate>
+          <Button
+            onClick={generateSecrets}
+            disabled={generating}
+            size="sm"
+            variant="outline"
+            className="border-purple-500/30 text-purple-400 hover:bg-purple-500/10 flex-shrink-0"
+          >
+            {generating ? (
+              <><Loader2 className="w-3 h-3 mr-1.5 animate-spin" /> Generating...</>
+            ) : (
+              <><Sparkles className="w-3 h-3 mr-1.5" /> Generate 10 Secrets</>
+            )}
+          </Button>
+        </AiGate>
       </div>
 
       <div className="flex gap-1.5 flex-wrap mb-2">

@@ -4,6 +4,7 @@ import { WorldEntity, InvokeLLM } from '@/api/entities';
 import { Sparkles, Loader2 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import AiGate from '@/components/ui/AiGate';
 
 export default function CharacterHooks({ campaignId, hooks, onChange }) {
   const { data: pcs = [] } = useQuery({
@@ -65,19 +66,21 @@ Keep it short and punchy. No preamble.`,
               placeholder="What's their personal hook this session?"
               className="bg-zinc-950/60 border-zinc-800 text-zinc-200 text-sm placeholder:text-zinc-600"
             />
-            <Button
-              onClick={() => generateHook(pc)}
-              disabled={generating === pc.name}
-              size="sm"
-              variant="ghost"
-              className="text-purple-400 hover:text-purple-300 flex-shrink-0"
-            >
-              {generating === pc.name ? (
-                <Loader2 className="w-3.5 h-3.5 animate-spin" />
-              ) : (
-                <Sparkles className="w-3.5 h-3.5" />
-              )}
-            </Button>
+            <AiGate>
+              <Button
+                onClick={() => generateHook(pc)}
+                disabled={generating === pc.name}
+                size="sm"
+                variant="ghost"
+                className="text-purple-400 hover:text-purple-300 flex-shrink-0"
+              >
+                {generating === pc.name ? (
+                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                ) : (
+                  <Sparkles className="w-3.5 h-3.5" />
+                )}
+              </Button>
+            </AiGate>
           </div>
         </div>
       ))}

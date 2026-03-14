@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { RandomTable, InvokeLLM } from '@/api/entities';
 import { Sparkles, Plus, X, Loader2 } from 'lucide-react';
+import AiGate from '@/components/ui/AiGate';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -140,16 +141,18 @@ export default function RandomTableDialog({ open, onClose, campaignId, campaign,
             <span className="text-xs font-semibold uppercase tracking-wider dark:text-zinc-400 text-gray-500">
               Entries ({form.entries.length})
             </span>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={generateEntries}
-              disabled={generating || !form.name.trim()}
-              className="dark:border-zinc-700 dark:text-zinc-300 text-xs"
-            >
-              {generating ? <Loader2 className="w-3 h-3 mr-1.5 animate-spin" /> : <Sparkles className="w-3 h-3 mr-1.5" />}
-              Generate with AI
-            </Button>
+            <AiGate>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={generateEntries}
+                disabled={generating || !form.name.trim()}
+                className="dark:border-zinc-700 dark:text-zinc-300 text-xs"
+              >
+                {generating ? <Loader2 className="w-3 h-3 mr-1.5 animate-spin" /> : <Sparkles className="w-3 h-3 mr-1.5" />}
+                Generate with AI
+              </Button>
+            </AiGate>
           </div>
 
           <div ref={entryListRef} className="max-h-52 overflow-y-auto space-y-1.5 pr-1">
