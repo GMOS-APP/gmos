@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { InvokeLLM } from '@/api/entities';
 import { Button } from '@/components/ui/button';
-import { Plus, MapPin, Users, Swords, Flame, Scroll, Gem, X } from 'lucide-react';
+import { Plus, MapPin, Users, Swords, Flame, Scroll, Gem, X, CalendarDays } from 'lucide-react';
 import AIGenerateTextarea from './AIGenerateTextarea';
 import EntityPickerModal from './EntityPickerModal';
 
@@ -104,6 +104,19 @@ export default function PrepTab({ session, campaign, entities, formData, setForm
 
   return (
     <div className="space-y-8 max-w-3xl">
+
+      {/* Play Date */}
+      <section className="flex items-center gap-3">
+        <label className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-widest text-zinc-500 whitespace-nowrap">
+          <CalendarDays className="w-3.5 h-3.5" /> Play Date
+        </label>
+        <input
+          type="date"
+          value={formData.date || ''}
+          onChange={e => setFormData(prev => ({ ...prev, date: e.target.value }))}
+          className="bg-transparent border-b border-zinc-700 text-sm text-zinc-200 focus:outline-none focus:border-amber-500/60 pb-0.5 dark:[color-scheme:dark]"
+        />
+      </section>
 
       {/* Previously On */}
       <section className="space-y-2">
