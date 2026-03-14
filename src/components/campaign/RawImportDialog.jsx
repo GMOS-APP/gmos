@@ -20,7 +20,9 @@ export default function RawImportDialog({ open, onOpenChange, onImported }) {
 
     addLog('Analyzing raw data...');
 
-    const result = await InvokeLLM({
+    let result;
+    try {
+      result = await InvokeLLM({
       prompt: `You are a D&D campaign organizer. The user has pasted raw campaign notes, wiki content, or world-building text below. Extract and structure this into a full campaign with entities.
 
 RAW DATA:
@@ -63,6 +65,11 @@ Be thorough — extract every named person, place, organization, creature, item,
         },
       },
     });
+    } catch (err) {
+      addLog(`Error: ${err.message || 'AI call failed'}`);
+      setStatus('idle');
+      return;
+    }
 
     addLog(`Creating campaign: "${result.campaign.name}"...`);
     const campaign = await Campaign.create({

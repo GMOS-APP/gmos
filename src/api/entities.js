@@ -78,7 +78,10 @@ export async function InvokeLLM({ prompt, response_json_schema, add_context_from
   const { data, error } = await supabase.functions.invoke('invoke-llm', {
     body: { prompt, response_json_schema, add_context_from_internet },
   });
-  if (error) throw error;
+  if (error) {
+    const detail = data?.detail || data?.error || error.message;
+    throw new Error(detail);
+  }
   // Plain-text responses are wrapped in { result: "..." }; unwrap for callers expecting a string
   if (!response_json_schema && data?.result !== undefined) return data.result;
   return data;
