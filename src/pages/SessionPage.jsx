@@ -74,6 +74,10 @@ export default function SessionPage() {
         previous_session_recap: session.previous_session_recap ||
           (previousSession ? (previousSession.next_session_primer || previousSession.summary || '') : ''),
         strong_start: session.strong_start || '',
+        session_goals: session.session_goals || [],
+        potential_scenes: session.potential_scenes || [],
+        secrets_and_clues: session.secrets_and_clues || [],
+        character_hooks: session.character_hooks || [],
         planned_encounters: session.planned_encounters || [],
         creature_ids: session.creature_ids || [],
         planned_locations: session.planned_locations || [],

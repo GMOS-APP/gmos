@@ -1,9 +1,13 @@
 import React, { useState } from 'react';
 import { InvokeLLM } from '@/api/entities';
 import { Button } from '@/components/ui/button';
-import { Plus, MapPin, Users, Swords, Flame, Scroll, Gem, X, CalendarDays } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Plus, MapPin, Users, Swords, Flame, Scroll, Gem, X, CalendarDays, Target } from 'lucide-react';
 import AIGenerateTextarea from './AIGenerateTextarea';
 import EntityPickerModal from './EntityPickerModal';
+import CharacterHooks from '@/components/prep/CharacterHooks';
+import PotentialScenes from '@/components/prep/PotentialScenes';
+import SecretsClues from '@/components/prep/SecretsClues';
 
 function buildSessionContext(campaign, session, entities) {
   const linkedEntities = entities
@@ -94,12 +98,30 @@ function LinkedEntitiesSection({ title, icon: Icon, color, entityType, linkedIds
 }
 
 export default function PrepTab({ session, campaign, entities, formData, setFormData, campaignId }) {
+  const [newGoal, setNewGoal] = useState('');
   const ctx = () => buildSessionContext(campaign, { ...session, ...formData }, entities);
 
   const setField = (key) => (val) => setFormData(prev => ({ ...prev, [key]: val }));
   const setIds = (key) => (updater) => setFormData(prev => ({
     ...prev,
     [key]: typeof updater === 'function' ? updater(prev[key] || []) : updater,
+  }));
+
+  const threads = entities.filter(e => e.entity_type === 'lore');
+
+  const addGoal = () => {
+    if (newGoal.trim()) {
+      setFormData(prev => ({
+        ...prev,
+        session_goals: [...(prev.session_goals || []), { text: newGoal.trim(), completed: false }],
+      }));
+      setNewGoal('');
+    }
+  };
+
+  const removeGoal = (i) => setFormData(prev => ({
+    ...prev,
+    session_goals: (prev.session_goals || []).filter((_, idx) => idx !== i),
   }));
 
   return (
@@ -156,6 +178,100 @@ The strong start should:
 - Connect naturally to previous events
 - Be written as present-tense narration the DM reads aloud
 Keep it punchy: 2 short paragraphs max.`,
+            });
+            return result;
+          }}
+        />
+      </section>
+
+      {/* Session Goals */}
+      <section className="space-y-3">
+        <h3 className="text-xs font-semibold uppercase tracking-widest text-zinc-500 flex items-center gap-1.5">
+          <Target className="w-3.5 h-3.5" /> Session Goals
+        </h3>
+        <div className="space-y-2">
+          {(formData.session_goals || []).map((goal, i) => (
+            <div key={i} className="flex items-start gap-2 group bg-zinc-900/40 border border-zinc-800 rounded-lg p-3">
+              <span className="text-xs text-zinc-600 font-mono w-5 flex-shrink-0 mt-0.5">{i + 1}.</span>
+              <span className="text-sm text-zinc-300 flex-1">{goal.text}</span>
+              <button onClick={() => removeGoal(i)} className="opacity-0 group-hover:opacity-100 text-zinc-600 hover:text-red-400">
+                <X className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          ))}
+        </div>
+        <div className="flex gap-2">
+          <Input
+            value={newGoal}
+            onChange={(e) => setNewGoal(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addGoal())}
+            placeholder="e.g. Players reach the Sunken Temple..."
+            className="bg-zinc-950/60 border-zinc-800 text-zinc-200 text-sm placeholder:text-zinc-600"
+          />
+          <Button onClick={addGoal} size="sm" variant="ghost" className="text-zinc-500">
+            <Plus className="w-4 h-4" />
+          </Button>
+        </div>
+      </section>
+
+      {/* Potential Scenes */}
+      <section className="space-y-2">
+        <h3 className="text-xs font-semibold uppercase tracking-widest text-zinc-500">Potential Scenes</h3>
+        <PotentialScenes
+          scenes={formData.potential_scenes || []}
+          onChange={setField('potential_scenes')}
+          campaign={campaign}
+          threads={threads}
+        />
+      </section>
+
+      {/* Secrets & Clues */}
+      <section className="space-y-2">
+        <h3 className="text-xs font-semibold uppercase tracking-widest text-zinc-500">Secrets & Clues</h3>
+        <SecretsClues
+          campaignId={campaignId}
+          secrets={formData.secrets_and_clues || []}
+          onChange={setField('secrets_and_clues')}
+          campaign={campaign}
+          threads={threads}
+        />
+      </section>
+
+      {/* Character Hooks */}
+      <section className="space-y-2">
+        <h3 className="text-xs font-semibold uppercase tracking-widest text-zinc-500">Character Hooks</h3>
+        <CharacterHooks
+          campaignId={campaignId}
+          hooks={formData.character_hooks || []}
+          onChange={setField('character_hooks')}
+        />
+      </section>
+
+      {/* Relevant NPCs */}
+      <section className="space-y-3">
+        <h3 className="text-xs font-semibold uppercase tracking-widest text-zinc-500">NPCs</h3>
+        <LinkedEntitiesSection
+          title="NPCs"
+          icon={Users}
+          color="cyan"
+          entityType="npc"
+          linkedIds={formData.npc_ids || []}
+          setLinkedIds={setIds('npc_ids')}
+          entities={entities}
+          campaignId={campaignId}
+          session={session}
+          campaign={campaign}
+        />
+        <AIGenerateTextarea
+          value={formData.npc_notes || ''}
+          onChange={setField('npc_notes')}
+          placeholder={`e.g.\n- Lady Voss (gravelly voice, never makes eye contact) — wants the deed to the mill`}
+          rows={4}
+          onGenerate={async () => {
+            const result = await InvokeLLM({
+              prompt: `Generate a list of 3-5 important NPCs for a D&D session, formatted as bullet points.
+${ctx()}
+For each NPC include: name, one physical/vocal trait, and their motivation in this session.`,
             });
             return result;
           }}
@@ -229,37 +345,6 @@ Focus on monsters that fit the setting and current story threads. Include quanti
             const result = await InvokeLLM({
               prompt: `Generate 2-3 evocative fantastic locations for a D&D session, with brief descriptive bullet points (name + 2-3 sensory details each).
 ${ctx()}`,
-            });
-            return result;
-          }}
-        />
-      </section>
-
-      {/* Relevant NPCs */}
-      <section className="space-y-3">
-        <h3 className="text-xs font-semibold uppercase tracking-widest text-zinc-500">NPCs</h3>
-        <LinkedEntitiesSection
-          title="NPCs"
-          icon={Users}
-          color="cyan"
-          entityType="npc"
-          linkedIds={formData.npc_ids || []}
-          setLinkedIds={setIds('npc_ids')}
-          entities={entities}
-          campaignId={campaignId}
-          session={session}
-          campaign={campaign}
-        />
-        <AIGenerateTextarea
-          value={formData.npc_notes || ''}
-          onChange={setField('npc_notes')}
-          placeholder={`e.g.\n- Lady Voss (gravelly voice, never makes eye contact) — wants the deed to the mill`}
-          rows={4}
-          onGenerate={async () => {
-            const result = await InvokeLLM({
-              prompt: `Generate a list of 3-5 important NPCs for a D&D session, formatted as bullet points.
-${ctx()}
-For each NPC include: name, one physical/vocal trait, and their motivation in this session.`,
             });
             return result;
           }}
