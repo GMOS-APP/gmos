@@ -85,7 +85,7 @@ function HpControl({ current, max, onChange }) {
   return (
     <div className="flex flex-col gap-1.5">
       <div className="flex items-center gap-1.5">
-        <button onClick={() => apply(-1)} className="w-6 h-6 rounded flex items-center justify-center bg-red-500/10 hover:bg-red-500/20 text-red-400 transition-colors" title="Deal damage">
+        <button onClick={() => apply(-1)} className="w-8 h-8 sm:w-6 sm:h-6 rounded flex items-center justify-center bg-red-500/10 hover:bg-red-500/20 text-red-400 transition-colors" title="Deal damage">
           <Minus className="w-3 h-3" />
         </button>
         <Input
@@ -93,9 +93,9 @@ function HpControl({ current, max, onChange }) {
           onChange={(e) => setDelta(e.target.value.replace(/\D/g, ''))}
           onKeyDown={(e) => { if (e.key === 'Enter') apply(-1); }}
           placeholder="0"
-          className="w-12 h-6 text-center text-xs bg-zinc-900 border-zinc-700 text-zinc-200 px-1"
+          className="w-12 h-8 sm:h-6 text-center text-xs bg-zinc-900 border-zinc-700 text-zinc-200 px-1"
         />
-        <button onClick={() => apply(1)} className="w-6 h-6 rounded flex items-center justify-center bg-green-500/10 hover:bg-green-500/20 text-green-400 transition-colors" title="Heal">
+        <button onClick={() => apply(1)} className="w-8 h-8 sm:w-6 sm:h-6 rounded flex items-center justify-center bg-green-500/10 hover:bg-green-500/20 text-green-400 transition-colors" title="Heal">
           <Plus className="w-3 h-3" />
         </button>
         <span className="text-xs text-zinc-300 tabular-nums ml-1">
@@ -443,7 +443,7 @@ export default function InitiativeTracker({ campaignId }) {
                   </div>
 
                   {/* Remove */}
-                  <button onClick={() => removeCombatant(c.id)} className="text-zinc-700 hover:text-red-400 transition-colors flex-shrink-0 mt-0.5">
+                  <button onClick={() => removeCombatant(c.id)} className="p-1 text-zinc-700 hover:text-red-400 transition-colors flex-shrink-0 mt-0.5">
                     <Trash2 className="w-3.5 h-3.5" />
                   </button>
                 </div>

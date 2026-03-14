@@ -43,7 +43,7 @@ export default function Layout({ children, currentPageName }) {
   }
 
   return (
-    <div className="flex h-screen overflow-hidden">
+    <div className="flex h-screen overflow-hidden max-w-[1920px] mx-auto">
       <style>{`body { overflow: hidden; }`}</style>
 
       {/* Mobile overlay backdrop */}
@@ -78,6 +78,7 @@ export default function Layout({ children, currentPageName }) {
             <Menu className="w-5 h-5" />
           </button>
           <span className="text-sm font-semibold text-zinc-900 dark:text-zinc-400">{campaign?.name}</span>
+          <GlobalSearch campaignId={campaignId} />
         </div>
         <div className="flex items-center gap-3 px-3 py-1.5 border-b border-zinc-200 dark:border-zinc-800/60 bg-white dark:bg-zinc-950 flex-shrink-0">
           <Breadcrumbs currentPageName={currentPageName} campaign={campaign} />

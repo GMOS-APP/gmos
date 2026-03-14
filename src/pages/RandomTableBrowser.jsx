@@ -55,7 +55,7 @@ export default function RandomTableBrowser() {
     : tables.filter(t => t.category === categoryFilter);
 
   return (
-    <div className="p-6 lg:p-8 max-w-5xl">
+    <div className="p-4 sm:p-6 lg:p-8 max-w-5xl">
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-2xl font-bold dark:text-zinc-100 text-gray-900">Random Tables</h1>

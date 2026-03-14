@@ -82,7 +82,7 @@ export default function PublicPlayerView() {
 
   return (
     <div className="min-h-screen bg-zinc-950 text-zinc-100">
-      <div className="max-w-4xl mx-auto p-6 lg:p-8">
+      <div className="max-w-4xl mx-auto p-4 sm:p-6 lg:p-8">
 
         {/* Header */}
         <div className="mb-8">

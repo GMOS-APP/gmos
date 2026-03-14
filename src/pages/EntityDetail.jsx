@@ -357,7 +357,7 @@ Format with markdown for readability.`;
   // Entry mode selection for new entities
   if (isNew && !entryMode) {
     return (
-      <div className="p-6 lg:p-8 max-w-4xl">
+      <div className="p-4 sm:p-6 lg:p-8 max-w-4xl">
         <Link
           to={createPageUrl('EntityBrowser') + `?campaign_id=${campaignId}`}
           className="inline-flex items-center gap-1.5 text-xs dark:text-zinc-500 dark:hover:text-zinc-300 text-gray-600 hover:text-gray-900 mb-6"
@@ -459,7 +459,7 @@ Format with markdown for readability.`;
   // D&D Beyond Import mode
   if (isNew && entryMode === 'dnd_import') {
     return (
-      <div className="p-6 lg:p-8 max-w-4xl">
+      <div className="p-4 sm:p-6 lg:p-8 max-w-4xl">
         <DndBeyondImport
           onImport={(characterData) => {
             setForm((prev) => ({ ...prev, ...characterData }));
@@ -474,7 +474,7 @@ Format with markdown for readability.`;
   // SRD Import mode
   if (isNew && entryMode === 'srd_import') {
     return (
-      <div className="p-6 lg:p-8 max-w-4xl">
+      <div className="p-4 sm:p-6 lg:p-8 max-w-4xl">
         <button
           onClick={() => setEntryMode(null)}
           className="inline-flex items-center gap-1.5 text-xs dark:text-zinc-500 dark:hover:text-zinc-300 text-gray-600 hover:text-gray-900 mb-6"
@@ -563,7 +563,7 @@ Format with markdown for readability.`;
   }
 
   return (
-    <div className="p-6 lg:p-8 max-w-4xl">
+    <div className="p-4 sm:p-6 lg:p-8 max-w-4xl">
       {/* Back */}
       <Link
         to={createPageUrl('EntityBrowser') + `?campaign_id=${form.campaign_id}`}

@@ -116,10 +116,10 @@ export default function CampaignDashboard() {
   }
 
   return (
-    <div className="p-6 lg:p-8 max-w-6xl space-y-8">
+    <div className="p-4 sm:p-6 lg:p-8 max-w-6xl space-y-8">
 
       {/* ── Header ─────────────────────────────────────────────────── */}
-      <div className="flex items-start justify-between">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
         <div>
           <h1 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100">{campaign?.name || 'Campaign'}</h1>
           <p className="text-sm text-zinc-600 dark:text-zinc-500 mt-1">
@@ -139,7 +139,7 @@ export default function CampaignDashboard() {
       {/* ── Session Banner ──────────────────────────────────────────── */}
       {currentSession && (
         <div className={cn(
-          "rounded-xl border p-4 flex items-center gap-4",
+          "rounded-xl border p-4 flex flex-wrap items-center gap-4",
           inProgressSession
             ? "bg-emerald-50 dark:bg-emerald-500/5 border-emerald-300 dark:border-emerald-500/20"
             : "bg-amber-50 dark:bg-amber-500/5 border-amber-300 dark:border-amber-500/20"
