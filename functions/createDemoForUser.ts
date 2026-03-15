@@ -26,9 +26,16 @@ Deno.serve(async (req) => {
     return Response.json({ error: 'unauthorized' }, { status: 401, headers: corsHeaders });
   }
 
-  const { data: existing } = await supabase.from('campaigns').select('id').eq('is_demo', true).limit(1);
+  const { data: existing } = await supabase.from('campaigns').select('id').eq('is_demo', true);
   if (existing && existing.length > 0) {
-    return Response.json({ message: 'demo_already_exists' }, { headers: corsHeaders });
+    const ids = existing.map((r: { id: string }) => r.id);
+    await supabase.from('world_entities').delete().in('campaign_id', ids);
+    await supabase.from('sessions').delete().in('campaign_id', ids);
+    await supabase.from('relationships').delete().in('campaign_id', ids);
+    await supabase.from('quick_notes').delete().in('campaign_id', ids);
+    await supabase.from('campaign_maps').delete().in('campaign_id', ids);
+    await supabase.from('random_tables').delete().in('campaign_id', ids);
+    await supabase.from('campaigns').delete().in('id', ids);
   }
 
   const userId = user.id;
