@@ -114,11 +114,11 @@ export default function CampaignList() {
 
       {/* Hero */}
       <div className="text-center mb-16 max-w-lg">
-        <h1 className="text-4xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100 mb-3">
-          GM<span className="text-amber-600 dark:text-amber-400">/OS{isPlus ? '+' : ''}</span>
+        <h1 className="font-display text-5xl font-semibold tracking-widest text-zinc-100 dark:text-zinc-100 mb-4 select-none">
+          GM<span className="text-amber-400">/OS{isPlus ? '+' : ''}</span>
         </h1>
-        <p className="text-zinc-600 dark:text-zinc-500 text-sm leading-relaxed">
-          The operating system for Game Masters. Manage your world, run your sessions, stay in control.
+        <p className="text-zinc-500 dark:text-zinc-500 text-sm tracking-wide">
+          The operating system for Game Masters.
         </p>
       </div>
 
@@ -200,7 +200,7 @@ export default function CampaignList() {
                 >
                   <Link
                     to={createPageUrl('CampaignDashboard') + `?id=${c.id}`}
-                    className="group block p-5 rounded-xl bg-white dark:bg-zinc-900/60 border border-zinc-200 dark:border-zinc-800/50 hover:border-zinc-300 dark:hover:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-900 transition-all"
+                    className="group block p-5 rounded-xl bg-white dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800/50 hover:border-zinc-300 dark:hover:border-amber-900/40 hover:bg-zinc-50 dark:hover:bg-zinc-900/70 dark:shadow-[inset_0_1px_0_hsl(0_0%_100%_/_0.04)] transition-all"
                   >
                     <div className="flex items-start justify-between">
                       <div className="flex-1 min-w-0">
