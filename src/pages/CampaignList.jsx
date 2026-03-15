@@ -114,7 +114,7 @@ export default function CampaignList() {
 
       {/* Hero */}
       <div className="text-center mb-16 max-w-lg">
-        <h1 className="font-display text-5xl font-semibold tracking-widest text-zinc-100 dark:text-zinc-100 mb-4 select-none">
+        <h1 className="text-5xl font-semibold tracking-widest text-zinc-100 dark:text-zinc-100 mb-4 select-none">
           GM<span className="text-amber-400">/OS{isPlus ? '+' : ''}</span>
         </h1>
         <p className="text-zinc-500 dark:text-zinc-500 text-sm tracking-wide">
