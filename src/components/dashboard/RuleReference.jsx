@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { BookOpen, ChevronRight, ChevronDown } from 'lucide-react';
+import { useCampaign } from '@/lib/CampaignContext';
 
 const CONDITIONS = [
   { name: 'Blinded', desc: "Can't see. Attacks against you have advantage; your attacks have disadvantage." },
@@ -47,7 +48,10 @@ function CollapsibleCondition({ condition }) {
 }
 
 export default function RuleReference() {
+  const { system } = useCampaign();
   const [activeTab, setActiveTab] = useState('conditions');
+
+  if (!system.hasSrdConditions) return null;
 
   const tabs = [
     { id: 'conditions', label: 'Conditions' },

@@ -6,6 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Wand2, Loader2 } from 'lucide-react';
 import { InvokeLLM } from '@/api/entities';
 import AiGate from '@/components/ui/AiGate';
+import { useCampaign } from '@/lib/CampaignContext';
 
 const SRD_RACES = ['Human', 'Elf', 'Dwarf', 'Halfling', 'Dragonborn', 'Gnome', 'Half-Elf', 'Half-Orc', 'Tiefling'];
 const SRD_CLASSES = ['Barbarian', 'Bard', 'Cleric', 'Druid', 'Fighter', 'Monk', 'Paladin', 'Ranger', 'Rogue', 'Sorcerer', 'Warlock', 'Wizard'];
@@ -42,6 +43,7 @@ const rollStats = () => {
 };
 
 export default function NPCBuilder({ npcData, onUpdate }) {
+  const { system } = useCampaign();
   const [data, setData] = useState(npcData || {
     gender: '',
     race: '',
@@ -106,47 +108,73 @@ export default function NPCBuilder({ npcData, onUpdate }) {
           />
         </div>
 
-        <div>
-          <label className="text-xs text-zinc-500 uppercase tracking-widest font-semibold mb-2 block">Race</label>
-          <Select value={data.race} onValueChange={(v) => handleChange('race', v)}>
-            <SelectTrigger className="bg-gray-100 border-gray-300 text-gray-900 dark:bg-zinc-900/60 dark:border-zinc-800 dark:text-zinc-200">
-              <SelectValue placeholder="Select race" />
-            </SelectTrigger>
-            <SelectContent className="bg-white border-gray-200 dark:bg-zinc-900 dark:border-zinc-800">
-              {SRD_RACES.map((r) => (
-                <SelectItem key={r} value={r} className="text-zinc-300">{r}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+        {system.hasAbilityScores ? (
+          <>
+            <div>
+              <label className="text-xs text-zinc-500 uppercase tracking-widest font-semibold mb-2 block">{system.characterFields.species}</label>
+              <Select value={data.race} onValueChange={(v) => handleChange('race', v)}>
+                <SelectTrigger className="bg-gray-100 border-gray-300 text-gray-900 dark:bg-zinc-900/60 dark:border-zinc-800 dark:text-zinc-200">
+                  <SelectValue placeholder={`Select ${system.characterFields.species.toLowerCase()}`} />
+                </SelectTrigger>
+                <SelectContent className="bg-white border-gray-200 dark:bg-zinc-900 dark:border-zinc-800">
+                  {SRD_RACES.map((r) => (
+                    <SelectItem key={r} value={r} className="text-zinc-300">{r}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
 
-        <div>
-          <label className="text-xs text-zinc-500 uppercase tracking-widest font-semibold mb-2 block">Class</label>
-          <Select value={data.class} onValueChange={(v) => handleChange('class', v)}>
-            <SelectTrigger className="bg-gray-100 border-gray-300 text-gray-900 dark:bg-zinc-900/60 dark:border-zinc-800 dark:text-zinc-200">
-              <SelectValue placeholder="Select class" />
-            </SelectTrigger>
-            <SelectContent className="bg-white border-gray-200 dark:bg-zinc-900 dark:border-zinc-800">
-              {SRD_CLASSES.map((c) => (
-                <SelectItem key={c} value={c} className="text-zinc-300">{c}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+            <div>
+              <label className="text-xs text-zinc-500 uppercase tracking-widest font-semibold mb-2 block">{system.characterFields.role}</label>
+              <Select value={data.class} onValueChange={(v) => handleChange('class', v)}>
+                <SelectTrigger className="bg-gray-100 border-gray-300 text-gray-900 dark:bg-zinc-900/60 dark:border-zinc-800 dark:text-zinc-200">
+                  <SelectValue placeholder={`Select ${system.characterFields.role.toLowerCase()}`} />
+                </SelectTrigger>
+                <SelectContent className="bg-white border-gray-200 dark:bg-zinc-900 dark:border-zinc-800">
+                  {SRD_CLASSES.map((c) => (
+                    <SelectItem key={c} value={c} className="text-zinc-300">{c}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
 
-        <div>
-          <label className="text-xs text-zinc-500 uppercase tracking-widest font-semibold mb-2 block">Alignment</label>
-          <Select value={data.alignment} onValueChange={(v) => handleChange('alignment', v)}>
-            <SelectTrigger className="bg-gray-100 border-gray-300 text-gray-900 dark:bg-zinc-900/60 dark:border-zinc-800 dark:text-zinc-200">
-              <SelectValue placeholder="Select alignment" />
-            </SelectTrigger>
-            <SelectContent className="bg-white border-gray-200 dark:bg-zinc-900 dark:border-zinc-800">
-              {SRD_ALIGNMENTS.map((a) => (
-                <SelectItem key={a} value={a} className="text-zinc-300">{a}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+            <div>
+              <label className="text-xs text-zinc-500 uppercase tracking-widest font-semibold mb-2 block">Alignment</label>
+              <Select value={data.alignment} onValueChange={(v) => handleChange('alignment', v)}>
+                <SelectTrigger className="bg-gray-100 border-gray-300 text-gray-900 dark:bg-zinc-900/60 dark:border-zinc-800 dark:text-zinc-200">
+                  <SelectValue placeholder="Select alignment" />
+                </SelectTrigger>
+                <SelectContent className="bg-white border-gray-200 dark:bg-zinc-900 dark:border-zinc-800">
+                  {SRD_ALIGNMENTS.map((a) => (
+                    <SelectItem key={a} value={a} className="text-zinc-300">{a}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </>
+        ) : (
+          <>
+            <div>
+              <label className="text-xs text-zinc-500 uppercase tracking-widest font-semibold mb-2 block">Background</label>
+              <Input
+                value={data.race}
+                onChange={(e) => handleChange('race', e.target.value)}
+                placeholder="Origin, species, background..."
+                className="bg-gray-100 border-gray-300 text-gray-900 dark:bg-zinc-900/60 dark:border-zinc-800 dark:text-zinc-200"
+              />
+            </div>
+
+            <div>
+              <label className="text-xs text-zinc-500 uppercase tracking-widest font-semibold mb-2 block">Role / Occupation</label>
+              <Input
+                value={data.class}
+                onChange={(e) => handleChange('class', e.target.value)}
+                placeholder="Role, occupation, job..."
+                className="bg-gray-100 border-gray-300 text-gray-900 dark:bg-zinc-900/60 dark:border-zinc-800 dark:text-zinc-200"
+              />
+            </div>
+          </>
+        )}
       </div>
 
       {/* Generate All Button */}

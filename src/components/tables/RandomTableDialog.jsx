@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { RandomTable, InvokeLLM } from '@/api/entities';
+import { useCampaign } from '@/lib/CampaignContext';
 import { Sparkles, Plus, X, Loader2 } from 'lucide-react';
 import AiGate from '@/components/ui/AiGate';
 import { Button } from '@/components/ui/button';
@@ -26,6 +27,7 @@ const EMPTY_FORM = { name: '', description: '', category: 'custom', entries: [] 
 
 export default function RandomTableDialog({ open, onClose, campaignId, campaign, table }) {
   const queryClient = useQueryClient();
+  const { system } = useCampaign();
   const [form, setForm] = useState(EMPTY_FORM);
   const [entryInput, setEntryInput] = useState('');
   const [generating, setGenerating] = useState(false);
@@ -77,7 +79,7 @@ export default function RandomTableDialog({ open, onClose, campaignId, campaign,
     try {
       const categoryLabel = CATEGORIES.find(c => c.value === form.category)?.label || form.category;
       const result = await InvokeLLM({
-        prompt: `You are helping a Game Master populate a random "${categoryLabel}" table for a D&D campaign called "${campaign?.name || 'an unnamed campaign'}". Setting: ${campaign?.setting || 'a fantasy world'}. Table name: "${form.name}". Generate 10 varied, evocative entries suitable for this table. Return only the entries array.`,
+        prompt: `You are helping a Game Master populate a random "${categoryLabel}" table for a ${system.promptName} campaign called "${campaign?.name || 'an unnamed campaign'}". Setting: ${campaign?.setting || 'a fantasy world'}. Table name: "${form.name}". Generate 10 varied, evocative entries suitable for this table. Return only the entries array.`,
         response_json_schema: {
           type: 'object',
           properties: {
