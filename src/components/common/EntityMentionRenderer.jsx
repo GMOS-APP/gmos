@@ -1,5 +1,4 @@
-import React, { useState, useRef } from 'react';
-import { createPageUrl } from '@/utils';
+import React, { useState } from 'react';
 import EntityQuickViewModal from '@/components/common/EntityQuickViewModal';
 
 /**
