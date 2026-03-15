@@ -63,9 +63,18 @@ export default function CampaignList() {
   const [loadingDemo, setLoadingDemo] = useState(false);
   const handleLoadDemo = async () => {
     setLoadingDemo(true);
-    await supabase.functions.invoke('create-demo');
-    await queryClient.invalidateQueries({ queryKey: ['campaigns'] });
-    setLoadingDemo(false);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const { error } = await supabase.functions.invoke('create-demo', {
+        headers: session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : undefined,
+      });
+      if (error) throw error;
+      await queryClient.invalidateQueries({ queryKey: ['campaigns'] });
+    } catch (err) {
+      console.error('Failed to load demo campaign:', err);
+    } finally {
+      setLoadingDemo(false);
+    }
   };
 
   const { data: campaigns = [], isLoading } = useQuery({
