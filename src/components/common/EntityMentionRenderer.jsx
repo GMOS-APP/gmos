@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import EntityQuickViewModal from '@/components/common/EntityQuickViewModal';
 
 /**
@@ -51,8 +51,17 @@ export default function EntityMentionRenderer({ text, entities = [], campaignId,
 }
 
 function EntityMentionLink({ entityId, entityName, entity, campaignId }) {
-  const [modalOpen, setModalOpen] = useState(false);
+  const [open, setOpen] = useState(false);
+  const [anchorRect, setAnchorRect] = useState(null);
+  const btnRef = useRef(null);
   const isDeleted = !entity;
+
+  const handleClick = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setAnchorRect(btnRef.current?.getBoundingClientRect());
+    setOpen(true);
+  };
 
   return (
     <>
@@ -62,7 +71,8 @@ function EntityMentionLink({ entityId, entityName, entity, campaignId }) {
         </span>
       ) : (
         <button
-          onClick={(e) => { e.preventDefault(); e.stopPropagation(); setModalOpen(true); }}
+          ref={btnRef}
+          onClick={handleClick}
           className="text-amber-600 dark:text-amber-400 hover:text-amber-500 dark:hover:text-amber-300 underline decoration-dotted underline-offset-2 font-medium cursor-pointer"
         >
           @{entity.name}
@@ -73,8 +83,9 @@ function EntityMentionLink({ entityId, entityName, entity, campaignId }) {
         <EntityQuickViewModal
           entity={entity}
           campaignId={campaignId}
-          open={modalOpen}
-          onOpenChange={setModalOpen}
+          open={open}
+          onOpenChange={setOpen}
+          anchorRect={anchorRect}
         />
       )}
     </>

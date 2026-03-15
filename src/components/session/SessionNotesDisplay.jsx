@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import ReactMarkdown from 'react-markdown';
 import { createPageUrl } from '@/utils';
 import EntityQuickViewModal from '@/components/common/EntityQuickViewModal';
@@ -25,15 +25,18 @@ function Section({ title, children }) {
 
 function MentionButton({ entity, campaignId, children }) {
   const [open, setOpen] = useState(false);
+  const [anchorRect, setAnchorRect] = useState(null);
+  const btnRef = useRef(null);
   return (
     <>
       <button
-        onClick={(e) => { e.preventDefault(); e.stopPropagation(); setOpen(true); }}
+        ref={btnRef}
+        onClick={(e) => { e.preventDefault(); e.stopPropagation(); setAnchorRect(btnRef.current?.getBoundingClientRect()); setOpen(true); }}
         className="text-amber-600 dark:text-amber-400 hover:text-amber-500 dark:hover:text-amber-300 underline decoration-dotted underline-offset-2 font-medium cursor-pointer"
       >
         {children}
       </button>
-      <EntityQuickViewModal entity={entity} campaignId={campaignId} open={open} onOpenChange={setOpen} />
+      <EntityQuickViewModal entity={entity} campaignId={campaignId} open={open} onOpenChange={setOpen} anchorRect={anchorRect} />
     </>
   );
 }
