@@ -7,6 +7,7 @@ import { Link } from 'react-router-dom';
 import { Plus, FolderOpen, MoreHorizontal, Trash2, Download, Upload, FileText, Sparkles, LogOut, BookOpen } from 'lucide-react';
 import { useAuth } from '@/lib/AuthContext';
 import RawImportDialog from '@/components/campaign/RawImportDialog';
+import ThemeToggle from '@/components/ui/ThemeToggle';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -97,9 +98,10 @@ export default function CampaignList() {
   });
 
   return (
-    <div className="min-h-screen flex flex-col items-center px-6 py-16">
+    <div className="min-h-screen flex flex-col items-center px-4 sm:px-6 py-10 sm:py-16">
       {/* User bar */}
       <div className="w-full max-w-3xl flex justify-end items-center gap-3 mb-10">
+        <ThemeToggle className="mr-1" />
         {user?.email && (
           <span className="text-xs text-zinc-500 dark:text-zinc-600">{user.email}</span>
         )}

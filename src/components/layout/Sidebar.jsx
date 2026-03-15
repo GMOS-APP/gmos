@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { auth } from '@/api/entities';
+import ThemeToggle from '@/components/ui/ThemeToggle';
 import {
   Globe,
   Users,
@@ -25,8 +26,6 @@ import {
   Dices,
   History,
   Eye,
-  Moon,
-  Sun,
   LogOut,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -69,36 +68,11 @@ const entityGroups = [
 
 export default function Sidebar({ campaign, collapsed, onToggle, onNavClick }) {
   const location = useLocation();
-  const [isDark, setIsDark] = useState(true);
   const [user, setUser] = useState(null);
 
   useEffect(() => {
     auth.me().then(setUser).catch(() => {});
   }, []);
-
-  useEffect(() => {
-    const saved = localStorage.getItem('theme');
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    const shouldBeDark = saved ? saved === 'dark' : prefersDark;
-    setIsDark(shouldBeDark);
-    applyTheme(shouldBeDark);
-  }, []);
-
-  const applyTheme = (dark) => {
-    if (dark) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
-    document.body.style.background = dark ? 'hsl(240 6% 4%)' : 'hsl(0 0% 100%)';
-  };
-
-  const toggleTheme = () => {
-    const newValue = !isDark;
-    setIsDark(newValue);
-    localStorage.setItem('theme', newValue ? 'dark' : 'light');
-    applyTheme(newValue);
-  };
 
   if (!campaign) return null;
 
@@ -212,13 +186,10 @@ export default function Sidebar({ campaign, collapsed, onToggle, onNavClick }) {
             <span>World State</span>
           </div>
         )}
-        <button
-          onClick={toggleTheme}
-          className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800/50 text-sm"
-        >
-          {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
-          {!collapsed && <span>{isDark ? 'Light Mode' : 'Dark Mode'}</span>}
-        </button>
+        <div className={collapsed ? "flex justify-center" : "flex items-center gap-2 px-1"}>
+          <ThemeToggle />
+          {!collapsed && <span className="text-sm text-zinc-600 dark:text-zinc-400">Theme</span>}
+        </div>
         {user && !collapsed && (
           <div className="flex items-center gap-2 px-2 py-1.5 rounded-lg bg-zinc-100 dark:bg-zinc-800/50">
             <div className="w-6 h-6 rounded-full bg-amber-500/20 flex items-center justify-center flex-shrink-0">

@@ -6,6 +6,7 @@ import Sidebar from '@/components/layout/Sidebar';
 import Breadcrumbs from '@/components/layout/Breadcrumbs';
 import GlobalSearch from '@/components/layout/GlobalSearch';
 import QuickCapture from '@/components/layout/QuickCapture';
+import ThemeToggle from '@/components/ui/ThemeToggle';
 import { Menu, Loader2 } from 'lucide-react';
 const CAMPAIGN_PAGES = ['CampaignDashboard', 'EntityDetail', 'EntityBrowser', 'RelationshipMap', 'CampaignMap', 'SessionPage', 'SessionBrowser', 'RandomTableBrowser', 'CampaignTimeline', 'PlayerView'];
 
@@ -77,7 +78,8 @@ export default function Layout({ children, currentPageName }) {
           >
             <Menu className="w-5 h-5" />
           </button>
-          <span className="text-sm font-semibold text-zinc-900 dark:text-zinc-400">{campaign?.name}</span>
+          <span className="text-sm font-semibold text-zinc-900 dark:text-zinc-400 flex-1 truncate">{campaign?.name}</span>
+          <ThemeToggle />
           <GlobalSearch campaignId={campaignId} />
         </div>
         <div className="flex items-center gap-3 px-3 py-1.5 border-b border-zinc-200 dark:border-zinc-800/60 bg-white dark:bg-zinc-950 flex-shrink-0">
