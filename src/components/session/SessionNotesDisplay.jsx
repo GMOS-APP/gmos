@@ -1,7 +1,7 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import { createPageUrl } from '@/utils';
+import EntityQuickViewModal from '@/components/common/EntityQuickViewModal';
 
 function preprocessMentions(text, entityMap, campaignId) {
   if (!text) return text;
@@ -23,6 +23,21 @@ function Section({ title, children }) {
   );
 }
 
+function MentionButton({ entity, campaignId, children }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <>
+      <button
+        onClick={(e) => { e.preventDefault(); e.stopPropagation(); setOpen(true); }}
+        className="text-amber-600 dark:text-amber-400 hover:text-amber-500 dark:hover:text-amber-300 underline decoration-dotted underline-offset-2 font-medium cursor-pointer"
+      >
+        {children}
+      </button>
+      <EntityQuickViewModal entity={entity} campaignId={campaignId} open={open} onOpenChange={setOpen} />
+    </>
+  );
+}
+
 function MDText({ text, entityMap, campaignId }) {
   if (!text) return null;
   const processed = preprocessMentions(text, entityMap, campaignId);
@@ -38,14 +53,13 @@ function MDText({ text, entityMap, campaignId }) {
         h1: ({ children }) => <h1 className="text-base font-bold dark:text-zinc-100 text-gray-900 mb-2 mt-3 first:mt-0">{children}</h1>,
         h2: ({ children }) => <h2 className="text-sm font-bold dark:text-zinc-200 text-gray-800 mb-1.5 mt-3 first:mt-0">{children}</h2>,
         h3: ({ children }) => <h3 className="text-xs font-semibold dark:text-zinc-300 text-gray-700 mb-1 mt-2 first:mt-0">{children}</h3>,
-        a: ({ href, children }) => (
-          <Link
-            to={href}
-            className="text-amber-600 dark:text-amber-400 hover:text-amber-500 dark:hover:text-amber-300 underline decoration-dotted underline-offset-2 font-medium"
-          >
-            {children}
-          </Link>
-        ),
+        a: ({ href, children }) => {
+          const params = href ? new URLSearchParams(href.split('?')[1]) : null;
+          const entityId = params?.get('id');
+          const entity = entityId ? entityMap[entityId] : null;
+          if (entity) return <MentionButton entity={entity} campaignId={campaignId}>{children}</MentionButton>;
+          return <a href={href} className="text-amber-600 dark:text-amber-400 underline decoration-dotted underline-offset-2 font-medium">{children}</a>;
+        },
       }}
     >
       {processed}
