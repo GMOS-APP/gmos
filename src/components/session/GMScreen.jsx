@@ -30,7 +30,7 @@ function InlineTimer({ session }) {
   const m = Math.floor((elapsed % 3600) / 60);
   const s = elapsed % 60;
   return (
-    <span className="font-mono text-sm font-bold text-zinc-200">
+    <span className="font-mono text-sm font-bold text-gray-900 dark:text-zinc-200">
       {String(h).padStart(2, '0')}:{String(m).padStart(2, '0')}:{String(s).padStart(2, '0')}
     </span>
   );
@@ -54,37 +54,37 @@ export default function GMScreen({ session, notes, entities, campaignId, onAddNo
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-zinc-950 flex flex-col overflow-hidden">
+    <div className="fixed inset-0 z-50 bg-white dark:bg-zinc-950 flex flex-col overflow-hidden">
 
       {/* ── Header ─────────────────────────────────────────────────── */}
-      <div className="flex items-center gap-3 px-4 py-2 border-b border-zinc-800 bg-zinc-900 flex-shrink-0">
+      <div className="flex items-center gap-3 px-4 py-2 border-b border-gray-200 dark:border-zinc-800 bg-gray-50 dark:bg-zinc-900 flex-shrink-0">
         <button
           onClick={onMinimize}
           title="Minimize GM Screen"
-          className="p-1 rounded text-zinc-500 hover:text-zinc-300 transition-colors flex-shrink-0"
+          className="p-1 rounded text-gray-400 hover:text-gray-700 dark:text-zinc-500 dark:hover:text-zinc-300 transition-colors flex-shrink-0"
         >
           <Minimize2 className="w-3.5 h-3.5" />
         </button>
 
-        <span className="text-sm font-semibold text-zinc-200 truncate flex-1">
+        <span className="text-sm font-semibold text-gray-900 dark:text-zinc-200 truncate flex-1">
           {session?.title || `Session #${session?.session_number}`}
           {session?.session_number && (
-            <span className="ml-2 text-xs text-zinc-500 font-normal">#{session.session_number}</span>
+            <span className="ml-2 text-xs text-gray-400 dark:text-zinc-500 font-normal">#{session.session_number}</span>
           )}
         </span>
 
-        <div className="flex items-center gap-1.5 text-zinc-500">
+        <div className="flex items-center gap-1.5 text-gray-400 dark:text-zinc-500">
           <Clock className="w-3 h-3" />
           <InlineTimer session={session} />
         </div>
 
-        <span className="w-px h-4 bg-zinc-800 flex-shrink-0" />
+        <span className="w-px h-4 bg-gray-200 dark:bg-zinc-800 flex-shrink-0" />
 
         <Button
           onClick={endSession}
           size="sm"
           variant="outline"
-          className="border-amber-500/30 text-amber-400 hover:bg-amber-500/10 text-xs h-7 flex-shrink-0"
+          className="border-amber-500/40 text-amber-600 hover:bg-amber-50 dark:border-amber-500/30 dark:text-amber-400 dark:hover:bg-amber-500/10 text-xs h-7 flex-shrink-0"
         >
           End Session →
         </Button>
@@ -94,27 +94,27 @@ export default function GMScreen({ session, notes, entities, campaignId, onAddNo
       <div className="flex-1 flex overflow-hidden min-h-0">
 
         {/* LEFT: Session Notes ──────────────────────────────────────── */}
-        <div className="w-72 flex-shrink-0 border-r border-zinc-800 flex flex-col overflow-hidden">
+        <div className="w-72 flex-shrink-0 border-r border-gray-200 dark:border-zinc-800 flex flex-col overflow-hidden">
 
           {/* Panel header */}
-          <div className="px-3 py-2 border-b border-zinc-800 flex items-center justify-between flex-shrink-0">
-            <span className="text-[10px] font-semibold uppercase tracking-widest text-zinc-500">
+          <div className="px-3 py-2 border-b border-gray-200 dark:border-zinc-800 flex items-center justify-between flex-shrink-0">
+            <span className="text-[10px] font-semibold uppercase tracking-widest text-gray-400 dark:text-zinc-500">
               Session Notes
             </span>
             <div className="flex items-center gap-2">
               {notes.length > 0 && (
-                <span className="text-[10px] bg-zinc-800 text-zinc-500 rounded-full px-1.5 py-0.5">
+                <span className="text-[10px] bg-gray-200 text-gray-500 dark:bg-zinc-800 dark:text-zinc-500 rounded-full px-1.5 py-0.5">
                   {notes.length}
                 </span>
               )}
               {justSaved && (
-                <span className="text-[10px] text-emerald-400">✓ saved to session</span>
+                <span className="text-[10px] text-emerald-600 dark:text-emerald-400">✓ saved to session</span>
               )}
             </div>
           </div>
 
           {/* Note input */}
-          <div className="p-3 border-b border-zinc-800/60 flex-shrink-0">
+          <div className="p-3 border-b border-gray-200/60 dark:border-zinc-800/60 flex-shrink-0">
             <QuickNoteInput
               onSubmit={handleAddNote}
               isSubmitting={isAddingNote}
@@ -122,12 +122,12 @@ export default function GMScreen({ session, notes, entities, campaignId, onAddNo
             />
           </div>
 
-          {/* Quick tools */}
-          <div className="px-3 py-2 border-b border-zinc-800/40 flex-shrink-0">
+          {/* NPC search */}
+          <div className="px-3 py-2 border-b border-gray-200/40 dark:border-zinc-800/40 flex-shrink-0">
             <NPCSearchModal campaignId={campaignId} isOpen={npcSearchOpen} onOpenChange={setNpcSearchOpen} />
             <button
               onClick={() => setNpcSearchOpen(true)}
-              className="w-full py-1.5 rounded-lg text-[11px] border border-zinc-800 text-zinc-500 hover:text-zinc-300 hover:border-zinc-700 transition-colors"
+              className="w-full py-1.5 rounded-lg text-[11px] border border-gray-200 text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:border-zinc-800 dark:text-zinc-500 dark:hover:text-zinc-300 dark:hover:border-zinc-700 transition-colors"
             >
               Search NPC
             </button>
@@ -135,7 +135,7 @@ export default function GMScreen({ session, notes, entities, campaignId, onAddNo
 
           {/* AI linker suggestions */}
           {notes.length > 0 && (
-            <div className="px-3 py-2 border-b border-zinc-800/40 flex-shrink-0">
+            <div className="px-3 py-2 border-b border-gray-200/40 dark:border-zinc-800/40 flex-shrink-0">
               <AutoLinkerSuggestions
                 notes={notes.map((n) => n.content).join('\n')}
                 entities={entities}
@@ -147,7 +147,7 @@ export default function GMScreen({ session, notes, entities, campaignId, onAddNo
           {/* Notes list */}
           <div className="flex-1 overflow-y-auto px-3 pb-3 pt-2 space-y-2 min-h-0">
             {notes.length === 0 ? (
-              <p className="text-[11px] text-zinc-600 text-center py-8 leading-relaxed">
+              <p className="text-[11px] text-gray-400 dark:text-zinc-600 text-center py-8 leading-relaxed">
                 Notes you capture appear here,<br />saved to this session automatically.
               </p>
             ) : (
@@ -156,12 +156,12 @@ export default function GMScreen({ session, notes, entities, campaignId, onAddNo
                   key={note.id}
                   className={`p-2.5 rounded-lg border transition-colors ${
                     i === 0
-                      ? 'border-amber-500/20 bg-amber-500/5'
-                      : 'border-zinc-800/50 bg-zinc-900/30'
+                      ? 'border-amber-400/30 bg-amber-50 dark:border-amber-500/20 dark:bg-amber-500/5'
+                      : 'border-gray-200 bg-gray-50 dark:border-zinc-800/50 dark:bg-zinc-900/30'
                   }`}
                 >
-                  <p className="text-xs text-zinc-300 whitespace-pre-wrap leading-relaxed">{note.content}</p>
-                  <p className="text-[10px] text-zinc-600 mt-1 font-mono">
+                  <p className="text-xs text-gray-800 dark:text-zinc-300 whitespace-pre-wrap leading-relaxed">{note.content}</p>
+                  <p className="text-[10px] text-gray-400 dark:text-zinc-600 mt-1 font-mono">
                     {new Date(note.created_date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                   </p>
                 </div>
@@ -173,13 +173,13 @@ export default function GMScreen({ session, notes, entities, campaignId, onAddNo
         {/* CENTER: Prep Reference ────────────────────────────────────── */}
         <div className="flex-1 flex flex-col overflow-hidden min-w-0">
           <Tabs defaultValue="prep" className="flex-1 flex flex-col overflow-hidden">
-            <div className="px-4 pt-2.5 pb-2 border-b border-zinc-800 flex-shrink-0">
-              <TabsList className="bg-zinc-900 border border-zinc-800">
+            <div className="px-4 pt-2.5 pb-2 border-b border-gray-200 dark:border-zinc-800 flex-shrink-0">
+              <TabsList className="bg-gray-100 border border-gray-200 dark:bg-zinc-900 dark:border-zinc-800">
                 <TabsTrigger value="prep" className="text-xs">Prep Reference</TabsTrigger>
                 <TabsTrigger value="entities" className="text-xs">
                   Linked Entities
                   {session?.linked_entities?.length > 0 && (
-                    <span className="ml-1.5 text-[10px] bg-zinc-800 text-zinc-400 rounded-full px-1.5 py-0.5">
+                    <span className="ml-1.5 text-[10px] bg-gray-200 text-gray-600 dark:bg-zinc-800 dark:text-zinc-400 rounded-full px-1.5 py-0.5">
                       {session.linked_entities.length}
                     </span>
                   )}
@@ -196,9 +196,9 @@ export default function GMScreen({ session, notes, entities, campaignId, onAddNo
         </div>
 
         {/* RIGHT: Tools ─────────────────────────────────────────────── */}
-        <div className="w-72 flex-shrink-0 border-l border-zinc-800 flex flex-col overflow-y-auto">
-          <div className="px-3 py-2 border-b border-zinc-800 flex-shrink-0">
-            <span className="text-[10px] font-semibold uppercase tracking-widest text-zinc-500">Tools</span>
+        <div className="w-72 flex-shrink-0 border-l border-gray-200 dark:border-zinc-800 flex flex-col overflow-y-auto">
+          <div className="px-3 py-2 border-b border-gray-200 dark:border-zinc-800 flex-shrink-0">
+            <span className="text-[10px] font-semibold uppercase tracking-widest text-gray-400 dark:text-zinc-500">Tools</span>
           </div>
 
           <div className="p-3 space-y-3">
@@ -209,7 +209,7 @@ export default function GMScreen({ session, notes, entities, campaignId, onAddNo
               <QuickDialogueGenerator />
             </div>
 
-            <div className="border-t border-zinc-800 pt-3">
+            <div className="border-t border-gray-200 dark:border-zinc-800 pt-3">
               <ResourceTracker session={session} entities={entities} campaignId={campaignId} />
             </div>
           </div>

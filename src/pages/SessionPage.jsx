@@ -220,12 +220,12 @@ export default function SessionPage() {
               <div className="flex-1 flex flex-col items-center justify-center gap-4 p-8">
                 <button
                   onClick={() => setGmScreenOpen(true)}
-                  className="flex items-center gap-2.5 px-5 py-3 rounded-xl bg-zinc-900 border border-zinc-700 hover:border-amber-500/40 hover:bg-zinc-800 transition-all text-zinc-300 hover:text-amber-400 font-semibold text-sm"
+                  className="flex items-center gap-2.5 px-5 py-3 rounded-xl bg-white border border-gray-300 hover:border-amber-500/40 hover:bg-gray-50 dark:bg-zinc-900 dark:border-zinc-700 dark:hover:border-amber-500/40 dark:hover:bg-zinc-800 transition-all text-gray-700 hover:text-amber-600 dark:text-zinc-300 dark:hover:text-amber-400 font-semibold text-sm"
                 >
                   <Maximize2 className="w-4 h-4" />
                   Open GM Screen
                 </button>
-                <p className="text-xs text-zinc-600">Session is live — open the GM Screen to run the game</p>
+                <p className="text-xs text-gray-400 dark:text-zinc-600">Session is live — open the GM Screen to run the game</p>
               </div>
             ) : (
               <RunTab
