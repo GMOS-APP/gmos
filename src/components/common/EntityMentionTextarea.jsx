@@ -44,16 +44,14 @@ export default function EntityMentionTextarea({
     (e) => e.name.toLowerCase() === query.toLowerCase()
   );
 
-  // Calculate dropdown position using a mirror div technique
+  // Use fixed positioning so the dropdown escapes any overflow:hidden ancestors
   const computeDropdownPos = useCallback(() => {
     const ta = textareaRef.current;
     if (!ta) return;
     const rect = ta.getBoundingClientRect();
-    const containerRect = ta.offsetParent?.getBoundingClientRect() || rect;
-    // Approximate: place below textarea for simplicity
     setDropdownPos({
-      top: rect.bottom - containerRect.top + 4,
-      left: rect.left - containerRect.left,
+      top: rect.bottom + 4,
+      left: rect.left,
     });
   }, []);
 
@@ -167,7 +165,7 @@ export default function EntityMentionTextarea({
         <div
           ref={dropdownRef}
           style={{ top: dropdownPos.top, left: dropdownPos.left }}
-          className="absolute z-50 w-72 dark:bg-zinc-900 dark:border-zinc-700 bg-white border-gray-300 border rounded-xl shadow-2xl overflow-hidden"
+          className="fixed z-[200] w-72 dark:bg-zinc-900 dark:border-zinc-700 bg-white border-gray-300 border rounded-xl shadow-2xl overflow-hidden"
         >
           <div className="px-3 py-2 dark:border-b dark:border-zinc-800 border-b border-gray-200 flex items-center gap-2">
             <AtSign className="w-3.5 h-3.5 text-amber-400" />
