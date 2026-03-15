@@ -23,7 +23,7 @@ import {
 import AiGate from '@/components/ui/AiGate';
 import { CampaignProvider, useCampaign } from '@/lib/CampaignContext';
 
-const entityTypes = ['npc', 'creature', 'location', 'faction', 'thread', 'item', 'player_character', 'event', 'lore', 'deity', 'encounter', 'shop'];
+const entityTypes = ['note', 'npc', 'creature', 'location', 'faction', 'thread', 'item', 'player_character', 'event', 'lore', 'deity', 'encounter', 'shop'];
 const statuses = ['active', 'inactive', 'dead', 'destroyed', 'resolved', 'unknown'];
 const visibilities = ['gm_only', 'players_know', 'players_suspect', 'false_info'];
 
@@ -364,7 +364,8 @@ Format with markdown for readability.`;
           </h2>
           <p className="text-sm dark:text-zinc-500 text-gray-600 text-center mb-8">Choose how you'd like to create this {defaultType.replace('_', ' ')}</p>
           
-          <div className={`grid gap-4 ${defaultType === 'creature' ? 'grid-cols-3' : 'grid-cols-2'}`}>
+          <div className={`grid gap-4 ${defaultType === 'note' ? 'grid-cols-1 max-w-xs mx-auto' : defaultType === 'creature' ? 'grid-cols-3' : 'grid-cols-2'}`}>
+            {defaultType !== 'note' && (
             <AiGate>
             <button
               onClick={async () => {
@@ -386,6 +387,7 @@ Format with markdown for readability.`;
               </div>
             </button>
             </AiGate>
+            )}
 
             {defaultType === 'creature' && system.hasSrdImport && (
               <button
