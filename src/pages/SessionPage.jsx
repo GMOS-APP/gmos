@@ -7,9 +7,11 @@ import { BookOpen, Swords, FileText, Loader2, Printer } from 'lucide-react';
 import PrepTab from '@/components/session/PrepTab';
 import { printSessionPrep } from '@/utils/printSessionPrep';
 import RunTab from '@/components/session/RunTab';
+import GMScreen from '@/components/session/GMScreen';
 import SessionDebrief from '@/components/session/SessionDebrief';
 import SessionHeader from '@/components/session/SessionHeader';
 import { CampaignProvider } from '@/lib/CampaignContext';
+import { Maximize2 } from 'lucide-react';
 
 export default function SessionPage() {
   const params = new URLSearchParams(window.location.search);
@@ -23,6 +25,7 @@ export default function SessionPage() {
   const [saved, setSaved] = useState(false);
   const [activeTab, setActiveTab] = useState('prep');
   const [debriefStarted, setDebriefStarted] = useState(false);
+  const [gmScreenOpen, setGmScreenOpen] = useState(false);
 
   const { data: campaign } = useQuery({
     queryKey: ['campaign', campaignId],
@@ -135,13 +138,26 @@ export default function SessionPage() {
 
   const isRunMode = session?.status === 'in_progress';
 
-  // Auto-switch to Run tab when session goes live
+  // Auto-switch to Run tab and open GM Screen when session goes live
   useEffect(() => {
     if (isRunMode && activeTab === 'prep') setActiveTab('run');
+    if (isRunMode) setGmScreenOpen(true);
   }, [isRunMode]);
 
   return (
     <CampaignProvider campaign={campaign}>
+    {/* GM Screen full-viewport overlay */}
+    {isRunMode && gmScreenOpen && (
+      <GMScreen
+        session={session}
+        notes={notes}
+        entities={entities}
+        campaignId={campaignId}
+        onAddNote={(content) => addNoteMutation.mutate(content)}
+        isAddingNote={addNoteMutation.isPending}
+        onMinimize={() => setGmScreenOpen(false)}
+      />
+    )}
     <div className={activeTab === 'run' ? "h-full flex flex-col" : "min-h-full flex flex-col"}>
 
       <SessionHeader
@@ -200,14 +216,27 @@ export default function SessionPage() {
 
           {/* RUN */}
           <TabsContent value="run" className="flex-1 flex overflow-hidden m-0">
-            <RunTab
-              session={session}
-              notes={notes}
-              entities={entities}
-              campaignId={campaignId}
-              onAddNote={(content) => addNoteMutation.mutate(content)}
-              isAddingNote={addNoteMutation.isPending}
-            />
+            {isRunMode && !gmScreenOpen ? (
+              <div className="flex-1 flex flex-col items-center justify-center gap-4 p-8">
+                <button
+                  onClick={() => setGmScreenOpen(true)}
+                  className="flex items-center gap-2.5 px-5 py-3 rounded-xl bg-zinc-900 border border-zinc-700 hover:border-amber-500/40 hover:bg-zinc-800 transition-all text-zinc-300 hover:text-amber-400 font-semibold text-sm"
+                >
+                  <Maximize2 className="w-4 h-4" />
+                  Open GM Screen
+                </button>
+                <p className="text-xs text-zinc-600">Session is live — open the GM Screen to run the game</p>
+              </div>
+            ) : (
+              <RunTab
+                session={session}
+                notes={notes}
+                entities={entities}
+                campaignId={campaignId}
+                onAddNote={(content) => addNoteMutation.mutate(content)}
+                isAddingNote={addNoteMutation.isPending}
+              />
+            )}
           </TabsContent>
 
           {/* DEBRIEF */}
