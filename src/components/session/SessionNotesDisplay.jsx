@@ -19,9 +19,9 @@ function MDText({ text }) {
     <ReactMarkdown
       components={{
         p: ({ children }) => <p className="mb-2 last:mb-0 dark:text-zinc-300 text-gray-700 leading-relaxed text-sm">{children}</p>,
-        ul: ({ children }) => <ul className="list-disc list-inside mb-2 dark:text-zinc-300 text-gray-700 text-sm space-y-0.5 ml-1">{children}</ul>,
-        ol: ({ children }) => <ol className="list-decimal list-inside mb-2 dark:text-zinc-300 text-gray-700 text-sm space-y-0.5 ml-1">{children}</ol>,
-        li: ({ children }) => <li className="leading-relaxed">{children}</li>,
+        ul: ({ children }) => <ul className="list-disc list-outside pl-4 mb-3 dark:text-zinc-300 text-gray-700 text-sm space-y-1.5">{children}</ul>,
+        ol: ({ children }) => <ol className="list-decimal list-outside pl-4 mb-3 dark:text-zinc-300 text-gray-700 text-sm space-y-1.5">{children}</ol>,
+        li: ({ children }) => <li className="leading-relaxed pl-0.5">{children}</li>,
         strong: ({ children }) => <strong className="dark:text-white text-gray-900 font-semibold">{children}</strong>,
         em: ({ children }) => <em className="dark:text-zinc-400 text-gray-500 italic">{children}</em>,
         h1: ({ children }) => <h1 className="text-base font-bold dark:text-zinc-100 text-gray-900 mb-2 mt-3 first:mt-0">{children}</h1>,
