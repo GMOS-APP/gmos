@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Textarea } from '@/components/ui/textarea';
+import EntityMentionTextarea from '@/components/common/EntityMentionTextarea';
 import { Button } from '@/components/ui/button';
 import { Sparkles, Loader2 } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
@@ -38,9 +38,9 @@ export default function AIGenerateTextarea({ value, onChange, placeholder, rows 
   return (
     <>
       <div className="relative">
-        <Textarea
+        <EntityMentionTextarea
           value={value}
-          onChange={(e) => onChange(e.target.value)}
+          onChange={onChange}
           placeholder={placeholder}
           rows={rows}
           className={`dark:bg-zinc-950/60 dark:border-zinc-800 dark:text-zinc-200 dark:placeholder:text-zinc-600 bg-white border-gray-300 text-gray-900 placeholder:text-gray-400 resize-y text-sm pr-[130px] ${className}`}

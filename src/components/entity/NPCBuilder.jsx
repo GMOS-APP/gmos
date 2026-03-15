@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
+import EntityMentionTextarea from '@/components/common/EntityMentionTextarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Wand2, Loader2 } from 'lucide-react';
 import { InvokeLLM } from '@/api/entities';
@@ -209,9 +209,9 @@ export default function NPCBuilder({ npcData, onUpdate }) {
             </Button>
           </AiGate>
         </div>
-        <Textarea
+        <EntityMentionTextarea
           value={data.appearance}
-          onChange={(e) => handleChange('appearance', e.target.value)}
+          onChange={(v) => handleChange('appearance', v)}
           placeholder="Physical description, clothing, distinctive features..."
           rows={3}
           className="bg-gray-100 border-gray-300 text-gray-900 placeholder:text-gray-500 dark:bg-zinc-900/60 dark:border-zinc-800 dark:text-zinc-200 dark:placeholder:text-zinc-600 text-sm"
@@ -234,9 +234,9 @@ export default function NPCBuilder({ npcData, onUpdate }) {
             </Button>
           </AiGate>
         </div>
-        <Textarea
+        <EntityMentionTextarea
           value={data.traits}
-          onChange={(e) => handleChange('traits', e.target.value)}
+          onChange={(v) => handleChange('traits', v)}
           placeholder="Personality traits, mannerisms, speech patterns..."
           rows={3}
           className="bg-gray-100 border-gray-300 text-gray-900 placeholder:text-gray-500 dark:bg-zinc-900/60 dark:border-zinc-800 dark:text-zinc-200 dark:placeholder:text-zinc-600 text-sm"
@@ -259,9 +259,9 @@ export default function NPCBuilder({ npcData, onUpdate }) {
             </Button>
           </AiGate>
         </div>
-        <Textarea
+        <EntityMentionTextarea
           value={data.rumors}
-          onChange={(e) => handleChange('rumors', e.target.value)}
+          onChange={(v) => handleChange('rumors', v)}
           placeholder="Rumors about this NPC (true, false, or partially true)..."
           rows={3}
           className="bg-gray-100 border-gray-300 text-gray-900 placeholder:text-gray-500 dark:bg-zinc-900/60 dark:border-zinc-800 dark:text-zinc-200 dark:placeholder:text-zinc-600 text-sm"
@@ -284,9 +284,9 @@ export default function NPCBuilder({ npcData, onUpdate }) {
             </Button>
           </AiGate>
         </div>
-        <Textarea
+        <EntityMentionTextarea
           value={data.quests}
-          onChange={(e) => handleChange('quests', e.target.value)}
+          onChange={(v) => handleChange('quests', v)}
           placeholder="Potential quest hooks involving this NPC..."
           rows={3}
           className="bg-gray-100 border-gray-300 text-gray-900 placeholder:text-gray-500 dark:bg-zinc-900/60 dark:border-zinc-800 dark:text-zinc-200 dark:placeholder:text-zinc-600 text-sm"
@@ -309,9 +309,9 @@ export default function NPCBuilder({ npcData, onUpdate }) {
             </Button>
           </AiGate>
         </div>
-        <Textarea
+        <EntityMentionTextarea
           value={data.motives}
-          onChange={(e) => handleChange('motives', e.target.value)}
+          onChange={(v) => handleChange('motives', v)}
           placeholder="Hidden goals, secret agendas, true motivations..."
           rows={3}
           className="bg-gray-100 border-gray-300 text-gray-900 placeholder:text-gray-500 dark:bg-zinc-900/60 dark:border-zinc-800 dark:text-zinc-200 dark:placeholder:text-zinc-600 text-sm"
@@ -334,9 +334,9 @@ export default function NPCBuilder({ npcData, onUpdate }) {
             </Button>
           </AiGate>
         </div>
-        <Textarea
+        <EntityMentionTextarea
           value={data.sample_dialogue}
-          onChange={(e) => handleChange('sample_dialogue', e.target.value)}
+          onChange={(v) => handleChange('sample_dialogue', v)}
           placeholder="First meeting dialogue, example quotes..."
           rows={4}
           className="bg-gray-100 border-gray-300 text-gray-900 placeholder:text-gray-500 dark:bg-zinc-900/60 dark:border-zinc-800 dark:text-zinc-200 dark:placeholder:text-zinc-600 text-sm font-mono"

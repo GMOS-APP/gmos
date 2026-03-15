@@ -4,7 +4,7 @@ import { WorldEntity, Session } from '@/api/entities';
 import { Link as LinkIcon, X, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
+import EntityMentionTextarea from '@/components/common/EntityMentionTextarea';
 import { Badge } from '@/components/ui/badge';
 import { createPageUrl } from '@/utils';
 import { Link } from 'react-router-dom';
@@ -137,9 +137,9 @@ export default function EntityLinker({ session, campaignId }) {
                   </div>
                   <div>
                     <label className="text-xs text-zinc-500 mb-2 block">Context (optional)</label>
-                    <Textarea
+                    <EntityMentionTextarea
                       value={context}
-                      onChange={(e) => setContext(e.target.value)}
+                      onChange={setContext}
                       placeholder="How did this entity appear in the session? What happened?"
                       rows={3}
                       className="bg-zinc-950 border-zinc-800 text-zinc-200"

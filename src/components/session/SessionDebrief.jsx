@@ -4,7 +4,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Session, InvokeLLM } from '@/api/entities';
 import { useCampaign } from '@/lib/CampaignContext';
 import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
+import EntityMentionTextarea from '@/components/common/EntityMentionTextarea';
 import { Input } from '@/components/ui/input';
 import { Save, Loader2, Plus, X, CheckCircle2, Clock, CalendarDays, Wand2 } from 'lucide-react';
 import AiGate from '@/components/ui/AiGate';
@@ -127,9 +127,9 @@ Respond as JSON.`,
         <label className="text-xs font-semibold uppercase tracking-wider dark:text-zinc-400 text-zinc-500">
           Session Summary
         </label>
-        <Textarea
+        <EntityMentionTextarea
           value={summary}
-          onChange={(e) => setSummary(e.target.value)}
+          onChange={setSummary}
           placeholder="What happened this session? Write a narrative summary…"
           className="min-h-32 text-sm dark:bg-zinc-900 dark:border-zinc-800 dark:text-zinc-200 bg-zinc-50 border-zinc-200 resize-none"
         />
@@ -189,9 +189,9 @@ Respond as JSON.`,
         <label className="text-xs font-semibold uppercase tracking-wider dark:text-zinc-400 text-zinc-500">
           Next Session Primer
         </label>
-        <Textarea
+        <EntityMentionTextarea
           value={nextPrimer}
-          onChange={(e) => setNextPrimer(e.target.value)}
+          onChange={setNextPrimer}
           placeholder="Tease what's coming next session for your players…"
           className="min-h-20 text-sm dark:bg-zinc-900 dark:border-zinc-800 dark:text-zinc-200 bg-zinc-50 border-zinc-200 resize-none"
         />

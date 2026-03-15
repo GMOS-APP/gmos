@@ -1,6 +1,6 @@
 import React from 'react';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
+import EntityMentionTextarea from '@/components/common/EntityMentionTextarea';
 
 function Field({ label, children }) {
   return (
@@ -24,9 +24,9 @@ function TextInput({ value, onChange, placeholder }) {
 
 function TextArea({ value, onChange, placeholder, rows = 3 }) {
   return (
-    <Textarea
+    <EntityMentionTextarea
       value={value || ''}
-      onChange={(e) => onChange(e.target.value)}
+      onChange={onChange}
       placeholder={placeholder}
       rows={rows}
       className="bg-gray-100 border-gray-300 text-gray-900 placeholder:text-gray-500 dark:bg-zinc-900/60 dark:border-zinc-800 dark:text-zinc-200 dark:placeholder:text-zinc-600 resize-none"

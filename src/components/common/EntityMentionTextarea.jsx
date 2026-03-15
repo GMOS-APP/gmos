@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { WorldEntity } from '@/api/entities';
 import { AtSign, Plus, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useCampaign } from '@/lib/CampaignContext';
 
 /**
  * A textarea that supports @-mentions for WorldEntity records.
@@ -11,11 +12,13 @@ import { cn } from '@/lib/utils';
 export default function EntityMentionTextarea({
   value,
   onChange,
-  campaignId,
+  campaignId: campaignIdProp,
   placeholder,
   rows = 8,
   className,
 }) {
+  const { campaign } = useCampaign() || {};
+  const campaignId = campaignIdProp || campaign?.id;
   const textareaRef = useRef(null);
   const dropdownRef = useRef(null);
 

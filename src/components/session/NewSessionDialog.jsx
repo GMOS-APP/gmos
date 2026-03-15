@@ -6,7 +6,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
+import EntityMentionTextarea from '@/components/common/EntityMentionTextarea';
 import { Wand2, PenLine, ChevronRight, ChevronLeft, Plus, X, Loader2, Sparkles } from 'lucide-react';
 import AiGate from '@/components/ui/AiGate';
 import { cn } from '@/lib/utils';
@@ -227,10 +227,10 @@ export default function NewSessionDialog({ open, onClose, campaignId, campaign }
           {step === 2 && (
             <div className="space-y-3">
               <p className="text-xs dark:text-zinc-500 text-gray-500">How does the session open? Start in the middle of the action.</p>
-              <Textarea
+              <EntityMentionTextarea
                 placeholder="The players find themselves..."
                 value={form.strong_start}
-                onChange={e => setForm(f => ({ ...f, strong_start: e.target.value }))}
+                onChange={(v) => setForm(f => ({ ...f, strong_start: v }))}
                 className="dark:bg-zinc-800 dark:border-zinc-700 dark:text-zinc-200 h-32 resize-none"
               />
             </div>

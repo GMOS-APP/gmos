@@ -4,7 +4,7 @@ import { Relationship } from '@/api/entities';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
+import EntityMentionTextarea from '@/components/common/EntityMentionTextarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
 import { Slider } from '@/components/ui/slider';
@@ -184,9 +184,9 @@ export default function RelationshipDialog({ open, onOpenChange, relationship, c
 
           <div>
             <Label className="text-zinc-400 text-xs mb-2 block">Description</Label>
-            <Textarea
+            <EntityMentionTextarea
               value={form.description}
-              onChange={(e) => setForm({ ...form, description: e.target.value })}
+              onChange={(v) => setForm({ ...form, description: v })}
               placeholder="Brief description of the relationship..."
               rows={3}
               className="bg-zinc-950 border-zinc-800 text-zinc-200 placeholder:text-zinc-600"
@@ -195,9 +195,9 @@ export default function RelationshipDialog({ open, onOpenChange, relationship, c
 
           <div>
             <Label className="text-zinc-400 text-xs mb-2 block">DM Notes & Context</Label>
-            <Textarea
+            <EntityMentionTextarea
               value={form.notes}
-              onChange={(e) => setForm({ ...form, notes: e.target.value })}
+              onChange={(v) => setForm({ ...form, notes: v })}
               placeholder="Private notes about this relationship, how it affects the narrative, hidden details..."
               rows={4}
               className="bg-zinc-950 border-zinc-800 text-zinc-200 placeholder:text-zinc-600"
