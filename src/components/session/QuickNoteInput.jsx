@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { Send, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
+import EntityMentionTextarea from '@/components/common/EntityMentionTextarea';
 
-export default function QuickNoteInput({ onSubmit, isSubmitting, placeholder = "Capture a note..." }) {
+export default function QuickNoteInput({ onSubmit, isSubmitting, placeholder = "Capture a note...", campaignId }) {
   const [content, setContent] = useState('');
 
   const handleSubmit = () => {
@@ -13,16 +13,19 @@ export default function QuickNoteInput({ onSubmit, isSubmitting, placeholder = "
   };
 
   return (
-    <div className="relative">
-      <Textarea
+    <div
+      className="relative"
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
+          e.preventDefault();
+          handleSubmit();
+        }
+      }}
+    >
+      <EntityMentionTextarea
         value={content}
-        onChange={(e) => setContent(e.target.value)}
-        onKeyDown={(e) => {
-          if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
-            e.preventDefault();
-            handleSubmit();
-          }
-        }}
+        onChange={setContent}
+        campaignId={campaignId}
         placeholder={placeholder}
         rows={3}
         className="dark:bg-zinc-900/80 dark:border-zinc-800 dark:text-zinc-200 dark:placeholder:text-zinc-600 bg-white border-gray-300 text-gray-900 placeholder:text-gray-400 resize-none pr-12"

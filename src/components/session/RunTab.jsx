@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import EntityMentionRenderer from '@/components/common/EntityMentionRenderer';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import SessionTimer from '@/components/session/SessionTimer';
@@ -44,6 +45,7 @@ export default function RunTab({ session, notes, entities, campaignId, onAddNote
               <QuickNoteInput
                 onSubmit={onAddNote}
                 isSubmitting={isAddingNote}
+                campaignId={campaignId}
                 placeholder="Capture what's happening... press Enter to save"
               />
             </div>
@@ -76,7 +78,7 @@ export default function RunTab({ session, notes, entities, campaignId, onAddNote
               ) : (
                 notes.map((note) => (
                   <div key={note.id} className="p-3 rounded-lg dark:bg-zinc-900/40 dark:border dark:border-zinc-800/40 bg-zinc-50 border border-zinc-200">
-                    <p className="text-sm dark:text-zinc-300 text-zinc-900 whitespace-pre-wrap leading-relaxed">{note.content}</p>
+                    <EntityMentionRenderer text={note.content} entities={entities} campaignId={campaignId} className="text-sm dark:text-zinc-300 text-zinc-900 whitespace-pre-wrap leading-relaxed" />
                     <p className="text-[10px] dark:text-zinc-600 text-zinc-500 mt-1.5 font-mono">
                       {new Date(note.created_date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                     </p>
@@ -89,7 +91,7 @@ export default function RunTab({ session, notes, entities, campaignId, onAddNote
 
         {/* Prep Notes */}
         <TabsContent value="detailed" className="flex-1 m-0 overflow-y-auto">
-          {session && <SessionNotesDisplay session={session} entities={entities} />}
+          {session && <SessionNotesDisplay session={session} entities={entities} campaignId={campaignId} />}
         </TabsContent>
 
         {/* Linked Entities */}

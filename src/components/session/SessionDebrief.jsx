@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import EntityMentionRenderer from '@/components/common/EntityMentionRenderer';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Session, InvokeLLM } from '@/api/entities';
 import { useCampaign } from '@/lib/CampaignContext';
@@ -176,7 +177,7 @@ Respond as JSON.`,
           <div className="space-y-1.5 max-h-40 overflow-y-auto pr-1">
             {notes.map((n) => (
               <div key={n.id} className="px-3 py-2 rounded-lg dark:bg-zinc-900/50 dark:border dark:border-zinc-800/40 bg-zinc-50 border border-zinc-200">
-                <p className="text-xs dark:text-zinc-400 text-zinc-600 whitespace-pre-wrap">{n.content}</p>
+                <EntityMentionRenderer text={n.content} entities={entities} campaignId={campaignId} className="text-xs dark:text-zinc-400 text-zinc-600 whitespace-pre-wrap" />
               </div>
             ))}
           </div>

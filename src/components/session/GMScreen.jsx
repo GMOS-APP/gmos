@@ -13,6 +13,7 @@ import RandomNPCGenerator from '@/components/session/RandomNPCGenerator';
 import QuickDialogueGenerator from '@/components/session/QuickDialogueGenerator';
 import AutoLinkerSuggestions from '@/components/session/AutoLinkerSuggestions';
 import { Minimize2, Clock, StickyNote, Scroll, Wrench } from 'lucide-react';
+import EntityMentionRenderer from '@/components/common/EntityMentionRenderer';
 import { cn } from '@/lib/utils';
 
 function InlineTimer({ session }) {
@@ -144,6 +145,7 @@ export default function GMScreen({ session, notes, entities, campaignId, onAddNo
             <QuickNoteInput
               onSubmit={handleAddNote}
               isSubmitting={isAddingNote}
+              campaignId={campaignId}
               placeholder="What's happening… (⌘+Enter)"
             />
           </div>
@@ -186,7 +188,7 @@ export default function GMScreen({ session, notes, entities, campaignId, onAddNo
                       : 'border-gray-200 bg-gray-50 dark:border-zinc-800/50 dark:bg-zinc-900/30'
                   }`}
                 >
-                  <p className="text-xs text-gray-800 dark:text-zinc-300 whitespace-pre-wrap leading-relaxed">{note.content}</p>
+                  <EntityMentionRenderer text={note.content} entities={entities} campaignId={campaignId} className="text-xs text-gray-800 dark:text-zinc-300 whitespace-pre-wrap leading-relaxed" />
                   <p className="text-[10px] text-gray-400 dark:text-zinc-600 mt-1 font-mono">
                     {new Date(note.created_date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                   </p>
@@ -220,7 +222,7 @@ export default function GMScreen({ session, notes, entities, campaignId, onAddNo
               </TabsList>
             </div>
             <TabsContent value="prep" className="flex-1 m-0 overflow-y-auto">
-              <SessionNotesDisplay session={session} entities={entities} />
+              <SessionNotesDisplay session={session} entities={entities} campaignId={campaignId} />
             </TabsContent>
             <TabsContent value="entities" className="flex-1 m-0 overflow-y-auto">
               <EntityLinker session={session} campaignId={campaignId} />

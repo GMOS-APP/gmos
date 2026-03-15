@@ -1,5 +1,15 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
+import { createPageUrl } from '@/utils';
+
+function preprocessMentions(text, entityMap, campaignId) {
+  if (!text) return text;
+  return text.replace(/\[\[([^\]|]+)\|([^\]]+)\]\]/g, (_, id, name) => {
+    const path = createPageUrl('EntityDetail') + `?id=${id}&campaign_id=${campaignId}`;
+    return `[@${name}](${path})`;
+  });
+}
 
 function Section({ title, children }) {
   if (!children) return null;
@@ -13,8 +23,9 @@ function Section({ title, children }) {
   );
 }
 
-function MDText({ text }) {
+function MDText({ text, entityMap, campaignId }) {
   if (!text) return null;
+  const processed = preprocessMentions(text, entityMap, campaignId);
   return (
     <ReactMarkdown
       components={{
@@ -27,9 +38,17 @@ function MDText({ text }) {
         h1: ({ children }) => <h1 className="text-base font-bold dark:text-zinc-100 text-gray-900 mb-2 mt-3 first:mt-0">{children}</h1>,
         h2: ({ children }) => <h2 className="text-sm font-bold dark:text-zinc-200 text-gray-800 mb-1.5 mt-3 first:mt-0">{children}</h2>,
         h3: ({ children }) => <h3 className="text-xs font-semibold dark:text-zinc-300 text-gray-700 mb-1 mt-2 first:mt-0">{children}</h3>,
+        a: ({ href, children }) => (
+          <Link
+            to={href}
+            className="text-amber-600 dark:text-amber-400 hover:text-amber-500 dark:hover:text-amber-300 underline decoration-dotted underline-offset-2 font-medium"
+          >
+            {children}
+          </Link>
+        ),
       }}
     >
-      {text}
+      {processed}
     </ReactMarkdown>
   );
 }
@@ -51,7 +70,7 @@ function EntityChips({ ids, entityMap }) {
   );
 }
 
-export default function SessionNotesDisplay({ session, entities = [] }) {
+export default function SessionNotesDisplay({ session, entities = [], campaignId }) {
   if (!session) return null;
 
   const entityMap = Object.fromEntries(entities.map(e => [e.id, e]));
@@ -78,7 +97,7 @@ export default function SessionNotesDisplay({ session, entities = [] }) {
       {session.previous_session_recap && (
         <Section title="📜 Previously…">
           <div className="p-3 rounded-lg bg-gray-50 dark:bg-zinc-900/60 border border-gray-200 dark:border-zinc-800">
-            <MDText text={session.previous_session_recap} />
+            <MDText entityMap={entityMap} campaignId={campaignId} text={session.previous_session_recap} />
           </div>
         </Section>
       )}
@@ -86,7 +105,7 @@ export default function SessionNotesDisplay({ session, entities = [] }) {
       {session.strong_start && (
         <Section title="⚡ Strong Start">
           <div className="p-3.5 rounded-lg bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/25">
-            <MDText text={session.strong_start} />
+            <MDText entityMap={entityMap} campaignId={campaignId} text={session.strong_start} />
           </div>
         </Section>
       )}
@@ -94,21 +113,21 @@ export default function SessionNotesDisplay({ session, entities = [] }) {
       {(session.planned_events?.length > 0 || session.event_notes) && (
         <Section title="🗓 Events">
           <EntityChips ids={session.planned_events} entityMap={entityMap} />
-          {session.event_notes && <MDText text={session.event_notes} />}
+          {session.event_notes && <MDText entityMap={entityMap} campaignId={campaignId} text={session.event_notes} />}
         </Section>
       )}
 
       {(session.planned_locations?.length > 0 || session.location_notes) && (
         <Section title="🗺️ Locations">
           <EntityChips ids={session.planned_locations} entityMap={entityMap} />
-          {session.location_notes && <MDText text={session.location_notes} />}
+          {session.location_notes && <MDText entityMap={entityMap} campaignId={campaignId} text={session.location_notes} />}
         </Section>
       )}
 
       {(session.npc_ids?.length > 0 || session.npc_notes) && (
         <Section title="👤 NPCs">
           <EntityChips ids={session.npc_ids} entityMap={entityMap} />
-          {session.npc_notes && <MDText text={session.npc_notes} />}
+          {session.npc_notes && <MDText entityMap={entityMap} campaignId={campaignId} text={session.npc_notes} />}
         </Section>
       )}
 
@@ -116,20 +135,20 @@ export default function SessionNotesDisplay({ session, entities = [] }) {
         <Section title="⚔️ Encounters & Creatures">
           <EntityChips ids={session.planned_encounters} entityMap={entityMap} />
           <EntityChips ids={session.creature_ids} entityMap={entityMap} />
-          {session.monster_notes && <MDText text={session.monster_notes} />}
+          {session.monster_notes && <MDText entityMap={entityMap} campaignId={campaignId} text={session.monster_notes} />}
         </Section>
       )}
 
       {(session.thread_ids?.length > 0 || session.thread_notes) && (
         <Section title="🧵 Threads">
           <EntityChips ids={session.thread_ids} entityMap={entityMap} />
-          {session.thread_notes && <MDText text={session.thread_notes} />}
+          {session.thread_notes && <MDText entityMap={entityMap} campaignId={campaignId} text={session.thread_notes} />}
         </Section>
       )}
 
       {session.treasure_notes && (
         <Section title="💰 Rewards">
-          <MDText text={session.treasure_notes} />
+          <MDText entityMap={entityMap} campaignId={campaignId} text={session.treasure_notes} />
         </Section>
       )}
 
