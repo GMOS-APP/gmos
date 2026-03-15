@@ -715,11 +715,12 @@ Format with markdown for readability.`;
         )}
 
         {/* Stat Block (for NPCs, Creatures, Encounters) */}
-        {['npc', 'creature', 'encounter'].includes(form.entity_type) && form.description && (
-          <div>
-            <label className="text-xs dark:text-zinc-500 text-gray-600 uppercase tracking-widest font-semibold mb-2 block">Stat Block</label>
-            <StatBlock description={form.description} />
-          </div>
+        {['npc', 'creature', 'encounter'].includes(form.entity_type) && (
+          <StatBlock
+            extraData={form.extra_data}
+            system={system}
+            description={form.description}
+          />
         )}
 
         {/* Initiative Tracker (Encounters only) */}
