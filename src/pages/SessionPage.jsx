@@ -75,18 +75,17 @@ export default function SessionPage() {
         previous_session_recap: session.previous_session_recap ||
           (previousSession ? (previousSession.next_session_primer || previousSession.summary || '') : ''),
         strong_start: session.strong_start || '',
-        session_goals: session.session_goals || [],
-        potential_scenes: session.potential_scenes || [],
-        secrets_and_clues: session.secrets_and_clues || [],
-        character_hooks: session.character_hooks || [],
         planned_encounters: session.planned_encounters || [],
         creature_ids: session.creature_ids || [],
         planned_locations: session.planned_locations || [],
         npc_ids: session.npc_ids || [],
+        planned_events: session.planned_events || [],
+        thread_ids: session.thread_ids || [],
         npc_notes: session.npc_notes || '',
         monster_notes: session.monster_notes || '',
         location_notes: session.location_notes || '',
-        rumors: session.rumors || '',
+        event_notes: session.event_notes || '',
+        thread_notes: session.thread_notes || '',
         treasure_notes: session.treasure_notes || '',
       });
     } else if (!sessionId && previousSession) {
