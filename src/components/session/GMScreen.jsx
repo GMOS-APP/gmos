@@ -12,7 +12,8 @@ import EntityLinker from '@/components/session/EntityLinker';
 import RandomNPCGenerator from '@/components/session/RandomNPCGenerator';
 import QuickDialogueGenerator from '@/components/session/QuickDialogueGenerator';
 import AutoLinkerSuggestions from '@/components/session/AutoLinkerSuggestions';
-import { Minimize2, Clock } from 'lucide-react';
+import { Minimize2, Clock, StickyNote, Scroll, Wrench } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 function InlineTimer({ session }) {
   const [elapsed, setElapsed] = useState(0);
@@ -36,9 +37,26 @@ function InlineTimer({ session }) {
   );
 }
 
+function ToolsContent({ session, entities, campaignId }) {
+  return (
+    <div className="p-3 space-y-3">
+      <DiceRoller />
+      <div className="space-y-2">
+        <RandomNPCGenerator campaignId={campaignId} />
+        <QuickDialogueGenerator />
+      </div>
+      <div className="border-t border-gray-200 dark:border-zinc-800 pt-3">
+        <ResourceTracker session={session} entities={entities} campaignId={campaignId} />
+      </div>
+    </div>
+  );
+}
+
 export default function GMScreen({ session, notes, entities, campaignId, onAddNote, isAddingNote, onMinimize }) {
   const [npcSearchOpen, setNpcSearchOpen] = useState(false);
   const [justSaved, setJustSaved] = useState(false);
+  // Mobile panel: 'notes' | 'reference' | 'tools'
+  const [mobilePanel, setMobilePanel] = useState('notes');
   const queryClient = useQueryClient();
 
   const handleAddNote = (content) => {
@@ -57,7 +75,7 @@ export default function GMScreen({ session, notes, entities, campaignId, onAddNo
     <div className="fixed inset-0 z-50 bg-white dark:bg-zinc-950 flex flex-col overflow-hidden">
 
       {/* ── Header ─────────────────────────────────────────────────── */}
-      <div className="flex items-center gap-3 px-4 py-2 border-b border-gray-200 dark:border-zinc-800 bg-gray-50 dark:bg-zinc-900 flex-shrink-0">
+      <div className="flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2 border-b border-gray-200 dark:border-zinc-800 bg-gray-50 dark:bg-zinc-900 flex-shrink-0">
         <button
           onClick={onMinimize}
           title="Minimize GM Screen"
@@ -66,19 +84,21 @@ export default function GMScreen({ session, notes, entities, campaignId, onAddNo
           <Minimize2 className="w-3.5 h-3.5" />
         </button>
 
-        <span className="text-sm font-semibold text-gray-900 dark:text-zinc-200 truncate flex-1">
+        <span className="text-sm font-semibold text-gray-900 dark:text-zinc-200 truncate flex-1 min-w-0">
           {session?.title || `Session #${session?.session_number}`}
           {session?.session_number && (
-            <span className="ml-2 text-xs text-gray-400 dark:text-zinc-500 font-normal">#{session.session_number}</span>
+            <span className="ml-2 text-xs text-gray-400 dark:text-zinc-500 font-normal hidden sm:inline">
+              #{session.session_number}
+            </span>
           )}
         </span>
 
-        <div className="flex items-center gap-1.5 text-gray-400 dark:text-zinc-500">
-          <Clock className="w-3 h-3" />
+        <div className="flex items-center gap-1.5 text-gray-400 dark:text-zinc-500 flex-shrink-0">
+          <Clock className="w-3 h-3 hidden sm:block" />
           <InlineTimer session={session} />
         </div>
 
-        <span className="w-px h-4 bg-gray-200 dark:bg-zinc-800 flex-shrink-0" />
+        <span className="w-px h-4 bg-gray-200 dark:bg-zinc-800 flex-shrink-0 hidden sm:block" />
 
         <Button
           onClick={endSession}
@@ -86,17 +106,23 @@ export default function GMScreen({ session, notes, entities, campaignId, onAddNo
           variant="outline"
           className="border-amber-500/40 text-amber-600 hover:bg-amber-50 dark:border-amber-500/30 dark:text-amber-400 dark:hover:bg-amber-500/10 text-xs h-7 flex-shrink-0"
         >
-          End Session →
+          <span className="hidden sm:inline">End Session →</span>
+          <span className="sm:hidden">End</span>
         </Button>
       </div>
 
       {/* ── 3-column body ──────────────────────────────────────────── */}
       <div className="flex-1 flex overflow-hidden min-h-0">
 
-        {/* LEFT: Session Notes ──────────────────────────────────────── */}
-        <div className="w-72 flex-shrink-0 border-r border-gray-200 dark:border-zinc-800 flex flex-col overflow-hidden">
-
-          {/* Panel header */}
+        {/* LEFT: Session Notes ─────────────────────────────────────── */}
+        {/* Mobile: full-width when active. md+: fixed-width column always visible */}
+        <div className={cn(
+          'flex-col overflow-hidden',
+          'md:flex md:w-56 md:flex-shrink-0 md:border-r md:border-gray-200 md:dark:border-zinc-800',
+          'lg:w-72',
+          mobilePanel === 'notes' ? 'flex w-full' : 'hidden md:flex',
+        )}>
+          {/* Panel label */}
           <div className="px-3 py-2 border-b border-gray-200 dark:border-zinc-800 flex items-center justify-between flex-shrink-0">
             <span className="text-[10px] font-semibold uppercase tracking-widest text-gray-400 dark:text-zinc-500">
               Session Notes
@@ -108,12 +134,12 @@ export default function GMScreen({ session, notes, entities, campaignId, onAddNo
                 </span>
               )}
               {justSaved && (
-                <span className="text-[10px] text-emerald-600 dark:text-emerald-400">✓ saved to session</span>
+                <span className="text-[10px] text-emerald-600 dark:text-emerald-400">✓ saved</span>
               )}
             </div>
           </div>
 
-          {/* Note input */}
+          {/* Input */}
           <div className="p-3 border-b border-gray-200/60 dark:border-zinc-800/60 flex-shrink-0">
             <QuickNoteInput
               onSubmit={handleAddNote}
@@ -133,7 +159,7 @@ export default function GMScreen({ session, notes, entities, campaignId, onAddNo
             </button>
           </div>
 
-          {/* AI linker suggestions */}
+          {/* AI suggestions */}
           {notes.length > 0 && (
             <div className="px-3 py-2 border-b border-gray-200/40 dark:border-zinc-800/40 flex-shrink-0">
               <AutoLinkerSuggestions
@@ -170,20 +196,27 @@ export default function GMScreen({ session, notes, entities, campaignId, onAddNo
           </div>
         </div>
 
-        {/* CENTER: Prep Reference ────────────────────────────────────── */}
-        <div className="flex-1 flex flex-col overflow-hidden min-w-0">
+        {/* CENTER: Prep Reference ─────────────────────────────────── */}
+        {/* Mobile: full-width when active. md+: flex-1 always visible */}
+        <div className={cn(
+          'flex-col overflow-hidden min-w-0',
+          'md:flex md:flex-1',
+          mobilePanel === 'reference' ? 'flex w-full' : 'hidden md:flex',
+        )}>
           <Tabs defaultValue="prep" className="flex-1 flex flex-col overflow-hidden">
             <div className="px-4 pt-2.5 pb-2 border-b border-gray-200 dark:border-zinc-800 flex-shrink-0">
               <TabsList className="bg-gray-100 border border-gray-200 dark:bg-zinc-900 dark:border-zinc-800">
-                <TabsTrigger value="prep" className="text-xs">Prep Reference</TabsTrigger>
+                <TabsTrigger value="prep" className="text-xs">Prep</TabsTrigger>
                 <TabsTrigger value="entities" className="text-xs">
-                  Linked Entities
+                  Entities
                   {session?.linked_entities?.length > 0 && (
                     <span className="ml-1.5 text-[10px] bg-gray-200 text-gray-600 dark:bg-zinc-800 dark:text-zinc-400 rounded-full px-1.5 py-0.5">
                       {session.linked_entities.length}
                     </span>
                   )}
                 </TabsTrigger>
+                {/* Tools tab visible on tablet only (hidden on desktop where right panel shows) */}
+                <TabsTrigger value="tools" className="text-xs lg:hidden">Tools</TabsTrigger>
               </TabsList>
             </div>
             <TabsContent value="prep" className="flex-1 m-0 overflow-y-auto">
@@ -192,30 +225,53 @@ export default function GMScreen({ session, notes, entities, campaignId, onAddNo
             <TabsContent value="entities" className="flex-1 m-0 overflow-y-auto">
               <EntityLinker session={session} campaignId={campaignId} />
             </TabsContent>
+            {/* Tools tab content — tablet only */}
+            <TabsContent value="tools" className="flex-1 m-0 overflow-y-auto lg:hidden">
+              <ToolsContent session={session} entities={entities} campaignId={campaignId} />
+            </TabsContent>
           </Tabs>
         </div>
 
-        {/* RIGHT: Tools ─────────────────────────────────────────────── */}
-        <div className="w-72 flex-shrink-0 border-l border-gray-200 dark:border-zinc-800 flex flex-col overflow-y-auto">
+        {/* RIGHT: Tools ─────────────────────────────────────────────
+            Mobile: full-width when active
+            Tablet (md): hidden — tools live in center tabs instead
+            Desktop (lg+): always visible fixed-width column           */}
+        <div className={cn(
+          'flex-col overflow-y-auto',
+          'md:hidden lg:flex lg:w-72 lg:flex-shrink-0 lg:border-l lg:border-gray-200 lg:dark:border-zinc-800',
+          mobilePanel === 'tools' ? 'flex w-full' : 'hidden',
+        )}>
           <div className="px-3 py-2 border-b border-gray-200 dark:border-zinc-800 flex-shrink-0">
             <span className="text-[10px] font-semibold uppercase tracking-widest text-gray-400 dark:text-zinc-500">Tools</span>
           </div>
-
-          <div className="p-3 space-y-3">
-            <DiceRoller />
-
-            <div className="space-y-2">
-              <RandomNPCGenerator campaignId={campaignId} />
-              <QuickDialogueGenerator />
-            </div>
-
-            <div className="border-t border-gray-200 dark:border-zinc-800 pt-3">
-              <ResourceTracker session={session} entities={entities} campaignId={campaignId} />
-            </div>
-          </div>
+          <ToolsContent session={session} entities={entities} campaignId={campaignId} />
         </div>
 
       </div>
+
+      {/* ── Mobile bottom nav (hidden on md+) ──────────────────────── */}
+      <div className="flex md:hidden border-t border-gray-200 dark:border-zinc-800 bg-gray-50 dark:bg-zinc-900 flex-shrink-0">
+        {[
+          { id: 'notes',     Icon: StickyNote, label: 'Notes' },
+          { id: 'reference', Icon: Scroll,     label: 'Prep' },
+          { id: 'tools',     Icon: Wrench,     label: 'Tools' },
+        ].map(({ id, Icon, label }) => (
+          <button
+            key={id}
+            onClick={() => setMobilePanel(id)}
+            className={cn(
+              'flex-1 flex flex-col items-center gap-0.5 py-2.5 text-[10px] font-medium transition-colors',
+              mobilePanel === id
+                ? 'text-amber-600 dark:text-amber-400'
+                : 'text-gray-400 dark:text-zinc-500 hover:text-gray-600 dark:hover:text-zinc-300'
+            )}
+          >
+            <Icon className={cn('w-4 h-4', mobilePanel === id ? 'text-amber-500' : '')} />
+            {label}
+          </button>
+        ))}
+      </div>
+
     </div>
   );
 }
