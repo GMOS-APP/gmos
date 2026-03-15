@@ -479,7 +479,7 @@ Format with markdown for readability.`;
 
         <div className="max-w-2xl mx-auto mt-8">
           <h2 className="text-2xl font-bold dark:text-zinc-100 text-gray-900 mb-2">Import Creature from SRD</h2>
-          <p className="text-sm dark:text-zinc-500 text-gray-600 mb-6">Search the D&D 5e System Reference Document 5.2.1</p>
+          <p className="text-sm dark:text-zinc-500 text-gray-600 mb-6">Search the D&D 5e System Reference Document 5.1</p>
 
           <div className="flex gap-2 mb-6">
             <Input

@@ -237,6 +237,13 @@ export default function Sidebar({ campaign, collapsed, onToggle, onNavClick }) {
             </button>
           </div>
         )}
+        {!collapsed && (
+          <p className="text-[10px] text-zinc-600 dark:text-zinc-700 px-1">
+            <a href="https://dnd.wizards.com/resources/systems-reference-document" target="_blank" rel="noreferrer" className="hover:text-zinc-500 underline underline-offset-2">D&amp;D SRD 5.1</a>
+            {' · © Wizards of the Coast · '}
+            <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noreferrer" className="hover:text-zinc-500 underline underline-offset-2">CC BY 4.0</a>
+          </p>
+        )}
         {user && collapsed && (
           <button
             onClick={() => { sessionStorage.removeItem('gmos_booted'); auth.logout(); }}
