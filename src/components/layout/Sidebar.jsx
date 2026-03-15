@@ -30,6 +30,7 @@ import {
   LogOut,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { getSystem } from '@/lib/systems';
 
 const entityGroups = [
   {
@@ -237,7 +238,7 @@ export default function Sidebar({ campaign, collapsed, onToggle, onNavClick }) {
             </button>
           </div>
         )}
-        {!collapsed && (
+        {!collapsed && getSystem(campaign?.system).hasSrdConditions && (
           <p className="text-[10px] text-zinc-600 dark:text-zinc-700 px-1">
             <a href="https://dnd.wizards.com/resources/systems-reference-document" target="_blank" rel="noreferrer" className="hover:text-zinc-500 underline underline-offset-2">D&amp;D SRD 5.1</a>
             {' · © Wizards of the Coast · '}
