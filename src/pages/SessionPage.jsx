@@ -36,6 +36,12 @@ export default function SessionPage() {
 
   const sessionNum = campaign?.current_session_number || 0;
 
+  const buildRecap = (prev) => {
+    if (!prev) return '';
+    if (prev.key_events?.length) return prev.key_events.map(e => `• ${e}`).join('\n');
+    return prev.next_session_primer || prev.summary || '';
+  };
+
   const { data: session } = useQuery({
     queryKey: ['session', sessionId || `${campaignId}-${sessionNum}`],
     queryFn: () => sessionId
@@ -75,8 +81,7 @@ export default function SessionPage() {
       setFormData({
         title: session.title || '',
         date: session.date || '',
-        previous_session_recap: session.previous_session_recap ||
-          (previousSession ? (previousSession.next_session_primer || previousSession.summary || '') : ''),
+        previous_session_recap: session.previous_session_recap || buildRecap(previousSession),
         strong_start: session.strong_start || '',
         planned_encounters: session.planned_encounters || [],
         creature_ids: session.creature_ids || [],
@@ -94,7 +99,7 @@ export default function SessionPage() {
     } else if (!sessionId && previousSession) {
       setFormData(prev => ({
         ...prev,
-        previous_session_recap: previousSession.next_session_primer || previousSession.summary || '',
+        previous_session_recap: buildRecap(previousSession),
       }));
     }
   }, [session?.id, previousSession?.id, sessionId]);
@@ -197,6 +202,7 @@ export default function SessionPage() {
                 formData={formData}
                 setFormData={setFormData}
                 campaignId={campaignId}
+                previousSession={previousSession}
               />
             </div>
           </TabsContent>

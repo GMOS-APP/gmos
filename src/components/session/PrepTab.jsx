@@ -95,7 +95,7 @@ function LinkedEntitiesSection({ title, icon: Icon, color, entityType, linkedIds
   );
 }
 
-export default function PrepTab({ session, campaign, entities, formData, setFormData, campaignId }) {
+export default function PrepTab({ session, campaign, entities, formData, setFormData, campaignId, previousSession }) {
   const { system } = useCampaign();
   const ctx = () => buildSessionContext(campaign, { ...session, ...formData }, entities, system.promptName);
 
@@ -131,11 +131,17 @@ export default function PrepTab({ session, campaign, entities, formData, setForm
           placeholder="Last session: the party discovered the map was a forgery, Harrow escaped through the sewer gate, and the players are now framed for the theft..."
           rows={4}
           onGenerate={async () => {
+            const keyEventLines = previousSession?.key_events?.length
+              ? previousSession.key_events.map((e, i) => `${i + 1}. ${e}`).join('\n')
+              : null;
+            const prevSummary = previousSession?.summary || previousSession?.next_session_primer || null;
+
             const result = await InvokeLLM({
               prompt: `Write a "Previously on..." recap for a ${system.promptName} session (2-3 sentences, past tense, dramatic tone).
 Identify the three most critical takeaways: the last major action taken, the most important discovery made, and the exact cliffhanger or hook where the session ended.
-${ctx()}
-Base it on the previous session recap if available, otherwise use campaign context.`,
+${keyEventLines ? `\nKey events from the previous session — use ONLY these as your source of truth, do not invent events:\n${keyEventLines}` : ''}
+${prevSummary ? `\nPrevious session summary for additional context:\n${prevSummary}` : ''}
+${ctx()}`,
             });
             return result;
           }}

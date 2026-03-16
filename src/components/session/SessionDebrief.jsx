@@ -71,12 +71,16 @@ export default function SessionDebrief({ session, previousSession, notes = [], e
         ? `\nPrevious session context:\n${prevLines.join('\n')}\n`
         : '';
 
+      const existingKeyEventsText = keyEvents.length
+        ? `\nKey events already recorded (treat these as the factual backbone — use them verbatim or refine, do not ignore):\n${keyEvents.map((e, i) => `${i + 1}. ${e}`).join('\n')}\n`
+        : '';
+
       const result = await InvokeLLM({
         prompt: `You are a ${system.promptName} session chronicler. Given the following session data, generate:
-1. A vivid 2-3 paragraph narrative summary of the session — reference specific events from the notes
-2. 4-6 bullet-point key events (short, punchy, present-tense)
+1. A vivid 2-3 paragraph narrative summary of the session — reference specific events from the key events and notes
+2. 4-6 bullet-point key events (short, punchy, present-tense) — if key events are already provided, refine rather than replace them
 3. A 1-2 sentence "next session primer" teaser for players
-${prevContext}
+${prevContext}${existingKeyEventsText}
 Current session: ${session?.title || `Session #${session?.session_number}`}
 Quick notes captured during play (with tags):
 ${notesText || '(none)'}
