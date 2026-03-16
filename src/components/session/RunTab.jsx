@@ -60,7 +60,7 @@ export default function RunTab({ session, notes, entities, campaignId, onAddNote
                 Search NPC
               </Button>
               <RandomNPCGenerator campaignId={campaignId} />
-              <QuickDialogueGenerator />
+              <QuickDialogueGenerator entities={entities} />
               <DiceRoller />
             </div>
             {notes.length > 0 && (

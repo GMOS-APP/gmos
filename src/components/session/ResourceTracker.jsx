@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Session } from '@/api/entities';
-import { Plus, Minus, X, ChevronDown, ChevronRight, Heart, Zap } from 'lucide-react';
+import { Plus, Minus, X, ChevronDown, ChevronRight, Heart, Zap, Eye } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
@@ -66,7 +66,7 @@ function Counter({ counter, onChange, onRemove }) {
   );
 }
 
-function CharacterPanel({ charId, char, onChange }) {
+function CharacterPanel({ charId, char, entity, onChange }) {
   const [expanded, setExpanded] = useState(true);
   const [addingCounter, setAddingCounter] = useState(false);
   const [newName, setNewName] = useState('');
@@ -147,6 +147,36 @@ function CharacterPanel({ charId, char, onChange }) {
             </div>
             <HpBar current={char.hp.current} max={char.hp.max} />
           </div>
+
+          {/* Passive Skills */}
+          {(entity?.extra_data?.passive_perception || entity?.extra_data?.passive_investigation || entity?.extra_data?.passive_insight) && (
+            <div className="pt-2 border-t dark:border-zinc-800 border-gray-100">
+              <div className="flex items-center gap-1 mb-1.5">
+                <Eye className="w-3 h-3 dark:text-zinc-500 text-gray-400" />
+                <span className="text-xs dark:text-zinc-500 text-gray-500">Passives</span>
+              </div>
+              <div className="flex gap-4 text-xs">
+                {entity.extra_data.passive_perception && (
+                  <span>
+                    <span className="dark:text-zinc-600 text-gray-400">Perception </span>
+                    <span className="dark:text-zinc-200 text-gray-900 font-bold">{entity.extra_data.passive_perception}</span>
+                  </span>
+                )}
+                {entity.extra_data.passive_investigation && (
+                  <span>
+                    <span className="dark:text-zinc-600 text-gray-400">Investigation </span>
+                    <span className="dark:text-zinc-200 text-gray-900 font-bold">{entity.extra_data.passive_investigation}</span>
+                  </span>
+                )}
+                {entity.extra_data.passive_insight && (
+                  <span>
+                    <span className="dark:text-zinc-600 text-gray-400">Insight </span>
+                    <span className="dark:text-zinc-200 text-gray-900 font-bold">{entity.extra_data.passive_insight}</span>
+                  </span>
+                )}
+              </div>
+            </div>
+          )}
 
           {/* Counters */}
           {(char.counters || []).length > 0 && (
@@ -296,6 +326,7 @@ export default function ResourceTracker({ session, entities, campaignId }) {
           key={pc.id}
           charId={pc.id}
           char={state[pc.id] || initCharacter(pc)}
+          entity={pc}
           onChange={updated => handleChange(pc.id, updated)}
         />
       ))}
