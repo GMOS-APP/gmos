@@ -4,7 +4,7 @@ import { WorldEntity, Relationship, InvokeLLM, Campaign } from '@/api/entities';
 import { createPageUrl } from '@/utils';
 import { Link, useLocation } from 'react-router-dom';
 import {
-  ArrowLeft, Save, Trash2, Plus, X, BookOpen, Loader2, Wand2, Search, Download,
+  ArrowLeft, Save, Trash2, Plus, X, BookOpen, Loader2, Wand2, Search, Download, Pencil,
 } from 'lucide-react';
 import StatBlock from '@/components/entity/StatBlock';
 import DndBeyondImport from '@/components/entity/DndBeyondImport';
@@ -27,6 +27,42 @@ const entityTypes = ['note', 'npc', 'creature', 'location', 'faction', 'thread',
 const statuses = ['active', 'inactive', 'dead', 'destroyed', 'resolved', 'unknown'];
 const visibilities = ['gm_only', 'players_know', 'players_suspect', 'false_info'];
 
+const TYPE_COLORS = {
+  npc:              'bg-blue-500/15 text-blue-400 border-blue-500/30',
+  creature:         'bg-red-500/15 text-red-400 border-red-500/30',
+  location:         'bg-green-500/15 text-green-400 border-green-500/30',
+  faction:          'bg-purple-500/15 text-purple-400 border-purple-500/30',
+  thread:           'bg-orange-500/15 text-orange-400 border-orange-500/30',
+  item:             'bg-yellow-500/15 text-yellow-400 border-yellow-500/30',
+  player_character: 'bg-cyan-500/15 text-cyan-400 border-cyan-500/30',
+  event:            'bg-pink-500/15 text-pink-400 border-pink-500/30',
+  lore:             'bg-indigo-500/15 text-indigo-400 border-indigo-500/30',
+  deity:            'bg-amber-500/15 text-amber-400 border-amber-500/30',
+  encounter:        'bg-rose-500/15 text-rose-400 border-rose-500/30',
+  shop:             'bg-emerald-500/15 text-emerald-400 border-emerald-500/30',
+  note:             'bg-zinc-500/15 text-zinc-400 border-zinc-500/30',
+};
+
+const STATUS_COLORS = {
+  active:    'bg-green-500/15 text-green-400 border-green-500/30',
+  inactive:  'bg-zinc-500/15 text-zinc-400 border-zinc-500/30',
+  dead:      'bg-red-500/15 text-red-400 border-red-500/30',
+  destroyed: 'bg-red-500/15 text-red-400 border-red-500/30',
+  resolved:  'bg-blue-500/15 text-blue-400 border-blue-500/30',
+  unknown:   'bg-zinc-500/15 text-zinc-400 border-zinc-500/30',
+};
+
+const VISIBILITY_LABELS = {
+  gm_only:         'GM Only',
+  players_know:    'Players Know',
+  players_suspect: 'Players Suspect',
+  false_info:      'False Info',
+};
+
+function humanizeKey(key) {
+  return key.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
 function EntityDetailInner() {
   const { system } = useCampaign();
   const location = useLocation();
@@ -37,6 +73,7 @@ function EntityDetailInner() {
   const defaultType = params.get('type') || 'npc';
   const queryClient = useQueryClient();
 
+  const [pageMode, setPageMode] = useState(isNew ? 'edit' : 'view'); // 'view' | 'edit'
   const [form, setForm] = useState({
     campaign_id: campaignId || '',
     name: '', entity_type: defaultType, summary: '', description: '',
@@ -69,6 +106,7 @@ function EntityDetailInner() {
     setSrdSearch('');
     setSrdResults([]);
     setDescriptionMode('edit');
+    setPageMode(isNew ? 'edit' : 'view');
   }, [entityId]);
 
   const { data: entity, isLoading } = useQuery({
@@ -131,6 +169,7 @@ function EntityDetailInner() {
       queryClient.invalidateQueries({ queryKey: ['entities'] });
       setSaved(true);
       setTimeout(() => setSaved(false), 2000);
+      setPageMode('view');
       if (isNew && result?.id) {
         window.history.replaceState(null, '', `/${window.location.pathname.split('/').pop()}?id=${result.id}&campaign_id=${form.campaign_id}`);
       }
@@ -263,7 +302,7 @@ Keep content practical for table use. Use markdown formatting. Focus on actionab
   const searchSRD = async () => {
     if (!srdSearch.trim()) return;
     setSearching(true);
-    
+
     const prompt = `Search ${system.promptName} rules for creatures/adversaries matching: "${srdSearch}"
 
 Return a JSON array of matching creatures with this exact schema:
@@ -308,7 +347,7 @@ If no exact matches, find similar creatures. Return up to 5 matches.`;
 
   const importCreature = async (creature) => {
     setGenerating(true);
-    
+
     const prompt = `Import the complete stat block and information for: ${creature.name} (from ${system.promptName})
 
 Include:
@@ -363,7 +402,7 @@ Format with markdown for readability.`;
             New {defaultType.replace('_', ' ')}
           </h2>
           <p className="text-sm dark:text-zinc-500 text-gray-600 text-center mb-8">Choose how you'd like to create this {defaultType.replace('_', ' ')}</p>
-          
+
           <div className={`grid gap-4 ${defaultType === 'note' ? 'grid-cols-1 max-w-xs mx-auto' : defaultType === 'creature' ? 'grid-cols-3' : 'grid-cols-2'}`}>
             {defaultType !== 'note' && (
             <AiGate>
@@ -560,25 +599,261 @@ Format with markdown for readability.`;
     );
   }
 
+  // ── Read-only view ──────────────────────────────────────────────────────────
+  if (!isNew && pageMode === 'view') {
+    // Classify extra_data fields for display
+    const extraFields = Object.entries(form.extra_data || {}).filter(([_, v]) => {
+      if (v === null || v === undefined || v === '') return false;
+      if (typeof v === 'object') return false; // skip nested objects (ability_scores etc.)
+      return true;
+    });
+    const isLongValue = (v) => typeof v === 'string' && (v.includes('\n') || v.length > 120);
+    const shortFields = extraFields.filter(([_, v]) => !isLongValue(v));
+    const longFields  = extraFields.filter(([_, v]) =>  isLongValue(v));
+
+    return (
+      <div className="p-4 sm:p-6 lg:p-8 max-w-4xl">
+        {/* Back */}
+        <Link
+          to={createPageUrl('EntityBrowser') + `?campaign_id=${form.campaign_id}`}
+          className="inline-flex items-center gap-1.5 text-xs dark:text-zinc-500 dark:hover:text-zinc-300 text-gray-600 hover:text-gray-900 mb-6"
+        >
+          <ArrowLeft className="w-3.5 h-3.5" />
+          Back to entities
+        </Link>
+
+        {/* Header */}
+        <div className="flex items-start gap-5 mb-8">
+          {form.entity_type === 'player_character' && form.image_url && (
+            <img
+              src={form.image_url}
+              alt={form.name}
+              className="w-28 h-36 rounded-lg object-cover border-2 dark:border-zinc-800 border-gray-200 shadow-lg flex-shrink-0"
+            />
+          )}
+          <div className="flex-1 min-w-0">
+            <h1 className="text-3xl font-bold dark:text-zinc-100 text-gray-900 mb-3 leading-tight">
+              {form.name || 'Unnamed'}
+            </h1>
+            <div className="flex flex-wrap items-center gap-2">
+              <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border capitalize ${TYPE_COLORS[form.entity_type] || 'bg-zinc-500/15 text-zinc-400 border-zinc-500/30'}`}>
+                {form.entity_type.replace('_', ' ')}
+              </span>
+              <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border capitalize ${STATUS_COLORS[form.status] || 'bg-zinc-500/15 text-zinc-400 border-zinc-500/30'}`}>
+                {form.status}
+              </span>
+              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border dark:border-zinc-700 dark:text-zinc-500 border-gray-300 text-gray-600">
+                {VISIBILITY_LABELS[form.visibility] || form.visibility}
+              </span>
+              {form.last_seen_session && (
+                <span className="text-xs dark:text-zinc-600 text-gray-500">
+                  Session {form.last_seen_session}
+                </span>
+              )}
+            </div>
+          </div>
+          <div className="flex gap-2 flex-shrink-0">
+            <Button
+              onClick={() => setPageMode('edit')}
+              size="sm"
+              className="bg-amber-500 hover:bg-amber-400 text-zinc-950 font-semibold"
+            >
+              <Pencil className="w-3.5 h-3.5 mr-1.5" />
+              Edit
+            </Button>
+            {entityId && (
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button size="sm" variant="ghost" className="dark:text-zinc-500 dark:hover:text-red-400 text-gray-400 hover:text-red-600">
+                    <Trash2 className="w-4 h-4" />
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent className="dark:bg-zinc-900 dark:border-zinc-800 bg-white border-gray-200">
+                  <AlertDialogHeader>
+                    <AlertDialogTitle className="dark:text-zinc-100 text-gray-900">Delete entity?</AlertDialogTitle>
+                    <AlertDialogDescription className="dark:text-zinc-400 text-gray-600">
+                      This will permanently remove {form.name} from your world.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel className="dark:bg-zinc-800 dark:border-zinc-700 dark:text-zinc-300">Cancel</AlertDialogCancel>
+                    <AlertDialogAction onClick={() => deleteMutation.mutate()} className="bg-red-600 hover:bg-red-700">
+                      Delete
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            )}
+          </div>
+        </div>
+
+        <div className="space-y-8">
+          {/* Summary */}
+          {form.summary && (
+            <p className="text-base dark:text-zinc-400 text-gray-600 italic leading-relaxed border-l-2 dark:border-amber-500/40 border-amber-400/50 pl-4">
+              {form.summary}
+            </p>
+          )}
+
+          {/* Key Facts */}
+          {form.key_facts.length > 0 && (
+            <div>
+              <h3 className="text-xs dark:text-zinc-500 text-gray-500 uppercase tracking-widest font-semibold mb-3">
+                Key Facts
+              </h3>
+              <ul className="space-y-2">
+                {form.key_facts.map((fact, i) => (
+                  <li key={i} className="flex items-start gap-2.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-amber-500/60 flex-shrink-0 mt-[7px]" />
+                    <span className="text-sm dark:text-zinc-300 text-gray-800 leading-relaxed">{fact}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {/* Type-specific details — short single-line fields */}
+          {shortFields.length > 0 && (
+            <div>
+              <h3 className="text-xs dark:text-zinc-500 text-gray-500 uppercase tracking-widest font-semibold mb-3 capitalize">
+                {form.entity_type.replace('_', ' ')} Details
+              </h3>
+              <div className="grid grid-cols-2 gap-x-8 gap-y-4">
+                {shortFields.map(([key, val]) => (
+                  <div key={key}>
+                    <span className="text-[11px] dark:text-zinc-600 text-gray-500 uppercase tracking-wide block mb-0.5">
+                      {humanizeKey(key)}
+                    </span>
+                    <span className="text-sm dark:text-zinc-300 text-gray-900">{String(val)}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Stat block (NPCs, creatures, encounters) */}
+          {['npc', 'creature', 'encounter'].includes(form.entity_type) && (
+            <StatBlock extraData={form.extra_data} system={system} description={form.description} />
+          )}
+
+          {/* Long text fields (traits, appearance, etc.) */}
+          {longFields.length > 0 && (
+            <div className="space-y-6">
+              {longFields.map(([key, val]) => (
+                <div key={key}>
+                  <h3 className="text-xs dark:text-zinc-500 text-gray-500 uppercase tracking-widest font-semibold mb-2">
+                    {humanizeKey(key)}
+                  </h3>
+                  <p className="text-sm dark:text-zinc-300 text-gray-800 leading-relaxed whitespace-pre-wrap">
+                    {String(val)}
+                  </p>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Description */}
+          {form.description && (
+            <div>
+              <h3 className="text-xs dark:text-zinc-500 text-gray-500 uppercase tracking-widest font-semibold mb-3">
+                Description
+              </h3>
+              <div className="text-sm dark:text-zinc-300 text-gray-800 leading-relaxed">
+                <EntityMentionRenderer
+                  text={form.description}
+                  entities={campaignEntities}
+                  campaignId={form.campaign_id}
+                />
+              </div>
+            </div>
+          )}
+
+          {/* Tags */}
+          {form.tags.length > 0 && (
+            <div>
+              <h3 className="text-xs dark:text-zinc-500 text-gray-500 uppercase tracking-widest font-semibold mb-2">
+                Tags
+              </h3>
+              <div className="flex flex-wrap gap-1.5">
+                {form.tags.map((tag, i) => (
+                  <Badge key={i} variant="outline" className="dark:border-zinc-700 dark:text-zinc-400 border-gray-300 text-gray-700 text-xs">
+                    {tag}
+                  </Badge>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Relationships */}
+          {relationships.length > 0 && (
+            <div>
+              <h3 className="text-xs dark:text-zinc-500 text-gray-500 uppercase tracking-widest font-semibold mb-2">
+                Relationships
+              </h3>
+              <div className="space-y-1">
+                {relationships.map((rel) => {
+                  const isSource = rel.source_entity_id === entityId;
+                  const linkedName = isSource ? rel.target_name : rel.source_name;
+                  const linkedId = isSource ? rel.target_entity_id : rel.source_entity_id;
+                  return (
+                    <Link
+                      key={rel.id}
+                      to={createPageUrl('EntityDetail') + `?id=${linkedId}&campaign_id=${form.campaign_id}`}
+                      className="flex items-center gap-2 p-2 rounded-lg dark:hover:bg-zinc-800/50 hover:bg-gray-100/50 group"
+                    >
+                      <span className="text-xs dark:text-zinc-600 text-gray-500 w-24 text-right capitalize">
+                        {rel.relationship_type?.replace('_', ' ')}
+                      </span>
+                      <span className="text-xs dark:text-zinc-700 text-gray-400">→</span>
+                      <span className="text-sm dark:text-zinc-300 dark:group-hover:text-amber-400 text-gray-900 group-hover:text-amber-600">
+                        {linkedName}
+                      </span>
+                      {rel.status !== 'active' && (
+                        <Badge variant="outline" className="text-[10px] dark:border-zinc-700 dark:text-zinc-600 border-gray-300 text-gray-600 capitalize ml-auto">
+                          {rel.status}
+                        </Badge>
+                      )}
+                    </Link>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  // ── Edit form ───────────────────────────────────────────────────────────────
   return (
     <div className="p-4 sm:p-6 lg:p-8 max-w-4xl">
-      {/* Back */}
-      <Link
-        to={createPageUrl('EntityBrowser') + `?campaign_id=${form.campaign_id}`}
-        className="inline-flex items-center gap-1.5 text-xs dark:text-zinc-500 dark:hover:text-zinc-300 text-gray-600 hover:text-gray-900 mb-6"
-      >
-        <ArrowLeft className="w-3.5 h-3.5" />
-        Back to entities
-      </Link>
+      {/* Back / Cancel */}
+      {isNew ? (
+        <Link
+          to={createPageUrl('EntityBrowser') + `?campaign_id=${form.campaign_id}`}
+          className="inline-flex items-center gap-1.5 text-xs dark:text-zinc-500 dark:hover:text-zinc-300 text-gray-600 hover:text-gray-900 mb-6"
+        >
+          <ArrowLeft className="w-3.5 h-3.5" />
+          Back to entities
+        </Link>
+      ) : (
+        <button
+          onClick={() => setPageMode('view')}
+          className="inline-flex items-center gap-1.5 text-xs dark:text-zinc-500 dark:hover:text-zinc-300 text-gray-600 hover:text-gray-900 mb-6"
+        >
+          <ArrowLeft className="w-3.5 h-3.5" />
+          Cancel edit
+        </button>
+      )}
 
       {/* Header */}
       <div className="flex items-start justify-between mb-8">
         {/* Portrait (PC only) */}
         {form.entity_type === 'player_character' && form.image_url && (
           <div className="flex-shrink-0 mr-6">
-            <img 
-              src={form.image_url} 
-              alt={form.name} 
+            <img
+              src={form.image_url}
+              alt={form.name}
               className="w-32 h-40 rounded-lg object-cover border-2 border-zinc-800 shadow-lg"
             />
           </div>
@@ -853,7 +1128,6 @@ export default function EntityDetail() {
   const location = useLocation();
   const params = new URLSearchParams(location.search);
   const campaignId = params.get('campaign_id');
-  const entityId = params.get('id');
 
   const { data: campaignData } = useQuery({
     queryKey: ['campaign', campaignId],
