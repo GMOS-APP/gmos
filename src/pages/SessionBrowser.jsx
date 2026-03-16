@@ -112,7 +112,7 @@ export default function SessionBrowser() {
                   : "dark:text-zinc-500 dark:hover:bg-zinc-800 text-gray-500 hover:bg-gray-100"
               )}
             >
-              <List className="w-3.5 h-3.5" /> List
+              <List className="w-3.5 h-3.5" /><span className="hidden sm:inline">List</span>
             </button>
             <button
               onClick={() => setView('calendar')}
@@ -123,11 +123,11 @@ export default function SessionBrowser() {
                   : "dark:text-zinc-500 dark:hover:bg-zinc-800 text-gray-500 hover:bg-gray-100"
               )}
             >
-              <CalendarDays className="w-3.5 h-3.5" /> Calendar
+              <CalendarDays className="w-3.5 h-3.5" /><span className="hidden sm:inline">Calendar</span>
             </button>
           </div>
           <Button size="sm" onClick={() => setShowNewDialog(true)} className="bg-amber-500 hover:bg-amber-400 text-zinc-950 font-semibold">
-            <Plus className="w-4 h-4 mr-1.5" /> New Session
+            <Plus className="w-4 h-4 sm:mr-1.5" /><span className="hidden sm:inline">New Session</span>
           </Button>
         </div>
       </div>

@@ -138,8 +138,8 @@ export default function CampaignList() {
                   disabled={importing}
                   className="border-zinc-300 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800"
                 >
-                  <Upload className="w-4 h-4 mr-1.5" />
-                  {importing ? 'Importing...' : 'Import'}
+                  <Upload className="w-4 h-4 sm:mr-1.5" />
+                  <span className="hidden sm:inline">{importing ? 'Importing...' : 'Import'}</span>
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800">
@@ -172,8 +172,8 @@ export default function CampaignList() {
               size="sm"
               className="bg-amber-500 hover:bg-amber-400 text-zinc-950 font-semibold"
             >
-              <Plus className="w-4 h-4 mr-1.5" />
-              New Campaign
+              <Plus className="w-4 h-4 sm:mr-1.5" />
+              <span className="hidden sm:inline">New Campaign</span>
             </Button>
           </div>
         </div>
