@@ -27,6 +27,7 @@ import {
   History,
   Eye,
   LogOut,
+  StickyNote,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { getSystem } from '@/lib/systems';
@@ -117,6 +118,7 @@ export default function Sidebar({ campaign, collapsed, onToggle, onNavClick }) {
           { page: 'RelationshipMap', label: 'Relationship Map', icon: Network, query: `?campaign_id=${campaign.id}` },
           { page: 'CampaignMap', label: 'Campaign Map', icon: Map, query: `?campaign_id=${campaign.id}` },
           { page: 'SessionBrowser', label: 'Sessions', icon: CalendarDays, query: `?campaign_id=${campaign.id}` },
+          { page: 'CampaignNotes', label: 'Notes', icon: StickyNote, query: `?campaign_id=${campaign.id}` },
           { page: 'RandomTableBrowser', label: 'Random Tables', icon: Dices, query: `?campaign_id=${campaign.id}` },
           { page: 'CampaignTimeline', label: 'Timeline', icon: History, query: `?campaign_id=${campaign.id}` },
           { page: 'PlayerView', label: 'Player View', icon: Eye, query: `?campaign_id=${campaign.id}` },
