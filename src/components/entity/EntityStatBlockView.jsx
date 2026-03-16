@@ -79,7 +79,7 @@ function AbilityScoresGrid({ scores }) {
 
   return (
     <div className="pt-3 border-t dark:border-zinc-800 border-gray-200">
-      <div className="grid grid-cols-6 gap-1.5">
+      <div className="grid grid-cols-3 sm:grid-cols-6 gap-1.5">
         {Object.entries(parsed).map(([k, v]) => (
           <AbilityScore key={k} name={k} score={v} />
         ))}
@@ -162,7 +162,7 @@ function InfoGrid({ fields }) {
   const visible = fields.filter(([_, v]) => v != null && v !== '' && v !== 0);
   if (!visible.length) return null;
   return (
-    <div className="grid grid-cols-2 gap-x-6 gap-y-3">
+    <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3">
       {visible.map(([label, value]) => (
         <div key={label}>
           <span className="text-[11px] dark:text-zinc-600 text-gray-500 uppercase tracking-wide block mb-0.5">{label}</span>

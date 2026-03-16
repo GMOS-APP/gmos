@@ -22,7 +22,51 @@ export default function PassiveStatsHub({ playerCharacters, campaignId }) {
 
   return (
     <div className="bg-white dark:bg-zinc-900/40 border border-zinc-200 dark:border-zinc-800/50 rounded-xl overflow-hidden">
-      <div className="overflow-x-auto">
+
+      {/* Mobile: stat cards (hidden on sm+) */}
+      <div className="sm:hidden divide-y divide-zinc-200 dark:divide-zinc-800/30">
+        {playerCharacters.map((pc) => {
+          const ex = pc.extra_data || {};
+          return (
+            <div key={pc.id} className="px-4 py-3 space-y-2">
+              <Link
+                to={createPageUrl('EntityDetail') + `?id=${pc.id}&campaign_id=${campaignId}`}
+                className="flex items-center gap-2 group"
+              >
+                {pc.image_url && (
+                  <img
+                    src={pc.image_url}
+                    alt={pc.name}
+                    className="w-8 h-10 rounded object-cover border border-zinc-300 dark:border-zinc-700 flex-shrink-0"
+                  />
+                )}
+                <div>
+                  <p className="font-medium text-zinc-900 dark:text-zinc-200 text-sm group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors">{pc.name}</p>
+                  {ex.class && <p className="text-[11px] text-zinc-500 dark:text-zinc-600">{ex.class}</p>}
+                </div>
+              </Link>
+              <div className="grid grid-cols-5 gap-1 text-center">
+                {STAT_COLS.map((c) => (
+                  <div key={c.key} className="space-y-0.5">
+                    <p className={`text-[10px] uppercase font-semibold ${c.color}`}>{c.label}</p>
+                    <p className={`text-base font-bold tabular-nums ${ex[c.key] ? c.color : 'text-zinc-400 dark:text-zinc-700'}`}>
+                      {ex[c.key] || '—'}
+                    </p>
+                  </div>
+                ))}
+              </div>
+              {ex.languages && (
+                <p className="text-xs text-zinc-500 dark:text-zinc-500 flex items-center gap-1">
+                  <Globe className="w-3 h-3" />{ex.languages}
+                </p>
+              )}
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Desktop: table (hidden below sm) */}
+      <div className="hidden sm:block overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-zinc-200 dark:border-zinc-800/60 bg-zinc-50 dark:bg-zinc-900/60">
@@ -56,8 +100,8 @@ export default function PassiveStatsHub({ playerCharacters, campaignId }) {
                        className="group flex items-center gap-3"
                      >
                        {pc.image_url && (
-                         <img 
-                           src={pc.image_url} 
+                         <img
+                           src={pc.image_url}
                            alt={pc.name}
                            className="w-10 h-12 rounded object-cover border border-zinc-300 dark:border-zinc-700 flex-shrink-0"
                          />

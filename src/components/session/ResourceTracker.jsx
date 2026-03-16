@@ -123,7 +123,7 @@ function CharacterPanel({ charId, char, entity, onChange }) {
             <div className="flex items-center gap-2 mb-1">
               <Heart className="w-3.5 h-3.5 dark:text-zinc-500 text-gray-400" />
               <span className="text-xs dark:text-zinc-500 text-gray-500 flex-1">Hit Points</span>
-              <div className="flex items-center gap-1">
+              <div className="flex items-center gap-1 flex-wrap justify-end">
                 <button onClick={() => handleHpChange(-1)} disabled={char.hp.current <= 0}
                   className="w-6 h-6 rounded dark:bg-zinc-800 bg-gray-100 flex items-center justify-center dark:text-zinc-400 text-gray-500 hover:dark:bg-red-500/20 hover:bg-red-50 hover:text-red-500 dark:hover:text-red-400 disabled:opacity-30 transition-colors">
                   <Minus className="w-3 h-3" />
@@ -155,7 +155,7 @@ function CharacterPanel({ charId, char, entity, onChange }) {
                 <Eye className="w-3 h-3 dark:text-zinc-500 text-gray-400" />
                 <span className="text-xs dark:text-zinc-500 text-gray-500">Passives</span>
               </div>
-              <div className="flex gap-4 text-xs">
+              <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs">
                 {entity.extra_data.passive_perception && (
                   <span>
                     <span className="dark:text-zinc-600 text-gray-400">Perception </span>

@@ -52,7 +52,7 @@ export default function MapPinMarker({ pin, entity, campaignId, onRemove, editMo
       {hovered && entity && (
         <div
           className={cn(
-            'absolute z-50 w-56 bg-zinc-900 border border-zinc-700 rounded-xl p-3 shadow-2xl pointer-events-none',
+            'absolute z-50 w-48 sm:w-56 bg-zinc-900 border border-zinc-700 rounded-xl p-3 shadow-2xl pointer-events-none',
             tooltipLeft ? 'right-7' : 'left-7',
             tooltipTop ? 'bottom-0' : 'top-0'
           )}

@@ -139,7 +139,7 @@ function StructuredStatBlock({ extraData, system }) {
 
       {abilities && (
         <div className="pt-2 border-t dark:border-zinc-800 border-gray-200">
-          <div className="grid grid-cols-6 gap-1.5">
+          <div className="grid grid-cols-3 sm:grid-cols-6 gap-1.5">
             {Object.entries(abilities).map(([k, v]) => (
               <AbilityScore key={k} name={k} score={v} />
             ))}
@@ -262,7 +262,7 @@ function ParsedStatBlock({ description }) {
 
       {stats.abilities && (
         <div className="pt-2 border-t dark:border-zinc-800 border-gray-200">
-          <div className="grid grid-cols-6 gap-1.5">
+          <div className="grid grid-cols-3 sm:grid-cols-6 gap-1.5">
             {Object.entries(stats.abilities).map(([k, v]) => (
               <AbilityScore key={k} name={k} score={v} />
             ))}

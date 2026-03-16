@@ -78,13 +78,13 @@ export default function EntityBrowser() {
             className="pl-9 dark:bg-zinc-900 dark:border-zinc-800 dark:text-zinc-200 dark:placeholder:text-zinc-600 bg-gray-100 border-gray-300 text-gray-900 placeholder:text-gray-500"
           />
         </div>
-        <div className="flex gap-1 flex-wrap">
+        <div className="flex gap-1 overflow-x-auto pb-1 scrollbar-none">
           {entityTypes.map((t) => (
             <button
               key={t.value}
               onClick={() => setTypeFilter(t.value)}
               className={cn(
-                "px-3 py-1.5 rounded-lg text-xs font-medium transition-colors",
+                "px-3 py-2 rounded-lg text-xs font-medium transition-colors whitespace-nowrap flex-shrink-0 min-h-[36px]",
                 typeFilter === t.value
                   ? "dark:bg-amber-500/10 dark:text-amber-400 dark:border dark:border-amber-500/20 bg-amber-100 text-amber-700 border border-amber-300"
                   : "dark:text-zinc-500 dark:hover:text-zinc-300 dark:hover:bg-zinc-800/50 text-gray-600 hover:text-gray-900 hover:bg-gray-200/50"

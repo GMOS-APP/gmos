@@ -219,11 +219,43 @@ export default function RelationshipMap() {
         </TabsList>
 
         <TabsContent value="graph" className="flex-1 m-0">
-          <RelationshipGraph
-            entities={filteredEntities}
-            relationships={filteredRelationships}
-            onEditRelationship={openDialog}
-          />
+          {/* Mobile: flat list (graph is illegible on small screens) */}
+          <div className="block sm:hidden overflow-y-auto h-full rounded-lg border dark:border-zinc-800 dark:bg-zinc-900/30 bg-gray-50 border-gray-200">
+            {filteredRelationships.length === 0 ? (
+              <p className="text-center text-sm dark:text-zinc-600 text-gray-400 py-12">No relationships yet.</p>
+            ) : (
+              <div className="divide-y dark:divide-zinc-800 divide-gray-200">
+                {filteredRelationships.map((r) => {
+                  const from = entities.find(e => e.id === r.source_entity_id);
+                  const to = entities.find(e => e.id === r.target_entity_id);
+                  return (
+                    <button
+                      key={r.id}
+                      onClick={() => openDialog(r)}
+                      className="w-full text-left px-4 py-3 hover:dark:bg-zinc-800/40 hover:bg-gray-100 transition-colors"
+                    >
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        <span className="text-sm font-medium dark:text-zinc-200 text-gray-900">{from?.name ?? '?'}</span>
+                        <span className="text-xs dark:text-zinc-500 text-gray-400 px-1.5 py-0.5 rounded-full dark:bg-zinc-800 bg-gray-200">
+                          {formatLabel(r.relationship_type)}
+                        </span>
+                        <span className="text-sm font-medium dark:text-zinc-200 text-gray-900">{to?.name ?? '?'}</span>
+                      </div>
+                      {r.notes && <p className="text-xs dark:text-zinc-500 text-gray-500 mt-0.5 truncate">{r.notes}</p>}
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+          {/* Desktop: graph */}
+          <div className="hidden sm:block h-full">
+            <RelationshipGraph
+              entities={filteredEntities}
+              relationships={filteredRelationships}
+              onEditRelationship={openDialog}
+            />
+          </div>
         </TabsContent>
 
         <TabsContent value="timeline" className="flex-1 m-0">

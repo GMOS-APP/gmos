@@ -97,7 +97,7 @@ export default function NPCBuilder({ npcData, onUpdate }) {
   return (
     <div className="space-y-6">
       {/* Basic Info */}
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
           <label className="text-xs text-zinc-500 uppercase tracking-widest font-semibold mb-2 block">Gender</label>
           <Input
