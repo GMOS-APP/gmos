@@ -5,9 +5,8 @@ import { Link as LinkIcon, X, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import EntityMentionTextarea from '@/components/common/EntityMentionTextarea';
+import EntityQuickViewModal from '@/components/common/EntityQuickViewModal';
 import { Badge } from '@/components/ui/badge';
-import { createPageUrl } from '@/utils';
-import { Link } from 'react-router-dom';
 import {
   Dialog,
   DialogContent,
@@ -30,6 +29,8 @@ export default function EntityLinker({ session, campaignId }) {
   const [search, setSearch] = useState('');
   const [selectedEntity, setSelectedEntity] = useState(null);
   const [context, setContext] = useState('');
+  const [quickViewEntity, setQuickViewEntity] = useState(null);
+  const [quickViewAnchorRect, setQuickViewAnchorRect] = useState(null);
   const queryClient = useQueryClient();
 
   const { data: entities = [] } = useQuery({
@@ -161,44 +162,59 @@ export default function EntityLinker({ session, campaignId }) {
       </div>
 
       <div className="space-y-2">
-        {linkedEntities.map((le) => (
-          <div
-            key={le.entity_id}
-            className="bg-zinc-900/60 border border-zinc-800 rounded-lg p-3 group hover:border-zinc-700"
-          >
-            <div className="flex items-start gap-3">
-              <span className="text-xl mt-0.5">{ENTITY_ICONS[le.entity_type] || '📌'}</span>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 mb-1">
-                  <Link
-                    to={createPageUrl('EntityDetail') + `?id=${le.entity_id}&campaign_id=${campaignId}`}
-                    className="font-medium text-zinc-200 hover:text-amber-400"
-                  >
-                    {le.entity_name}
-                  </Link>
-                  <Badge variant="outline" className="text-[10px] border-zinc-700 text-zinc-500 capitalize">
-                    {le.entity_type.replace('_', ' ')}
-                  </Badge>
+        {linkedEntities.map((le) => {
+          const fullEntity = entities.find(e => e.id === le.entity_id);
+          return (
+            <div
+              key={le.entity_id}
+              className="bg-zinc-900/60 border border-zinc-800 rounded-lg p-3 group hover:border-zinc-700 cursor-pointer"
+              onClick={(e) => {
+                if (!fullEntity) return;
+                setQuickViewAnchorRect(e.currentTarget.getBoundingClientRect());
+                setQuickViewEntity(fullEntity);
+              }}
+            >
+              <div className="flex items-start gap-3">
+                <span className="text-xl mt-0.5">{ENTITY_ICONS[le.entity_type] || '📌'}</span>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="font-medium text-zinc-200 group-hover:text-amber-400 transition-colors">
+                      {le.entity_name}
+                    </span>
+                    <Badge variant="outline" className="text-[10px] border-zinc-700 text-zinc-500 capitalize">
+                      {le.entity_type.replace('_', ' ')}
+                    </Badge>
+                  </div>
+                  {le.context && (
+                    <p className="text-xs text-zinc-500">{le.context}</p>
+                  )}
                 </div>
-                {le.context && (
-                  <p className="text-xs text-zinc-500">{le.context}</p>
-                )}
+                <button
+                  onClick={(e) => { e.stopPropagation(); unlinkMutation.mutate(le.entity_id); }}
+                  className="opacity-0 group-hover:opacity-100 text-zinc-600 hover:text-red-400 transition-opacity"
+                >
+                  <X className="w-4 h-4" />
+                </button>
               </div>
-              <button
-                onClick={() => unlinkMutation.mutate(le.entity_id)}
-                className="opacity-0 group-hover:opacity-100 text-zinc-600 hover:text-red-400 transition-opacity"
-              >
-                <X className="w-4 h-4" />
-              </button>
             </div>
-          </div>
-        ))}
+          );
+        })}
         {linkedEntities.length === 0 && (
           <div className="text-center py-8 text-zinc-600 text-sm">
             No entities linked yet
           </div>
         )}
       </div>
+
+      {quickViewEntity && (
+        <EntityQuickViewModal
+          entity={quickViewEntity}
+          campaignId={campaignId}
+          open={!!quickViewEntity}
+          onOpenChange={(o) => { if (!o) setQuickViewEntity(null); }}
+          anchorRect={quickViewAnchorRect}
+        />
+      )}
     </div>
   );
 }
