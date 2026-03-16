@@ -49,6 +49,7 @@
  */
 import CampaignDashboard from './pages/CampaignDashboard';
 import CampaignList from './pages/CampaignList';
+import CampaignNotes from './pages/CampaignNotes';
 import CampaignMap from './pages/CampaignMap';
 import EntityBrowser from './pages/EntityBrowser';
 import EntityDetail from './pages/EntityDetail';
@@ -64,6 +65,7 @@ import __Layout from './Layout.jsx';
 export const PAGES = {
     "CampaignDashboard": CampaignDashboard,
     "CampaignList": CampaignList,
+    "CampaignNotes": CampaignNotes,
     "CampaignMap": CampaignMap,
     "EntityBrowser": EntityBrowser,
     "EntityDetail": EntityDetail,
