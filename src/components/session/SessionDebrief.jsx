@@ -9,7 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Save, Loader2, Plus, X, CheckCircle2, Clock, CalendarDays, Wand2 } from 'lucide-react';
 import AiGate from '@/components/ui/AiGate';
 
-export default function SessionDebrief({ session, notes = [], entities = [], campaignId }) {
+export default function SessionDebrief({ session, previousSession, notes = [], entities = [], campaignId }) {
   const { system } = useCampaign();
   const queryClient = useQueryClient();
 
@@ -19,6 +19,7 @@ export default function SessionDebrief({ session, notes = [], entities = [], cam
   const [newEvent, setNewEvent] = useState('');
   const [generating, setGenerating] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [saveError, setSaveError] = useState(null);
 
   useEffect(() => {
     setSummary(session?.summary || '');
@@ -36,23 +37,36 @@ export default function SessionDebrief({ session, notes = [], entities = [], cam
     onSuccess: () => {
       queryClient.invalidateQueries();
       setSaved(true);
+      setSaveError(null);
       setTimeout(() => setSaved(false), 2500);
+    },
+    onError: (err) => {
+      setSaveError(err?.message || 'Save failed. Please try again.');
     },
   });
 
   const handleGenerate = async () => {
     setGenerating(true);
-    const notesText = notes.map((n) => n.content).join('\n');
+    const notesText = notes.map((n, i) => {
+      const tags = n.tags?.length ? `[${n.tags.join(', ')}] ` : '';
+      return `${i + 1}. ${tags}${n.content}`;
+    }).join('\n');
     const linkedNames = (session?.linked_entities || []).map((e) => e.entity_name).join(', ');
+
+    const prevContext = previousSession ? `
+Previous session (#${previousSession.session_number}${previousSession.title ? ` — ${previousSession.title}` : ''}):
+Summary: ${previousSession.summary || '(none)'}
+Key events: ${(previousSession.key_events || []).join('; ') || '(none)'}
+Next session primer written last time: ${previousSession.next_session_primer || '(none)'}` : '';
 
     const result = await InvokeLLM({
       prompt: `You are a ${system.promptName} session chronicler. Given the following session data, generate:
 1. A vivid 2-3 paragraph narrative summary of the session
 2. 4-6 bullet-point key events (short, punchy, present-tense)
 3. A 1-2 sentence "next session primer" teaser for players
-
-Session title: ${session?.title || 'Untitled'}
-Quick notes captured during session:
+${prevContext}
+Current session: ${session?.title || `Session #${session?.session_number}`}
+Quick notes captured during play (with tags):
 ${notesText || '(none)'}
 Linked entities/characters: ${linkedNames || '(none)'}
 Session goals: ${(session?.session_goals || []).map((g) => g.text).join(', ') || '(none)'}
@@ -198,9 +212,12 @@ Respond as JSON.`,
       </div>
 
       {/* Save */}
-      <div className="flex justify-end pt-2">
+      <div className="flex items-center justify-end gap-3 pt-2">
+        {saveError && (
+          <p className="text-xs text-red-500 dark:text-red-400">{saveError}</p>
+        )}
         <Button
-          onClick={() => saveMutation.mutate()}
+          onClick={() => { setSaveError(null); saveMutation.mutate(); }}
           disabled={saveMutation.isPending || saved}
           className="bg-amber-500 hover:bg-amber-400 text-zinc-950 font-semibold"
         >

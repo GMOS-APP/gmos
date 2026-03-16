@@ -228,6 +228,7 @@ export default function SessionPage() {
             {(debriefStarted || session?.status === 'completed' || session?.status === 'debriefed') ? (
               <SessionDebrief
                 session={session}
+                previousSession={previousSession}
                 notes={notes}
                 entities={entities}
                 campaignId={campaignId}
