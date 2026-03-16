@@ -4,19 +4,16 @@ import { Session, Campaign } from '@/api/entities';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import QuickNoteInput from '@/components/session/QuickNoteInput';
-import NPCSearchModal from '@/components/session/NPCSearchModal';
 import DiceRoller from '@/components/session/DiceRoller';
+import SessionNotesPanel from '@/components/session/SessionNotesPanel';
 import ResourceTracker from '@/components/session/ResourceTracker';
 import SessionNotesDisplay from '@/components/session/SessionNotesDisplay';
 import EntityLinker from '@/components/session/EntityLinker';
 import RandomNPCGenerator from '@/components/session/RandomNPCGenerator';
 import QuickDialogueGenerator from '@/components/session/QuickDialogueGenerator';
-import AutoLinkerSuggestions from '@/components/session/AutoLinkerSuggestions';
 import CombatTracker from '@/components/session/CombatTracker';
 import EntityQuickViewModal from '@/components/common/EntityQuickViewModal';
 import { Minimize2, Clock, StickyNote, Scroll, Swords, Heart, Search, Users, MapPin, Shield, Waypoints, Package, Sparkles, BookOpen, Church, Flame, ShoppingBag } from 'lucide-react';
-import EntityMentionRenderer from '@/components/common/EntityMentionRenderer';
 import { cn } from '@/lib/utils';
 import { getEntityColors } from '@/lib/entityColors';
 
@@ -160,18 +157,10 @@ function RightPanelContent({ session, entities, campaignId }) {
   );
 }
 
-export default function GMScreen({ session, notes, entities, campaignId, onAddNote, isAddingNote, onMinimize }) {
-  const [npcSearchOpen, setNpcSearchOpen] = useState(false);
-  const [justSaved, setJustSaved] = useState(false);
+export default function GMScreen({ session, entities, campaignId, onMinimize }) {
   // Mobile panel: 'notes' | 'reference' | 'tools'
   const [mobilePanel, setMobilePanel] = useState('notes');
   const queryClient = useQueryClient();
-
-  const handleAddNote = (content) => {
-    onAddNote(content);
-    setJustSaved(true);
-    setTimeout(() => setJustSaved(false), 2500);
-  };
 
   const endSession = async () => {
     await Session.update(session.id, { status: 'completed', end_time: new Date().toISOString() });
@@ -229,79 +218,13 @@ export default function GMScreen({ session, notes, entities, campaignId, onAddNo
           'lg:w-64',
           mobilePanel === 'notes' ? 'flex w-full' : 'hidden md:flex',
         )}>
-          {/* Panel label */}
-          <div className="px-3 py-2 border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between flex-shrink-0">
-            <span className="text-[10px] font-semibold uppercase tracking-widest text-zinc-400 dark:text-zinc-500">
-              Session Notes
-            </span>
-            <div className="flex items-center gap-2">
-              {notes.length > 0 && (
-                <span className="text-[10px] bg-zinc-200 text-zinc-500 dark:bg-zinc-800 dark:text-zinc-500 rounded-full px-1.5 py-0.5">
-                  {notes.length}
-                </span>
-              )}
-              {justSaved && (
-                <span className="text-[10px] text-emerald-600 dark:text-emerald-400">✓ saved</span>
-              )}
-            </div>
-          </div>
-
-          {/* Input */}
-          <div className="p-3 border-b border-zinc-200/60 dark:border-zinc-800/60 flex-shrink-0">
-            <QuickNoteInput
-              onSubmit={handleAddNote}
-              isSubmitting={isAddingNote}
-              campaignId={campaignId}
-              placeholder="What's happening… (⌘+Enter)"
-            />
-          </div>
-
-          {/* NPC search */}
-          <div className="px-3 py-2 border-b border-zinc-200/40 dark:border-zinc-800/40 flex-shrink-0">
-            <NPCSearchModal campaignId={campaignId} isOpen={npcSearchOpen} onOpenChange={setNpcSearchOpen} />
-            <button
-              onClick={() => setNpcSearchOpen(true)}
-              className="w-full py-1.5 rounded-lg text-[11px] border border-zinc-200 text-zinc-500 hover:text-zinc-700 hover:border-zinc-300 dark:border-zinc-800 dark:text-zinc-500 dark:hover:text-zinc-300 dark:hover:border-zinc-700 transition-colors"
-            >
-              Search NPC
-            </button>
-          </div>
-
-          {/* AI suggestions */}
-          {notes.length > 0 && (
-            <div className="px-3 py-2 border-b border-zinc-200/40 dark:border-zinc-800/40 flex-shrink-0">
-              <AutoLinkerSuggestions
-                notes={notes.map((n) => n.content).join('\n')}
-                entities={entities}
-                session={session}
-              />
-            </div>
-          )}
-
-          {/* Notes list */}
-          <div className="flex-1 overflow-y-auto px-3 pb-3 pt-2 space-y-2.5 min-h-0">
-            {notes.length === 0 ? (
-              <p className="text-[11px] text-zinc-400 dark:text-zinc-600 text-center py-8 leading-relaxed">
-                Notes you capture appear here,<br />saved to this session automatically.
-              </p>
-            ) : (
-              notes.map((note, i) => (
-                <div
-                  key={note.id}
-                  className={`p-2.5 rounded-lg border transition-colors ${
-                    i === 0
-                      ? 'border-amber-400/30 bg-amber-50 dark:border-amber-500/20 dark:bg-amber-500/5'
-                      : 'border-zinc-200 bg-zinc-50 dark:border-zinc-800/50 dark:bg-zinc-900/30'
-                  }`}
-                >
-                  <EntityMentionRenderer text={note.content} entities={entities} campaignId={campaignId} className="text-xs text-zinc-800 dark:text-zinc-300 whitespace-pre-wrap leading-relaxed" />
-                  <p className="text-[10px] text-zinc-400 dark:text-zinc-600 mt-1 font-mono">
-                    {new Date(note.created_date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                  </p>
-                </div>
-              ))
-            )}
-          </div>
+          <SessionNotesPanel
+            session={session}
+            entities={entities}
+            campaignId={campaignId}
+            sessionId={session?.id}
+            compact
+          />
         </div>
 
         {/* CENTER: Prep Reference ─────────────────────────────────── */}

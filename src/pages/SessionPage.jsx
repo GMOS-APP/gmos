@@ -61,7 +61,7 @@ export default function SessionPage() {
     enabled: !!campaignId,
   });
 
-  const { data: notes = [], refetch: refetchNotes } = useQuery({
+  const { data: notes = [] } = useQuery({
     queryKey: ['quick-notes', campaignId, session?.id],
     queryFn: () => QuickNote.filter(
       { campaign_id: campaignId, session_id: session?.id },
@@ -98,16 +98,6 @@ export default function SessionPage() {
       }));
     }
   }, [session?.id, previousSession?.id, sessionId]);
-
-  const addNoteMutation = useMutation({
-    mutationFn: (content) => QuickNote.create({
-      campaign_id: campaignId,
-      session_id: session?.id,
-      content,
-      processed: false,
-    }),
-    onSuccess: () => refetchNotes(),
-  });
 
   const saveMutation = useMutation({
     mutationFn: async () => {
@@ -150,11 +140,8 @@ export default function SessionPage() {
     {isRunMode && gmScreenOpen && (
       <GMScreen
         session={session}
-        notes={notes}
         entities={entities}
         campaignId={campaignId}
-        onAddNote={(content) => addNoteMutation.mutate(content)}
-        isAddingNote={addNoteMutation.isPending}
         onMinimize={() => setGmScreenOpen(false)}
       />
     )}
@@ -230,11 +217,8 @@ export default function SessionPage() {
             ) : (
               <RunTab
                 session={session}
-                notes={notes}
                 entities={entities}
                 campaignId={campaignId}
-                onAddNote={(content) => addNoteMutation.mutate(content)}
-                isAddingNote={addNoteMutation.isPending}
               />
             )}
           </TabsContent>
