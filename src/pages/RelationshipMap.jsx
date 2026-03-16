@@ -102,8 +102,8 @@ export default function RelationshipMap() {
     <div className="p-6 lg:p-8 h-[calc(100vh-2rem)]">
       <div className="flex items-center justify-between mb-4">
         <div>
-          <h1 className="text-2xl font-bold dark:text-zinc-100 text-gray-900">Relationship Map</h1>
-          <p className="text-sm dark:text-zinc-500 text-gray-600">Visualize connections and narrative web</p>
+          <h1 className="text-2xl font-bold dark:text-zinc-100 text-zinc-900">Relationship Map</h1>
+          <p className="text-sm dark:text-zinc-500 text-zinc-600">Visualize connections and narrative web</p>
         </div>
         <div className="flex items-center gap-2">
           <Button
@@ -131,9 +131,9 @@ export default function RelationshipMap() {
 
       {/* Filter panel */}
       {filtersOpen && (
-        <div className="mb-4 p-4 rounded-lg border dark:border-zinc-800 dark:bg-zinc-900/50 bg-gray-50 border-gray-200 space-y-3">
+        <div className="mb-4 p-4 rounded-lg border dark:border-zinc-800 dark:bg-zinc-900/50 bg-zinc-50 border-zinc-200 space-y-3">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold uppercase tracking-wider dark:text-zinc-400 text-gray-500">Filters</span>
+            <span className="text-xs font-semibold uppercase tracking-wider dark:text-zinc-400 text-zinc-500">Filters</span>
             {activeFilterCount > 0 && (
               <button onClick={clearFilters} className="text-xs text-amber-500 hover:text-amber-400 flex items-center gap-1">
                 <X className="w-3 h-3" /> Clear all
@@ -142,7 +142,7 @@ export default function RelationshipMap() {
           </div>
 
           <div>
-            <p className="text-xs dark:text-zinc-500 text-gray-500 mb-1.5">Entity Type</p>
+            <p className="text-xs dark:text-zinc-500 text-zinc-500 mb-1.5">Entity Type</p>
             <div className="flex flex-wrap gap-1.5">
               {ENTITY_TYPES.map(({ value, label }) => (
                 <button
@@ -151,7 +151,7 @@ export default function RelationshipMap() {
                   className={`px-2.5 py-0.5 rounded-full text-xs font-medium border transition-colors ${
                     activeEntityTypes.has(value)
                       ? 'bg-amber-500 border-amber-500 text-zinc-950'
-                      : 'dark:border-zinc-700 dark:text-zinc-400 dark:hover:border-zinc-500 border-gray-300 text-gray-600 hover:border-gray-400'
+                      : 'dark:border-zinc-700 dark:text-zinc-400 dark:hover:border-zinc-500 border-zinc-300 text-zinc-600 hover:border-zinc-400'
                   }`}
                 >
                   {label}
@@ -161,7 +161,7 @@ export default function RelationshipMap() {
           </div>
 
           <div>
-            <p className="text-xs dark:text-zinc-500 text-gray-500 mb-1.5">Relationship Type</p>
+            <p className="text-xs dark:text-zinc-500 text-zinc-500 mb-1.5">Relationship Type</p>
             <div className="flex flex-wrap gap-1.5">
               {RELATIONSHIP_TYPES.map(value => (
                 <button
@@ -170,7 +170,7 @@ export default function RelationshipMap() {
                   className={`px-2.5 py-0.5 rounded-full text-xs font-medium border transition-colors ${
                     activeRelTypes.has(value)
                       ? 'bg-amber-500 border-amber-500 text-zinc-950'
-                      : 'dark:border-zinc-700 dark:text-zinc-400 dark:hover:border-zinc-500 border-gray-300 text-gray-600 hover:border-gray-400'
+                      : 'dark:border-zinc-700 dark:text-zinc-400 dark:hover:border-zinc-500 border-zinc-300 text-zinc-600 hover:border-zinc-400'
                   }`}
                 >
                   {formatLabel(value)}
@@ -180,7 +180,7 @@ export default function RelationshipMap() {
           </div>
 
           <div>
-            <p className="text-xs dark:text-zinc-500 text-gray-500 mb-1.5">Status</p>
+            <p className="text-xs dark:text-zinc-500 text-zinc-500 mb-1.5">Status</p>
             <div className="flex flex-wrap gap-1.5">
               {STATUSES.map(value => (
                 <button
@@ -189,7 +189,7 @@ export default function RelationshipMap() {
                   className={`px-2.5 py-0.5 rounded-full text-xs font-medium border transition-colors ${
                     activeStatuses.has(value)
                       ? 'bg-amber-500 border-amber-500 text-zinc-950'
-                      : 'dark:border-zinc-700 dark:text-zinc-400 dark:hover:border-zinc-500 border-gray-300 text-gray-600 hover:border-gray-400'
+                      : 'dark:border-zinc-700 dark:text-zinc-400 dark:hover:border-zinc-500 border-zinc-300 text-zinc-600 hover:border-zinc-400'
                   }`}
                 >
                   {formatLabel(value)}
@@ -199,7 +199,7 @@ export default function RelationshipMap() {
           </div>
 
           {activeFilterCount > 0 && (
-            <p className="text-xs dark:text-zinc-500 text-gray-500">
+            <p className="text-xs dark:text-zinc-500 text-zinc-500">
               Showing {filteredEntities.length} of {entities.length} entities · {filteredRelationships.length} of {relationships.length} relationships
             </p>
           )}
@@ -207,7 +207,7 @@ export default function RelationshipMap() {
       )}
 
       <Tabs defaultValue="graph" className="flex-1 flex flex-col h-[calc(100%-5rem)]">
-        <TabsList className="dark:bg-zinc-900 dark:border dark:border-zinc-800 bg-gray-100 border border-gray-300 mb-4">
+        <TabsList className="dark:bg-zinc-900 dark:border dark:border-zinc-800 bg-zinc-100 border border-zinc-300 mb-4">
           <TabsTrigger value="graph" className="dark:data-[state=active]:bg-zinc-800 data-[state=active]:bg-white">
             <Network className="w-4 h-4 mr-2" />
             Graph View
@@ -220,9 +220,9 @@ export default function RelationshipMap() {
 
         <TabsContent value="graph" className="flex-1 m-0">
           {/* Mobile: flat list (graph is illegible on small screens) */}
-          <div className="block sm:hidden overflow-y-auto h-full rounded-lg border dark:border-zinc-800 dark:bg-zinc-900/30 bg-gray-50 border-gray-200">
+          <div className="block sm:hidden overflow-y-auto h-full rounded-lg border dark:border-zinc-800 dark:bg-zinc-900/30 bg-zinc-50 border-zinc-200">
             {filteredRelationships.length === 0 ? (
-              <p className="text-center text-sm dark:text-zinc-600 text-gray-400 py-12">No relationships yet.</p>
+              <p className="text-center text-sm dark:text-zinc-600 text-zinc-400 py-12">No relationships yet.</p>
             ) : (
               <div className="divide-y dark:divide-zinc-800 divide-gray-200">
                 {filteredRelationships.map((r) => {
@@ -232,16 +232,16 @@ export default function RelationshipMap() {
                     <button
                       key={r.id}
                       onClick={() => openDialog(r)}
-                      className="w-full text-left px-4 py-3 hover:dark:bg-zinc-800/40 hover:bg-gray-100 transition-colors"
+                      className="w-full text-left px-4 py-3 hover:dark:bg-zinc-800/40 hover:bg-zinc-100 transition-colors"
                     >
                       <div className="flex items-center gap-1.5 flex-wrap">
-                        <span className="text-sm font-medium dark:text-zinc-200 text-gray-900">{from?.name ?? '?'}</span>
-                        <span className="text-xs dark:text-zinc-500 text-gray-400 px-1.5 py-0.5 rounded-full dark:bg-zinc-800 bg-gray-200">
+                        <span className="text-sm font-medium dark:text-zinc-200 text-zinc-900">{from?.name ?? '?'}</span>
+                        <span className="text-xs dark:text-zinc-500 text-zinc-400 px-1.5 py-0.5 rounded-full dark:bg-zinc-800 bg-zinc-200">
                           {formatLabel(r.relationship_type)}
                         </span>
-                        <span className="text-sm font-medium dark:text-zinc-200 text-gray-900">{to?.name ?? '?'}</span>
+                        <span className="text-sm font-medium dark:text-zinc-200 text-zinc-900">{to?.name ?? '?'}</span>
                       </div>
-                      {r.notes && <p className="text-xs dark:text-zinc-500 text-gray-500 mt-0.5 truncate">{r.notes}</p>}
+                      {r.notes && <p className="text-xs dark:text-zinc-500 text-zinc-500 mt-0.5 truncate">{r.notes}</p>}
                     </button>
                   );
                 })}

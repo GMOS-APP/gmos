@@ -111,7 +111,7 @@ export default function CampaignMap() {
   return (
     <div className="h-full flex flex-col">
       {/* Header */}
-      <div className="flex items-center justify-between px-4 py-2.5 dark:border-b dark:border-zinc-800/60 dark:bg-zinc-950/80 border-b border-gray-200 bg-white/80 dark:backdrop-blur backdrop-blur flex-shrink-0">
+      <div className="flex items-center justify-between px-4 py-2.5 dark:border-b dark:border-zinc-800/60 dark:bg-zinc-950/80 border-b border-zinc-200 bg-white/80 dark:backdrop-blur backdrop-blur flex-shrink-0">
         <div className="flex items-center gap-3">
           <div className="p-1.5 rounded-lg bg-blue-500/10 border border-blue-500/20">
             <Map className="w-4 h-4 text-blue-400" />
@@ -121,17 +121,17 @@ export default function CampaignMap() {
           {maps.length > 0 ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <button className="flex items-center gap-2 text-sm font-semibold dark:text-zinc-200 dark:hover:text-zinc-100 text-gray-900 hover:text-gray-950">
+                <button className="flex items-center gap-2 text-sm font-semibold dark:text-zinc-200 dark:hover:text-zinc-100 text-zinc-900 hover:text-zinc-950">
                   {activeMap?.name || 'Select Map'}
-                  <ChevronDown className="w-3.5 h-3.5 dark:text-zinc-500 text-gray-500" />
+                  <ChevronDown className="w-3.5 h-3.5 dark:text-zinc-500 text-zinc-500" />
                 </button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent className="dark:bg-zinc-900 dark:border-zinc-800 bg-white border-gray-200">
+              <DropdownMenuContent className="dark:bg-zinc-900 dark:border-zinc-800 bg-white border-zinc-200">
                 {maps.map(m => (
                   <DropdownMenuItem
                     key={m.id}
                     onClick={() => setSelectedMapId(m.id)}
-                    className={cn(m.id === activeMap?.id ? 'dark:text-amber-400 text-amber-600' : 'dark:text-gray-300 text-gray-900')}
+                    className={cn(m.id === activeMap?.id ? 'dark:text-amber-400 text-amber-600' : 'dark:text-zinc-300 text-zinc-900')}
                   >
                     {m.name}
                   </DropdownMenuItem>
@@ -139,7 +139,7 @@ export default function CampaignMap() {
               </DropdownMenuContent>
             </DropdownMenu>
           ) : (
-           <span className="text-sm dark:text-zinc-500 text-gray-600">No maps yet</span>
+           <span className="text-sm dark:text-zinc-500 text-zinc-600">No maps yet</span>
           )}
         </div>
 
@@ -152,7 +152,7 @@ export default function CampaignMap() {
                 onClick={() => { setEditMode(!editMode); setPlacingLocation(null); }}
                 className={editMode
                   ? 'bg-amber-500 hover:bg-amber-400 text-zinc-950 text-xs'
-                  : 'dark:border-zinc-700 dark:text-zinc-400 dark:text-xs dark:hover:text-zinc-200 border-gray-300 text-gray-700 text-xs hover:text-gray-900'}
+                  : 'dark:border-zinc-700 dark:text-zinc-400 dark:text-xs dark:hover:text-zinc-200 border-zinc-300 text-zinc-700 text-xs hover:text-zinc-900'}
               >
                 {editMode ? <><Check className="w-3.5 h-3.5 mr-1.5" />Done Editing</> : <><Pencil className="w-3.5 h-3.5 mr-1.5" />Edit Pins</>}
               </Button>
@@ -171,7 +171,7 @@ export default function CampaignMap() {
           <Button
             size="sm"
             onClick={() => setShowNewMapDialog(true)}
-            className="dark:bg-zinc-800 dark:hover:bg-zinc-700 dark:text-zinc-200 bg-gray-200 hover:bg-gray-300 text-gray-900 text-xs"
+            className="dark:bg-zinc-800 dark:hover:bg-zinc-700 dark:text-zinc-200 bg-zinc-200 hover:bg-zinc-300 text-zinc-900 text-xs"
           >
             <Plus className="w-3.5 h-3.5 mr-1.5" />New Map
           </Button>
@@ -184,9 +184,9 @@ export default function CampaignMap() {
         <div className="flex-1 relative overflow-hidden dark:bg-zinc-950 bg-white flex items-center justify-center">
           {!activeMap ? (
             <div className="text-center">
-              <ImageOff className="w-12 h-12 dark:text-zinc-800 text-gray-400 mx-auto mb-3" />
-              <p className="dark:text-zinc-500 text-gray-600 text-sm">No map selected</p>
-              <p className="dark:text-zinc-500 text-gray-500 text-xs mt-1">Create a new map to get started</p>
+              <ImageOff className="w-12 h-12 dark:text-zinc-800 text-zinc-400 mx-auto mb-3" />
+              <p className="dark:text-zinc-500 text-zinc-600 text-sm">No map selected</p>
+              <p className="dark:text-zinc-500 text-zinc-500 text-xs mt-1">Create a new map to get started</p>
               <Button
                 size="sm"
                 onClick={() => setShowNewMapDialog(true)}
@@ -197,8 +197,8 @@ export default function CampaignMap() {
             </div>
           ) : !activeMap.image_url ? (
             <div className="text-center">
-              <ImageOff className="w-12 h-12 dark:text-zinc-800 text-gray-400 mx-auto mb-3" />
-              <p className="dark:text-zinc-500 text-gray-600 text-sm">No image for this map</p>
+              <ImageOff className="w-12 h-12 dark:text-zinc-800 text-zinc-400 mx-auto mb-3" />
+              <p className="dark:text-zinc-500 text-zinc-600 text-sm">No image for this map</p>
             </div>
           ) : (
             <div
@@ -236,12 +236,12 @@ export default function CampaignMap() {
 
         {/* Edit sidebar */}
         {editMode && activeMap && (
-          <div className="w-60 dark:border-l dark:border-zinc-800/60 dark:bg-zinc-950/80 border-l border-gray-200 bg-white/80 flex flex-col">
-            <div className="p-3 dark:border-b dark:border-zinc-800/40 border-b border-gray-200">
-              <p className="text-[10px] dark:text-zinc-600 text-gray-600 uppercase tracking-widest font-semibold">
+          <div className="w-60 dark:border-l dark:border-zinc-800/60 dark:bg-zinc-950/80 border-l border-zinc-200 bg-white/80 flex flex-col">
+            <div className="p-3 dark:border-b dark:border-zinc-800/40 border-b border-zinc-200">
+              <p className="text-[10px] dark:text-zinc-600 text-zinc-600 uppercase tracking-widest font-semibold">
                 Pin Locations
               </p>
-              <p className="text-[10px] dark:text-zinc-500 text-gray-600 mt-1">
+              <p className="text-[10px] dark:text-zinc-500 text-zinc-600 mt-1">
                 {placingLocation ? `Placing: ${placingLocation.name}` : 'Select a location to place'}
               </p>
             </div>
@@ -256,17 +256,17 @@ export default function CampaignMap() {
             </div>
             {/* Already pinned */}
             {pins.length > 0 && (
-              <div className="dark:border-t dark:border-zinc-800/60 border-t border-gray-200 p-3">
-                <p className="text-[10px] dark:text-zinc-600 text-gray-600 uppercase tracking-widest font-semibold mb-2">
+              <div className="dark:border-t dark:border-zinc-800/60 border-t border-zinc-200 p-3">
+                <p className="text-[10px] dark:text-zinc-600 text-zinc-600 uppercase tracking-widest font-semibold mb-2">
                   Pinned ({pins.length})
                 </p>
                 <div className="space-y-1">
                   {pins.map(p => (
-                    <div key={p.entity_id} className="flex items-center justify-between text-xs dark:text-zinc-500 text-gray-600">
+                    <div key={p.entity_id} className="flex items-center justify-between text-xs dark:text-zinc-500 text-zinc-600">
                       <span className="truncate">{p.entity_name}</span>
                       <button
                         onClick={() => handleRemovePin(p.entity_id)}
-                        className="dark:text-zinc-500 dark:hover:text-red-400 text-gray-500 hover:text-red-500 ml-2 flex-shrink-0"
+                        className="dark:text-zinc-500 dark:hover:text-red-400 text-zinc-500 hover:text-red-500 ml-2 flex-shrink-0"
                       >
                         <Trash2 className="w-3 h-3" />
                       </button>
@@ -281,7 +281,7 @@ export default function CampaignMap() {
 
       {/* New Map Dialog */}
       <Dialog open={showNewMapDialog} onOpenChange={setShowNewMapDialog}>
-        <DialogContent className="dark:bg-zinc-900 dark:border-zinc-800 dark:text-zinc-100 bg-white border-gray-300 text-gray-900 sm:max-w-md">
+        <DialogContent className="dark:bg-zinc-900 dark:border-zinc-800 dark:text-zinc-100 bg-white border-zinc-300 text-zinc-900 sm:max-w-md">
           <DialogHeader>
             <DialogTitle>New Campaign Map</DialogTitle>
           </DialogHeader>
@@ -290,10 +290,10 @@ export default function CampaignMap() {
               placeholder="Map name (e.g. The Sword Coast, Dungeon Level 2)"
               value={newMapForm.name}
               onChange={(e) => setNewMapForm(f => ({ ...f, name: e.target.value }))}
-              className="dark:bg-zinc-950 dark:border-zinc-800 dark:text-zinc-100 bg-gray-100 border-gray-300 text-gray-900"
+              className="dark:bg-zinc-950 dark:border-zinc-800 dark:text-zinc-100 bg-zinc-100 border-zinc-300 text-zinc-900"
             />
             <div>
-              <p className="text-xs dark:text-zinc-500 text-gray-600 mb-2">Map image</p>
+              <p className="text-xs dark:text-zinc-500 text-zinc-600 mb-2">Map image</p>
               <div className="flex gap-2">
                 <Input
                   placeholder="Paste image URL..."
@@ -316,13 +316,13 @@ export default function CampaignMap() {
                 <img
                   src={newMapForm.image_url}
                   alt="preview"
-                  className="mt-2 w-full h-28 object-cover rounded-lg dark:border-zinc-800 border-gray-300 border"
+                  className="mt-2 w-full h-28 object-cover rounded-lg dark:border-zinc-800 border-zinc-300 border"
                 />
               )}
             </div>
           </div>
           <DialogFooter>
-            <Button variant="ghost" onClick={() => setShowNewMapDialog(false)} className="dark:text-zinc-400 text-gray-700">Cancel</Button>
+            <Button variant="ghost" onClick={() => setShowNewMapDialog(false)} className="dark:text-zinc-400 text-zinc-700">Cancel</Button>
             <Button
               onClick={() => createMapMutation.mutate(newMapForm)}
               disabled={!newMapForm.name.trim() || createMapMutation.isPending}

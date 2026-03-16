@@ -32,23 +32,23 @@ function SessionRow({ s, campaignId }) {
   return (
     <Link
       to={createPageUrl('SessionPage') + `?id=${campaignId}&session_id=${s.id}`}
-      className="flex items-center gap-4 px-4 py-3 rounded-xl dark:bg-zinc-900/40 dark:border-zinc-800/50 dark:hover:border-zinc-700 dark:hover:bg-zinc-900 bg-white border-gray-200 border hover:border-gray-300 hover:bg-gray-50 transition-all group"
+      className="flex items-center gap-4 px-4 py-3 rounded-xl dark:bg-zinc-900/40 dark:border-zinc-800/50 dark:hover:border-zinc-700 dark:hover:bg-zinc-900 bg-white border-zinc-200 border hover:border-zinc-300 hover:bg-zinc-50 transition-all group"
     >
-      <div className="w-9 h-9 rounded-lg dark:bg-zinc-800 dark:text-zinc-400 bg-gray-200 text-gray-700 flex items-center justify-center text-sm font-bold flex-shrink-0">
+      <div className="w-9 h-9 rounded-lg dark:bg-zinc-800 dark:text-zinc-400 bg-zinc-200 text-zinc-700 flex items-center justify-center text-sm font-bold flex-shrink-0">
         {s.session_number}
       </div>
       <div className="flex-1 min-w-0">
-        <p className="text-sm font-medium dark:text-zinc-200 dark:group-hover:text-amber-400 text-gray-900 group-hover:text-amber-600 transition-colors truncate">
+        <p className="text-sm font-medium dark:text-zinc-200 dark:group-hover:text-amber-400 text-zinc-900 group-hover:text-amber-600 transition-colors truncate">
           {s.title || `Session ${s.session_number}`}
         </p>
         <div className="flex items-center gap-3 mt-0.5">
           {s.date && (
-            <p className="text-xs dark:text-zinc-600 text-gray-500">
+            <p className="text-xs dark:text-zinc-600 text-zinc-500">
               {new Date(s.date).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })}
             </p>
           )}
           {s.session_goals?.length > 0 && (
-            <p className="text-xs dark:text-zinc-600 text-gray-500">
+            <p className="text-xs dark:text-zinc-600 text-zinc-500">
               {s.session_goals.filter(g => g.completed).length}/{s.session_goals.length} goals
             </p>
           )}
@@ -98,18 +98,18 @@ export default function SessionBrowser() {
     <div className="p-4 sm:p-6 lg:p-8 max-w-4xl">
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold dark:text-zinc-100 text-gray-900">Sessions</h1>
-          <p className="text-sm dark:text-zinc-500 text-gray-600 mt-1">{sessions.length} session{sessions.length !== 1 ? 's' : ''}</p>
+          <h1 className="text-2xl font-bold dark:text-zinc-100 text-zinc-900">Sessions</h1>
+          <p className="text-sm dark:text-zinc-500 text-zinc-600 mt-1">{sessions.length} session{sessions.length !== 1 ? 's' : ''}</p>
         </div>
         <div className="flex items-center gap-2">
-          <div className="flex rounded-lg border dark:border-zinc-700 border-gray-200 overflow-hidden">
+          <div className="flex rounded-lg border dark:border-zinc-700 border-zinc-200 overflow-hidden">
             <button
               onClick={() => setView('list')}
               className={cn(
                 "px-3 py-1.5 text-xs font-medium transition-colors flex items-center gap-1.5",
                 view === 'list'
-                  ? "dark:bg-zinc-700 dark:text-zinc-100 bg-gray-200 text-gray-900"
-                  : "dark:text-zinc-500 dark:hover:bg-zinc-800 text-gray-500 hover:bg-gray-100"
+                  ? "dark:bg-zinc-700 dark:text-zinc-100 bg-zinc-200 text-zinc-900"
+                  : "dark:text-zinc-500 dark:hover:bg-zinc-800 text-zinc-500 hover:bg-zinc-100"
               )}
             >
               <List className="w-3.5 h-3.5" /> List
@@ -119,8 +119,8 @@ export default function SessionBrowser() {
               className={cn(
                 "px-3 py-1.5 text-xs font-medium transition-colors flex items-center gap-1.5",
                 view === 'calendar'
-                  ? "dark:bg-zinc-700 dark:text-zinc-100 bg-gray-200 text-gray-900"
-                  : "dark:text-zinc-500 dark:hover:bg-zinc-800 text-gray-500 hover:bg-gray-100"
+                  ? "dark:bg-zinc-700 dark:text-zinc-100 bg-zinc-200 text-zinc-900"
+                  : "dark:text-zinc-500 dark:hover:bg-zinc-800 text-zinc-500 hover:bg-zinc-100"
               )}
             >
               <CalendarDays className="w-3.5 h-3.5" /> Calendar
@@ -135,7 +135,7 @@ export default function SessionBrowser() {
       {isLoading ? (
         <div className="space-y-2">
           {[...Array(4)].map((_, i) => (
-            <div key={i} className="h-16 rounded-xl dark:bg-zinc-900/50 dark:border-zinc-800/50 bg-gray-100 border border-gray-300 animate-pulse" />
+            <div key={i} className="h-16 rounded-xl dark:bg-zinc-900/50 dark:border-zinc-800/50 bg-zinc-100 border border-zinc-300 animate-pulse" />
           ))}
         </div>
       ) : view === 'calendar' ? (
@@ -155,7 +155,7 @@ export default function SessionBrowser() {
             }
           `}</style>
           <div className="flex justify-center">
-            <div className="dark:bg-zinc-900 dark:border-zinc-800 bg-white border border-gray-200 rounded-xl p-2 inline-block">
+            <div className="dark:bg-zinc-900 dark:border-zinc-800 bg-white border border-zinc-200 rounded-xl p-2 inline-block">
               <Calendar
                 mode="single"
                 selected={selectedDay}
@@ -167,25 +167,25 @@ export default function SessionBrowser() {
           </div>
           {selectedDay && (
             <div className="space-y-2">
-              <p className="text-xs font-medium dark:text-zinc-500 text-gray-500 uppercase tracking-wide">
+              <p className="text-xs font-medium dark:text-zinc-500 text-zinc-500 uppercase tracking-wide">
                 {selectedDay.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}
               </p>
               {selectedSessions.length === 0 ? (
-                <p className="text-sm dark:text-zinc-600 text-gray-400 py-2">No sessions scheduled on this date.</p>
+                <p className="text-sm dark:text-zinc-600 text-zinc-400 py-2">No sessions scheduled on this date.</p>
               ) : (
                 selectedSessions.map(s => <SessionRow key={s.id} s={s} campaignId={campaignId} />)
               )}
             </div>
           )}
           {!selectedDay && sessions.length > 0 && (
-            <p className="text-xs dark:text-zinc-600 text-gray-400 text-center">Click a date to see sessions. Amber dots mark scheduled sessions.</p>
+            <p className="text-xs dark:text-zinc-600 text-zinc-400 text-center">Click a date to see sessions. Amber dots mark scheduled sessions.</p>
           )}
         </div>
       ) : sessions.length === 0 ? (
         <div className="text-center py-20">
-          <CalendarDays className="w-10 h-10 dark:text-zinc-600 text-gray-400 mx-auto mb-3" />
-          <p className="dark:text-zinc-500 text-gray-600 text-sm">No sessions yet</p>
-          <Button variant="outline" size="sm" onClick={() => setShowNewDialog(true)} className="mt-4 dark:border-zinc-700 dark:text-zinc-400 border-gray-300 text-gray-700">
+          <CalendarDays className="w-10 h-10 dark:text-zinc-600 text-zinc-400 mx-auto mb-3" />
+          <p className="dark:text-zinc-500 text-zinc-600 text-sm">No sessions yet</p>
+          <Button variant="outline" size="sm" onClick={() => setShowNewDialog(true)} className="mt-4 dark:border-zinc-700 dark:text-zinc-400 border-zinc-300 text-zinc-700">
             Start First Session
           </Button>
         </div>

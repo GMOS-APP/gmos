@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { Users, MapPin, Shield, Waypoints, Package, Sparkles, Scroll, BookOpen, Swords, Church, Flame, ShoppingBag } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { getEntityColors } from '@/lib/entityColors';
 
 const typeIcons = {
   npc: Users,
@@ -19,21 +20,6 @@ const typeIcons = {
   shop: ShoppingBag,
 };
 
-const typeColors = {
-  npc: 'text-violet-400',
-  creature: 'text-red-400',
-  location: 'text-emerald-400',
-  faction: 'text-rose-400',
-  thread: 'text-blue-400',
-  item: 'text-amber-400',
-  player_character: 'text-cyan-400',
-  event: 'text-pink-400',
-  lore: 'text-orange-400',
-  deity: 'text-yellow-400',
-  encounter: 'text-fuchsia-400',
-  shop: 'text-teal-400',
-};
-
 export default function RecentEntities({ entities = [] }) {
   if (entities.length === 0) {
     return (
@@ -47,7 +33,7 @@ export default function RecentEntities({ entities = [] }) {
     <div className="space-y-1">
       {entities.slice(0, 8).map((entity) => {
         const Icon = typeIcons[entity.entity_type] || Scroll;
-        const color = typeColors[entity.entity_type] || 'text-zinc-400';
+        const color = getEntityColors(entity.entity_type).text;
         return (
           <Link
             key={entity.id}

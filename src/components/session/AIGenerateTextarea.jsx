@@ -43,7 +43,7 @@ export default function AIGenerateTextarea({ value, onChange, placeholder, rows 
           onChange={onChange}
           placeholder={placeholder}
           rows={rows}
-          className={`dark:bg-zinc-950/60 dark:border-zinc-800 dark:text-zinc-200 dark:placeholder:text-zinc-600 bg-white border-gray-300 text-gray-900 placeholder:text-gray-400 resize-y text-sm pr-[130px] ${className}`}
+          className={`dark:bg-zinc-950/60 dark:border-zinc-800 dark:text-zinc-200 dark:placeholder:text-zinc-600 bg-white border-zinc-300 text-zinc-900 placeholder:text-zinc-400 resize-y text-sm pr-[130px] ${className}`}
         />
         <AiGate>
           <Button
@@ -62,21 +62,21 @@ export default function AIGenerateTextarea({ value, onChange, placeholder, rows 
       </div>
 
       <Dialog open={showDialog} onOpenChange={setShowDialog}>
-        <DialogContent className="dark:bg-zinc-900 dark:border-zinc-800 dark:text-zinc-100 bg-white border-gray-200 text-gray-900 max-w-lg">
+        <DialogContent className="dark:bg-zinc-900 dark:border-zinc-800 dark:text-zinc-100 bg-white border-zinc-200 text-zinc-900 max-w-lg">
           <DialogHeader>
             <DialogTitle>AI Generated Content</DialogTitle>
           </DialogHeader>
-          <p className="text-sm dark:text-zinc-400 text-gray-600">This field already has content. Would you like to replace it or append the new content?</p>
+          <p className="text-sm dark:text-zinc-400 text-zinc-600">This field already has content. Would you like to replace it or append the new content?</p>
           {pendingContent && (
-            <div className="p-3 rounded-lg dark:bg-zinc-800/60 dark:border-zinc-700 dark:text-zinc-300 bg-gray-100 border-gray-300 text-gray-800 text-sm max-h-44 overflow-y-auto whitespace-pre-wrap">
+            <div className="p-3 rounded-lg dark:bg-zinc-800/60 dark:border-zinc-700 dark:text-zinc-300 bg-zinc-100 border-zinc-300 text-zinc-800 text-sm max-h-44 overflow-y-auto whitespace-pre-wrap">
               {pendingContent}
             </div>
           )}
           <DialogFooter className="gap-2 flex-wrap">
-            <Button onClick={() => setShowDialog(false)} variant="ghost" className="dark:text-zinc-500 text-gray-500">
+            <Button onClick={() => setShowDialog(false)} variant="ghost" className="dark:text-zinc-500 text-zinc-500">
               Cancel
             </Button>
-            <Button onClick={handleAppend} variant="outline" className="dark:border-zinc-600 dark:text-zinc-300 dark:hover:bg-zinc-800 border-gray-300 text-gray-700 hover:bg-gray-100">
+            <Button onClick={handleAppend} variant="outline" className="dark:border-zinc-600 dark:text-zinc-300 dark:hover:bg-zinc-800 border-zinc-300 text-zinc-700 hover:bg-zinc-100">
               Append
             </Button>
             <Button onClick={handleReplace} className="bg-amber-500 text-zinc-950 hover:bg-amber-400">

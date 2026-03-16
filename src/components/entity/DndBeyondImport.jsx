@@ -51,7 +51,7 @@ export default function DndBeyondImport({ onImport, onCancel }) {
           onChange={(e) => setCharacterId(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && handleImport()}
           placeholder="Enter Character ID (e.g. 155724296)"
-          className="bg-gray-100 border-gray-300 text-gray-900 dark:bg-zinc-900/60 dark:border-zinc-800 dark:text-zinc-200 font-mono"
+          className="bg-zinc-100 border-zinc-300 text-zinc-900 dark:bg-zinc-900/60 dark:border-zinc-800 dark:text-zinc-200 font-mono"
         />
         <Button
           onClick={handleImport}

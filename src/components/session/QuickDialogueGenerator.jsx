@@ -139,12 +139,12 @@ Make it immediately usable for a DM to speak aloud.`;
                 if (e.key === 'Enter' && !showSuggestions) generateDialogue();
                 if (e.key === 'Escape') setShowSuggestions(false);
               }}
-              className={`dark:bg-zinc-950 dark:border-zinc-800 dark:text-zinc-100 bg-white border-gray-300 text-gray-900 placeholder:text-gray-400 text-xs pr-6 ${selectedEntity ? 'dark:border-purple-500/40 border-purple-400/50' : ''}`}
+              className={`dark:bg-zinc-950 dark:border-zinc-800 dark:text-zinc-100 bg-white border-zinc-300 text-zinc-900 placeholder:text-zinc-400 text-xs pr-6 ${selectedEntity ? 'dark:border-purple-500/40 border-purple-400/50' : ''}`}
             />
             {(nameQuery || selectedEntity) && (
               <button
                 onClick={clearEntity}
-                className="absolute right-2 dark:text-zinc-600 dark:hover:text-zinc-300 text-gray-400 hover:text-gray-600"
+                className="absolute right-2 dark:text-zinc-600 dark:hover:text-zinc-300 text-zinc-400 hover:text-zinc-600"
               >
                 <X className="w-3 h-3" />
               </button>
@@ -159,7 +159,7 @@ Make it immediately usable for a DM to speak aloud.`;
                 {selectedEntity.entity_type.replace('_', ' ')}
               </span>
               {selectedEntity.extra_data?.traits && (
-                <span className="text-[10px] dark:text-zinc-600 text-gray-400 truncate max-w-[120px]" title={selectedEntity.extra_data.traits}>
+                <span className="text-[10px] dark:text-zinc-600 text-zinc-400 truncate max-w-[120px]" title={selectedEntity.extra_data.traits}>
                   has personality
                 </span>
               )}
@@ -170,16 +170,16 @@ Make it immediately usable for a DM to speak aloud.`;
           {showSuggestions && suggestions.length > 0 && (
             <div
               ref={dropdownRef}
-              className="absolute top-full left-0 right-0 mt-1 z-50 rounded-lg border dark:border-zinc-700 dark:bg-zinc-900 bg-white border-gray-200 shadow-lg overflow-hidden"
+              className="absolute top-full left-0 right-0 mt-1 z-50 rounded-lg border dark:border-zinc-700 dark:bg-zinc-900 bg-white border-zinc-200 shadow-lg overflow-hidden"
             >
               {suggestions.map((entity) => (
                 <button
                   key={entity.id}
                   onMouseDown={(e) => { e.preventDefault(); selectEntity(entity); }}
-                  className="w-full flex items-center gap-2 px-3 py-2 text-left dark:hover:bg-zinc-800 hover:bg-gray-50 transition-colors"
+                  className="w-full flex items-center gap-2 px-3 py-2 text-left dark:hover:bg-zinc-800 hover:bg-zinc-50 transition-colors"
                 >
-                  <span className="text-xs dark:text-zinc-200 text-gray-900 font-medium flex-1 truncate">{entity.name}</span>
-                  <span className="text-[10px] dark:text-zinc-500 text-gray-400 capitalize flex-shrink-0">
+                  <span className="text-xs dark:text-zinc-200 text-zinc-900 font-medium flex-1 truncate">{entity.name}</span>
+                  <span className="text-[10px] dark:text-zinc-500 text-zinc-400 capitalize flex-shrink-0">
                     {entity.entity_type.replace('_', ' ')}
                   </span>
                 </button>
@@ -192,7 +192,7 @@ Make it immediately usable for a DM to speak aloud.`;
           placeholder="Context (optional) — what's happening?"
           value={context}
           onChange={(e) => setContext(e.target.value)}
-          className="dark:bg-zinc-950 dark:border-zinc-800 dark:text-zinc-100 bg-white border-gray-300 text-gray-900 placeholder:text-gray-400 text-xs resize-none h-16"
+          className="dark:bg-zinc-950 dark:border-zinc-800 dark:text-zinc-100 bg-white border-zinc-300 text-zinc-900 placeholder:text-zinc-400 text-xs resize-none h-16"
         />
       </div>
 
@@ -212,15 +212,15 @@ Make it immediately usable for a DM to speak aloud.`;
       </AiGate>
 
       {dialogue && (
-        <div className="dark:bg-zinc-800/40 dark:border-zinc-800 bg-gray-100 border-gray-300 rounded-lg p-3 space-y-2 border">
-          <p className="text-xs dark:text-zinc-500 text-gray-500 font-semibold">{npcName}'s Dialogue:</p>
-          <p className="text-xs dark:text-zinc-300 text-gray-800 whitespace-pre-wrap italic">{dialogue}</p>
+        <div className="dark:bg-zinc-800/40 dark:border-zinc-800 bg-zinc-100 border-zinc-300 rounded-lg p-3 space-y-2 border">
+          <p className="text-xs dark:text-zinc-500 text-zinc-500 font-semibold">{npcName}'s Dialogue:</p>
+          <p className="text-xs dark:text-zinc-300 text-zinc-800 whitespace-pre-wrap italic">{dialogue}</p>
           <div className="flex gap-2 pt-2">
             <Button
               onClick={() => navigator.clipboard.writeText(dialogue)}
               size="sm"
               variant="outline"
-              className="flex-1 text-xs dark:border-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-200 border-gray-300 text-gray-600 hover:text-gray-900"
+              className="flex-1 text-xs dark:border-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-200 border-zinc-300 text-zinc-600 hover:text-zinc-900"
             >
               Copy
             </Button>
@@ -228,7 +228,7 @@ Make it immediately usable for a DM to speak aloud.`;
               onClick={generateDialogue}
               size="sm"
               variant="outline"
-              className="flex-1 text-xs dark:border-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-200 border-gray-300 text-gray-600 hover:text-gray-900"
+              className="flex-1 text-xs dark:border-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-200 border-zinc-300 text-zinc-600 hover:text-zinc-900"
               disabled={generating}
             >
               Regenerate

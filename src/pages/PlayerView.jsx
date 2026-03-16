@@ -63,11 +63,11 @@ export default function PlayerView() {
       <div className="mb-8">
         <div className="flex items-center gap-2 mb-1">
           <Eye className="w-4 h-4 dark:text-amber-400 text-amber-500" />
-          <span className="text-xs font-semibold uppercase tracking-widest dark:text-zinc-500 text-gray-400">Player View</span>
+          <span className="text-xs font-semibold uppercase tracking-widest dark:text-zinc-500 text-zinc-400">Player View</span>
         </div>
-        <h1 className="text-3xl font-bold dark:text-zinc-100 text-gray-900">{campaign?.name || 'Campaign'}</h1>
+        <h1 className="text-3xl font-bold dark:text-zinc-100 text-zinc-900">{campaign?.name || 'Campaign'}</h1>
         {campaign?.setting && (
-          <p className="text-sm dark:text-zinc-500 text-gray-500 mt-1">{campaign.setting}</p>
+          <p className="text-sm dark:text-zinc-500 text-zinc-500 mt-1">{campaign.setting}</p>
         )}
       </div>
 
@@ -75,7 +75,7 @@ export default function PlayerView() {
       {lastDebriefed?.previous_session_recap && (
         <div className="mb-8 rounded-xl border dark:border-amber-500/20 border-amber-200 bg-amber-500/5 p-4">
           <p className="text-xs font-semibold uppercase tracking-wider dark:text-amber-500 text-amber-600 mb-2">Previously…</p>
-          <p className="text-sm dark:text-zinc-300 text-gray-700 leading-relaxed italic">{lastDebriefed.previous_session_recap}</p>
+          <p className="text-sm dark:text-zinc-300 text-zinc-700 leading-relaxed italic">{lastDebriefed.previous_session_recap}</p>
         </div>
       )}
 
@@ -87,7 +87,7 @@ export default function PlayerView() {
             className={cn('px-3 py-1 rounded-full text-xs font-medium transition-colors',
               activeType === 'all'
                 ? 'bg-amber-500 text-zinc-950'
-                : 'dark:bg-zinc-800 dark:text-zinc-400 bg-gray-100 text-gray-600 hover:bg-gray-200 dark:hover:bg-zinc-700'
+                : 'dark:bg-zinc-800 dark:text-zinc-400 bg-zinc-100 text-zinc-600 hover:bg-zinc-200 dark:hover:bg-zinc-700'
             )}
           >
             All ({visible.length})
@@ -103,7 +103,7 @@ export default function PlayerView() {
                 className={cn('px-3 py-1 rounded-full text-xs font-medium transition-colors',
                   activeType === type
                     ? 'bg-amber-500 text-zinc-950'
-                    : 'dark:bg-zinc-800 dark:text-zinc-400 bg-gray-100 text-gray-600 hover:bg-gray-200 dark:hover:bg-zinc-700'
+                    : 'dark:bg-zinc-800 dark:text-zinc-400 bg-zinc-100 text-zinc-600 hover:bg-zinc-200 dark:hover:bg-zinc-700'
                 )}
               >
                 {meta.label} ({count})
@@ -116,9 +116,9 @@ export default function PlayerView() {
       {/* Entity grid */}
       {filtered.length === 0 ? (
         <div className="text-center py-20">
-          <Eye className="w-12 h-12 dark:text-zinc-700 text-gray-300 mx-auto mb-4" />
-          <p className="dark:text-zinc-400 text-gray-600 font-medium mb-1">Nothing revealed yet</p>
-          <p className="text-sm dark:text-zinc-600 text-gray-400">Entities become visible here when their visibility is set to "Players Know" or "Players Suspect".</p>
+          <Eye className="w-12 h-12 dark:text-zinc-700 text-zinc-300 mx-auto mb-4" />
+          <p className="dark:text-zinc-400 text-zinc-600 font-medium mb-1">Nothing revealed yet</p>
+          <p className="text-sm dark:text-zinc-600 text-zinc-400">Entities become visible here when their visibility is set to "Players Know" or "Players Suspect".</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -132,14 +132,14 @@ export default function PlayerView() {
               <Link
                 key={entity.id}
                 to={createPageUrl('EntityDetail') + `?id=${entity.id}&campaign_id=${campaignId}`}
-                className="group flex gap-3 p-3 rounded-xl border dark:border-zinc-800 dark:bg-zinc-900/40 bg-white border-gray-200 hover:border-amber-500/40 transition-colors"
+                className="group flex gap-3 p-3 rounded-xl border dark:border-zinc-800 dark:bg-zinc-900/40 bg-white border-zinc-200 hover:border-amber-500/40 transition-colors"
               >
                 <div className={cn('w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5', meta.bg)}>
                   <Icon className={cn('w-4 h-4', meta.accent)} />
                 </div>
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2 mb-0.5">
-                    <p className="text-sm font-semibold dark:text-zinc-200 text-gray-800 truncate group-hover:text-amber-500 dark:group-hover:text-amber-400 transition-colors">
+                    <p className="text-sm font-semibold dark:text-zinc-200 text-zinc-800 truncate group-hover:text-amber-500 dark:group-hover:text-amber-400 transition-colors">
                       {entity.name}
                     </p>
                     {vis && VisIcon && (
@@ -150,7 +150,7 @@ export default function PlayerView() {
                     )}
                   </div>
                   {entity.summary && (
-                    <p className="text-xs dark:text-zinc-500 text-gray-500 line-clamp-2 leading-snug">{entity.summary}</p>
+                    <p className="text-xs dark:text-zinc-500 text-zinc-500 line-clamp-2 leading-snug">{entity.summary}</p>
                   )}
                 </div>
               </Link>
@@ -160,8 +160,8 @@ export default function PlayerView() {
       )}
 
       {/* Session count footer */}
-      <div className="mt-12 pt-6 border-t dark:border-zinc-800 border-gray-200 text-center">
-        <p className="text-xs dark:text-zinc-600 text-gray-400">
+      <div className="mt-12 pt-6 border-t dark:border-zinc-800 border-zinc-200 text-center">
+        <p className="text-xs dark:text-zinc-600 text-zinc-400">
           {sessions.length} session{sessions.length !== 1 ? 's' : ''} played · {visible.length} revealed {visible.length !== 1 ? 'entries' : 'entry'}
         </p>
       </div>

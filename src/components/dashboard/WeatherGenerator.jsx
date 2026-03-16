@@ -149,10 +149,10 @@ export default function WeatherGenerator() {
   };
 
   return (
-    <div className="h-full dark:bg-zinc-900/40 bg-white border dark:border-zinc-800/50 border-gray-200 rounded-xl p-4 flex flex-col gap-3">
+    <div className="h-full dark:bg-zinc-900/40 bg-white border dark:border-zinc-800/50 border-zinc-200 rounded-xl p-4 flex flex-col gap-3">
       <div className="flex items-center gap-2 mb-1">
         <Cloud className="w-4 h-4 text-blue-400" />
-        <span className="text-xs font-semibold uppercase tracking-widest dark:text-zinc-400 text-gray-500">Weather</span>
+        <span className="text-xs font-semibold uppercase tracking-widest dark:text-zinc-400 text-zinc-500">Weather</span>
       </div>
 
       <div className="grid grid-cols-2 gap-2">
@@ -202,8 +202,8 @@ function Row({ icon, label, value }) {
     <div className="flex gap-2">
       <span className="text-base leading-tight flex-shrink-0">{icon}</span>
       <div className="min-w-0">
-        <p className="text-[10px] uppercase tracking-wider dark:text-zinc-600 text-gray-400 font-semibold">{label}</p>
-        <p className="text-xs dark:text-zinc-300 text-gray-700 leading-snug">{value}</p>
+        <p className="text-[10px] uppercase tracking-wider dark:text-zinc-600 text-zinc-400 font-semibold">{label}</p>
+        <p className="text-xs dark:text-zinc-300 text-zinc-700 leading-snug">{value}</p>
       </div>
     </div>
   );

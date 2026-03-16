@@ -104,7 +104,7 @@ export default function NPCBuilder({ npcData, onUpdate }) {
             value={data.gender}
             onChange={(e) => handleChange('gender', e.target.value)}
             placeholder="Male, Female, Non-binary, etc."
-            className="bg-gray-100 border-gray-300 text-gray-900 dark:bg-zinc-900/60 dark:border-zinc-800 dark:text-zinc-200"
+            className="bg-zinc-100 border-zinc-300 text-zinc-900 dark:bg-zinc-900/60 dark:border-zinc-800 dark:text-zinc-200"
           />
         </div>
 
@@ -113,10 +113,10 @@ export default function NPCBuilder({ npcData, onUpdate }) {
             <div>
               <label className="text-xs text-zinc-500 uppercase tracking-widest font-semibold mb-2 block">{system.characterFields.species}</label>
               <Select value={data.race} onValueChange={(v) => handleChange('race', v)}>
-                <SelectTrigger className="bg-gray-100 border-gray-300 text-gray-900 dark:bg-zinc-900/60 dark:border-zinc-800 dark:text-zinc-200">
+                <SelectTrigger className="bg-zinc-100 border-zinc-300 text-zinc-900 dark:bg-zinc-900/60 dark:border-zinc-800 dark:text-zinc-200">
                   <SelectValue placeholder={`Select ${system.characterFields.species.toLowerCase()}`} />
                 </SelectTrigger>
-                <SelectContent className="bg-white border-gray-200 dark:bg-zinc-900 dark:border-zinc-800">
+                <SelectContent className="bg-white border-zinc-200 dark:bg-zinc-900 dark:border-zinc-800">
                   {SRD_RACES.map((r) => (
                     <SelectItem key={r} value={r} className="text-zinc-300">{r}</SelectItem>
                   ))}
@@ -127,10 +127,10 @@ export default function NPCBuilder({ npcData, onUpdate }) {
             <div>
               <label className="text-xs text-zinc-500 uppercase tracking-widest font-semibold mb-2 block">{system.characterFields.role}</label>
               <Select value={data.class} onValueChange={(v) => handleChange('class', v)}>
-                <SelectTrigger className="bg-gray-100 border-gray-300 text-gray-900 dark:bg-zinc-900/60 dark:border-zinc-800 dark:text-zinc-200">
+                <SelectTrigger className="bg-zinc-100 border-zinc-300 text-zinc-900 dark:bg-zinc-900/60 dark:border-zinc-800 dark:text-zinc-200">
                   <SelectValue placeholder={`Select ${system.characterFields.role.toLowerCase()}`} />
                 </SelectTrigger>
-                <SelectContent className="bg-white border-gray-200 dark:bg-zinc-900 dark:border-zinc-800">
+                <SelectContent className="bg-white border-zinc-200 dark:bg-zinc-900 dark:border-zinc-800">
                   {SRD_CLASSES.map((c) => (
                     <SelectItem key={c} value={c} className="text-zinc-300">{c}</SelectItem>
                   ))}
@@ -141,10 +141,10 @@ export default function NPCBuilder({ npcData, onUpdate }) {
             <div>
               <label className="text-xs text-zinc-500 uppercase tracking-widest font-semibold mb-2 block">Alignment</label>
               <Select value={data.alignment} onValueChange={(v) => handleChange('alignment', v)}>
-                <SelectTrigger className="bg-gray-100 border-gray-300 text-gray-900 dark:bg-zinc-900/60 dark:border-zinc-800 dark:text-zinc-200">
+                <SelectTrigger className="bg-zinc-100 border-zinc-300 text-zinc-900 dark:bg-zinc-900/60 dark:border-zinc-800 dark:text-zinc-200">
                   <SelectValue placeholder="Select alignment" />
                 </SelectTrigger>
-                <SelectContent className="bg-white border-gray-200 dark:bg-zinc-900 dark:border-zinc-800">
+                <SelectContent className="bg-white border-zinc-200 dark:bg-zinc-900 dark:border-zinc-800">
                   {SRD_ALIGNMENTS.map((a) => (
                     <SelectItem key={a} value={a} className="text-zinc-300">{a}</SelectItem>
                   ))}
@@ -160,7 +160,7 @@ export default function NPCBuilder({ npcData, onUpdate }) {
                 value={data.race}
                 onChange={(e) => handleChange('race', e.target.value)}
                 placeholder="Origin, species, background..."
-                className="bg-gray-100 border-gray-300 text-gray-900 dark:bg-zinc-900/60 dark:border-zinc-800 dark:text-zinc-200"
+                className="bg-zinc-100 border-zinc-300 text-zinc-900 dark:bg-zinc-900/60 dark:border-zinc-800 dark:text-zinc-200"
               />
             </div>
 
@@ -170,7 +170,7 @@ export default function NPCBuilder({ npcData, onUpdate }) {
                 value={data.class}
                 onChange={(e) => handleChange('class', e.target.value)}
                 placeholder="Role, occupation, job..."
-                className="bg-gray-100 border-gray-300 text-gray-900 dark:bg-zinc-900/60 dark:border-zinc-800 dark:text-zinc-200"
+                className="bg-zinc-100 border-zinc-300 text-zinc-900 dark:bg-zinc-900/60 dark:border-zinc-800 dark:text-zinc-200"
               />
             </div>
           </>
@@ -214,7 +214,7 @@ export default function NPCBuilder({ npcData, onUpdate }) {
           onChange={(v) => handleChange('appearance', v)}
           placeholder="Physical description, clothing, distinctive features..."
           rows={3}
-          className="bg-gray-100 border-gray-300 text-gray-900 placeholder:text-gray-500 dark:bg-zinc-900/60 dark:border-zinc-800 dark:text-zinc-200 dark:placeholder:text-zinc-600 text-sm"
+          className="bg-zinc-100 border-zinc-300 text-zinc-900 placeholder:text-zinc-500 dark:bg-zinc-900/60 dark:border-zinc-800 dark:text-zinc-200 dark:placeholder:text-zinc-600 text-sm"
         />
       </div>
 
@@ -239,7 +239,7 @@ export default function NPCBuilder({ npcData, onUpdate }) {
           onChange={(v) => handleChange('traits', v)}
           placeholder="Personality traits, mannerisms, speech patterns..."
           rows={3}
-          className="bg-gray-100 border-gray-300 text-gray-900 placeholder:text-gray-500 dark:bg-zinc-900/60 dark:border-zinc-800 dark:text-zinc-200 dark:placeholder:text-zinc-600 text-sm"
+          className="bg-zinc-100 border-zinc-300 text-zinc-900 placeholder:text-zinc-500 dark:bg-zinc-900/60 dark:border-zinc-800 dark:text-zinc-200 dark:placeholder:text-zinc-600 text-sm"
         />
       </div>
 
@@ -264,7 +264,7 @@ export default function NPCBuilder({ npcData, onUpdate }) {
           onChange={(v) => handleChange('rumors', v)}
           placeholder="Rumors about this NPC (true, false, or partially true)..."
           rows={3}
-          className="bg-gray-100 border-gray-300 text-gray-900 placeholder:text-gray-500 dark:bg-zinc-900/60 dark:border-zinc-800 dark:text-zinc-200 dark:placeholder:text-zinc-600 text-sm"
+          className="bg-zinc-100 border-zinc-300 text-zinc-900 placeholder:text-zinc-500 dark:bg-zinc-900/60 dark:border-zinc-800 dark:text-zinc-200 dark:placeholder:text-zinc-600 text-sm"
         />
       </div>
 
@@ -289,7 +289,7 @@ export default function NPCBuilder({ npcData, onUpdate }) {
           onChange={(v) => handleChange('quests', v)}
           placeholder="Potential quest hooks involving this NPC..."
           rows={3}
-          className="bg-gray-100 border-gray-300 text-gray-900 placeholder:text-gray-500 dark:bg-zinc-900/60 dark:border-zinc-800 dark:text-zinc-200 dark:placeholder:text-zinc-600 text-sm"
+          className="bg-zinc-100 border-zinc-300 text-zinc-900 placeholder:text-zinc-500 dark:bg-zinc-900/60 dark:border-zinc-800 dark:text-zinc-200 dark:placeholder:text-zinc-600 text-sm"
         />
       </div>
 
@@ -314,7 +314,7 @@ export default function NPCBuilder({ npcData, onUpdate }) {
           onChange={(v) => handleChange('motives', v)}
           placeholder="Hidden goals, secret agendas, true motivations..."
           rows={3}
-          className="bg-gray-100 border-gray-300 text-gray-900 placeholder:text-gray-500 dark:bg-zinc-900/60 dark:border-zinc-800 dark:text-zinc-200 dark:placeholder:text-zinc-600 text-sm"
+          className="bg-zinc-100 border-zinc-300 text-zinc-900 placeholder:text-zinc-500 dark:bg-zinc-900/60 dark:border-zinc-800 dark:text-zinc-200 dark:placeholder:text-zinc-600 text-sm"
         />
       </div>
 
@@ -339,7 +339,7 @@ export default function NPCBuilder({ npcData, onUpdate }) {
           onChange={(v) => handleChange('sample_dialogue', v)}
           placeholder="First meeting dialogue, example quotes..."
           rows={4}
-          className="bg-gray-100 border-gray-300 text-gray-900 placeholder:text-gray-500 dark:bg-zinc-900/60 dark:border-zinc-800 dark:text-zinc-200 dark:placeholder:text-zinc-600 text-sm font-mono"
+          className="bg-zinc-100 border-zinc-300 text-zinc-900 placeholder:text-zinc-500 dark:bg-zinc-900/60 dark:border-zinc-800 dark:text-zinc-200 dark:placeholder:text-zinc-600 text-sm font-mono"
         />
       </div>
     </div>

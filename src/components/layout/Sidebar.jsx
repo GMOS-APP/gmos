@@ -105,7 +105,7 @@ export default function Sidebar({ campaign, collapsed, onToggle, onNavClick }) {
       {!collapsed && (
         <div className="px-4 py-3 border-b border-zinc-200 dark:border-zinc-800/60">
           <p className="text-sm font-semibold text-zinc-900 dark:text-zinc-200 truncate">{campaign.name}</p>
-          <p className="text-xs text-gray-600 dark:text-zinc-500 mt-0.5">Session #{campaign.current_session_number || 0}</p>
+          <p className="text-xs text-zinc-600 dark:text-zinc-500 mt-0.5">Session #{campaign.current_session_number || 0}</p>
         </div>
       )}
 
@@ -181,7 +181,7 @@ export default function Sidebar({ campaign, collapsed, onToggle, onNavClick }) {
       {/* Footer */}
       <div className="p-3 border-t border-zinc-200 dark:border-zinc-800/60 space-y-2">
         {!collapsed && (
-          <div className="flex items-center gap-2 text-xs text-gray-600 dark:text-zinc-600">
+          <div className="flex items-center gap-2 text-xs text-zinc-600 dark:text-zinc-600">
             <Globe className="w-3 h-3" />
             <span>World State</span>
           </div>

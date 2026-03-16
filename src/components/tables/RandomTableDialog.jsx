@@ -140,7 +140,7 @@ export default function RandomTableDialog({ open, onClose, campaignId, campaign,
           />
 
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold uppercase tracking-wider dark:text-zinc-400 text-gray-500">
+            <span className="text-xs font-semibold uppercase tracking-wider dark:text-zinc-400 text-zinc-500">
               Entries ({form.entries.length})
             </span>
             <AiGate>
@@ -159,7 +159,7 @@ export default function RandomTableDialog({ open, onClose, campaignId, campaign,
 
           <div ref={entryListRef} className="max-h-52 overflow-y-auto space-y-1.5 pr-1">
             {form.entries.length === 0 && (
-              <p className="text-sm dark:text-zinc-600 text-gray-400 text-center py-4">No entries yet — add some below or generate with AI.</p>
+              <p className="text-sm dark:text-zinc-600 text-zinc-400 text-center py-4">No entries yet — add some below or generate with AI.</p>
             )}
             {form.entries.map((e, i) => (
               <div key={i} className="flex gap-2 items-center">
@@ -170,7 +170,7 @@ export default function RandomTableDialog({ open, onClose, campaignId, campaign,
                 />
                 <button
                   onClick={() => removeEntry(i)}
-                  className="flex-shrink-0 p-1 rounded dark:text-zinc-500 dark:hover:text-red-400 text-gray-400 hover:text-red-500"
+                  className="flex-shrink-0 p-1 rounded dark:text-zinc-500 dark:hover:text-red-400 text-zinc-400 hover:text-red-500"
                 >
                   <X className="w-3.5 h-3.5" />
                 </button>
@@ -192,7 +192,7 @@ export default function RandomTableDialog({ open, onClose, campaignId, campaign,
           </div>
         </div>
 
-        <div className="flex justify-end gap-2 mt-4 pt-4 border-t dark:border-zinc-800 border-gray-200">
+        <div className="flex justify-end gap-2 mt-4 pt-4 border-t dark:border-zinc-800 border-zinc-200">
           <Button variant="ghost" onClick={onClose}>Cancel</Button>
           <Button
             onClick={handleSave}

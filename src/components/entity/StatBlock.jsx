@@ -49,7 +49,7 @@ const DiceButton = ({ notation, label }) => {
           ? 'bg-amber-500/20 text-amber-300'
           : result !== null
             ? 'bg-emerald-500/20 text-emerald-400'
-            : 'dark:bg-zinc-800/60 dark:text-zinc-500 dark:hover:text-amber-400 bg-gray-200 text-gray-600 hover:text-amber-600'
+            : 'dark:bg-zinc-800/60 dark:text-zinc-500 dark:hover:text-amber-400 bg-zinc-200 text-zinc-600 hover:text-amber-600'
       )}
     >
       {result !== null ? <span className="font-bold">{result}</span> : <span>{label ?? notation}</span>}
@@ -61,9 +61,9 @@ const AbilityScore = ({ name, score }) => {
   const mod = Math.floor((score - 10) / 2);
   const modStr = mod >= 0 ? `+${mod}` : `${mod}`;
   return (
-    <div className="flex flex-col items-center gap-0.5 p-2 rounded-lg dark:bg-zinc-900/60 dark:border dark:border-zinc-800 bg-gray-100 border border-gray-300">
-      <span className="text-[10px] uppercase tracking-wider dark:text-zinc-500 text-gray-500 font-semibold">{name}</span>
-      <span className="text-base font-bold dark:text-zinc-200 text-gray-900">{score}</span>
+    <div className="flex flex-col items-center gap-0.5 p-2 rounded-lg dark:bg-zinc-900/60 dark:border dark:border-zinc-800 bg-zinc-100 border border-zinc-300">
+      <span className="text-[10px] uppercase tracking-wider dark:text-zinc-500 text-zinc-500 font-semibold">{name}</span>
+      <span className="text-base font-bold dark:text-zinc-200 text-zinc-900">{score}</span>
       <DiceButton notation={`1d20${modStr}`} label={modStr} />
     </div>
   );
@@ -72,9 +72,9 @@ const AbilityScore = ({ name, score }) => {
 function StatSection({ title, text }) {
   if (!text) return null;
   return (
-    <div className="pt-3 border-t dark:border-zinc-800 border-gray-200">
-      <p className="text-[10px] uppercase tracking-widest dark:text-zinc-500 text-gray-400 font-semibold mb-1.5">{title}</p>
-      <p className="text-sm dark:text-zinc-300 text-gray-700 leading-relaxed whitespace-pre-wrap">{text}</p>
+    <div className="pt-3 border-t dark:border-zinc-800 border-zinc-200">
+      <p className="text-[10px] uppercase tracking-widest dark:text-zinc-500 text-zinc-400 font-semibold mb-1.5">{title}</p>
+      <p className="text-sm dark:text-zinc-300 text-zinc-700 leading-relaxed whitespace-pre-wrap">{text}</p>
     </div>
   );
 }
@@ -90,7 +90,7 @@ function StructuredStatBlock({ extraData, system }) {
     <div className="rounded-xl border-2 dark:border-amber-500/30 dark:bg-gradient-to-br dark:from-zinc-900 dark:to-zinc-950 border-amber-600/30 bg-gradient-to-br from-white to-gray-50 p-5 space-y-4">
       {(extraData.size || extraData.creature_type) && (
         <div className="border-b-2 dark:border-amber-500/20 border-amber-600/20 pb-2">
-          <p className="text-xs dark:text-zinc-400 text-gray-500 italic">
+          <p className="text-xs dark:text-zinc-400 text-zinc-500 italic">
             {[extraData.size, extraData.creature_type].filter(Boolean).join(' ')}
           </p>
         </div>
@@ -104,8 +104,8 @@ function StructuredStatBlock({ extraData, system }) {
                 <Shield className="w-4 h-4 text-blue-400" />
               </div>
               <div>
-                <p className="text-[10px] dark:text-zinc-500 text-gray-500 uppercase tracking-wider font-semibold">AC</p>
-                <p className="text-base font-bold dark:text-zinc-100 text-gray-900">{extraData.ac}</p>
+                <p className="text-[10px] dark:text-zinc-500 text-zinc-500 uppercase tracking-wider font-semibold">AC</p>
+                <p className="text-base font-bold dark:text-zinc-100 text-zinc-900">{extraData.ac}</p>
               </div>
             </div>
           )}
@@ -115,8 +115,8 @@ function StructuredStatBlock({ extraData, system }) {
                 <Heart className="w-4 h-4 text-red-400" />
               </div>
               <div>
-                <p className="text-[10px] dark:text-zinc-500 text-gray-500 uppercase tracking-wider font-semibold">HP</p>
-                <p className="text-base font-bold dark:text-zinc-100 text-gray-900 flex items-center flex-wrap gap-1">
+                <p className="text-[10px] dark:text-zinc-500 text-zinc-500 uppercase tracking-wider font-semibold">HP</p>
+                <p className="text-base font-bold dark:text-zinc-100 text-zinc-900 flex items-center flex-wrap gap-1">
                   {hp.value}
                   {hp.dice && <DiceButton notation={hp.dice} label={`(${hp.dice})`} />}
                 </p>
@@ -129,8 +129,8 @@ function StructuredStatBlock({ extraData, system }) {
                 <Zap className="w-4 h-4 text-green-400" />
               </div>
               <div>
-                <p className="text-[10px] dark:text-zinc-500 text-gray-500 uppercase tracking-wider font-semibold">Speed</p>
-                <p className="text-sm dark:text-zinc-300 text-gray-900 leading-tight">{extraData.speed}</p>
+                <p className="text-[10px] dark:text-zinc-500 text-zinc-500 uppercase tracking-wider font-semibold">Speed</p>
+                <p className="text-sm dark:text-zinc-300 text-zinc-900 leading-tight">{extraData.speed}</p>
               </div>
             </div>
           )}
@@ -138,7 +138,7 @@ function StructuredStatBlock({ extraData, system }) {
       )}
 
       {abilities && (
-        <div className="pt-2 border-t dark:border-zinc-800 border-gray-200">
+        <div className="pt-2 border-t dark:border-zinc-800 border-zinc-200">
           <div className="grid grid-cols-3 sm:grid-cols-6 gap-1.5">
             {Object.entries(abilities).map(([k, v]) => (
               <AbilityScore key={k} name={k} score={v} />
@@ -150,7 +150,7 @@ function StructuredStatBlock({ extraData, system }) {
       {showCR && (
         <div className="flex items-center gap-2">
           <Skull className="w-3.5 h-3.5 text-amber-400" />
-          <span className="text-xs dark:text-zinc-500 text-gray-500 font-semibold">Challenge</span>
+          <span className="text-xs dark:text-zinc-500 text-zinc-500 font-semibold">Challenge</span>
           <Badge className="bg-amber-500/20 text-amber-400 border-amber-500/30 text-xs">CR {extraData.cr}</Badge>
         </div>
       )}
@@ -218,7 +218,7 @@ function ParsedStatBlock({ description }) {
     <div className="rounded-xl border-2 dark:border-amber-500/30 dark:bg-gradient-to-br dark:from-zinc-900 dark:to-zinc-950 border-amber-600/30 bg-gradient-to-br from-white to-gray-50 p-5 space-y-4">
       {stats.size && stats.type && (
         <div className="border-b-2 dark:border-amber-500/20 border-amber-600/20 pb-2">
-          <p className="text-xs dark:text-zinc-400 text-gray-500 italic">
+          <p className="text-xs dark:text-zinc-400 text-zinc-500 italic">
             {stats.size} {stats.type}{stats.alignment && `, ${stats.alignment}`}
           </p>
         </div>
@@ -229,10 +229,10 @@ function ParsedStatBlock({ description }) {
           <div className="flex items-center gap-2">
             <div className="p-1.5 rounded-lg bg-blue-500/10"><Shield className="w-4 h-4 text-blue-400" /></div>
             <div>
-              <p className="text-[10px] dark:text-zinc-500 text-gray-500 uppercase tracking-wider font-semibold">AC</p>
-              <p className="text-base font-bold dark:text-zinc-100 text-gray-900">
+              <p className="text-[10px] dark:text-zinc-500 text-zinc-500 uppercase tracking-wider font-semibold">AC</p>
+              <p className="text-base font-bold dark:text-zinc-100 text-zinc-900">
                 {stats.ac}
-                {stats.acType && <span className="text-xs dark:text-zinc-500 text-gray-500 ml-1">({stats.acType})</span>}
+                {stats.acType && <span className="text-xs dark:text-zinc-500 text-zinc-500 ml-1">({stats.acType})</span>}
               </p>
             </div>
           </div>
@@ -241,8 +241,8 @@ function ParsedStatBlock({ description }) {
           <div className="flex items-center gap-2">
             <div className="p-1.5 rounded-lg bg-red-500/10"><Heart className="w-4 h-4 text-red-400" /></div>
             <div>
-              <p className="text-[10px] dark:text-zinc-500 text-gray-500 uppercase tracking-wider font-semibold">HP</p>
-              <p className="text-base font-bold dark:text-zinc-100 text-gray-900 flex items-center gap-1">
+              <p className="text-[10px] dark:text-zinc-500 text-zinc-500 uppercase tracking-wider font-semibold">HP</p>
+              <p className="text-base font-bold dark:text-zinc-100 text-zinc-900 flex items-center gap-1">
                 {stats.hp}
                 {stats.hpDice && <DiceButton notation={stats.hpDice} label={`(${stats.hpDice})`} />}
               </p>
@@ -253,15 +253,15 @@ function ParsedStatBlock({ description }) {
           <div className="flex items-center gap-2">
             <div className="p-1.5 rounded-lg bg-green-500/10"><Zap className="w-4 h-4 text-green-400" /></div>
             <div>
-              <p className="text-[10px] dark:text-zinc-500 text-gray-500 uppercase tracking-wider font-semibold">Speed</p>
-              <p className="text-sm dark:text-zinc-300 text-gray-900">{stats.speed}</p>
+              <p className="text-[10px] dark:text-zinc-500 text-zinc-500 uppercase tracking-wider font-semibold">Speed</p>
+              <p className="text-sm dark:text-zinc-300 text-zinc-900">{stats.speed}</p>
             </div>
           </div>
         )}
       </div>
 
       {stats.abilities && (
-        <div className="pt-2 border-t dark:border-zinc-800 border-gray-200">
+        <div className="pt-2 border-t dark:border-zinc-800 border-zinc-200">
           <div className="grid grid-cols-3 sm:grid-cols-6 gap-1.5">
             {Object.entries(stats.abilities).map(([k, v]) => (
               <AbilityScore key={k} name={k} score={v} />
@@ -270,35 +270,35 @@ function ParsedStatBlock({ description }) {
         </div>
       )}
 
-      <div className="pt-2 border-t dark:border-zinc-800 border-gray-200 space-y-1.5 text-sm">
+      <div className="pt-2 border-t dark:border-zinc-800 border-zinc-200 space-y-1.5 text-sm">
         {stats.saves && (
           <div className="flex gap-2">
-            <span className="dark:text-zinc-500 text-gray-500 font-semibold min-w-[120px]">Saving Throws</span>
-            <span className="dark:text-zinc-300 text-gray-700">{stats.saves}</span>
+            <span className="dark:text-zinc-500 text-zinc-500 font-semibold min-w-[120px]">Saving Throws</span>
+            <span className="dark:text-zinc-300 text-zinc-700">{stats.saves}</span>
           </div>
         )}
         {stats.skills && (
           <div className="flex gap-2">
-            <span className="dark:text-zinc-500 text-gray-500 font-semibold min-w-[120px]">Skills</span>
-            <span className="dark:text-zinc-300 text-gray-700">{stats.skills}</span>
+            <span className="dark:text-zinc-500 text-zinc-500 font-semibold min-w-[120px]">Skills</span>
+            <span className="dark:text-zinc-300 text-zinc-700">{stats.skills}</span>
           </div>
         )}
         {stats.senses && (
           <div className="flex gap-2">
-            <span className="dark:text-zinc-500 text-gray-500 font-semibold min-w-[120px]">Senses</span>
-            <span className="dark:text-zinc-300 text-gray-700">{stats.senses}</span>
+            <span className="dark:text-zinc-500 text-zinc-500 font-semibold min-w-[120px]">Senses</span>
+            <span className="dark:text-zinc-300 text-zinc-700">{stats.senses}</span>
           </div>
         )}
         {stats.languages && (
           <div className="flex gap-2">
-            <span className="dark:text-zinc-500 text-gray-500 font-semibold min-w-[120px]">Languages</span>
-            <span className="dark:text-zinc-300 text-gray-700">{stats.languages}</span>
+            <span className="dark:text-zinc-500 text-zinc-500 font-semibold min-w-[120px]">Languages</span>
+            <span className="dark:text-zinc-300 text-zinc-700">{stats.languages}</span>
           </div>
         )}
         {stats.cr && (
           <div className="flex items-center gap-2 pt-1">
             <Skull className="w-3.5 h-3.5 text-amber-400" />
-            <span className="dark:text-zinc-500 text-gray-500 font-semibold">Challenge</span>
+            <span className="dark:text-zinc-500 text-zinc-500 font-semibold">Challenge</span>
             <Badge className="bg-amber-500/20 text-amber-400 border-amber-500/30 text-xs">CR {stats.cr}</Badge>
           </div>
         )}

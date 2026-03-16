@@ -91,7 +91,7 @@ function EncounterBalancer() {
       </button>
 
       {open && (
-        <div className="rounded-lg dark:bg-zinc-900/60 bg-gray-50 border dark:border-zinc-800 border-gray-200 p-3 space-y-3">
+        <div className="rounded-lg dark:bg-zinc-900/60 bg-zinc-50 border dark:border-zinc-800 border-zinc-200 p-3 space-y-3">
           <div className="flex gap-3">
             <div className="flex-1">
               <label className="text-[10px] uppercase tracking-widest dark:text-zinc-500 text-zinc-500 font-semibold block mb-1">Party Size</label>
@@ -108,7 +108,7 @@ function EncounterBalancer() {
           {/* XP thresholds */}
           <div className="grid grid-cols-4 gap-1 text-center">
             {['Easy', 'Medium', 'Hard', 'Deadly'].map((label, i) => (
-              <div key={label} className="rounded dark:bg-zinc-800/60 bg-gray-100 px-1.5 py-1">
+              <div key={label} className="rounded dark:bg-zinc-800/60 bg-zinc-100 px-1.5 py-1">
                 <p className="text-[9px] uppercase tracking-wider dark:text-zinc-500 text-zinc-500">{label}</p>
                 <p className="text-xs font-mono font-semibold dark:text-zinc-300 text-zinc-700">{fmt(partyThresholds[i])}</p>
               </div>
@@ -122,7 +122,7 @@ function EncounterBalancer() {
               <div key={i} className="flex gap-2 items-center">
                 <Select value={m.cr} onValueChange={v => updateMonster(i, 'cr', v)}>
                   <SelectTrigger className="flex-1 h-7 text-xs bg-zinc-900/60 border-zinc-800 text-zinc-300"><SelectValue /></SelectTrigger>
-                  <SelectContent className="bg-white border-gray-200 dark:bg-zinc-900 dark:border-zinc-800 max-h-48">
+                  <SelectContent className="bg-white border-zinc-200 dark:bg-zinc-900 dark:border-zinc-800 max-h-48">
                     {CR_LIST.map(cr => <SelectItem key={cr} value={cr} className="text-zinc-300 text-xs">CR {cr} ({fmt(CR_XP[cr])} XP)</SelectItem>)}
                   </SelectContent>
                 </Select>
@@ -141,7 +141,7 @@ function EncounterBalancer() {
 
           {/* Result */}
           {rawXP > 0 && (
-            <div className="flex items-center justify-between pt-2 border-t dark:border-zinc-800 border-gray-200">
+            <div className="flex items-center justify-between pt-2 border-t dark:border-zinc-800 border-zinc-200">
               <div className="text-xs dark:text-zinc-500 text-zinc-500">
                 {fmt(rawXP)} XP × {multiplier} = <span className="dark:text-zinc-300 text-zinc-700 font-semibold">{fmt(adjustedXP)} XP</span>
               </div>
@@ -169,7 +169,7 @@ function TextInput({ value, onChange, placeholder }) {
       value={value || ''}
       onChange={(e) => onChange(e.target.value)}
       placeholder={placeholder}
-      className="bg-gray-100 border-gray-300 text-gray-900 placeholder:text-gray-500 dark:bg-zinc-900/60 dark:border-zinc-800 dark:text-zinc-200 dark:placeholder:text-zinc-600"
+      className="bg-zinc-100 border-zinc-300 text-zinc-900 placeholder:text-zinc-500 dark:bg-zinc-900/60 dark:border-zinc-800 dark:text-zinc-200 dark:placeholder:text-zinc-600"
     />
   );
 }
@@ -181,7 +181,7 @@ function TextArea({ value, onChange, placeholder, rows = 3 }) {
       onChange={onChange}
       placeholder={placeholder}
       rows={rows}
-      className="bg-gray-100 border-gray-300 text-gray-900 placeholder:text-gray-500 dark:bg-zinc-900/60 dark:border-zinc-800 dark:text-zinc-200 dark:placeholder:text-zinc-600 resize-none"
+      className="bg-zinc-100 border-zinc-300 text-zinc-900 placeholder:text-zinc-500 dark:bg-zinc-900/60 dark:border-zinc-800 dark:text-zinc-200 dark:placeholder:text-zinc-600 resize-none"
     />
   );
 }
@@ -207,8 +207,8 @@ export default function EncounterFields({ extraData, onChange }) {
       <SectionDivider label="Overview" />
       <Field label="Difficulty">
         <Select value={get('difficulty')} onValueChange={(v) => set('difficulty', v)}>
-          <SelectTrigger className="bg-gray-100 border-gray-300 text-gray-700 text-sm h-9 dark:bg-zinc-900/60 dark:border-zinc-800 dark:text-zinc-300"><SelectValue placeholder="Select difficulty" /></SelectTrigger>
-          <SelectContent className="bg-white border-gray-200 dark:bg-zinc-900 dark:border-zinc-800">
+          <SelectTrigger className="bg-zinc-100 border-zinc-300 text-zinc-700 text-sm h-9 dark:bg-zinc-900/60 dark:border-zinc-800 dark:text-zinc-300"><SelectValue placeholder="Select difficulty" /></SelectTrigger>
+          <SelectContent className="bg-white border-zinc-200 dark:bg-zinc-900 dark:border-zinc-800">
             {DIFFICULTIES.map((d) => <SelectItem key={d} value={d} className="text-zinc-300 text-xs">{d}</SelectItem>)}
           </SelectContent>
         </Select>

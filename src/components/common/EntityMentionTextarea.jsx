@@ -152,13 +152,13 @@ export default function EntityMentionTextarea({
         placeholder={placeholder}
         rows={rows}
         className={cn(
-          'w-full dark:bg-zinc-900/60 dark:border-zinc-800 dark:text-zinc-200 dark:placeholder:text-zinc-600 dark:focus:ring-amber-500/50 bg-gray-100 border-gray-300 border text-gray-900 placeholder:text-gray-500 text-sm p-3 resize-y focus:outline-none focus:ring-1 focus:ring-amber-600/50 font-mono',
+          'w-full dark:bg-zinc-900/60 dark:border-zinc-800 dark:text-zinc-200 dark:placeholder:text-zinc-600 dark:focus:ring-amber-500/50 bg-zinc-100 border-zinc-300 border text-zinc-900 placeholder:text-zinc-500 text-sm p-3 resize-y focus:outline-none focus:ring-1 focus:ring-amber-600/50 font-mono',
           className
         )}
       />
 
       {/* Hint */}
-      <div className="flex items-center gap-1 mt-1.5 text-[11px] dark:text-zinc-500 text-gray-600">
+      <div className="flex items-center gap-1 mt-1.5 text-[11px] dark:text-zinc-500 text-zinc-600">
         <AtSign className="w-3 h-3" />
         <span>Type @ to link a world entity</span>
       </div>
@@ -168,31 +168,31 @@ export default function EntityMentionTextarea({
         <div
           ref={dropdownRef}
           style={{ top: dropdownPos.top, left: dropdownPos.left }}
-          className="fixed z-[200] w-72 dark:bg-zinc-900 dark:border-zinc-700 bg-white border-gray-300 border rounded-xl shadow-2xl overflow-hidden"
+          className="fixed z-[200] w-72 dark:bg-zinc-900 dark:border-zinc-700 bg-white border-zinc-300 border rounded-xl shadow-2xl overflow-hidden"
         >
-          <div className="px-3 py-2 dark:border-b dark:border-zinc-800 border-b border-gray-200 flex items-center gap-2">
+          <div className="px-3 py-2 dark:border-b dark:border-zinc-800 border-b border-zinc-200 flex items-center gap-2">
             <AtSign className="w-3.5 h-3.5 text-amber-400" />
-            <span className="text-xs dark:text-zinc-400 text-gray-600">
+            <span className="text-xs dark:text-zinc-400 text-zinc-600">
               {query ? `"${query}"` : 'All entities'}
             </span>
           </div>
 
           <div className="max-h-56 overflow-y-auto">
             {filtered.length === 0 && !showCreateOption && (
-              <p className="text-xs dark:text-zinc-600 text-gray-600 p-3">No entities found</p>
+              <p className="text-xs dark:text-zinc-600 text-zinc-600 p-3">No entities found</p>
             )}
 
             {filtered.map((entity) => (
               <button
                 key={entity.id}
                 onMouseDown={(e) => { e.preventDefault(); insertMention(entity); }}
-                className="w-full text-left px-3 py-2.5 dark:hover:bg-zinc-800 hover:bg-gray-100 flex items-start gap-3 group"
+                className="w-full text-left px-3 py-2.5 dark:hover:bg-zinc-800 hover:bg-zinc-100 flex items-start gap-3 group"
               >
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm dark:text-zinc-200 dark:group-hover:text-amber-400 text-gray-900 group-hover:text-amber-600 font-medium truncate">
+                  <p className="text-sm dark:text-zinc-200 dark:group-hover:text-amber-400 text-zinc-900 group-hover:text-amber-600 font-medium truncate">
                     {entity.name}
                   </p>
-                  <p className="text-[11px] dark:text-zinc-500 text-gray-600 capitalize truncate">
+                  <p className="text-[11px] dark:text-zinc-500 text-zinc-600 capitalize truncate">
                     {entity.entity_type}{entity.summary ? ` · ${entity.summary}` : ''}
                   </p>
                 </div>
@@ -203,7 +203,7 @@ export default function EntityMentionTextarea({
               <button
                 onMouseDown={(e) => { e.preventDefault(); createAndInsert(); }}
                 disabled={creating}
-                className="w-full text-left px-3 py-2.5 dark:hover:bg-zinc-800/80 dark:border-t dark:border-zinc-800 hover:bg-gray-100 border-t border-gray-200 flex items-center gap-2"
+                className="w-full text-left px-3 py-2.5 dark:hover:bg-zinc-800/80 dark:border-t dark:border-zinc-800 hover:bg-zinc-100 border-t border-zinc-200 flex items-center gap-2"
               >
                 {creating ? (
                   <Loader2 className="w-3.5 h-3.5 text-green-400 animate-spin" />

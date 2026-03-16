@@ -4,7 +4,7 @@ import { Campaign, functions } from '@/api/entities';
 import { supabase } from '@/api/supabaseClient';
 import { createPageUrl } from '@/utils';
 import { Link } from 'react-router-dom';
-import { Plus, FolderOpen, MoreHorizontal, Trash2, Download, Upload, FileText, Sparkles, LogOut, BookOpen } from 'lucide-react';
+import { Plus, FolderOpen, MoreHorizontal, Trash2, Download, Upload, FileText, Sparkles, LogOut, BookOpen, Loader2 } from 'lucide-react';
 import { useAuth } from '@/lib/AuthContext';
 import RawImportDialog from '@/components/campaign/RawImportDialog';
 import ThemeToggle from '@/components/ui/ThemeToggle';
@@ -40,7 +40,7 @@ export default function CampaignList() {
     setImporting(true);
     const text = await file.text();
     const data = JSON.parse(text);
-    const response = await functions.invoke('importCampaign', data);
+    await functions.invoke('importCampaign', data);
     queryClient.invalidateQueries({ queryKey: ['campaigns'] });
     setImporting(false);
     e.target.value = '';
@@ -98,25 +98,24 @@ export default function CampaignList() {
   });
 
   return (
-    <div className="min-h-screen flex flex-col items-center px-4 sm:px-6 py-10 sm:py-16">
+    <div className="min-h-screen flex flex-col items-center px-4 sm:px-6 py-8 sm:py-16">
+
       {/* User bar */}
-      <div className="w-full max-w-3xl flex justify-end items-center gap-3 mb-10">
+      <div className="w-full max-w-3xl flex justify-end items-center gap-2 sm:gap-3 mb-8 sm:mb-10">
         <ThemeToggle className="mr-1" />
-        {user?.email && (
-          <span className="text-xs text-zinc-500 dark:text-zinc-600">{user.email}</span>
-        )}
+        <span className="hidden sm:block text-xs text-zinc-500 dark:text-zinc-600 truncate max-w-[200px]">{user?.email}</span>
         <button
           onClick={logout}
           className="flex items-center gap-1.5 text-xs text-zinc-500 dark:text-zinc-600 hover:text-zinc-700 dark:hover:text-zinc-300 transition-colors"
         >
           <LogOut className="w-3.5 h-3.5" />
-          Sign out
+          <span className="hidden sm:inline">Sign out</span>
         </button>
       </div>
 
       {/* Hero */}
-      <div className="text-center mb-16 max-w-lg">
-        <h1 className="text-5xl font-semibold tracking-widest text-zinc-900 dark:text-zinc-100 mb-4 select-none">
+      <div className="text-center mb-10 sm:mb-16 max-w-lg">
+        <h1 className="text-4xl sm:text-5xl font-semibold tracking-widest text-zinc-900 dark:text-zinc-100 mb-3 select-none">
           GM<span className="text-amber-600 dark:text-amber-400">/OS{isPlus ? '+' : ''}</span>
         </h1>
         <p className="text-zinc-500 dark:text-zinc-500 text-sm tracking-wide">
@@ -124,9 +123,11 @@ export default function CampaignList() {
         </p>
       </div>
 
-      {/* Campaign Grid */}
+      {/* Campaign section */}
       <div className="w-full max-w-3xl">
-        <div className="flex items-center justify-between mb-6">
+
+        {/* Header row */}
+        <div className="flex items-center justify-between mb-5">
           <h2 className="text-sm font-semibold text-zinc-600 dark:text-zinc-400 uppercase tracking-widest">Campaigns</h2>
           <div className="flex items-center gap-2">
             <input ref={fileInputRef} type="file" accept=".json" className="hidden" onChange={handleImport} />
@@ -136,10 +137,10 @@ export default function CampaignList() {
                   size="sm"
                   variant="outline"
                   disabled={importing}
-                  className="border-zinc-300 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800"
+                  className="border-zinc-300 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 h-9"
                 >
-                  <Upload className="w-4 h-4 mr-1.5" />
-                  {importing ? 'Importing...' : 'Import'}
+                  {importing ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4 sm:mr-1.5" />}
+                  <span className="hidden sm:inline">{importing ? 'Importing…' : 'Import'}</span>
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800">
@@ -163,35 +164,55 @@ export default function CampaignList() {
                   className="text-zinc-700 dark:text-zinc-300 focus:text-zinc-900 dark:focus:text-zinc-100"
                 >
                   <BookOpen className="w-3.5 h-3.5 mr-2" />
-                  {loadingDemo ? 'Loading...' : 'Load Demo Campaign'}
+                  {loadingDemo ? 'Loading…' : 'Load Demo Campaign'}
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
             <Button
               onClick={() => setShowCreate(true)}
               size="sm"
-              className="bg-amber-500 hover:bg-amber-400 text-zinc-950 font-semibold"
+              className="bg-amber-500 hover:bg-amber-400 text-zinc-950 font-semibold h-9"
             >
-              <Plus className="w-4 h-4 mr-1.5" />
-              New Campaign
+              <Plus className="w-4 h-4 sm:mr-1.5" />
+              <span className="hidden sm:inline">New Campaign</span>
             </Button>
           </div>
         </div>
 
+        {/* Campaign list */}
         {isLoading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {[1, 2].map((i) => (
-              <div key={i} className="h-40 rounded-xl bg-zinc-200 dark:bg-zinc-900 animate-pulse" />
+              <div key={i} className="h-36 rounded-xl bg-zinc-200 dark:bg-zinc-900 animate-pulse" />
             ))}
           </div>
         ) : campaigns.length === 0 ? (
-          <div className="text-center py-24 border border-dashed border-zinc-300 dark:border-zinc-800 rounded-xl">
-            <FolderOpen className="w-10 h-10 text-zinc-500 dark:text-zinc-600 mx-auto mb-3" />
-            <p className="text-zinc-600 dark:text-zinc-500 text-sm">No campaigns yet</p>
-            <p className="text-zinc-500 dark:text-zinc-600 text-xs mt-1">Create one to get started</p>
+          /* Empty state */
+          <div className="text-center py-16 sm:py-24 border border-dashed border-zinc-300 dark:border-zinc-800 rounded-xl px-6">
+            <FolderOpen className="w-10 h-10 text-zinc-400 dark:text-zinc-600 mx-auto mb-4" />
+            <p className="text-zinc-700 dark:text-zinc-400 font-medium mb-1">No campaigns yet</p>
+            <p className="text-zinc-500 dark:text-zinc-600 text-sm mb-6">Create your first campaign or explore the demo.</p>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+              <Button
+                onClick={() => setShowCreate(true)}
+                className="bg-amber-500 hover:bg-amber-400 text-zinc-950 font-semibold w-full sm:w-auto"
+              >
+                <Plus className="w-4 h-4 mr-1.5" />
+                New Campaign
+              </Button>
+              <Button
+                variant="outline"
+                onClick={handleLoadDemo}
+                disabled={loadingDemo}
+                className="border-zinc-300 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 w-full sm:w-auto"
+              >
+                {loadingDemo ? <Loader2 className="w-4 h-4 mr-1.5 animate-spin" /> : <BookOpen className="w-4 h-4 mr-1.5" />}
+                {loadingDemo ? 'Loading…' : 'Load Demo Campaign'}
+              </Button>
+            </div>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <AnimatePresence>
               {campaigns.map((c) => (
                 <motion.div
@@ -202,57 +223,66 @@ export default function CampaignList() {
                 >
                   <Link
                     to={createPageUrl('CampaignDashboard') + `?id=${c.id}`}
-                    className="group block p-5 rounded-xl bg-white dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800/50 hover:border-zinc-300 dark:hover:border-amber-900/40 hover:bg-zinc-50 dark:hover:bg-zinc-900/70 dark:shadow-[inset_0_1px_0_hsl(0_0%_100%_/_0.04)] transition-all"
+                    className="group relative block p-4 sm:p-5 rounded-xl bg-white dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800/50 hover:border-zinc-300 dark:hover:border-amber-900/40 hover:bg-zinc-50 dark:hover:bg-zinc-900/70 dark:shadow-[inset_0_1px_0_hsl(0_0%_100%_/_0.04)] transition-all"
                   >
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 min-w-0">
-                          <h3 className="font-semibold text-zinc-900 dark:text-zinc-100 group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors truncate">
-                            {c.name}
-                          </h3>
-                          {c.is_demo && (
-                            <span className="shrink-0 text-xs font-medium px-1.5 py-0.5 rounded bg-zinc-200 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-500 border border-zinc-300 dark:border-zinc-700">
-                              Demo
-                            </span>
-                          )}
-                        </div>
-                        {c.description && (
-                          <p className="text-xs text-zinc-600 dark:text-zinc-500 mt-1 line-clamp-2">{c.description}</p>
-                        )}
-                      </div>
+                    {/* Card menu */}
+                    <div className="absolute top-3 right-3" onClick={(e) => e.preventDefault()}>
                       <DropdownMenu>
-                        <DropdownMenuTrigger asChild onClick={(e) => e.preventDefault()}>
-                          <button className="p-1 rounded text-zinc-500 hover:text-zinc-700 dark:text-zinc-600 dark:hover:text-zinc-300">
+                        <DropdownMenuTrigger asChild>
+                          <button className="p-1.5 rounded-md text-zinc-400 hover:text-zinc-700 dark:text-zinc-600 dark:hover:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors">
                             <MoreHorizontal className="w-4 h-4" />
                           </button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800">
-                         <DropdownMenuItem
-                           onClick={(e) => handleExport(e, c)}
-                           disabled={exportingId === c.id}
-                           className="text-zinc-700 dark:text-zinc-300 focus:text-zinc-900 dark:focus:text-zinc-100"
-                         >
-                           <Download className="w-3.5 h-3.5 mr-2" />
-                           {exportingId === c.id ? 'Exporting...' : 'Export Backup'}
-                         </DropdownMenuItem>
-                         <DropdownMenuItem
-                           onClick={(e) => {
-                             e.preventDefault();
-                             deleteMutation.mutate(c.id);
-                           }}
-                           className="text-red-600 dark:text-red-400 focus:text-red-600 dark:focus:text-red-400"
-                         >
-                           <Trash2 className="w-3.5 h-3.5 mr-2" />
-                           Delete
-                         </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={(e) => handleExport(e, c)}
+                            disabled={exportingId === c.id}
+                            className="text-zinc-700 dark:text-zinc-300 focus:text-zinc-900 dark:focus:text-zinc-100"
+                          >
+                            <Download className="w-3.5 h-3.5 mr-2" />
+                            {exportingId === c.id ? 'Exporting…' : 'Export Backup'}
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={(e) => {
+                              e.preventDefault();
+                              deleteMutation.mutate(c.id);
+                            }}
+                            className="text-red-600 dark:text-red-400 focus:text-red-600 dark:focus:text-red-400"
+                          >
+                            <Trash2 className="w-3.5 h-3.5 mr-2" />
+                            Delete
+                          </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
                     </div>
-                    <div className="flex items-center gap-3 mt-4 text-xs text-zinc-600 dark:text-zinc-600">
+
+                    {/* Title + demo badge */}
+                    <div className="pr-8 mb-1.5">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <h3 className="font-semibold text-zinc-900 dark:text-zinc-100 group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors leading-snug">
+                          {c.name}
+                        </h3>
+                        {c.is_demo && (
+                          <span className="text-[10px] font-medium px-1.5 py-0.5 rounded bg-zinc-200 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-500 border border-zinc-300 dark:border-zinc-700 shrink-0">
+                            Demo
+                          </span>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Description or setting */}
+                    {(c.description || c.setting) && (
+                      <p className="text-xs text-zinc-500 dark:text-zinc-500 line-clamp-2 mb-3 leading-relaxed">
+                        {c.description || c.setting}
+                      </p>
+                    )}
+
+                    {/* Meta row */}
+                    <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-zinc-500 dark:text-zinc-600 mt-auto">
+                      <span className="font-medium dark:text-zinc-500 text-zinc-600">{getSystem(c.system).shortLabel}</span>
+                      <span className="w-1 h-1 rounded-full bg-zinc-300 dark:bg-zinc-700 shrink-0" />
                       <span>Session #{c.current_session_number || 0}</span>
-                      <span className="w-1 h-1 rounded-full bg-zinc-300 dark:bg-zinc-700" />
-                      <span className="text-zinc-500 dark:text-zinc-500">{getSystem(c.system).shortLabel}</span>
-                      <span className="w-1 h-1 rounded-full bg-zinc-300 dark:bg-zinc-700" />
+                      <span className="w-1 h-1 rounded-full bg-zinc-300 dark:bg-zinc-700 shrink-0" />
                       <span className={cn(
                         "flex items-center gap-1 capitalize",
                         c.status === 'active' || !c.status ? 'text-emerald-600 dark:text-emerald-500' :
@@ -260,7 +290,7 @@ export default function CampaignList() {
                         'text-zinc-500 dark:text-zinc-600'
                       )}>
                         <span className={cn(
-                          "w-1.5 h-1.5 rounded-full inline-block",
+                          "w-1.5 h-1.5 rounded-full inline-block shrink-0",
                           c.status === 'active' || !c.status ? 'bg-emerald-500' :
                           c.status === 'paused' ? 'bg-amber-500' : 'bg-zinc-400'
                         )} />
@@ -286,7 +316,7 @@ export default function CampaignList() {
 
       {/* Create Dialog */}
       <Dialog open={showCreate} onOpenChange={setShowCreate}>
-        <DialogContent className="bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 sm:max-w-md">
+        <DialogContent className="bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 sm:max-w-md mx-4">
           <DialogHeader>
             <DialogTitle>New Campaign</DialogTitle>
           </DialogHeader>
@@ -296,6 +326,7 @@ export default function CampaignList() {
               value={form.name}
               onChange={(e) => setForm({ ...form, name: e.target.value })}
               className="bg-white dark:bg-zinc-950 border-zinc-300 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100"
+              autoFocus
             />
             <Textarea
               placeholder="Brief description (optional)"
@@ -331,6 +362,7 @@ export default function CampaignList() {
               disabled={!form.name.trim() || createMutation.isPending}
               className="bg-amber-500 hover:bg-amber-400 text-zinc-950 font-semibold"
             >
+              {createMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin mr-1.5" /> : null}
               Create
             </Button>
           </DialogFooter>

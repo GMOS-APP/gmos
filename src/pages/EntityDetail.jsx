@@ -383,7 +383,7 @@ Format with markdown for readability.`;
   };
 
   if (isLoading && !isNew) {
-    return <div className="p-8"><div className="h-8 w-48 dark:bg-zinc-800 bg-gray-200 rounded animate-pulse" /></div>;
+    return <div className="p-8"><div className="h-8 w-48 dark:bg-zinc-800 bg-zinc-200 rounded animate-pulse" /></div>;
   }
 
   // Entry mode selection for new entities
@@ -392,17 +392,17 @@ Format with markdown for readability.`;
       <div className="p-4 sm:p-6 lg:p-8 max-w-4xl">
         <Link
           to={createPageUrl('EntityBrowser') + `?campaign_id=${campaignId}`}
-          className="inline-flex items-center gap-1.5 text-xs dark:text-zinc-500 dark:hover:text-zinc-300 text-gray-600 hover:text-gray-900 mb-6"
+          className="inline-flex items-center gap-1.5 text-xs dark:text-zinc-500 dark:hover:text-zinc-300 text-zinc-600 hover:text-zinc-900 mb-6"
         >
           <ArrowLeft className="w-3.5 h-3.5" />
           Back to entities
         </Link>
 
         <div className="max-w-2xl mx-auto mt-16">
-          <h2 className="text-2xl font-bold dark:text-zinc-100 text-gray-900 mb-1 text-center capitalize">
+          <h2 className="text-2xl font-bold dark:text-zinc-100 text-zinc-900 mb-1 text-center capitalize">
             New {defaultType.replace('_', ' ')}
           </h2>
-          <p className="text-sm dark:text-zinc-500 text-gray-600 text-center mb-8">Choose how you'd like to create this {defaultType.replace('_', ' ')}</p>
+          <p className="text-sm dark:text-zinc-500 text-zinc-600 text-center mb-8">Choose how you'd like to create this {defaultType.replace('_', ' ')}</p>
 
           <div className={`grid gap-4 ${defaultType === 'note' ? 'grid-cols-1 max-w-xs mx-auto' : defaultType === 'creature' ? 'grid-cols-3' : 'grid-cols-2'}`}>
             {defaultType !== 'note' && (
@@ -414,15 +414,15 @@ Format with markdown for readability.`;
                 await generateContent();
                 setGenerating(false);
               }}
-              className="group p-6 rounded-xl dark:border-2 dark:border-zinc-800 dark:bg-zinc-900/40 border-2 border-gray-300 bg-gray-50 dark:hover:border-blue-500/50 dark:hover:bg-blue-500/5 hover:border-blue-500/50 hover:bg-blue-500/5 transition-all"
+              className="group p-6 rounded-xl dark:border-2 dark:border-zinc-800 dark:bg-zinc-900/40 border-2 border-zinc-300 bg-zinc-50 dark:hover:border-blue-500/50 dark:hover:bg-blue-500/5 hover:border-blue-500/50 hover:bg-blue-500/5 transition-all"
             >
               <div className="flex flex-col items-center gap-3">
                 <div className="p-3 rounded-lg bg-blue-500/10 group-hover:bg-blue-500/20 transition-colors">
                   <Wand2 className="w-6 h-6 text-blue-400" />
                 </div>
                 <div className="text-center">
-                  <h3 className="font-semibold dark:text-zinc-100 text-gray-900 mb-1">Auto Generate</h3>
-                  <p className="text-xs dark:text-zinc-500 text-gray-600">AI generates content for your system</p>
+                  <h3 className="font-semibold dark:text-zinc-100 text-zinc-900 mb-1">Auto Generate</h3>
+                  <p className="text-xs dark:text-zinc-500 text-zinc-600">AI generates content for your system</p>
                 </div>
               </div>
             </button>
@@ -432,15 +432,15 @@ Format with markdown for readability.`;
             {defaultType === 'creature' && system.hasSrdImport && (
               <button
                 onClick={() => setEntryMode('srd_import')}
-                className="group p-6 rounded-xl dark:border-2 dark:border-zinc-800 dark:bg-zinc-900/40 border-2 border-gray-300 bg-gray-50 dark:hover:border-green-500/50 dark:hover:bg-green-500/5 hover:border-green-500/50 hover:bg-green-500/5 transition-all"
+                className="group p-6 rounded-xl dark:border-2 dark:border-zinc-800 dark:bg-zinc-900/40 border-2 border-zinc-300 bg-zinc-50 dark:hover:border-green-500/50 dark:hover:bg-green-500/5 hover:border-green-500/50 hover:bg-green-500/5 transition-all"
               >
                 <div className="flex flex-col items-center gap-3">
                   <div className="p-3 rounded-lg bg-green-500/10 group-hover:bg-green-500/20 transition-colors">
                     <Download className="w-6 h-6 text-green-400" />
                   </div>
                   <div className="text-center">
-                    <h3 className="font-semibold dark:text-zinc-100 text-gray-900 mb-1">Import from SRD</h3>
-                    <p className="text-xs dark:text-zinc-500 text-gray-600">Search and import from the rulebook</p>
+                    <h3 className="font-semibold dark:text-zinc-100 text-zinc-900 mb-1">Import from SRD</h3>
+                    <p className="text-xs dark:text-zinc-500 text-zinc-600">Search and import from the rulebook</p>
                   </div>
                 </div>
               </button>
@@ -448,15 +448,15 @@ Format with markdown for readability.`;
 
             <button
               onClick={() => setEntryMode('manual')}
-              className="group p-6 rounded-xl dark:border-2 dark:border-zinc-800 dark:bg-zinc-900/40 border-2 border-gray-300 bg-gray-50 dark:hover:border-amber-500/50 dark:hover:bg-amber-500/5 hover:border-amber-500/50 hover:bg-amber-500/5 transition-all"
+              className="group p-6 rounded-xl dark:border-2 dark:border-zinc-800 dark:bg-zinc-900/40 border-2 border-zinc-300 bg-zinc-50 dark:hover:border-amber-500/50 dark:hover:bg-amber-500/5 hover:border-amber-500/50 hover:bg-amber-500/5 transition-all"
             >
               <div className="flex flex-col items-center gap-3">
                 <div className="p-3 rounded-lg bg-amber-500/10 group-hover:bg-amber-500/20 transition-colors">
                   <BookOpen className="w-6 h-6 text-amber-400" />
                 </div>
                 <div className="text-center">
-                  <h3 className="font-semibold dark:text-zinc-100 text-gray-900 mb-1">Manual Entry</h3>
-                  <p className="text-xs dark:text-zinc-500 text-gray-600">Write your own content from scratch</p>
+                  <h3 className="font-semibold dark:text-zinc-100 text-zinc-900 mb-1">Manual Entry</h3>
+                  <p className="text-xs dark:text-zinc-500 text-zinc-600">Write your own content from scratch</p>
                 </div>
               </div>
             </button>
@@ -466,15 +466,15 @@ Format with markdown for readability.`;
             <div className="mt-4">
               <button
                 onClick={() => setEntryMode('dnd_import')}
-                className="group w-full p-5 rounded-xl dark:border-2 dark:border-zinc-800 dark:bg-zinc-900/40 border-2 border-gray-300 bg-gray-50 dark:hover:border-purple-500/50 dark:hover:bg-purple-500/5 hover:border-purple-500/50 hover:bg-purple-500/5 transition-all"
+                className="group w-full p-5 rounded-xl dark:border-2 dark:border-zinc-800 dark:bg-zinc-900/40 border-2 border-zinc-300 bg-zinc-50 dark:hover:border-purple-500/50 dark:hover:bg-purple-500/5 hover:border-purple-500/50 hover:bg-purple-500/5 transition-all"
               >
                 <div className="flex items-center justify-center gap-3">
                   <div className="p-2.5 rounded-lg bg-purple-500/10 group-hover:bg-purple-500/20 transition-colors">
                     <Download className="w-5 h-5 text-purple-400" />
                   </div>
                   <div className="text-center">
-                    <h3 className="font-semibold dark:text-zinc-100 text-gray-900 mb-0.5">Import from D&D Beyond</h3>
-                    <p className="text-xs dark:text-zinc-500 text-gray-600">Pull character data directly from your D&D Beyond sheet</p>
+                    <h3 className="font-semibold dark:text-zinc-100 text-zinc-900 mb-0.5">Import from D&D Beyond</h3>
+                    <p className="text-xs dark:text-zinc-500 text-zinc-600">Pull character data directly from your D&D Beyond sheet</p>
                   </div>
                 </div>
               </button>
@@ -484,7 +484,7 @@ Format with markdown for readability.`;
           {generating && (
             <div className="mt-8 text-center">
               <Loader2 className="w-6 h-6 animate-spin text-blue-400 mx-auto mb-2" />
-              <p className="text-sm dark:text-zinc-500 text-gray-600">Generating content...</p>
+              <p className="text-sm dark:text-zinc-500 text-zinc-600">Generating content...</p>
             </div>
           )}
         </div>
@@ -513,15 +513,15 @@ Format with markdown for readability.`;
       <div className="p-4 sm:p-6 lg:p-8 max-w-4xl">
         <button
           onClick={() => setEntryMode(null)}
-          className="inline-flex items-center gap-1.5 text-xs dark:text-zinc-500 dark:hover:text-zinc-300 text-gray-600 hover:text-gray-900 mb-6"
+          className="inline-flex items-center gap-1.5 text-xs dark:text-zinc-500 dark:hover:text-zinc-300 text-zinc-600 hover:text-zinc-900 mb-6"
         >
           <ArrowLeft className="w-3.5 h-3.5" />
           Back to options
         </button>
 
         <div className="max-w-2xl mx-auto mt-8">
-          <h2 className="text-2xl font-bold dark:text-zinc-100 text-gray-900 mb-2">Import Creature from SRD</h2>
-          <p className="text-sm dark:text-zinc-500 text-gray-600 mb-6">Search the D&D 5e System Reference Document 5.1</p>
+          <h2 className="text-2xl font-bold dark:text-zinc-100 text-zinc-900 mb-2">Import Creature from SRD</h2>
+          <p className="text-sm dark:text-zinc-500 text-zinc-600 mb-6">Search the D&D 5e System Reference Document 5.1</p>
 
           <div className="flex gap-2 mb-6">
             <Input
@@ -529,7 +529,7 @@ Format with markdown for readability.`;
               onChange={(e) => setSrdSearch(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && searchSRD()}
               placeholder="Search for creature (e.g., Goblin, Ancient Red Dragon)..."
-              className="dark:bg-zinc-900/60 dark:border-zinc-800 dark:text-zinc-200 bg-gray-100 border-gray-300 text-gray-900"
+              className="dark:bg-zinc-900/60 dark:border-zinc-800 dark:text-zinc-200 bg-zinc-100 border-zinc-300 text-zinc-900"
             />
             <AiGate>
               <Button
@@ -545,24 +545,24 @@ Format with markdown for readability.`;
           {searching && (
             <div className="text-center py-8">
               <Loader2 className="w-6 h-6 animate-spin text-green-400 mx-auto mb-2" />
-              <p className="text-sm dark:text-zinc-500 text-gray-600">Searching SRD...</p>
+              <p className="text-sm dark:text-zinc-500 text-zinc-600">Searching SRD...</p>
             </div>
           )}
 
           {!searching && srdResults.length > 0 && (
             <div className="space-y-2">
-              <p className="text-xs dark:text-zinc-500 text-gray-600 mb-3">Found {srdResults.length} creature(s):</p>
+              <p className="text-xs dark:text-zinc-500 text-zinc-600 mb-3">Found {srdResults.length} creature(s):</p>
               {srdResults.map((creature, idx) => (
                 <button
                   key={idx}
                   onClick={() => importCreature(creature)}
                   disabled={generating}
-                  className="w-full p-4 rounded-lg dark:border-zinc-800 dark:bg-zinc-900/40 dark:hover:bg-zinc-800/60 dark:hover:border-green-500/50 border-gray-300 bg-gray-50 hover:bg-gray-100 hover:border-green-500/50 transition-all text-left group"
+                  className="w-full p-4 rounded-lg dark:border-zinc-800 dark:bg-zinc-900/40 dark:hover:bg-zinc-800/60 dark:hover:border-green-500/50 border-zinc-300 bg-zinc-50 hover:bg-zinc-100 hover:border-green-500/50 transition-all text-left group"
                 >
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
-                      <h3 className="font-semibold dark:text-zinc-100 dark:group-hover:text-green-400 text-gray-900 group-hover:text-green-600 mb-1">{creature.name}</h3>
-                      <p className="text-xs dark:text-zinc-500 text-gray-600 mb-2">{creature.summary}</p>
+                      <h3 className="font-semibold dark:text-zinc-100 dark:group-hover:text-green-400 text-zinc-900 group-hover:text-green-600 mb-1">{creature.name}</h3>
+                      <p className="text-xs dark:text-zinc-500 text-zinc-600 mb-2">{creature.summary}</p>
                       <div className="flex gap-2">
                         <Badge variant="outline" className="text-[10px] border-zinc-700 text-zinc-500 capitalize">
                           {creature.type}
@@ -575,7 +575,7 @@ Format with markdown for readability.`;
                     {generating ? (
                       <Loader2 className="w-4 h-4 animate-spin text-green-400 ml-4" />
                     ) : (
-                      <Download className="w-4 h-4 dark:text-zinc-600 dark:group-hover:text-green-400 text-gray-400 group-hover:text-green-600 ml-4" />
+                      <Download className="w-4 h-4 dark:text-zinc-600 dark:group-hover:text-green-400 text-zinc-400 group-hover:text-green-600 ml-4" />
                     )}
                   </div>
                 </button>
@@ -584,7 +584,7 @@ Format with markdown for readability.`;
           )}
 
           {!searching && srdResults.length === 0 && srdSearch && (
-            <div className="text-center py-8 dark:text-zinc-500 text-gray-600 text-sm">
+            <div className="text-center py-8 dark:text-zinc-500 text-zinc-600 text-sm">
               No creatures found. Try a different search term.
             </div>
           )}
@@ -592,7 +592,7 @@ Format with markdown for readability.`;
           {generating && (
             <div className="mt-8 text-center">
               <Loader2 className="w-6 h-6 animate-spin text-green-400 mx-auto mb-2" />
-              <p className="text-sm dark:text-zinc-500 text-gray-600">Importing creature data...</p>
+              <p className="text-sm dark:text-zinc-500 text-zinc-600">Importing creature data...</p>
             </div>
           )}
         </div>
@@ -617,7 +617,7 @@ Format with markdown for readability.`;
         {/* Back */}
         <Link
           to={createPageUrl('EntityBrowser') + `?campaign_id=${form.campaign_id}`}
-          className="inline-flex items-center gap-1.5 text-xs dark:text-zinc-500 dark:hover:text-zinc-300 text-gray-600 hover:text-gray-900 mb-6"
+          className="inline-flex items-center gap-1.5 text-xs dark:text-zinc-500 dark:hover:text-zinc-300 text-zinc-600 hover:text-zinc-900 mb-6"
         >
           <ArrowLeft className="w-3.5 h-3.5" />
           Back to entities
@@ -629,11 +629,11 @@ Format with markdown for readability.`;
             <img
               src={form.image_url}
               alt={form.name}
-              className="w-28 h-36 rounded-lg object-cover border-2 dark:border-zinc-800 border-gray-200 shadow-lg flex-shrink-0"
+              className="w-28 h-36 rounded-lg object-cover border-2 dark:border-zinc-800 border-zinc-200 shadow-lg flex-shrink-0"
             />
           )}
           <div className="flex-1 min-w-0">
-            <h1 className="text-3xl font-bold dark:text-zinc-100 text-gray-900 mb-3 leading-tight">
+            <h1 className="text-3xl font-bold dark:text-zinc-100 text-zinc-900 mb-3 leading-tight">
               {form.name || 'Unnamed'}
             </h1>
             <div className="flex flex-wrap items-center gap-2">
@@ -643,11 +643,11 @@ Format with markdown for readability.`;
               <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border capitalize ${STATUS_COLORS[form.status] || 'bg-zinc-500/15 text-zinc-400 border-zinc-500/30'}`}>
                 {form.status}
               </span>
-              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border dark:border-zinc-700 dark:text-zinc-500 border-gray-300 text-gray-600">
+              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border dark:border-zinc-700 dark:text-zinc-500 border-zinc-300 text-zinc-600">
                 {VISIBILITY_LABELS[form.visibility] || form.visibility}
               </span>
               {form.last_seen_session && (
-                <span className="text-xs dark:text-zinc-600 text-gray-500">
+                <span className="text-xs dark:text-zinc-600 text-zinc-500">
                   Session {form.last_seen_session}
                 </span>
               )}
@@ -665,14 +665,14 @@ Format with markdown for readability.`;
             {entityId && (
               <AlertDialog>
                 <AlertDialogTrigger asChild>
-                  <Button size="sm" variant="ghost" className="dark:text-zinc-500 dark:hover:text-red-400 text-gray-400 hover:text-red-600">
+                  <Button size="sm" variant="ghost" className="dark:text-zinc-500 dark:hover:text-red-400 text-zinc-400 hover:text-red-600">
                     <Trash2 className="w-4 h-4" />
                   </Button>
                 </AlertDialogTrigger>
-                <AlertDialogContent className="dark:bg-zinc-900 dark:border-zinc-800 bg-white border-gray-200">
+                <AlertDialogContent className="dark:bg-zinc-900 dark:border-zinc-800 bg-white border-zinc-200">
                   <AlertDialogHeader>
-                    <AlertDialogTitle className="dark:text-zinc-100 text-gray-900">Delete entity?</AlertDialogTitle>
-                    <AlertDialogDescription className="dark:text-zinc-400 text-gray-600">
+                    <AlertDialogTitle className="dark:text-zinc-100 text-zinc-900">Delete entity?</AlertDialogTitle>
+                    <AlertDialogDescription className="dark:text-zinc-400 text-zinc-600">
                       This will permanently remove {form.name} from your world.
                     </AlertDialogDescription>
                   </AlertDialogHeader>
@@ -691,7 +691,7 @@ Format with markdown for readability.`;
         <div className="space-y-8">
           {/* Summary */}
           {form.summary && (
-            <p className="text-base dark:text-zinc-400 text-gray-600 italic leading-relaxed border-l-2 dark:border-amber-500/40 border-amber-400/50 pl-4">
+            <p className="text-base dark:text-zinc-400 text-zinc-600 italic leading-relaxed border-l-2 dark:border-amber-500/40 border-amber-400/50 pl-4">
               {form.summary}
             </p>
           )}
@@ -699,14 +699,14 @@ Format with markdown for readability.`;
           {/* Key Facts */}
           {form.key_facts.length > 0 && (
             <div>
-              <h3 className="text-xs dark:text-zinc-500 text-gray-500 uppercase tracking-widest font-semibold mb-3">
+              <h3 className="text-xs dark:text-zinc-500 text-zinc-500 uppercase tracking-widest font-semibold mb-3">
                 Key Facts
               </h3>
               <ul className="space-y-2">
                 {form.key_facts.map((fact, i) => (
                   <li key={i} className="flex items-start gap-2.5">
                     <span className="w-1.5 h-1.5 rounded-full bg-amber-500/60 flex-shrink-0 mt-[7px]" />
-                    <span className="text-sm dark:text-zinc-300 text-gray-800 leading-relaxed">{fact}</span>
+                    <span className="text-sm dark:text-zinc-300 text-zinc-800 leading-relaxed">{fact}</span>
                   </li>
                 ))}
               </ul>
@@ -728,16 +728,16 @@ Format with markdown for readability.`;
             <>
               {shortFields.length > 0 && (
                 <div>
-                  <h3 className="text-xs dark:text-zinc-500 text-gray-500 uppercase tracking-widest font-semibold mb-3 capitalize">
+                  <h3 className="text-xs dark:text-zinc-500 text-zinc-500 uppercase tracking-widest font-semibold mb-3 capitalize">
                     {form.entity_type.replace('_', ' ')} Details
                   </h3>
                   <div className="grid grid-cols-2 gap-x-8 gap-y-4">
                     {shortFields.map(([key, val]) => (
                       <div key={key}>
-                        <span className="text-[11px] dark:text-zinc-600 text-gray-500 uppercase tracking-wide block mb-0.5">
+                        <span className="text-[11px] dark:text-zinc-600 text-zinc-500 uppercase tracking-wide block mb-0.5">
                           {humanizeKey(key)}
                         </span>
-                        <span className="text-sm dark:text-zinc-300 text-gray-900">{String(val)}</span>
+                        <span className="text-sm dark:text-zinc-300 text-zinc-900">{String(val)}</span>
                       </div>
                     ))}
                   </div>
@@ -747,10 +747,10 @@ Format with markdown for readability.`;
                 <div className="space-y-6">
                   {longFields.map(([key, val]) => (
                     <div key={key}>
-                      <h3 className="text-xs dark:text-zinc-500 text-gray-500 uppercase tracking-widest font-semibold mb-2">
+                      <h3 className="text-xs dark:text-zinc-500 text-zinc-500 uppercase tracking-widest font-semibold mb-2">
                         {humanizeKey(key)}
                       </h3>
-                      <p className="text-sm dark:text-zinc-300 text-gray-800 leading-relaxed whitespace-pre-wrap">
+                      <p className="text-sm dark:text-zinc-300 text-zinc-800 leading-relaxed whitespace-pre-wrap">
                         {String(val)}
                       </p>
                     </div>
@@ -763,10 +763,10 @@ Format with markdown for readability.`;
           {/* Description — shown for all types (GM notes, AI-generated prose, etc.) */}
           {form.description && (
             <div>
-              <h3 className="text-xs dark:text-zinc-500 text-gray-500 uppercase tracking-widest font-semibold mb-3">
+              <h3 className="text-xs dark:text-zinc-500 text-zinc-500 uppercase tracking-widest font-semibold mb-3">
                 Description
               </h3>
-              <div className="text-sm dark:text-zinc-300 text-gray-800 leading-relaxed">
+              <div className="text-sm dark:text-zinc-300 text-zinc-800 leading-relaxed">
                 <EntityMentionRenderer
                   text={form.description}
                   entities={campaignEntities}
@@ -779,12 +779,12 @@ Format with markdown for readability.`;
           {/* Tags */}
           {form.tags.length > 0 && (
             <div>
-              <h3 className="text-xs dark:text-zinc-500 text-gray-500 uppercase tracking-widest font-semibold mb-2">
+              <h3 className="text-xs dark:text-zinc-500 text-zinc-500 uppercase tracking-widest font-semibold mb-2">
                 Tags
               </h3>
               <div className="flex flex-wrap gap-1.5">
                 {form.tags.map((tag, i) => (
-                  <Badge key={i} variant="outline" className="dark:border-zinc-700 dark:text-zinc-400 border-gray-300 text-gray-700 text-xs">
+                  <Badge key={i} variant="outline" className="dark:border-zinc-700 dark:text-zinc-400 border-zinc-300 text-zinc-700 text-xs">
                     {tag}
                   </Badge>
                 ))}
@@ -795,7 +795,7 @@ Format with markdown for readability.`;
           {/* Relationships */}
           {relationships.length > 0 && (
             <div>
-              <h3 className="text-xs dark:text-zinc-500 text-gray-500 uppercase tracking-widest font-semibold mb-2">
+              <h3 className="text-xs dark:text-zinc-500 text-zinc-500 uppercase tracking-widest font-semibold mb-2">
                 Relationships
               </h3>
               <div className="space-y-1">
@@ -807,17 +807,17 @@ Format with markdown for readability.`;
                     <Link
                       key={rel.id}
                       to={createPageUrl('EntityDetail') + `?id=${linkedId}&campaign_id=${form.campaign_id}`}
-                      className="flex items-center gap-2 p-2 rounded-lg dark:hover:bg-zinc-800/50 hover:bg-gray-100/50 group"
+                      className="flex items-center gap-2 p-2 rounded-lg dark:hover:bg-zinc-800/50 hover:bg-zinc-100/50 group"
                     >
-                      <span className="text-xs dark:text-zinc-600 text-gray-500 w-24 text-right capitalize">
+                      <span className="text-xs dark:text-zinc-600 text-zinc-500 w-24 text-right capitalize">
                         {rel.relationship_type?.replace('_', ' ')}
                       </span>
-                      <span className="text-xs dark:text-zinc-700 text-gray-400">→</span>
-                      <span className="text-sm dark:text-zinc-300 dark:group-hover:text-amber-400 text-gray-900 group-hover:text-amber-600">
+                      <span className="text-xs dark:text-zinc-700 text-zinc-400">→</span>
+                      <span className="text-sm dark:text-zinc-300 dark:group-hover:text-amber-400 text-zinc-900 group-hover:text-amber-600">
                         {linkedName}
                       </span>
                       {rel.status !== 'active' && (
-                        <Badge variant="outline" className="text-[10px] dark:border-zinc-700 dark:text-zinc-600 border-gray-300 text-gray-600 capitalize ml-auto">
+                        <Badge variant="outline" className="text-[10px] dark:border-zinc-700 dark:text-zinc-600 border-zinc-300 text-zinc-600 capitalize ml-auto">
                           {rel.status}
                         </Badge>
                       )}
@@ -839,7 +839,7 @@ Format with markdown for readability.`;
       {isNew ? (
         <Link
           to={createPageUrl('EntityBrowser') + `?campaign_id=${form.campaign_id}`}
-          className="inline-flex items-center gap-1.5 text-xs dark:text-zinc-500 dark:hover:text-zinc-300 text-gray-600 hover:text-gray-900 mb-6"
+          className="inline-flex items-center gap-1.5 text-xs dark:text-zinc-500 dark:hover:text-zinc-300 text-zinc-600 hover:text-zinc-900 mb-6"
         >
           <ArrowLeft className="w-3.5 h-3.5" />
           Back to entities
@@ -847,7 +847,7 @@ Format with markdown for readability.`;
       ) : (
         <button
           onClick={() => setPageMode('view')}
-          className="inline-flex items-center gap-1.5 text-xs dark:text-zinc-500 dark:hover:text-zinc-300 text-gray-600 hover:text-gray-900 mb-6"
+          className="inline-flex items-center gap-1.5 text-xs dark:text-zinc-500 dark:hover:text-zinc-300 text-zinc-600 hover:text-zinc-900 mb-6"
         >
           <ArrowLeft className="w-3.5 h-3.5" />
           Cancel edit
@@ -871,14 +871,14 @@ Format with markdown for readability.`;
             value={form.name}
             onChange={(e) => setForm({ ...form, name: e.target.value })}
             placeholder="Entity name"
-            className="text-2xl font-bold bg-transparent border-none p-0 dark:text-zinc-100 dark:placeholder:text-zinc-700 text-gray-900 placeholder:text-gray-400 focus-visible:ring-0 h-auto"
+            className="text-2xl font-bold bg-transparent border-none p-0 dark:text-zinc-100 dark:placeholder:text-zinc-700 text-zinc-900 placeholder:text-zinc-400 focus-visible:ring-0 h-auto"
           />
           <div className="flex items-center gap-3 mt-3">
             <Select value={form.entity_type} onValueChange={(v) => setForm({ ...form, entity_type: v })}>
-              <SelectTrigger className="w-40 dark:bg-zinc-900 dark:border-zinc-800 dark:text-zinc-300 bg-white border-gray-300 text-gray-900 text-xs h-8">
+              <SelectTrigger className="w-40 dark:bg-zinc-900 dark:border-zinc-800 dark:text-zinc-300 bg-white border-zinc-300 text-zinc-900 text-xs h-8">
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent className="dark:bg-zinc-900 dark:border-zinc-800 bg-white border-gray-300">
+              <SelectContent className="dark:bg-zinc-900 dark:border-zinc-800 bg-white border-zinc-300">
                 {entityTypes.map((t) => (
                   <SelectItem key={t} value={t} className="text-zinc-300 capitalize text-xs">
                     {t.replace('_', ' ')}
@@ -887,22 +887,22 @@ Format with markdown for readability.`;
               </SelectContent>
             </Select>
             <Select value={form.status} onValueChange={(v) => setForm({ ...form, status: v })}>
-              <SelectTrigger className="w-32 dark:bg-zinc-900 dark:border-zinc-800 dark:text-zinc-300 bg-white border-gray-300 text-gray-900 text-xs h-8">
+              <SelectTrigger className="w-32 dark:bg-zinc-900 dark:border-zinc-800 dark:text-zinc-300 bg-white border-zinc-300 text-zinc-900 text-xs h-8">
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent className="dark:bg-zinc-900 dark:border-zinc-800 bg-white border-gray-300">
+              <SelectContent className="dark:bg-zinc-900 dark:border-zinc-800 bg-white border-zinc-300">
                 {statuses.map((s) => (
-                  <SelectItem key={s} value={s} className="dark:text-zinc-300 text-gray-900 capitalize text-xs">{s}</SelectItem>
+                  <SelectItem key={s} value={s} className="dark:text-zinc-300 text-zinc-900 capitalize text-xs">{s}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
             <Select value={form.visibility} onValueChange={(v) => setForm({ ...form, visibility: v })}>
-              <SelectTrigger className="w-36 dark:bg-zinc-900 dark:border-zinc-800 dark:text-zinc-300 bg-white border-gray-300 text-gray-900 text-xs h-8">
+              <SelectTrigger className="w-36 dark:bg-zinc-900 dark:border-zinc-800 dark:text-zinc-300 bg-white border-zinc-300 text-zinc-900 text-xs h-8">
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent className="dark:bg-zinc-900 dark:border-zinc-800 bg-white border-gray-300">
+              <SelectContent className="dark:bg-zinc-900 dark:border-zinc-800 bg-white border-zinc-300">
                 {visibilities.map((v) => (
-                  <SelectItem key={v} value={v} className="dark:text-zinc-300 text-gray-900 text-xs capitalize">{v.replace('_', ' ')}</SelectItem>
+                  <SelectItem key={v} value={v} className="dark:text-zinc-300 text-zinc-900 text-xs capitalize">{v.replace('_', ' ')}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
@@ -947,25 +947,25 @@ Format with markdown for readability.`;
       {/* Summary */}
       <div className="space-y-6">
         <div>
-          <label className="text-xs dark:text-zinc-500 text-gray-600 uppercase tracking-widest font-semibold mb-2 block">Summary</label>
+          <label className="text-xs dark:text-zinc-500 text-zinc-600 uppercase tracking-widest font-semibold mb-2 block">Summary</label>
           <Input
             value={form.summary}
             onChange={(e) => setForm({ ...form, summary: e.target.value })}
             placeholder="One-line summary for quick scanning..."
-            className="dark:bg-zinc-900/60 dark:border-zinc-800 dark:text-zinc-200 dark:placeholder:text-zinc-600 bg-gray-100 border-gray-300 text-gray-900 placeholder:text-gray-500"
+            className="dark:bg-zinc-900/60 dark:border-zinc-800 dark:text-zinc-200 dark:placeholder:text-zinc-600 bg-zinc-100 border-zinc-300 text-zinc-900 placeholder:text-zinc-500"
           />
         </div>
 
         {/* Key Facts */}
         <div>
-          <label className="text-xs dark:text-zinc-500 text-gray-600 uppercase tracking-widest font-semibold mb-2 block">Key Facts</label>
+          <label className="text-xs dark:text-zinc-500 text-zinc-600 uppercase tracking-widest font-semibold mb-2 block">Key Facts</label>
           <div className="space-y-1.5 mb-2">
             {form.key_facts.map((fact, i) => (
               <div key={i} className="flex items-center gap-2 group">
                 <span className="w-1.5 h-1.5 rounded-full bg-amber-500/60 flex-shrink-0" />
-                <span className="text-sm dark:text-zinc-300 text-gray-900 flex-1">{fact}</span>
+                <span className="text-sm dark:text-zinc-300 text-zinc-900 flex-1">{fact}</span>
                 <button onClick={() => setForm({ ...form, key_facts: form.key_facts.filter((_, j) => j !== i) })}
-                  className="opacity-0 group-hover:opacity-100 dark:text-zinc-600 dark:hover:text-red-400 text-gray-400 hover:text-red-500">
+                  className="opacity-0 group-hover:opacity-100 dark:text-zinc-600 dark:hover:text-red-400 text-zinc-400 hover:text-red-500">
                   <X className="w-3 h-3" />
                 </button>
               </div>
@@ -977,7 +977,7 @@ Format with markdown for readability.`;
               onChange={(e) => setNewFact(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addFact())}
               placeholder="Add a key fact..."
-              className="dark:bg-zinc-900/60 dark:border-zinc-800 dark:text-zinc-200 dark:text-sm dark:placeholder:text-zinc-600 bg-gray-100 border-gray-300 text-gray-900 text-sm placeholder:text-gray-500"
+              className="dark:bg-zinc-900/60 dark:border-zinc-800 dark:text-zinc-200 dark:text-sm dark:placeholder:text-zinc-600 bg-zinc-100 border-zinc-300 text-zinc-900 text-sm placeholder:text-zinc-500"
             />
             <Button onClick={addFact} size="sm" variant="ghost" className="text-zinc-500">
               <Plus className="w-4 h-4" />
@@ -988,7 +988,7 @@ Format with markdown for readability.`;
         {/* Type-Specific Fields */}
         {form.entity_type && (
           <div>
-            <label className="text-xs dark:text-zinc-500 text-gray-600 uppercase tracking-widest font-semibold mb-3 block capitalize">
+            <label className="text-xs dark:text-zinc-500 text-zinc-600 uppercase tracking-widest font-semibold mb-3 block capitalize">
               {form.entity_type.replace('_', ' ')} Details
             </label>
             <TypeSpecificFields
@@ -1011,7 +1011,7 @@ Format with markdown for readability.`;
         {/* Initiative Tracker (Encounters only) */}
         {form.entity_type === 'encounter' && (
           <div>
-            <label className="text-xs dark:text-zinc-500 text-gray-600 uppercase tracking-widest font-semibold mb-3 block">Initiative Tracker</label>
+            <label className="text-xs dark:text-zinc-500 text-zinc-600 uppercase tracking-widest font-semibold mb-3 block">Initiative Tracker</label>
             <InitiativeTracker campaignId={form.campaign_id} />
           </div>
         )}
@@ -1020,17 +1020,17 @@ Format with markdown for readability.`;
         <div>
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-3">
-              <label className="text-xs dark:text-zinc-500 text-gray-600 uppercase tracking-widest font-semibold">Description</label>
-              <div className="flex items-center gap-0.5 dark:bg-zinc-900 dark:border dark:border-zinc-800 bg-gray-100 border border-gray-300 rounded-lg p-0.5">
+              <label className="text-xs dark:text-zinc-500 text-zinc-600 uppercase tracking-widest font-semibold">Description</label>
+              <div className="flex items-center gap-0.5 dark:bg-zinc-900 dark:border dark:border-zinc-800 bg-zinc-100 border border-zinc-300 rounded-lg p-0.5">
                 <button
                   onClick={() => setDescriptionMode('edit')}
-                  className={`text-[11px] px-2.5 py-1 rounded-md transition-colors ${descriptionMode === 'edit' ? 'dark:bg-zinc-700 dark:text-zinc-200 bg-gray-300 text-gray-900' : 'dark:text-zinc-500 dark:hover:text-zinc-300 text-gray-600 hover:text-gray-800'}`}
+                  className={`text-[11px] px-2.5 py-1 rounded-md transition-colors ${descriptionMode === 'edit' ? 'dark:bg-zinc-700 dark:text-zinc-200 bg-zinc-300 text-zinc-900' : 'dark:text-zinc-500 dark:hover:text-zinc-300 text-zinc-600 hover:text-zinc-800'}`}
                 >
                   Edit
                 </button>
                 <button
                   onClick={() => setDescriptionMode('preview')}
-                  className={`text-[11px] px-2.5 py-1 rounded-md transition-colors ${descriptionMode === 'preview' ? 'dark:bg-zinc-700 dark:text-zinc-200 bg-gray-300 text-gray-900' : 'dark:text-zinc-500 dark:hover:text-zinc-300 text-gray-600 hover:text-gray-800'}`}
+                  className={`text-[11px] px-2.5 py-1 rounded-md transition-colors ${descriptionMode === 'preview' ? 'dark:bg-zinc-700 dark:text-zinc-200 bg-zinc-300 text-zinc-900' : 'dark:text-zinc-500 dark:hover:text-zinc-300 text-zinc-600 hover:text-zinc-800'}`}
                 >
                   Preview
                 </button>
@@ -1062,7 +1062,7 @@ Format with markdown for readability.`;
               rows={12}
             />
           ) : (
-            <div className="dark:bg-zinc-900/60 dark:border dark:border-zinc-800 bg-gray-100 border border-gray-300 rounded-lg p-4 min-h-[200px] text-sm dark:text-zinc-300 text-gray-900 leading-relaxed">
+            <div className="dark:bg-zinc-900/60 dark:border dark:border-zinc-800 bg-zinc-100 border border-zinc-300 rounded-lg p-4 min-h-[200px] text-sm dark:text-zinc-300 text-zinc-900 leading-relaxed">
               {form.description ? (
                 <EntityMentionRenderer
                   text={form.description}
@@ -1070,7 +1070,7 @@ Format with markdown for readability.`;
                   campaignId={form.campaign_id}
                 />
               ) : (
-                <span className="dark:text-zinc-600 text-gray-500">No description yet.</span>
+                <span className="dark:text-zinc-600 text-zinc-500">No description yet.</span>
               )}
             </div>
           )}
@@ -1078,10 +1078,10 @@ Format with markdown for readability.`;
 
         {/* Tags */}
         <div>
-          <label className="text-xs dark:text-zinc-500 text-gray-600 uppercase tracking-widest font-semibold mb-2 block">Tags</label>
+          <label className="text-xs dark:text-zinc-500 text-zinc-600 uppercase tracking-widest font-semibold mb-2 block">Tags</label>
           <div className="flex flex-wrap gap-1.5 mb-2">
             {form.tags.map((tag, i) => (
-              <Badge key={i} variant="outline" className="dark:border-zinc-700 dark:text-zinc-400 border-gray-300 text-gray-700 text-xs cursor-pointer dark:hover:border-red-500/50 dark:hover:text-red-400 hover:border-red-400/50 hover:text-red-600"
+              <Badge key={i} variant="outline" className="dark:border-zinc-700 dark:text-zinc-400 border-zinc-300 text-zinc-700 text-xs cursor-pointer dark:hover:border-red-500/50 dark:hover:text-red-400 hover:border-red-400/50 hover:text-red-600"
                 onClick={() => setForm({ ...form, tags: form.tags.filter((_, j) => j !== i) })}>
                 {tag} <X className="w-2.5 h-2.5 ml-1" />
               </Badge>
@@ -1093,7 +1093,7 @@ Format with markdown for readability.`;
               onChange={(e) => setNewTag(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addTag())}
               placeholder="Add tag..."
-              className="dark:bg-zinc-900/60 dark:border-zinc-800 dark:text-zinc-200 dark:text-sm dark:placeholder:text-zinc-600 bg-gray-100 border-gray-300 text-gray-900 text-sm placeholder:text-gray-500 max-w-xs"
+              className="dark:bg-zinc-900/60 dark:border-zinc-800 dark:text-zinc-200 dark:text-sm dark:placeholder:text-zinc-600 bg-zinc-100 border-zinc-300 text-zinc-900 text-sm placeholder:text-zinc-500 max-w-xs"
             />
           </div>
         </div>
@@ -1101,7 +1101,7 @@ Format with markdown for readability.`;
         {/* Relationships */}
         {!isNew && relationships.length > 0 && (
           <div>
-            <label className="text-xs dark:text-zinc-500 text-gray-600 uppercase tracking-widest font-semibold mb-2 block">Relationships</label>
+            <label className="text-xs dark:text-zinc-500 text-zinc-600 uppercase tracking-widest font-semibold mb-2 block">Relationships</label>
             <div className="space-y-1.5">
               {relationships.map((rel) => {
                 const isSource = rel.source_entity_id === entityId;
@@ -1111,13 +1111,13 @@ Format with markdown for readability.`;
                   <Link
                     key={rel.id}
                     to={createPageUrl('EntityDetail') + `?id=${linkedId}&campaign_id=${form.campaign_id}`}
-                    className="flex items-center gap-2 p-2 rounded-lg dark:hover:bg-zinc-800/50 hover:bg-gray-100/50 group"
+                    className="flex items-center gap-2 p-2 rounded-lg dark:hover:bg-zinc-800/50 hover:bg-zinc-100/50 group"
                   >
-                    <span className="text-xs dark:text-zinc-600 text-gray-500 w-24 text-right">{rel.relationship_type?.replace('_', ' ')}</span>
-                    <span className="text-xs dark:text-zinc-700 text-gray-600">→</span>
-                    <span className="text-sm dark:text-zinc-300 dark:group-hover:text-amber-400 text-gray-900 group-hover:text-amber-600">{linkedName}</span>
+                    <span className="text-xs dark:text-zinc-600 text-zinc-500 w-24 text-right">{rel.relationship_type?.replace('_', ' ')}</span>
+                    <span className="text-xs dark:text-zinc-700 text-zinc-600">→</span>
+                    <span className="text-sm dark:text-zinc-300 dark:group-hover:text-amber-400 text-zinc-900 group-hover:text-amber-600">{linkedName}</span>
                     {rel.status !== 'active' && (
-                      <Badge variant="outline" className="text-[10px] dark:border-zinc-700 dark:text-zinc-600 border-gray-300 text-gray-600 capitalize ml-auto">
+                      <Badge variant="outline" className="text-[10px] dark:border-zinc-700 dark:text-zinc-600 border-zinc-300 text-zinc-600 capitalize ml-auto">
                         {rel.status}
                       </Badge>
                     )}

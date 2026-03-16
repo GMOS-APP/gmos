@@ -14,7 +14,7 @@ function preprocessMentions(text, entityMap, campaignId) {
 function Section({ title, children }) {
   if (!children) return null;
   return (
-    <div className="py-5 border-b border-gray-100 dark:border-zinc-800/60 last:border-b-0">
+    <div className="py-5 border-b border-zinc-100 dark:border-zinc-800/60 last:border-b-0">
       <h3 className="text-[10px] font-bold uppercase tracking-widest text-amber-500 dark:text-amber-400 mb-3">
         {title}
       </h3>
@@ -47,15 +47,15 @@ function MDText({ text, entityMap, campaignId }) {
   return (
     <ReactMarkdown
       components={{
-        p: ({ children }) => <p className="mb-2 last:mb-0 dark:text-zinc-300 text-gray-700 leading-relaxed text-sm">{children}</p>,
-        ul: ({ children }) => <ul className="list-disc list-outside pl-4 mb-3 dark:text-zinc-300 text-gray-700 text-sm space-y-1.5">{children}</ul>,
-        ol: ({ children }) => <ol className="list-decimal list-outside pl-4 mb-3 dark:text-zinc-300 text-gray-700 text-sm space-y-1.5">{children}</ol>,
+        p: ({ children }) => <p className="mb-2 last:mb-0 dark:text-zinc-300 text-zinc-700 leading-relaxed text-sm">{children}</p>,
+        ul: ({ children }) => <ul className="list-disc list-outside pl-4 mb-3 dark:text-zinc-300 text-zinc-700 text-sm space-y-1.5">{children}</ul>,
+        ol: ({ children }) => <ol className="list-decimal list-outside pl-4 mb-3 dark:text-zinc-300 text-zinc-700 text-sm space-y-1.5">{children}</ol>,
         li: ({ children }) => <li className="leading-relaxed pl-0.5">{children}</li>,
-        strong: ({ children }) => <strong className="dark:text-white text-gray-900 font-semibold">{children}</strong>,
-        em: ({ children }) => <em className="dark:text-zinc-400 text-gray-500 italic">{children}</em>,
-        h1: ({ children }) => <h1 className="text-base font-bold dark:text-zinc-100 text-gray-900 mb-2 mt-3 first:mt-0">{children}</h1>,
-        h2: ({ children }) => <h2 className="text-sm font-bold dark:text-zinc-200 text-gray-800 mb-1.5 mt-3 first:mt-0">{children}</h2>,
-        h3: ({ children }) => <h3 className="text-xs font-semibold dark:text-zinc-300 text-gray-700 mb-1 mt-2 first:mt-0">{children}</h3>,
+        strong: ({ children }) => <strong className="dark:text-white text-zinc-900 font-semibold">{children}</strong>,
+        em: ({ children }) => <em className="dark:text-zinc-400 text-zinc-500 italic">{children}</em>,
+        h1: ({ children }) => <h1 className="text-base font-bold dark:text-zinc-100 text-zinc-900 mb-2 mt-3 first:mt-0">{children}</h1>,
+        h2: ({ children }) => <h2 className="text-sm font-bold dark:text-zinc-200 text-zinc-800 mb-1.5 mt-3 first:mt-0">{children}</h2>,
+        h3: ({ children }) => <h3 className="text-xs font-semibold dark:text-zinc-300 text-zinc-700 mb-1 mt-2 first:mt-0">{children}</h3>,
         a: ({ href, children }) => {
           const params = href ? new URLSearchParams(href.split('?')[1]) : null;
           const entityId = params?.get('id');
@@ -78,7 +78,7 @@ function EntityChips({ ids, entityMap }) {
       {entities.map(e => (
         <span
           key={e.id}
-          className="text-xs px-2.5 py-1 rounded-full border dark:bg-zinc-800 dark:border-zinc-700 dark:text-zinc-300 bg-gray-100 border-gray-200 text-gray-700 font-medium"
+          className="text-xs px-2.5 py-1 rounded-full border dark:bg-zinc-800 dark:border-zinc-700 dark:text-zinc-300 bg-zinc-100 border-zinc-200 text-zinc-700 font-medium"
         >
           {e.name}
         </span>
@@ -101,9 +101,9 @@ export default function SessionNotesDisplay({ session, entities = [], campaignId
 
   if (!hasContent) {
     return (
-      <div className="flex flex-col items-center justify-center h-48 dark:text-zinc-500 text-gray-400 gap-2">
+      <div className="flex flex-col items-center justify-center h-48 dark:text-zinc-500 text-zinc-400 gap-2">
         <p className="text-sm">No prep data yet.</p>
-        <p className="text-xs dark:text-zinc-600 text-gray-400">Fill in the Prep tab to see your session notes here.</p>
+        <p className="text-xs dark:text-zinc-600 text-zinc-400">Fill in the Prep tab to see your session notes here.</p>
       </div>
     );
   }
@@ -113,7 +113,7 @@ export default function SessionNotesDisplay({ session, entities = [], campaignId
 
       {session.previous_session_recap && (
         <Section title="📜 Previously…">
-          <div className="p-3 rounded-lg bg-gray-50 dark:bg-zinc-900/60 border border-gray-200 dark:border-zinc-800">
+          <div className="p-3 rounded-lg bg-zinc-50 dark:bg-zinc-900/60 border border-zinc-200 dark:border-zinc-800">
             <MDText entityMap={entityMap} campaignId={campaignId} text={session.previous_session_recap} />
           </div>
         </Section>

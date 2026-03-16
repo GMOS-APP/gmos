@@ -174,8 +174,8 @@ export default function SessionPage() {
 
       <div className={activeTab === 'run' ? "flex-1 overflow-hidden flex flex-col min-h-0" : "flex flex-col"}>
         <Tabs defaultValue="prep" value={activeTab} onValueChange={setActiveTab} className={activeTab === 'run' ? "flex-1 flex flex-col overflow-hidden min-h-0" : "flex flex-col"}>
-          <div className="px-4 pt-3 pb-3 dark:border-b dark:border-zinc-800/40 border-b border-gray-200 flex-shrink-0">
-            <TabsList className="dark:bg-zinc-900 dark:border dark:border-zinc-800 bg-gray-100 border border-gray-300">
+          <div className="px-4 pt-3 pb-3 dark:border-b dark:border-zinc-800/40 border-b border-zinc-200 flex-shrink-0">
+            <TabsList className="dark:bg-zinc-900 dark:border dark:border-zinc-800 bg-zinc-100 border border-zinc-300">
               <TabsTrigger value="prep" className="text-xs gap-1.5">
                 <BookOpen className="w-3.5 h-3.5" /> Prep
               </TabsTrigger>
@@ -220,12 +220,12 @@ export default function SessionPage() {
               <div className="flex-1 flex flex-col items-center justify-center gap-4 p-8">
                 <button
                   onClick={() => setGmScreenOpen(true)}
-                  className="flex items-center gap-2.5 px-5 py-3 rounded-xl bg-white border border-gray-300 hover:border-amber-500/40 hover:bg-gray-50 dark:bg-zinc-900 dark:border-zinc-700 dark:hover:border-amber-500/40 dark:hover:bg-zinc-800 transition-all text-gray-700 hover:text-amber-600 dark:text-zinc-300 dark:hover:text-amber-400 font-semibold text-sm"
+                  className="flex items-center gap-2.5 px-5 py-3 rounded-xl bg-white border border-zinc-300 hover:border-amber-500/40 hover:bg-zinc-50 dark:bg-zinc-900 dark:border-zinc-700 dark:hover:border-amber-500/40 dark:hover:bg-zinc-800 transition-all text-zinc-700 hover:text-amber-600 dark:text-zinc-300 dark:hover:text-amber-400 font-semibold text-sm"
                 >
                   <Maximize2 className="w-4 h-4" />
                   Open GM Screen
                 </button>
-                <p className="text-xs text-gray-400 dark:text-zinc-600">Session is live — open the GM Screen to run the game</p>
+                <p className="text-xs text-zinc-400 dark:text-zinc-600">Session is live — open the GM Screen to run the game</p>
               </div>
             ) : (
               <RunTab
@@ -250,10 +250,10 @@ export default function SessionPage() {
               />
             ) : (
               <div className="p-6 flex flex-col items-center justify-center gap-4 min-h-64">
-                <FileText className="w-10 h-10 dark:text-zinc-600 text-gray-400" />
+                <FileText className="w-10 h-10 dark:text-zinc-600 text-zinc-400" />
                 <div className="text-center">
-                  <p className="text-sm font-semibold dark:text-zinc-300 text-gray-900">Ready to debrief?</p>
-                  <p className="text-xs dark:text-zinc-600 text-gray-600 mt-1">Process your session notes and update your world.</p>
+                  <p className="text-sm font-semibold dark:text-zinc-300 text-zinc-900">Ready to debrief?</p>
+                  <p className="text-xs dark:text-zinc-600 text-zinc-600 mt-1">Process your session notes and update your world.</p>
                 </div>
                 <Button
                   onClick={async () => {

@@ -58,8 +58,8 @@ export default function RandomTableBrowser() {
     <div className="p-4 sm:p-6 lg:p-8 max-w-5xl">
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold dark:text-zinc-100 text-gray-900">Random Tables</h1>
-          <p className="text-sm dark:text-zinc-500 text-gray-600 mt-1">
+          <h1 className="text-2xl font-bold dark:text-zinc-100 text-zinc-900">Random Tables</h1>
+          <p className="text-sm dark:text-zinc-500 text-zinc-600 mt-1">
             {tables.length} table{tables.length !== 1 ? 's' : ''}
           </p>
         </div>
@@ -78,7 +78,7 @@ export default function RandomTableBrowser() {
               'px-3 py-1 rounded-full text-xs font-medium transition-colors',
               categoryFilter === value
                 ? 'bg-amber-500 text-zinc-950'
-                : 'dark:bg-zinc-800 dark:text-zinc-400 dark:hover:bg-zinc-700 bg-gray-100 text-gray-600 hover:bg-gray-200'
+                : 'dark:bg-zinc-800 dark:text-zinc-400 dark:hover:bg-zinc-700 bg-zinc-100 text-zinc-600 hover:bg-zinc-200'
             )}
           >
             {label}
@@ -89,16 +89,16 @@ export default function RandomTableBrowser() {
       {isLoading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {[...Array(4)].map((_, i) => (
-            <div key={i} className="h-40 rounded-xl dark:bg-zinc-900/40 bg-gray-100 animate-pulse" />
+            <div key={i} className="h-40 rounded-xl dark:bg-zinc-900/40 bg-zinc-100 animate-pulse" />
           ))}
         </div>
       ) : filtered.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-20 text-center">
-          <Dices className="w-12 h-12 dark:text-zinc-700 text-gray-300 mb-4" />
-          <p className="font-medium dark:text-zinc-400 text-gray-600 mb-1">
+          <Dices className="w-12 h-12 dark:text-zinc-700 text-zinc-300 mb-4" />
+          <p className="font-medium dark:text-zinc-400 text-zinc-600 mb-1">
             {categoryFilter === 'all' ? 'No tables yet' : `No ${categoryFilter.replace('_', ' ')} tables`}
           </p>
-          <p className="text-sm dark:text-zinc-600 text-gray-400 mb-4">
+          <p className="text-sm dark:text-zinc-600 text-zinc-400 mb-4">
             Create a table and roll on it during your session.
           </p>
           {categoryFilter === 'all' && (

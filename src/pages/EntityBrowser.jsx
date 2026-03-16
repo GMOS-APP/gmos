@@ -58,7 +58,7 @@ export default function EntityBrowser() {
     <div className="p-4 sm:p-6 lg:p-8 max-w-6xl">
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-xl font-bold dark:text-zinc-100 text-gray-900">World Entities</h1>
+        <h1 className="text-xl font-bold dark:text-zinc-100 text-zinc-900">World Entities</h1>
         <Link to={createPageUrl('EntityDetail') + `?campaign_id=${campaignId}&new=true${typeFilter ? `&type=${typeFilter}` : ''}`}>
           <Button size="sm" className="bg-amber-500 hover:bg-amber-400 text-zinc-950 font-semibold">
             <Plus className="w-4 h-4 mr-1.5" />
@@ -70,12 +70,12 @@ export default function EntityBrowser() {
       {/* Filters */}
       <div className="flex flex-col sm:flex-row gap-3 mb-6">
         <div className="relative flex-1 max-w-sm">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 dark:text-zinc-500 text-gray-400" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 dark:text-zinc-500 text-zinc-400" />
           <Input
             placeholder="Search entities..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-9 dark:bg-zinc-900 dark:border-zinc-800 dark:text-zinc-200 dark:placeholder:text-zinc-600 bg-gray-100 border-gray-300 text-gray-900 placeholder:text-gray-500"
+            className="pl-9 dark:bg-zinc-900 dark:border-zinc-800 dark:text-zinc-200 dark:placeholder:text-zinc-600 bg-zinc-100 border-zinc-300 text-zinc-900 placeholder:text-zinc-500"
           />
         </div>
         <div className="flex gap-1 overflow-x-auto pb-1 scrollbar-none">
@@ -87,7 +87,7 @@ export default function EntityBrowser() {
                 "px-3 py-2 rounded-lg text-xs font-medium transition-colors whitespace-nowrap flex-shrink-0 min-h-[36px]",
                 typeFilter === t.value
                   ? "dark:bg-amber-500/10 dark:text-amber-400 dark:border dark:border-amber-500/20 bg-amber-100 text-amber-700 border border-amber-300"
-                  : "dark:text-zinc-500 dark:hover:text-zinc-300 dark:hover:bg-zinc-800/50 text-gray-600 hover:text-gray-900 hover:bg-gray-200/50"
+                  : "dark:text-zinc-500 dark:hover:text-zinc-300 dark:hover:bg-zinc-800/50 text-zinc-600 hover:text-zinc-900 hover:bg-zinc-200/50"
               )}
             >
               {t.label}
@@ -104,7 +104,7 @@ export default function EntityBrowser() {
           ))}
         </div>
       ) : filtered.length === 0 ? (
-        <div className="text-center py-20 dark:text-zinc-600 text-gray-500">
+        <div className="text-center py-20 dark:text-zinc-600 text-zinc-500">
          <p className="text-sm">{searchQuery ? 'No entities match your search.' : 'No entities yet.'}</p>
         </div>
       ) : (

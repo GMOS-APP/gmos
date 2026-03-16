@@ -22,20 +22,20 @@ export default function PrepInfoPanel({ session }) {
     
     return (
       <Collapsible key={key} open={openSections[key]} onOpenChange={() => toggle(key)}>
-        <CollapsibleTrigger className="flex items-center gap-2 w-full p-3 rounded-lg dark:hover:bg-zinc-800/50 hover:bg-gray-100 dark:border dark:border-zinc-800/40 border border-gray-300 transition-colors">
-          <ChevronDown className={`w-4 h-4 transition-transform dark:text-zinc-500 text-gray-600 ${openSections[key] ? 'rotate-180' : ''}`} />
-          <span className="text-xs font-semibold dark:text-zinc-400 text-gray-700 uppercase tracking-widest">{title}</span>
+        <CollapsibleTrigger className="flex items-center gap-2 w-full p-3 rounded-lg dark:hover:bg-zinc-800/50 hover:bg-zinc-100 dark:border dark:border-zinc-800/40 border border-zinc-300 transition-colors">
+          <ChevronDown className={`w-4 h-4 transition-transform dark:text-zinc-500 text-zinc-600 ${openSections[key] ? 'rotate-180' : ''}`} />
+          <span className="text-xs font-semibold dark:text-zinc-400 text-zinc-700 uppercase tracking-widest">{title}</span>
         </CollapsibleTrigger>
-        <CollapsibleContent className="mt-2 p-3 rounded-lg dark:bg-zinc-900/30 dark:border dark:border-zinc-800/40 bg-gray-50 border border-gray-300">
-          <p className="text-sm dark:text-zinc-300 text-gray-900 whitespace-pre-wrap leading-relaxed">{content}</p>
+        <CollapsibleContent className="mt-2 p-3 rounded-lg dark:bg-zinc-900/30 dark:border dark:border-zinc-800/40 bg-zinc-50 border border-zinc-300">
+          <p className="text-sm dark:text-zinc-300 text-zinc-900 whitespace-pre-wrap leading-relaxed">{content}</p>
         </CollapsibleContent>
       </Collapsible>
     );
   };
 
   return (
-    <div className="space-y-2 mb-6 pb-6 dark:border-b dark:border-zinc-800/40 border-b border-gray-300">
-      <p className="text-xs dark:text-zinc-500 text-gray-600 uppercase tracking-widest font-semibold px-3">Prep Overview</p>
+    <div className="space-y-2 mb-6 pb-6 dark:border-b dark:border-zinc-800/40 border-b border-zinc-300">
+      <p className="text-xs dark:text-zinc-500 text-zinc-600 uppercase tracking-widest font-semibold px-3">Prep Overview</p>
       <div className="space-y-2">
         {renderSection('Previous Session Recap', session?.previous_session_recap, 'recap')}
         {renderSection('Strong Start', session?.strong_start, 'strongStart')}

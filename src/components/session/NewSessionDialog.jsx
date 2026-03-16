@@ -112,26 +112,26 @@ export default function NewSessionDialog({ open, onClose, campaignId, campaign }
           <div className="grid grid-cols-2 gap-3 mt-2">
             <button
               onClick={() => setMode('wizard')}
-              className="flex flex-col items-center gap-3 p-6 rounded-xl border-2 dark:border-zinc-700 border-gray-200 dark:hover:border-amber-500/50 hover:border-amber-400 dark:hover:bg-amber-500/5 hover:bg-amber-50 transition-all group"
+              className="flex flex-col items-center gap-3 p-6 rounded-xl border-2 dark:border-zinc-700 border-zinc-200 dark:hover:border-amber-500/50 hover:border-amber-400 dark:hover:bg-amber-500/5 hover:bg-amber-50 transition-all group"
             >
               <div className="w-12 h-12 rounded-xl bg-amber-500/10 flex items-center justify-center group-hover:bg-amber-500/20 transition-colors">
                 <Wand2 className="w-6 h-6 text-amber-500" />
               </div>
               <div className="text-center">
-                <p className="font-semibold text-sm dark:text-zinc-200 text-gray-900">Wizard</p>
-                <p className="text-xs dark:text-zinc-500 text-gray-500 mt-0.5">Step-by-step guided setup</p>
+                <p className="font-semibold text-sm dark:text-zinc-200 text-zinc-900">Wizard</p>
+                <p className="text-xs dark:text-zinc-500 text-zinc-500 mt-0.5">Step-by-step guided setup</p>
               </div>
             </button>
             <button
               onClick={() => navigate(createPageUrl('SessionPage') + `?id=${campaignId}&new=true`)}
-              className="flex flex-col items-center gap-3 p-6 rounded-xl border-2 dark:border-zinc-700 border-gray-200 dark:hover:border-zinc-500 hover:border-gray-400 dark:hover:bg-zinc-800/50 hover:bg-gray-50 transition-all group"
+              className="flex flex-col items-center gap-3 p-6 rounded-xl border-2 dark:border-zinc-700 border-zinc-200 dark:hover:border-zinc-500 hover:border-zinc-400 dark:hover:bg-zinc-800/50 hover:bg-zinc-50 transition-all group"
             >
-              <div className="w-12 h-12 rounded-xl dark:bg-zinc-800 bg-gray-100 flex items-center justify-center group-hover:bg-gray-200 dark:group-hover:bg-zinc-700 transition-colors">
-                <PenLine className="w-6 h-6 dark:text-zinc-400 text-gray-600" />
+              <div className="w-12 h-12 rounded-xl dark:bg-zinc-800 bg-zinc-100 flex items-center justify-center group-hover:bg-zinc-200 dark:group-hover:bg-zinc-700 transition-colors">
+                <PenLine className="w-6 h-6 dark:text-zinc-400 text-zinc-600" />
               </div>
               <div className="text-center">
-                <p className="font-semibold text-sm dark:text-zinc-200 text-gray-900">Manual</p>
-                <p className="text-xs dark:text-zinc-500 text-gray-500 mt-0.5">Open blank session</p>
+                <p className="font-semibold text-sm dark:text-zinc-200 text-zinc-900">Manual</p>
+                <p className="text-xs dark:text-zinc-500 text-zinc-500 mt-0.5">Open blank session</p>
               </div>
             </button>
           </div>
@@ -149,7 +149,7 @@ export default function NewSessionDialog({ open, onClose, campaignId, campaign }
             <DialogTitle className="dark:text-zinc-100">Session #{nextSessionNum} — {STEPS[step]}</DialogTitle>
             <div className="flex gap-1">
               {STEPS.map((_, i) => (
-                <div key={i} className={cn("w-6 h-1.5 rounded-full transition-colors", i <= step ? "bg-amber-500" : "dark:bg-zinc-700 bg-gray-200")} />
+                <div key={i} className={cn("w-6 h-1.5 rounded-full transition-colors", i <= step ? "bg-amber-500" : "dark:bg-zinc-700 bg-zinc-200")} />
               ))}
             </div>
           </div>
@@ -161,7 +161,7 @@ export default function NewSessionDialog({ open, onClose, campaignId, campaign }
           {step === 0 && (
             <div className="space-y-3">
               <div>
-                <label className="text-xs font-medium dark:text-zinc-400 text-gray-600 mb-1.5 block">Session Title</label>
+                <label className="text-xs font-medium dark:text-zinc-400 text-zinc-600 mb-1.5 block">Session Title</label>
                 <Input
                   placeholder={`Session ${nextSessionNum}`}
                   value={form.title}
@@ -170,7 +170,7 @@ export default function NewSessionDialog({ open, onClose, campaignId, campaign }
                 />
               </div>
               <div>
-                <label className="text-xs font-medium dark:text-zinc-400 text-gray-600 mb-1.5 block">Planned Date</label>
+                <label className="text-xs font-medium dark:text-zinc-400 text-zinc-600 mb-1.5 block">Planned Date</label>
                 <Input
                   type="date"
                   value={form.date}
@@ -196,7 +196,7 @@ export default function NewSessionDialog({ open, onClose, campaignId, campaign }
           {/* Step 1: Goals */}
           {step === 1 && (
             <div className="space-y-3">
-              <p className="text-xs dark:text-zinc-500 text-gray-500">What should the players accomplish this session?</p>
+              <p className="text-xs dark:text-zinc-500 text-zinc-500">What should the players accomplish this session?</p>
               <div className="flex gap-2">
                 <Input
                   placeholder="Add a goal..."
@@ -211,14 +211,14 @@ export default function NewSessionDialog({ open, onClose, campaignId, campaign }
               </div>
               <div className="space-y-1.5">
                 {form.session_goals.map((g, i) => (
-                  <div key={i} className="flex items-center gap-2 px-3 py-2 rounded-lg dark:bg-zinc-800/50 bg-gray-50 border dark:border-zinc-700/50 border-gray-200">
-                    <span className="flex-1 text-sm dark:text-zinc-300 text-gray-700">{g}</span>
-                    <button onClick={() => setForm(f => ({ ...f, session_goals: f.session_goals.filter((_, j) => j !== i) }))} className="dark:text-zinc-600 text-gray-400 hover:text-red-500 transition-colors">
+                  <div key={i} className="flex items-center gap-2 px-3 py-2 rounded-lg dark:bg-zinc-800/50 bg-zinc-50 border dark:border-zinc-700/50 border-zinc-200">
+                    <span className="flex-1 text-sm dark:text-zinc-300 text-zinc-700">{g}</span>
+                    <button onClick={() => setForm(f => ({ ...f, session_goals: f.session_goals.filter((_, j) => j !== i) }))} className="dark:text-zinc-600 text-zinc-400 hover:text-red-500 transition-colors">
                       <X className="w-3.5 h-3.5" />
                     </button>
                   </div>
                 ))}
-                {form.session_goals.length === 0 && <p className="text-xs dark:text-zinc-600 text-gray-400 text-center py-4">No goals yet</p>}
+                {form.session_goals.length === 0 && <p className="text-xs dark:text-zinc-600 text-zinc-400 text-center py-4">No goals yet</p>}
               </div>
             </div>
           )}
@@ -226,7 +226,7 @@ export default function NewSessionDialog({ open, onClose, campaignId, campaign }
           {/* Step 2: Strong Start */}
           {step === 2 && (
             <div className="space-y-3">
-              <p className="text-xs dark:text-zinc-500 text-gray-500">How does the session open? Start in the middle of the action.</p>
+              <p className="text-xs dark:text-zinc-500 text-zinc-500">How does the session open? Start in the middle of the action.</p>
               <EntityMentionTextarea
                 placeholder="The players find themselves..."
                 value={form.strong_start}
@@ -239,7 +239,7 @@ export default function NewSessionDialog({ open, onClose, campaignId, campaign }
           {/* Step 3: Scenes */}
           {step === 3 && (
             <div className="space-y-3">
-              <p className="text-xs dark:text-zinc-500 text-gray-500">Brief outline of scenes that might occur.</p>
+              <p className="text-xs dark:text-zinc-500 text-zinc-500">Brief outline of scenes that might occur.</p>
               <div className="flex gap-2">
                 <Input
                   placeholder="Add a scene..."
@@ -254,14 +254,14 @@ export default function NewSessionDialog({ open, onClose, campaignId, campaign }
               </div>
               <div className="space-y-1.5">
                 {form.potential_scenes.map((s, i) => (
-                  <div key={i} className="flex items-center gap-2 px-3 py-2 rounded-lg dark:bg-zinc-800/50 bg-gray-50 border dark:border-zinc-700/50 border-gray-200">
-                    <span className="flex-1 text-sm dark:text-zinc-300 text-gray-700">{s}</span>
-                    <button onClick={() => setForm(f => ({ ...f, potential_scenes: f.potential_scenes.filter((_, j) => j !== i) }))} className="dark:text-zinc-600 text-gray-400 hover:text-red-500 transition-colors">
+                  <div key={i} className="flex items-center gap-2 px-3 py-2 rounded-lg dark:bg-zinc-800/50 bg-zinc-50 border dark:border-zinc-700/50 border-zinc-200">
+                    <span className="flex-1 text-sm dark:text-zinc-300 text-zinc-700">{s}</span>
+                    <button onClick={() => setForm(f => ({ ...f, potential_scenes: f.potential_scenes.filter((_, j) => j !== i) }))} className="dark:text-zinc-600 text-zinc-400 hover:text-red-500 transition-colors">
                       <X className="w-3.5 h-3.5" />
                     </button>
                   </div>
                 ))}
-                {form.potential_scenes.length === 0 && <p className="text-xs dark:text-zinc-600 text-gray-400 text-center py-4">No scenes yet</p>}
+                {form.potential_scenes.length === 0 && <p className="text-xs dark:text-zinc-600 text-zinc-400 text-center py-4">No scenes yet</p>}
               </div>
             </div>
           )}
@@ -269,7 +269,7 @@ export default function NewSessionDialog({ open, onClose, campaignId, campaign }
         </div>
 
         {/* Footer */}
-        <div className="flex justify-between mt-4 pt-4 border-t dark:border-zinc-800 border-gray-200">
+        <div className="flex justify-between mt-4 pt-4 border-t dark:border-zinc-800 border-zinc-200">
           <Button variant="ghost" size="sm" onClick={() => step === 0 ? setMode(null) : setStep(s => s - 1)} className="dark:text-zinc-400">
             <ChevronLeft className="w-4 h-4 mr-1" />
             {step === 0 ? 'Back' : 'Previous'}

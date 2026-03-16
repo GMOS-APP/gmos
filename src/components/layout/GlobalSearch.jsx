@@ -6,18 +6,12 @@ import { useNavigate } from 'react-router-dom';
 import { Search, X, Users, MapPin, Shield, Waypoints, Package, Sparkles, Scroll,
   BookOpen, Swords, Church, Flame, ShoppingBag, CalendarDays, LayoutDashboard } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { getEntityColors } from '@/lib/entityColors';
 
 const ENTITY_ICONS = {
   npc: Users, creature: Swords, location: MapPin, faction: Shield,
   thread: Waypoints, item: Package, player_character: Sparkles,
   event: Scroll, lore: BookOpen, deity: Church, encounter: Flame, shop: ShoppingBag,
-};
-
-const ENTITY_COLORS = {
-  npc: 'text-violet-500', creature: 'text-orange-500', location: 'text-emerald-500',
-  faction: 'text-red-500', thread: 'text-blue-500', item: 'text-amber-500',
-  player_character: 'text-pink-500', event: 'text-cyan-500', lore: 'text-lime-500',
-  deity: 'text-yellow-500', encounter: 'text-rose-500', shop: 'text-teal-500',
 };
 
 export default function GlobalSearch({ campaignId }) {
@@ -149,7 +143,7 @@ export default function GlobalSearch({ campaignId }) {
             <ul ref={listRef} className="max-h-72 overflow-y-auto py-1">
               {results.map((r, i) => {
                 const Icon = r.type === 'session' ? CalendarDays : (ENTITY_ICONS[r.type] || LayoutDashboard);
-                const color = r.type === 'session' ? 'text-zinc-500' : (ENTITY_COLORS[r.type] || 'text-zinc-400');
+                const color = r.type === 'session' ? 'text-zinc-500' : getEntityColors(r.type).text;
                 return (
                   <li key={r.id}>
                     <button

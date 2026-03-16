@@ -94,15 +94,15 @@ Make the NPC interesting and ready to roleplay with immediately.`,
       </AiGate>
 
       {generatedNPC && (
-        <div className="dark:bg-zinc-800/40 dark:border-zinc-800 bg-gray-100 border-gray-300 rounded-lg p-3 space-y-2 border">
-          <h4 className="font-semibold dark:text-zinc-200 text-gray-900">{generatedNPC.name}</h4>
-          <div className="text-xs dark:text-zinc-400 text-gray-700 space-y-1.5">
-            <p><span className="dark:text-zinc-500 text-gray-500">Race:</span> {generatedNPC.race}</p>
-            <p><span className="dark:text-zinc-500 text-gray-500">Class:</span> {generatedNPC.class}</p>
-            <p><span className="dark:text-zinc-500 text-gray-500">Summary:</span> {generatedNPC.summary}</p>
-            <p><span className="dark:text-zinc-500 text-gray-500">Personality:</span> {generatedNPC.personality}</p>
-            <p><span className="dark:text-zinc-500 text-gray-500">Secret:</span> {generatedNPC.secret}</p>
-            <p><span className="dark:text-zinc-500 text-gray-500">Hook:</span> {generatedNPC.hook}</p>
+        <div className="dark:bg-zinc-800/40 dark:border-zinc-800 bg-zinc-100 border-zinc-300 rounded-lg p-3 space-y-2 border">
+          <h4 className="font-semibold dark:text-zinc-200 text-zinc-900">{generatedNPC.name}</h4>
+          <div className="text-xs dark:text-zinc-400 text-zinc-700 space-y-1.5">
+            <p><span className="dark:text-zinc-500 text-zinc-500">Race:</span> {generatedNPC.race}</p>
+            <p><span className="dark:text-zinc-500 text-zinc-500">Class:</span> {generatedNPC.class}</p>
+            <p><span className="dark:text-zinc-500 text-zinc-500">Summary:</span> {generatedNPC.summary}</p>
+            <p><span className="dark:text-zinc-500 text-zinc-500">Personality:</span> {generatedNPC.personality}</p>
+            <p><span className="dark:text-zinc-500 text-zinc-500">Secret:</span> {generatedNPC.secret}</p>
+            <p><span className="dark:text-zinc-500 text-zinc-500">Hook:</span> {generatedNPC.hook}</p>
           </div>
           <div className="flex gap-2 pt-2">
             <Button
@@ -112,7 +112,7 @@ Make the NPC interesting and ready to roleplay with immediately.`,
               }}
               size="sm"
               variant="outline"
-              className="flex-1 text-xs dark:border-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-200 border-gray-300 text-gray-600 hover:text-gray-900"
+              className="flex-1 text-xs dark:border-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-200 border-zinc-300 text-zinc-600 hover:text-zinc-900"
             >
               Copy
             </Button>
@@ -120,7 +120,7 @@ Make the NPC interesting and ready to roleplay with immediately.`,
               onClick={generateNPC}
               size="sm"
               variant="outline"
-              className="flex-1 text-xs dark:border-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-200 border-gray-300 text-gray-600 hover:text-gray-900"
+              className="flex-1 text-xs dark:border-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-200 border-zinc-300 text-zinc-600 hover:text-zinc-900"
             >
               Regenerate
             </Button>

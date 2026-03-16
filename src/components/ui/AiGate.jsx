@@ -29,16 +29,16 @@ export default function AiGate({ children }) {
       <Dialog open={showModal} onOpenChange={setShowModal}>
         <DialogContent className="max-w-sm dark:bg-zinc-900 dark:border-zinc-800">
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-2 dark:text-zinc-100 text-gray-900">
+            <DialogTitle className="flex items-center gap-2 dark:text-zinc-100 text-zinc-900">
               <Sparkles className="w-4 h-4 text-amber-400" />
               Unlock GM/OS+
             </DialogTitle>
           </DialogHeader>
           <div className="space-y-4 py-2">
-            <p className="text-sm dark:text-zinc-400 text-gray-600">
+            <p className="text-sm dark:text-zinc-400 text-zinc-600">
               AI features are part of <span className="text-amber-400 font-semibold">GM/OS+</span>. Upgrade to generate content, build NPCs, auto-write session recaps, and more.
             </p>
-            <ul className="text-xs dark:text-zinc-500 text-gray-500 space-y-1">
+            <ul className="text-xs dark:text-zinc-500 text-zinc-500 space-y-1">
               <li>✦ AI content generation for all entities</li>
               <li>✦ Session debrief &amp; auto-summaries</li>
               <li>✦ NPC builder with AI fields</li>

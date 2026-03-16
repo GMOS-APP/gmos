@@ -36,30 +36,30 @@ export default function RandomTableCard({ table, onEdit, onDelete }) {
   };
 
   return (
-    <div className="rounded-xl border dark:border-zinc-800 dark:bg-zinc-900/40 bg-white border-gray-200 p-4 flex flex-col gap-3">
+    <div className="rounded-xl border dark:border-zinc-800 dark:bg-zinc-900/40 bg-white border-zinc-200 p-4 flex flex-col gap-3">
       <div className="flex items-start justify-between gap-2">
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap mb-1">
-            <h3 className="font-semibold dark:text-zinc-100 text-gray-900 truncate">{table.name}</h3>
+            <h3 className="font-semibold dark:text-zinc-100 text-zinc-900 truncate">{table.name}</h3>
             <span className={cn('text-xs px-2 py-0.5 rounded-full border font-medium', CATEGORY_COLORS[table.category] || CATEGORY_COLORS.custom)}>
               {CATEGORY_LABELS[table.category] || table.category}
             </span>
           </div>
           {table.description && (
-            <p className="text-sm dark:text-zinc-500 text-gray-500 line-clamp-2">{table.description}</p>
+            <p className="text-sm dark:text-zinc-500 text-zinc-500 line-clamp-2">{table.description}</p>
           )}
-          <p className="text-xs dark:text-zinc-600 text-gray-400 mt-1">{table.entries?.length ?? 0} entries</p>
+          <p className="text-xs dark:text-zinc-600 text-zinc-400 mt-1">{table.entries?.length ?? 0} entries</p>
         </div>
         <div className="flex gap-1 flex-shrink-0">
           <button
             onClick={() => onEdit(table)}
-            className="p-1.5 rounded-md dark:text-zinc-500 dark:hover:text-zinc-300 dark:hover:bg-zinc-800 text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
+            className="p-1.5 rounded-md dark:text-zinc-500 dark:hover:text-zinc-300 dark:hover:bg-zinc-800 text-zinc-400 hover:text-zinc-600 hover:bg-zinc-100 transition-colors"
           >
             <Pencil className="w-3.5 h-3.5" />
           </button>
           <button
             onClick={() => onDelete(table.id)}
-            className="p-1.5 rounded-md dark:text-zinc-500 dark:hover:text-red-400 dark:hover:bg-zinc-800 text-gray-400 hover:text-red-500 hover:bg-gray-100 transition-colors"
+            className="p-1.5 rounded-md dark:text-zinc-500 dark:hover:text-red-400 dark:hover:bg-zinc-800 text-zinc-400 hover:text-red-500 hover:bg-zinc-100 transition-colors"
           >
             <Trash2 className="w-3.5 h-3.5" />
           </button>
@@ -77,7 +77,7 @@ export default function RandomTableCard({ table, onEdit, onDelete }) {
         onClick={handleRoll}
         disabled={!table.entries?.length || rolling}
         variant="outline"
-        className="w-full dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800 border-gray-300"
+        className="w-full dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800 border-zinc-300"
       >
         <Dices className="w-4 h-4 mr-2" />
         {rolling ? 'Rolling…' : lastRoll ? 'Roll Again' : 'Roll'}

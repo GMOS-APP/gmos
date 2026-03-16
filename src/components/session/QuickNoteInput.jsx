@@ -28,7 +28,7 @@ export default function QuickNoteInput({ onSubmit, isSubmitting, placeholder = "
         campaignId={campaignId}
         placeholder={placeholder}
         rows={3}
-        className="dark:bg-zinc-900/80 dark:border-zinc-800 dark:text-zinc-200 dark:placeholder:text-zinc-600 bg-white border-gray-300 text-gray-900 placeholder:text-gray-400 resize-none pr-12"
+        className="dark:bg-zinc-900/80 dark:border-zinc-800 dark:text-zinc-200 dark:placeholder:text-zinc-600 bg-white border-zinc-300 text-zinc-900 placeholder:text-zinc-400 resize-none pr-12"
       />
       <Button
         onClick={handleSubmit}
@@ -38,7 +38,7 @@ export default function QuickNoteInput({ onSubmit, isSubmitting, placeholder = "
       >
         {isSubmitting ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Send className="w-3.5 h-3.5" />}
       </Button>
-      <p className="text-[10px] dark:text-zinc-500 text-gray-400 mt-1">⌘+Enter to send</p>
+      <p className="text-[10px] dark:text-zinc-500 text-zinc-400 mt-1">⌘+Enter to send</p>
     </div>
   );
 }

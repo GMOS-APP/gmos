@@ -32,7 +32,7 @@ function DiceButton({ notation, label }) {
           ? 'bg-amber-500/20 text-amber-300'
           : result !== null
             ? 'bg-emerald-500/20 text-emerald-400'
-            : 'dark:bg-zinc-800/60 dark:text-zinc-500 dark:hover:text-amber-400 bg-gray-200 text-gray-600 hover:text-amber-600'
+            : 'dark:bg-zinc-800/60 dark:text-zinc-500 dark:hover:text-amber-400 bg-zinc-200 text-zinc-600 hover:text-amber-600'
       }`}
     >
       {result !== null ? <span className="font-bold">{result}</span> : <span>{label ?? notation}</span>}
@@ -45,9 +45,9 @@ function AbilityScore({ name, score }) {
   const mod = Math.floor((score - 10) / 2);
   const modStr = mod >= 0 ? `+${mod}` : `${mod}`;
   return (
-    <div className="flex flex-col items-center gap-0.5 p-2 rounded-lg dark:bg-zinc-900/60 dark:border dark:border-zinc-800 bg-gray-100 border border-gray-300">
-      <span className="text-[10px] uppercase tracking-wider dark:text-zinc-500 text-gray-500 font-semibold">{name}</span>
-      <span className="text-base font-bold dark:text-zinc-200 text-gray-900">{score}</span>
+    <div className="flex flex-col items-center gap-0.5 p-2 rounded-lg dark:bg-zinc-900/60 dark:border dark:border-zinc-800 bg-zinc-100 border border-zinc-300">
+      <span className="text-[10px] uppercase tracking-wider dark:text-zinc-500 text-zinc-500 font-semibold">{name}</span>
+      <span className="text-base font-bold dark:text-zinc-200 text-zinc-900">{score}</span>
       <DiceButton notation={`1d20${modStr}`} label={modStr} />
     </div>
   );
@@ -78,7 +78,7 @@ function AbilityScoresGrid({ scores }) {
   if (!parsed) return null;
 
   return (
-    <div className="pt-3 border-t dark:border-zinc-800 border-gray-200">
+    <div className="pt-3 border-t dark:border-zinc-800 border-zinc-200">
       <div className="grid grid-cols-3 sm:grid-cols-6 gap-1.5">
         {Object.entries(parsed).map(([k, v]) => (
           <AbilityScore key={k} name={k} score={v} />
@@ -110,8 +110,8 @@ function CombatStats({ ac, hp, speed }) {
             <Shield className="w-4 h-4 text-blue-400" />
           </div>
           <div>
-            <p className="text-[10px] dark:text-zinc-500 text-gray-500 uppercase tracking-wider font-semibold">AC</p>
-            <p className="text-xl font-bold dark:text-zinc-100 text-gray-900">{ac}</p>
+            <p className="text-[10px] dark:text-zinc-500 text-zinc-500 uppercase tracking-wider font-semibold">AC</p>
+            <p className="text-xl font-bold dark:text-zinc-100 text-zinc-900">{ac}</p>
           </div>
         </div>
       )}
@@ -121,8 +121,8 @@ function CombatStats({ ac, hp, speed }) {
             <Heart className="w-4 h-4 text-red-400" />
           </div>
           <div>
-            <p className="text-[10px] dark:text-zinc-500 text-gray-500 uppercase tracking-wider font-semibold">HP</p>
-            <p className="text-xl font-bold dark:text-zinc-100 text-gray-900 flex items-center flex-wrap gap-1">
+            <p className="text-[10px] dark:text-zinc-500 text-zinc-500 uppercase tracking-wider font-semibold">HP</p>
+            <p className="text-xl font-bold dark:text-zinc-100 text-zinc-900 flex items-center flex-wrap gap-1">
               {hpParsed.value}
               {hpParsed.dice && <DiceButton notation={hpParsed.dice} label={`(${hpParsed.dice})`} />}
             </p>
@@ -135,8 +135,8 @@ function CombatStats({ ac, hp, speed }) {
             <Zap className="w-4 h-4 text-green-400" />
           </div>
           <div>
-            <p className="text-[10px] dark:text-zinc-500 text-gray-500 uppercase tracking-wider font-semibold">Speed</p>
-            <p className="text-sm dark:text-zinc-300 text-gray-900 leading-tight">{speed}</p>
+            <p className="text-[10px] dark:text-zinc-500 text-zinc-500 uppercase tracking-wider font-semibold">Speed</p>
+            <p className="text-sm dark:text-zinc-300 text-zinc-900 leading-tight">{speed}</p>
           </div>
         </div>
       )}
@@ -148,9 +148,9 @@ function CombatStats({ ac, hp, speed }) {
 function NarrativeSection({ title, text, entities, campaignId }) {
   if (!text) return null;
   return (
-    <div className="pt-4 border-t dark:border-zinc-800 border-gray-200">
-      <p className="text-[11px] uppercase tracking-widest dark:text-zinc-500 text-gray-400 font-semibold mb-2">{title}</p>
-      <div className="text-sm dark:text-zinc-300 text-gray-700 leading-relaxed">
+    <div className="pt-4 border-t dark:border-zinc-800 border-zinc-200">
+      <p className="text-[11px] uppercase tracking-widest dark:text-zinc-500 text-zinc-400 font-semibold mb-2">{title}</p>
+      <div className="text-sm dark:text-zinc-300 text-zinc-700 leading-relaxed">
         <EntityMentionRenderer text={text} entities={entities} campaignId={campaignId} />
       </div>
     </div>
@@ -165,8 +165,8 @@ function InfoGrid({ fields }) {
     <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3">
       {visible.map(([label, value]) => (
         <div key={label}>
-          <span className="text-[11px] dark:text-zinc-600 text-gray-500 uppercase tracking-wide block mb-0.5">{label}</span>
-          <span className="text-sm dark:text-zinc-200 text-gray-900 font-medium">{value}</span>
+          <span className="text-[11px] dark:text-zinc-600 text-zinc-500 uppercase tracking-wide block mb-0.5">{label}</span>
+          <span className="text-sm dark:text-zinc-200 text-zinc-900 font-medium">{value}</span>
         </div>
       ))}
     </div>
@@ -216,7 +216,7 @@ function NPCView({ form, system, campaignEntities }) {
       {system?.hasXpCrSystem && d.cr && (
         <div className="flex items-center gap-2">
           <Skull className="w-3.5 h-3.5 text-amber-400" />
-          <span className="text-xs dark:text-zinc-500 text-gray-500 font-semibold">Challenge</span>
+          <span className="text-xs dark:text-zinc-500 text-zinc-500 font-semibold">Challenge</span>
           <Badge className="bg-amber-500/20 text-amber-400 border-amber-500/30 text-xs">CR {d.cr}</Badge>
         </div>
       )}
@@ -243,7 +243,7 @@ function CreatureView({ form, system, campaignEntities }) {
       {/* Type line */}
       {(d.size || d.creature_type) && (
         <div className="border-b-2 dark:border-amber-500/20 border-amber-600/20 pb-2">
-          <p className="text-sm dark:text-zinc-400 text-gray-500 italic">
+          <p className="text-sm dark:text-zinc-400 text-zinc-500 italic">
             {[d.size, d.creature_type].filter(Boolean).join(' ')}
           </p>
         </div>
@@ -261,7 +261,7 @@ function CreatureView({ form, system, campaignEntities }) {
       {system?.hasXpCrSystem && d.cr && (
         <div className="flex items-center gap-2">
           <Skull className="w-3.5 h-3.5 text-amber-400" />
-          <span className="text-xs dark:text-zinc-500 text-gray-500 font-semibold">Challenge</span>
+          <span className="text-xs dark:text-zinc-500 text-zinc-500 font-semibold">Challenge</span>
           <Badge className="bg-amber-500/20 text-amber-400 border-amber-500/30 text-xs">CR {d.cr}</Badge>
         </div>
       )}
@@ -294,7 +294,7 @@ function PCView({ form, system, campaignEntities }) {
       {/* Identity header */}
       <div className="border-b-2 dark:border-amber-500/20 border-amber-600/20 pb-4">
         {subline && (
-          <p className="text-sm dark:text-zinc-400 text-gray-500 italic mb-3">{subline}</p>
+          <p className="text-sm dark:text-zinc-400 text-zinc-500 italic mb-3">{subline}</p>
         )}
         <InfoGrid fields={[
           ['Player', d.player_name],
@@ -327,27 +327,27 @@ function PCView({ form, system, campaignEntities }) {
 
       {/* Passive skills */}
       {system?.hasAbilityScores && (d.passive_perception || d.passive_investigation || d.passive_insight) && (
-        <div className="pt-3 border-t dark:border-zinc-800 border-gray-200">
-          <p className="text-[11px] uppercase tracking-widest dark:text-zinc-500 text-gray-400 font-semibold mb-2">
+        <div className="pt-3 border-t dark:border-zinc-800 border-zinc-200">
+          <p className="text-[11px] uppercase tracking-widest dark:text-zinc-500 text-zinc-400 font-semibold mb-2">
             Passive Skills
           </p>
           <div className="flex flex-wrap gap-6 text-sm">
             {d.passive_perception && (
               <span>
-                <span className="dark:text-zinc-500 text-gray-500">Perception </span>
-                <span className="dark:text-zinc-200 text-gray-900 font-bold">{d.passive_perception}</span>
+                <span className="dark:text-zinc-500 text-zinc-500">Perception </span>
+                <span className="dark:text-zinc-200 text-zinc-900 font-bold">{d.passive_perception}</span>
               </span>
             )}
             {d.passive_investigation && (
               <span>
-                <span className="dark:text-zinc-500 text-gray-500">Investigation </span>
-                <span className="dark:text-zinc-200 text-gray-900 font-bold">{d.passive_investigation}</span>
+                <span className="dark:text-zinc-500 text-zinc-500">Investigation </span>
+                <span className="dark:text-zinc-200 text-zinc-900 font-bold">{d.passive_investigation}</span>
               </span>
             )}
             {d.passive_insight && (
               <span>
-                <span className="dark:text-zinc-500 text-gray-500">Insight </span>
-                <span className="dark:text-zinc-200 text-gray-900 font-bold">{d.passive_insight}</span>
+                <span className="dark:text-zinc-500 text-zinc-500">Insight </span>
+                <span className="dark:text-zinc-200 text-zinc-900 font-bold">{d.passive_insight}</span>
               </span>
             )}
           </div>

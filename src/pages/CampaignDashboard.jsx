@@ -282,7 +282,7 @@ export default function CampaignDashboard() {
             </div>
             <div className="bg-white dark:bg-zinc-900/40 border border-zinc-200 dark:border-zinc-800/50 rounded-xl p-3 space-y-2">
               {activeThreads.length === 0 ? (
-                <p className="text-center py-4 text-gray-500 dark:text-zinc-600 text-xs">No active threads</p>
+                <p className="text-center py-4 text-zinc-500 dark:text-zinc-600 text-xs">No active threads</p>
               ) : (
                 activeThreads.slice(0, 5).map((t) => (
                   <Link
@@ -310,19 +310,19 @@ export default function CampaignDashboard() {
             <h2 className="text-xs font-semibold text-zinc-600 dark:text-zinc-500 uppercase tracking-widest mb-3">Quick Actions</h2>
             <div className="space-y-2">
               <Link to={createPageUrl('SessionPage') + `?id=${campaignId}`} className="block">
-                <Button variant="outline" size="sm" className="w-full justify-start dark:border-zinc-800 dark:text-zinc-400 dark:hover:text-zinc-200 dark:hover:border-zinc-700 border-gray-300 text-gray-700 hover:text-gray-900 hover:border-gray-400 text-xs">
+                <Button variant="outline" size="sm" className="w-full justify-start dark:border-zinc-800 dark:text-zinc-400 dark:hover:text-zinc-200 dark:hover:border-zinc-700 border-zinc-300 text-zinc-700 hover:text-zinc-900 hover:border-zinc-400 text-xs">
                   <CalendarDays className="w-3.5 h-3.5 mr-2 text-amber-400" />
                   Go to Session
                 </Button>
               </Link>
               <Link to={createPageUrl('RelationshipMap') + `?campaign_id=${campaignId}`} className="block">
-                <Button variant="outline" size="sm" className="w-full justify-start dark:border-zinc-800 dark:text-zinc-400 dark:hover:text-zinc-200 dark:hover:border-zinc-700 border-gray-300 text-gray-700 hover:text-gray-900 hover:border-gray-400 text-xs">
+                <Button variant="outline" size="sm" className="w-full justify-start dark:border-zinc-800 dark:text-zinc-400 dark:hover:text-zinc-200 dark:hover:border-zinc-700 border-zinc-300 text-zinc-700 hover:text-zinc-900 hover:border-zinc-400 text-xs">
                   <Activity className="w-3.5 h-3.5 mr-2 text-blue-400" />
                   View Relationship Map
                 </Button>
               </Link>
               <Link to={createPageUrl('EntityDetail') + `?campaign_id=${campaignId}&new=true`} className="block">
-                <Button variant="outline" size="sm" className="w-full justify-start dark:border-zinc-800 dark:text-zinc-400 dark:hover:text-zinc-200 dark:hover:border-zinc-700 border-gray-300 text-gray-700 hover:text-gray-900 hover:border-gray-400 text-xs">
+                <Button variant="outline" size="sm" className="w-full justify-start dark:border-zinc-800 dark:text-zinc-400 dark:hover:text-zinc-200 dark:hover:border-zinc-700 border-zinc-300 text-zinc-700 hover:text-zinc-900 hover:border-zinc-400 text-xs">
                   <Plus className="w-3.5 h-3.5 mr-2 text-emerald-400" />
                   Add World Entity
                 </Button>
@@ -405,7 +405,7 @@ export default function CampaignDashboard() {
                     <div className="flex-1 min-w-0">
                       <p className="text-xs text-zinc-700 dark:text-zinc-300 group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors truncate">{s.title || `Session ${s.session_number}`}</p>
                       {s.date && (
-                        <p className="text-[10px] text-gray-600 dark:text-zinc-600 mt-0.5">
+                        <p className="text-[10px] text-zinc-600 dark:text-zinc-600 mt-0.5">
                           {new Date(s.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                         </p>
                       )}
