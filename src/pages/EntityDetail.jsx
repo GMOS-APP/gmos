@@ -7,6 +7,7 @@ import {
   ArrowLeft, Save, Trash2, Plus, X, BookOpen, Loader2, Wand2, Search, Download, Pencil,
 } from 'lucide-react';
 import StatBlock from '@/components/entity/StatBlock';
+import EntityStatBlockView from '@/components/entity/EntityStatBlockView';
 import DndBeyondImport from '@/components/entity/DndBeyondImport';
 import InitiativeTracker from '@/components/encounter/InitiativeTracker';
 import TypeSpecificFields from '@/components/entity/TypeSpecificFields.jsx';
@@ -712,47 +713,54 @@ Format with markdown for readability.`;
             </div>
           )}
 
-          {/* Type-specific details — short single-line fields */}
-          {shortFields.length > 0 && (
-            <div>
-              <h3 className="text-xs dark:text-zinc-500 text-gray-500 uppercase tracking-widest font-semibold mb-3 capitalize">
-                {form.entity_type.replace('_', ' ')} Details
-              </h3>
-              <div className="grid grid-cols-2 gap-x-8 gap-y-4">
-                {shortFields.map(([key, val]) => (
-                  <div key={key}>
-                    <span className="text-[11px] dark:text-zinc-600 text-gray-500 uppercase tracking-wide block mb-0.5">
-                      {humanizeKey(key)}
-                    </span>
-                    <span className="text-sm dark:text-zinc-300 text-gray-900">{String(val)}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
+          {/* NPC / Creature / PC — system-aware stat block */}
+          {['npc', 'creature', 'player_character'].includes(form.entity_type) && (
+            <EntityStatBlockView form={form} system={system} campaignEntities={campaignEntities} />
           )}
 
-          {/* Stat block (NPCs, creatures, encounters) */}
-          {['npc', 'creature', 'encounter'].includes(form.entity_type) && (
+          {/* Encounter — existing stat block */}
+          {form.entity_type === 'encounter' && (
             <StatBlock extraData={form.extra_data} system={system} description={form.description} />
           )}
 
-          {/* Long text fields (traits, appearance, etc.) */}
-          {longFields.length > 0 && (
-            <div className="space-y-6">
-              {longFields.map(([key, val]) => (
-                <div key={key}>
-                  <h3 className="text-xs dark:text-zinc-500 text-gray-500 uppercase tracking-widest font-semibold mb-2">
-                    {humanizeKey(key)}
+          {/* All other types — generic key-value grid */}
+          {!['npc', 'creature', 'player_character', 'encounter'].includes(form.entity_type) && (
+            <>
+              {shortFields.length > 0 && (
+                <div>
+                  <h3 className="text-xs dark:text-zinc-500 text-gray-500 uppercase tracking-widest font-semibold mb-3 capitalize">
+                    {form.entity_type.replace('_', ' ')} Details
                   </h3>
-                  <p className="text-sm dark:text-zinc-300 text-gray-800 leading-relaxed whitespace-pre-wrap">
-                    {String(val)}
-                  </p>
+                  <div className="grid grid-cols-2 gap-x-8 gap-y-4">
+                    {shortFields.map(([key, val]) => (
+                      <div key={key}>
+                        <span className="text-[11px] dark:text-zinc-600 text-gray-500 uppercase tracking-wide block mb-0.5">
+                          {humanizeKey(key)}
+                        </span>
+                        <span className="text-sm dark:text-zinc-300 text-gray-900">{String(val)}</span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-              ))}
-            </div>
+              )}
+              {longFields.length > 0 && (
+                <div className="space-y-6">
+                  {longFields.map(([key, val]) => (
+                    <div key={key}>
+                      <h3 className="text-xs dark:text-zinc-500 text-gray-500 uppercase tracking-widest font-semibold mb-2">
+                        {humanizeKey(key)}
+                      </h3>
+                      <p className="text-sm dark:text-zinc-300 text-gray-800 leading-relaxed whitespace-pre-wrap">
+                        {String(val)}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </>
           )}
 
-          {/* Description */}
+          {/* Description — shown for all types (GM notes, AI-generated prose, etc.) */}
           {form.description && (
             <div>
               <h3 className="text-xs dark:text-zinc-500 text-gray-500 uppercase tracking-widest font-semibold mb-3">
