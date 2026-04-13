@@ -150,7 +150,18 @@ Deno.serve(async (req) => {
       },
     };
 
-    return Response.json({ character: mappedData });
+    const maxHp = char.overrideHitPoints ?? char.baseHitPoints ?? 0;
+    const removedHp = char.removedHitPoints ?? 0;
+    const tempHp = char.temporaryHitPoints ?? 0;
+    const liveStats = {
+      max_hit_points: maxHp,
+      current_hit_points: Math.max(0, maxHp - removedHp),
+      temporary_hit_points: tempHp,
+      armor_class: armorClass,
+      last_synced_at: new Date().toISOString(),
+    };
+
+    return Response.json({ character: mappedData, liveStats });
   } catch (error) {
     return Response.json({ error: error.message }, { status: 500 });
   }

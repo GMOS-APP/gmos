@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
-import { Shield, Heart, Zap, Skull, ExternalLink } from 'lucide-react';
+import { Shield, Heart, Zap, Skull, ExternalLink, RefreshCw } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import EntityMentionRenderer from '@/components/common/EntityMentionRenderer';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { functions, WorldEntity } from '@/api/entities';
 
 // ── Dice roller ───────────────────────────────────────────────────────────────
 function DiceButton({ notation, label }) {
@@ -275,6 +277,101 @@ function CreatureView({ form, system, campaignEntities }) {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
+// D&D Beyond GM sync panel
+// ─────────────────────────────────────────────────────────────────────────────
+function DndBeyondGMPanel({ form, d }) {
+  const queryClient = useQueryClient();
+
+  const syncMutation = useMutation({
+    mutationFn: async () => {
+      const res = await functions.invoke('importDndBeyondCharacter', { characterId: d.dndbeyond_id });
+      const { liveStats } = res.data;
+      if (!liveStats) throw new Error('No live stats returned');
+      await WorldEntity.update(form.id, {
+        extra_data: { ...form.extra_data, ...liveStats },
+      });
+      return liveStats;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['entity', form.id] });
+      queryClient.invalidateQueries({ queryKey: ['entities', form.campaign_id] });
+    },
+  });
+
+  const currentHp = d.current_hit_points ?? null;
+  const maxHp = d.max_hit_points || 0;
+  const tempHp = d.temporary_hit_points || 0;
+  const lastSynced = d.last_synced_at ? new Date(d.last_synced_at) : null;
+
+  const hpPct = maxHp > 0 && currentHp !== null ? Math.max(0, Math.min(100, (currentHp / maxHp) * 100)) : null;
+  const hpColor = hpPct === null ? 'bg-zinc-500' : hpPct > 50 ? 'bg-emerald-500' : hpPct > 25 ? 'bg-amber-500' : 'bg-red-500';
+
+  function timeAgo(date) {
+    const diff = Math.floor((Date.now() - date.getTime()) / 1000);
+    if (diff < 60) return `${diff}s ago`;
+    if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
+    return `${Math.floor(diff / 3600)}h ago`;
+  }
+
+  return (
+    <div className="mt-3 rounded-lg border dark:border-zinc-700 border-zinc-300 overflow-hidden">
+      {/* Header */}
+      <div className="flex items-center justify-between px-3 py-2 dark:bg-zinc-800/60 bg-zinc-100">
+        <div className="flex items-center gap-2">
+          <span className="text-[10px] font-semibold uppercase tracking-widest dark:text-zinc-400 text-zinc-500">D&D Beyond</span>
+          {lastSynced && (
+            <span className="text-[10px] dark:text-zinc-600 text-zinc-400">· {timeAgo(lastSynced)}</span>
+          )}
+        </div>
+        <div className="flex items-center gap-2">
+          <a
+            href={`https://www.dndbeyond.com/characters/${d.dndbeyond_id}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1 text-[10px] text-purple-400 hover:text-purple-300 transition-colors"
+          >
+            <ExternalLink className="w-3 h-3" />
+            View Sheet
+          </a>
+          <button
+            onClick={() => syncMutation.mutate()}
+            disabled={syncMutation.isPending}
+            className="inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded dark:bg-zinc-700 bg-zinc-200 dark:text-zinc-300 text-zinc-600 dark:hover:bg-zinc-600 hover:bg-zinc-300 transition-colors disabled:opacity-50"
+          >
+            <RefreshCw className={`w-3 h-3 ${syncMutation.isPending ? 'animate-spin' : ''}`} />
+            {syncMutation.isPending ? 'Syncing…' : 'Sync'}
+          </button>
+        </div>
+      </div>
+
+      {/* Stats */}
+      <div className="px-3 py-2.5 space-y-2">
+        {syncMutation.isError && (
+          <p className="text-[10px] text-red-400">
+            {syncMutation.error?.message?.includes('private') ? 'Character is private on D&D Beyond — set it to Public to sync.' : 'Sync failed. Check character is set to Public.'}
+          </p>
+        )}
+        {currentHp !== null ? (
+          <div className="space-y-1">
+            <div className="flex items-center justify-between">
+              <span className="text-[10px] dark:text-zinc-500 text-zinc-500 font-medium">HP</span>
+              <span className="text-xs font-bold dark:text-zinc-200 text-zinc-900">
+                {currentHp} / {maxHp}
+                {tempHp > 0 && <span className="text-blue-400 ml-1">(+{tempHp} tmp)</span>}
+              </span>
+            </div>
+            <div className="h-1.5 rounded-full dark:bg-zinc-700 bg-zinc-200 overflow-hidden">
+              <div className={`h-full rounded-full transition-all ${hpColor}`} style={{ width: `${hpPct}%` }} />
+            </div>
+          </div>
+        ) : (
+          <p className="text-[10px] dark:text-zinc-600 text-zinc-400">Hit Sync to pull live HP from D&D Beyond.</p>
+        )}
+      </div>
+    </div>
+  );
+}
+
 // Player Character view
 // ─────────────────────────────────────────────────────────────────────────────
 function PCView({ form, system, campaignEntities }) {
@@ -303,15 +400,7 @@ function PCView({ form, system, campaignEntities }) {
           ['Languages', d.languages],
         ]} />
         {d.dndbeyond_id && system?.hasDndBeyondImport && (
-          <a
-            href={`https://www.dndbeyond.com/characters/${d.dndbeyond_id}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-1.5 text-xs text-purple-400 hover:text-purple-300 transition-colors mt-3"
-          >
-            <ExternalLink className="w-3 h-3" />
-            View on D&D Beyond
-          </a>
+          <DndBeyondGMPanel form={form} d={d} />
         )}
       </div>
 
