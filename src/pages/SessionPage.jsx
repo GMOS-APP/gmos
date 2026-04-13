@@ -47,7 +47,7 @@ export default function SessionPage() {
     queryFn: () => sessionId
       ? Session.filter({ id: sessionId })
       : Session.filter({ campaign_id: campaignId, session_number: sessionNum }),
-    enabled: !!campaignId && !isNewSession,
+    enabled: !!campaignId && !isNewSession && (!!sessionId || sessionNum > 0),
     select: (d) => d?.[0],
   });
 
