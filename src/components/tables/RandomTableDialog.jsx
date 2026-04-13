@@ -36,7 +36,7 @@ export default function RandomTableDialog({ open, onClose, campaignId, campaign,
   useEffect(() => {
     if (open) {
       setForm(table
-        ? { name: table.name, description: table.description || '', category: table.category, entries: table.entries || [] }
+        ? { name: table.name, description: table.description || '', category: table.category, entries: (table.entries || []).map(e => ({ id: crypto.randomUUID(), result: e.result ?? e })) }
         : EMPTY_FORM
       );
       setEntryInput('');
@@ -56,7 +56,7 @@ export default function RandomTableDialog({ open, onClose, campaignId, campaign,
   const addEntry = () => {
     const val = entryInput.trim();
     if (!val) return;
-    setForm(f => ({ ...f, entries: [...f.entries, { result: val }] }));
+    setForm(f => ({ ...f, entries: [...f.entries, { id: crypto.randomUUID(), result: val }] }));
     setEntryInput('');
     setTimeout(() => entryListRef.current?.scrollTo(0, entryListRef.current.scrollHeight), 50);
   };
@@ -89,7 +89,7 @@ export default function RandomTableDialog({ open, onClose, campaignId, campaign,
         },
       });
       if (result?.entries?.length) {
-        const newEntries = result.entries.map(e => ({ result: e }));
+        const newEntries = result.entries.map(e => ({ id: crypto.randomUUID(), result: e }));
         setForm(f => ({ ...f, entries: [...f.entries, ...newEntries] }));
         setTimeout(() => entryListRef.current?.scrollTo(0, entryListRef.current.scrollHeight), 50);
       }
@@ -162,7 +162,7 @@ export default function RandomTableDialog({ open, onClose, campaignId, campaign,
               <p className="text-sm dark:text-zinc-600 text-zinc-400 text-center py-4">No entries yet — add some below or generate with AI.</p>
             )}
             {form.entries.map((e, i) => (
-              <div key={i} className="flex gap-2 items-center">
+              <div key={e.id} className="flex gap-2 items-center">
                 <Input
                   value={e.result}
                   onChange={ev => updateEntry(i, ev.target.value)}

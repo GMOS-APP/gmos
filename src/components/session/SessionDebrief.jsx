@@ -181,7 +181,7 @@ Respond as JSON.`,
         </label>
         <div className="space-y-1.5">
           {keyEvents.map((ev, i) => (
-            <div key={i} className="flex items-start gap-2 group">
+            <div key={ev} className="flex items-start gap-2 group">
               <CheckCircle2 className="w-3.5 h-3.5 mt-0.5 flex-shrink-0 text-amber-500" />
               <span className="flex-1 text-sm dark:text-zinc-300 text-zinc-700">{ev}</span>
               <button
