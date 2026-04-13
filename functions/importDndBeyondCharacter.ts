@@ -3,11 +3,21 @@ import { createClient } from 'npm:@supabase/supabase-js@2';
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!;
 const ANON_KEY = Deno.env.get('SUPABASE_ANON_KEY')!;
 
+const CORS_HEADERS = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+};
+
 Deno.serve(async (req) => {
+  if (req.method === 'OPTIONS') {
+    return new Response('ok', { headers: CORS_HEADERS });
+  }
+
   try {
     const authHeader = req.headers.get('Authorization');
     if (!authHeader) {
-      return Response.json({ error: 'Unauthorized' }, { status: 401 });
+      return Response.json({ error: 'Unauthorized' }, { status: 401, headers: CORS_HEADERS });
     }
 
     const userClient = createClient(SUPABASE_URL, ANON_KEY, {
@@ -15,12 +25,12 @@ Deno.serve(async (req) => {
     });
     const { data: { user }, error: authError } = await userClient.auth.getUser();
     if (authError || !user) {
-      return Response.json({ error: 'Unauthorized' }, { status: 401 });
+      return Response.json({ error: 'Unauthorized' }, { status: 401, headers: CORS_HEADERS });
     }
 
     const { characterId } = await req.json();
     if (!characterId) {
-      return Response.json({ error: 'characterId is required' }, { status: 400 });
+      return Response.json({ error: 'characterId is required' }, { status: 400, headers: CORS_HEADERS });
     }
 
     const url = `https://character-service.dndbeyond.com/character/v5/character/${characterId}`;
@@ -34,20 +44,20 @@ Deno.serve(async (req) => {
     if (response.status === 401 || response.status === 403) {
       return Response.json({
         error: "Character is private. Please set your character's privacy to \"Public\" on D&D Beyond (Character Sheet → Settings → Character Privacy → Public) and try again.",
-      }, { status: 403 });
+      }, { status: 403, headers: CORS_HEADERS });
     }
 
     if (!response.ok) {
       return Response.json({
         error: `D&D Beyond returned an error (status: ${response.status}). Please verify the Character ID is correct.`,
-      }, { status: 400 });
+      }, { status: 400, headers: CORS_HEADERS });
     }
 
     const json = await response.json();
     const char = json.data;
 
     if (!char) {
-      return Response.json({ error: 'No character data found. Please check the Character ID.' }, { status: 404 });
+      return Response.json({ error: 'No character data found. Please check the Character ID.' }, { status: 404, headers: CORS_HEADERS });
     }
 
     const abilityNames: Record<number, string> = { 1: 'strength', 2: 'dexterity', 3: 'constitution', 4: 'intelligence', 5: 'wisdom', 6: 'charisma' };
@@ -161,8 +171,8 @@ Deno.serve(async (req) => {
       last_synced_at: new Date().toISOString(),
     };
 
-    return Response.json({ character: mappedData, liveStats });
+    return Response.json({ character: mappedData, liveStats }, { headers: CORS_HEADERS });
   } catch (error) {
-    return Response.json({ error: error.message }, { status: 500 });
+    return Response.json({ error: error.message }, { status: 500, headers: CORS_HEADERS });
   }
 });
