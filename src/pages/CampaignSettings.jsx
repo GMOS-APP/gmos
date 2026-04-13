@@ -12,7 +12,6 @@ import {
 } from '@/components/ui/select';
 import { Loader2, Download, Trash2, Save } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
-import { cn } from '@/lib/utils';
 
 const STATUS_OPTIONS = [
   { value: 'active', label: 'Active' },
