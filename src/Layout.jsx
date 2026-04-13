@@ -8,7 +8,7 @@ import GlobalSearch from '@/components/layout/GlobalSearch';
 import QuickCapture from '@/components/layout/QuickCapture';
 import ThemeToggle from '@/components/ui/ThemeToggle';
 import { Menu, Loader2 } from 'lucide-react';
-const CAMPAIGN_PAGES = ['CampaignDashboard', 'EntityDetail', 'EntityBrowser', 'RelationshipMap', 'CampaignMap', 'SessionPage', 'SessionBrowser', 'RandomTableBrowser', 'CampaignTimeline', 'PlayerView', 'CampaignNotes'];
+const CAMPAIGN_PAGES = ['CampaignDashboard', 'EntityDetail', 'EntityBrowser', 'RelationshipMap', 'CampaignMap', 'SessionPage', 'SessionBrowser', 'RandomTableBrowser', 'CampaignTimeline', 'PlayerView', 'CampaignNotes', 'CampaignSettings'];
 
 export default function Layout({ children, currentPageName }) {
   const [collapsed, setCollapsed] = useState(false);

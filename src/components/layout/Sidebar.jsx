@@ -28,6 +28,7 @@ import {
   Eye,
   LogOut,
   StickyNote,
+  Settings,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { getSystem } from '@/lib/systems';
@@ -122,6 +123,7 @@ export default function Sidebar({ campaign, collapsed, onToggle, onNavClick }) {
           { page: 'RandomTableBrowser', label: 'Random Tables', icon: Dices, query: `?campaign_id=${campaign.id}` },
           { page: 'CampaignTimeline', label: 'Timeline', icon: History, query: `?campaign_id=${campaign.id}` },
           { page: 'PlayerView', label: 'Player View', icon: Eye, query: `?campaign_id=${campaign.id}` },
+          { page: 'CampaignSettings', label: 'Settings', icon: Settings, query: `?campaign_id=${campaign.id}` },
         ].map(({ page, label, icon: Icon, query }) => {
           const isActive = location.pathname.includes(page.toLowerCase()) || location.search.includes(page.toLowerCase());
           const href = createPageUrl(page) + query;

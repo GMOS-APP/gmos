@@ -7,7 +7,7 @@ import { createPageUrl } from '@/utils';
 import {
   Users, MapPin, Shield, Waypoints, Package, Sparkles, Scroll,
   BookOpen, Plus, ArrowRight, Swords, Church, Flame, ShoppingBag,
-  CalendarDays, Activity, Share2, Copy, Check,
+  CalendarDays, Activity, Share2, Copy, Check, Settings,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -129,6 +129,11 @@ export default function CampaignDashboard() {
           </p>
         </div>
         <div className="flex gap-2">
+          <Link to={createPageUrl('CampaignSettings') + `?campaign_id=${campaignId}`}>
+            <Button size="sm" variant="outline" className="dark:border-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-200 border-zinc-300 text-zinc-600">
+              <Settings className="w-4 h-4" />
+            </Button>
+          </Link>
           <Link to={createPageUrl('SessionPage') + `?id=${campaignId}`}>
             <Button size="sm" className="bg-amber-500 hover:bg-amber-400 text-zinc-950 font-semibold">
               <ArrowRight className="w-4 h-4 mr-1.5" />
