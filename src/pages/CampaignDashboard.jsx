@@ -184,12 +184,12 @@ export default function CampaignDashboard() {
       <div>
         <div className="flex items-center justify-between mb-3">
           <h2 className="text-xs font-semibold text-zinc-600 dark:text-zinc-500 uppercase tracking-widest">Party Stats</h2>
-          <a
-            href={createPageUrl('EntityBrowser') + `?campaign_id=${campaignId}&type=player_character`}
+          <Link
+            to={createPageUrl('EntityBrowser') + `?campaign_id=${campaignId}&type=player_character`}
             className="text-xs text-zinc-600 dark:text-zinc-500 hover:text-amber-600 dark:hover:text-amber-400 transition-colors"
           >
             Manage PCs →
-          </a>
+          </Link>
         </div>
         <PassiveStatsHub playerCharacters={playerCharacters} campaignId={campaignId} />
       </div>
