@@ -29,6 +29,25 @@ export default function Footer() {
         </a>
         .
       </p>
+      <p>
+        {'Monster data provided by '}
+        <a href="https://open5e.com" target="_blank" rel="noreferrer" className="underline underline-offset-2 hover:text-zinc-400">
+          Open5e
+        </a>
+        {'. Content is published under open licenses including '}
+        <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noreferrer" className="underline underline-offset-2 hover:text-zinc-400">
+          CC BY 4.0
+        </a>
+        {', '}
+        <a href="https://creativecommons.org/publicdomain/zero/1.0/" target="_blank" rel="noreferrer" className="underline underline-offset-2 hover:text-zinc-400">
+          CC0
+        </a>
+        {', and the '}
+        <a href="https://www.dndbeyond.com/attachments/39j2li89/OGL_v1.0a.pdf" target="_blank" rel="noreferrer" className="underline underline-offset-2 hover:text-zinc-400">
+          Open Game License v1.0a
+        </a>
+        {'. See each entry\'s source for applicable license.'}
+      </p>
     </footer>
   );
 }
