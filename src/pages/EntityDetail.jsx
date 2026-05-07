@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { WorldEntity, Relationship, Campaign } from '@/api/entities';
 import { createPageUrl } from '@/utils';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
   ArrowLeft, Save, Trash2, Plus, X, BookOpen, Download, Pencil,
 } from 'lucide-react';
@@ -66,6 +66,7 @@ function humanizeKey(key) {
 function EntityDetailInner() {
   const { system } = useCampaign();
   const location = useLocation();
+  const navigate = useNavigate();
   const params = new URLSearchParams(location.search);
   const entityId = params.get('id');
   const campaignId = params.get('campaign_id');
@@ -172,7 +173,7 @@ function EntityDetailInner() {
   const deleteMutation = useMutation({
     mutationFn: () => WorldEntity.delete(entityId),
     onSuccess: () => {
-      window.location.href = createPageUrl('EntityBrowser') + `?campaign_id=${form.campaign_id}`;
+      navigate(createPageUrl('EntityBrowser') + `?campaign_id=${form.campaign_id}`);
     },
   });
 
