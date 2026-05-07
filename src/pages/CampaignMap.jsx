@@ -21,6 +21,7 @@ export default function CampaignMap() {
   const [view, setView] = useState('gallery'); // 'gallery' | 'detail'
   const [selectedMapId, setSelectedMapId] = useState(null);
   const [editMode, setEditMode] = useState(false);
+  const [pendingName, setPendingName] = useState('');
   const [placingLocation, setPlacingLocation] = useState(null);
   const [pendingColor, setPendingColor] = useState('amber');
   const [showNewMapDialog, setShowNewMapDialog] = useState(false);
@@ -73,6 +74,11 @@ export default function CampaignMap() {
 
   const updatePinsMutation = useMutation({
     mutationFn: ({ mapId, pins: newPins }) => CampaignMapEntity.update(mapId, { pins: newPins }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['campaign-maps', campaignId] }),
+  });
+
+  const renameMutation = useMutation({
+    mutationFn: ({ mapId, name }) => CampaignMapEntity.update(mapId, { name }),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['campaign-maps', campaignId] }),
   });
 
@@ -241,9 +247,19 @@ export default function CampaignMap() {
                 Maps
               </button>
               <span className="dark:text-zinc-700 text-zinc-300 text-xs">/</span>
-              <span className="text-sm font-semibold dark:text-zinc-200 text-zinc-900">
-                {activeMap?.name}
-              </span>
+              {editMode ? (
+                <input
+                  value={pendingName}
+                  onChange={(e) => setPendingName(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Escape' && setEditMode(false)}
+                  className="text-sm font-semibold dark:text-zinc-200 text-zinc-900 bg-transparent border-b dark:border-zinc-600 border-zinc-400 focus:outline-none focus:dark:border-amber-500 focus:border-amber-500 w-48"
+                  autoFocus
+                />
+              ) : (
+                <span className="text-sm font-semibold dark:text-zinc-200 text-zinc-900">
+                  {activeMap?.name}
+                </span>
+              )}
             </div>
 
             <div className="flex items-center gap-2">
@@ -252,7 +268,19 @@ export default function CampaignMap() {
                   <Button
                     size="sm"
                     variant={editMode ? 'default' : 'outline'}
-                    onClick={() => { setEditMode(!editMode); setPlacingLocation(null); }}
+                    onClick={() => {
+                      if (editMode) {
+                        const trimmed = pendingName.trim();
+                        if (trimmed && trimmed !== activeMap.name) {
+                          renameMutation.mutate({ mapId: activeMap.id, name: trimmed });
+                        }
+                        setEditMode(false);
+                        setPlacingLocation(null);
+                      } else {
+                        setPendingName(activeMap.name);
+                        setEditMode(true);
+                      }
+                    }}
                     className={editMode
                       ? 'bg-amber-500 hover:bg-amber-400 text-zinc-950 text-xs'
                       : 'dark:border-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-200 border-zinc-300 text-zinc-700 text-xs hover:text-zinc-900'}
