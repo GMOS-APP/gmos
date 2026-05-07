@@ -1,7 +1,22 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Loader2, Search, ArrowLeft, ExternalLink } from 'lucide-react';
+
+const CREATURE_TYPES = [
+  'Aberration', 'Beast', 'Celestial', 'Construct', 'Dragon',
+  'Elemental', 'Fey', 'Fiend', 'Giant', 'Humanoid',
+  'Monstrosity', 'Ooze', 'Plant', 'Undead',
+];
+
+const CR_OPTIONS = [
+  { label: '0',    value: '0' },
+  { label: '1/8',  value: '0.125' },
+  { label: '1/4',  value: '0.25' },
+  { label: '1/2',  value: '0.5' },
+  ...Array.from({ length: 30 }, (_, i) => ({ label: String(i + 1), value: String(i + 1) })),
+];
 
 function formatSpeed(speed) {
   if (!speed || typeof speed !== 'object') return '';
@@ -29,9 +44,8 @@ function mapMonsterToEntity(m) {
     m.challenge_rating ? `CR ${m.challenge_rating}` : null,
   ].filter(Boolean);
 
-  const traits = [
-    ...(m.special_abilities || []).map(a => `**${a.name}**\n${a.desc}`),
-  ].join('\n\n');
+  const traits = (m.special_abilities || [])
+    .map(a => `**${a.name}**\n${a.desc}`).join('\n\n');
 
   const actions = [
     formatActions(m.actions),
@@ -79,29 +93,40 @@ function mapMonsterToEntity(m) {
 
 export default function Open5eImport({ onImport, onCancel }) {
   const [query, setQuery] = useState('');
+  const [typeFilter, setTypeFilter] = useState('');
+  const [crFilter, setCrFilter] = useState('');
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [searched, setSearched] = useState(false);
+  const [total, setTotal] = useState(0);
 
-  const search = useCallback(async () => {
-    if (!query.trim()) return;
+  const search = useCallback(async (q = query, type = typeFilter, cr = crFilter) => {
+    if (!q.trim() && !type && !cr) return;
     setLoading(true);
     setError('');
     setSearched(true);
     try {
-      const res = await fetch(
-        `https://api.open5e.com/v1/monsters/?name__icontains=${encodeURIComponent(query.trim())}&limit=30&ordering=name`
-      );
+      const params = new URLSearchParams({ limit: '40', ordering: 'name' });
+      if (q.trim()) params.set('name__icontains', q.trim());
+      if (type) params.set('type', type);
+      if (cr) params.set('cr', cr);
+      const res = await fetch(`https://api.open5e.com/v1/monsters/?${params}`);
       if (!res.ok) throw new Error('Open5e API error');
       const json = await res.json();
       setResults(json.results || []);
+      setTotal(json.count || 0);
     } catch {
       setError('Failed to reach Open5e. Check your connection and try again.');
     } finally {
       setLoading(false);
     }
-  }, [query]);
+  }, [query, typeFilter, crFilter]);
+
+  // Auto-search when filters change if a search has already been run
+  useEffect(() => {
+    if (searched) search(query, typeFilter, crFilter);
+  }, [typeFilter, crFilter]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <div className="max-w-2xl mx-auto mt-8">
@@ -114,7 +139,7 @@ export default function Open5eImport({ onImport, onCancel }) {
 
       <h2 className="text-2xl font-bold dark:text-zinc-100 text-zinc-900 mb-1">Import from Open5e</h2>
       <p className="text-sm dark:text-zinc-500 text-zinc-600 mb-1">
-        Search the Open5e SRD database and import a monster's stat block directly.
+        Search the Open5e database and import a monster's full stat block.
       </p>
       <a
         href="https://open5e.com"
@@ -125,46 +150,81 @@ export default function Open5eImport({ onImport, onCancel }) {
         <ExternalLink className="w-3 h-3" /> open5e.com
       </a>
 
-      <div className="flex gap-2 mb-4">
+      {/* Search row */}
+      <div className="flex gap-2 mb-3">
         <Input
-          placeholder="Search monsters (e.g. goblin, dragon, zombie)…"
+          placeholder="Search by name…"
           value={query}
           onChange={e => setQuery(e.target.value)}
           onKeyDown={e => e.key === 'Enter' && search()}
           className="dark:bg-zinc-900/60 dark:border-zinc-800 dark:text-zinc-200"
         />
-        <Button onClick={search} disabled={loading || !query.trim()} className="bg-amber-500 hover:bg-amber-400 text-zinc-950 font-semibold flex-shrink-0">
+        <Button
+          onClick={() => search()}
+          disabled={loading || (!query.trim() && !typeFilter && !crFilter)}
+          className="bg-amber-500 hover:bg-amber-400 text-zinc-950 font-semibold flex-shrink-0"
+        >
           {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
         </Button>
+      </div>
+
+      {/* Filter row */}
+      <div className="flex gap-2 mb-5">
+        <Select value={typeFilter} onValueChange={v => setTypeFilter(v === '_all' ? '' : v)}>
+          <SelectTrigger className="dark:bg-zinc-900/60 dark:border-zinc-800 dark:text-zinc-300 text-sm">
+            <SelectValue placeholder="All types" />
+          </SelectTrigger>
+          <SelectContent className="dark:bg-zinc-900 dark:border-zinc-800">
+            <SelectItem value="_all">All types</SelectItem>
+            {CREATURE_TYPES.map(t => (
+              <SelectItem key={t} value={t}>{t}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+
+        <Select value={crFilter} onValueChange={v => setCrFilter(v === '_all' ? '' : v)}>
+          <SelectTrigger className="dark:bg-zinc-900/60 dark:border-zinc-800 dark:text-zinc-300 text-sm">
+            <SelectValue placeholder="Any CR" />
+          </SelectTrigger>
+          <SelectContent className="dark:bg-zinc-900 dark:border-zinc-800 max-h-60">
+            <SelectItem value="_all">Any CR</SelectItem>
+            {CR_OPTIONS.map(o => (
+              <SelectItem key={o.value} value={o.value}>CR {o.label}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
 
       {error && <p className="text-sm text-red-400 mb-4">{error}</p>}
 
       {searched && !loading && results.length === 0 && !error && (
-        <p className="text-sm dark:text-zinc-500 text-zinc-600 text-center py-8">No monsters found for "{query}"</p>
+        <p className="text-sm dark:text-zinc-500 text-zinc-600 text-center py-8">No monsters found — try different filters</p>
       )}
 
       {results.length > 0 && (
-        <div className="space-y-1.5 max-h-[480px] overflow-y-auto pr-1">
-          {results.map(m => (
-            <button
-              key={m.slug}
-              onClick={() => onImport(mapMonsterToEntity(m))}
-              className="w-full flex items-center gap-4 px-4 py-3 rounded-xl border dark:border-zinc-800 border-zinc-200 dark:bg-zinc-900/40 bg-zinc-50 dark:hover:border-amber-500/40 hover:border-amber-400/60 dark:hover:bg-amber-500/5 hover:bg-amber-50 transition-all text-left group"
-            >
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-semibold dark:text-zinc-200 text-zinc-900 group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors">{m.name}</p>
-                <p className="text-xs dark:text-zinc-500 text-zinc-500 truncate">
-                  {[m.size, m.type, m.subtype ? `(${m.subtype})` : null].filter(Boolean).join(' ')}
-                </p>
-              </div>
-              <div className="flex items-center gap-3 flex-shrink-0 text-right">
-                <span className="text-xs dark:text-zinc-400 text-zinc-600 font-mono">CR {m.challenge_rating}</span>
-                <span className="text-[10px] dark:text-zinc-600 text-zinc-400 max-w-[100px] truncate">{m.document__title}</span>
-              </div>
-            </button>
-          ))}
-        </div>
+        <>
+          <p className="text-xs dark:text-zinc-600 text-zinc-500 mb-2">{total} result{total !== 1 ? 's' : ''}{total > 40 ? ' — showing first 40' : ''}</p>
+          <div className="space-y-1.5 max-h-[460px] overflow-y-auto pr-1">
+            {results.map(m => (
+              <button
+                key={m.slug}
+                onClick={() => onImport(mapMonsterToEntity(m))}
+                className="w-full flex items-center gap-4 px-4 py-3 rounded-xl border dark:border-zinc-800 border-zinc-200 dark:bg-zinc-900/40 bg-zinc-50 dark:hover:border-amber-500/40 hover:border-amber-400/60 dark:hover:bg-amber-500/5 hover:bg-amber-50 transition-all text-left group"
+              >
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-semibold dark:text-zinc-200 text-zinc-900 group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors">{m.name}</p>
+                  <p className="text-xs dark:text-zinc-500 text-zinc-500 truncate">
+                    {[m.size, m.type, m.subtype ? `(${m.subtype})` : null].filter(Boolean).join(' ')}
+                  </p>
+                </div>
+                <div className="flex items-center gap-3 flex-shrink-0 text-right">
+                  <span className="text-xs dark:text-zinc-400 text-zinc-600 font-mono">CR {m.challenge_rating}</span>
+                  <span className="text-[10px] dark:text-zinc-600 text-zinc-400 max-w-[100px] truncate">{m.document__title}</span>
+                </div>
+              </button>
+            ))}
+          </div>
+        </>
       )}
     </div>
   );
