@@ -3,16 +3,10 @@ import { useQuery } from '@tanstack/react-query';
 import { WorldEntity, Session } from '@/api/entities';
 import { createPageUrl } from '@/utils';
 import { useNavigate } from 'react-router-dom';
-import { Search, X, Users, MapPin, Shield, Waypoints, Package, Sparkles, Scroll,
-  BookOpen, Swords, Church, Flame, ShoppingBag, CalendarDays, LayoutDashboard } from 'lucide-react';
+import { Search, X, CalendarDays } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { getEntityColors } from '@/lib/entityColors';
-
-const ENTITY_ICONS = {
-  npc: Users, creature: Swords, location: MapPin, faction: Shield,
-  thread: Waypoints, item: Package, player_character: Sparkles,
-  event: Scroll, lore: BookOpen, deity: Church, encounter: Flame, shop: ShoppingBag,
-};
+import EntityAvatar from '@/components/entity/EntityAvatar';
 
 export default function GlobalSearch({ campaignId }) {
   const [query, setQuery] = useState('');
@@ -52,6 +46,7 @@ export default function GlobalSearch({ campaignId }) {
         sub: e.summary || e.entity_type,
         kind: 'entity',
         type: e.entity_type,
+        image_url: e.image_url || null,
         href: createPageUrl('EntityDetail') + `?id=${e.id}&campaign_id=${campaignId}`,
       })),
     ...sessions
@@ -142,8 +137,8 @@ export default function GlobalSearch({ campaignId }) {
           ) : (
             <ul ref={listRef} className="max-h-72 overflow-y-auto py-1">
               {results.map((r, i) => {
-                const Icon = r.type === 'session' ? CalendarDays : (ENTITY_ICONS[r.type] || LayoutDashboard);
-                const color = r.type === 'session' ? 'text-zinc-500' : getEntityColors(r.type).text;
+                const isSession = r.type === 'session';
+                const color = isSession ? 'text-zinc-500' : getEntityColors(r.type).text;
                 return (
                   <li key={r.id}>
                     <button
@@ -156,7 +151,10 @@ export default function GlobalSearch({ campaignId }) {
                           : "hover:bg-zinc-50 dark:hover:bg-zinc-900"
                       )}
                     >
-                      <Icon className={cn("w-3.5 h-3.5 flex-shrink-0", color)} />
+                      {isSession
+                        ? <CalendarDays className={cn("w-3.5 h-3.5 flex-shrink-0", color)} />
+                        : <EntityAvatar entity={{ entity_type: r.type, image_url: r.image_url, name: r.label }} size="sm" />
+                      }
                       <div className="flex-1 min-w-0">
                         <p className="text-xs font-medium text-zinc-800 dark:text-zinc-200 truncate">{r.label}</p>
                         <p className="text-[10px] text-zinc-500 dark:text-zinc-500 truncate capitalize">{r.sub}</p>

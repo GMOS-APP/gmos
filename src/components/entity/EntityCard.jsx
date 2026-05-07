@@ -1,25 +1,10 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
-import { Users, MapPin, Shield, Waypoints, Package, Sparkles, Scroll, BookOpen, Eye, EyeOff, AlertTriangle, Swords, Church, Flame, ShoppingBag } from 'lucide-react';
+import { Eye, EyeOff, AlertTriangle } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
-import { getEntityColors } from '@/lib/entityColors';
-
-const typeIcons = {
-  npc: Users,
-  creature: Swords,
-  location: MapPin,
-  faction: Shield,
-  thread: Waypoints,
-  item: Package,
-  player_character: Sparkles,
-  event: Scroll,
-  lore: BookOpen,
-  deity: Church,
-  encounter: Flame,
-  shop: ShoppingBag,
-};
+import EntityAvatar from '@/components/entity/EntityAvatar';
 
 const visibilityIcons = {
   dm_only: { icon: EyeOff, label: 'DM Only', class: 'text-zinc-500' },
@@ -29,8 +14,6 @@ const visibilityIcons = {
 };
 
 export default function EntityCard({ entity }) {
-  const Icon = typeIcons[entity.entity_type] || Scroll;
-  const colors = getEntityColors(entity.entity_type).badge;
   const vis = visibilityIcons[entity.visibility] || visibilityIcons.dm_only;
   const VisIcon = vis.icon;
 
@@ -43,9 +26,7 @@ export default function EntityCard({ entity }) {
       )}
     >
       <div className="flex items-start gap-3">
-        <div className={cn("p-2 rounded-lg border", colors)}>
-          <Icon className="w-4 h-4" />
-        </div>
+        <EntityAvatar entity={entity} size="md" boxed />
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
             <h3 className="font-semibold dark:text-zinc-200 dark:group-hover:text-zinc-100 text-zinc-900 group-hover:text-zinc-950 truncate text-sm">

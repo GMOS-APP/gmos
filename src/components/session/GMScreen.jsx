@@ -11,15 +11,9 @@ import SessionNotesDisplay from '@/components/session/SessionNotesDisplay';
 import EntityLinker from '@/components/session/EntityLinker';
 import CombatTracker from '@/components/session/CombatTracker';
 import EntityQuickViewModal from '@/components/common/EntityQuickViewModal';
-import { Minimize2, Clock, StickyNote, Scroll, Swords, Heart, Search, Users, MapPin, Shield, Waypoints, Package, Sparkles, BookOpen, Church, Flame, ShoppingBag } from 'lucide-react';
+import { Minimize2, Clock, StickyNote, Heart, Search } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { getEntityColors } from '@/lib/entityColors';
-
-const TYPE_ICONS = {
-  npc: Users, creature: Swords, location: MapPin, faction: Shield,
-  thread: Waypoints, item: Package, player_character: Sparkles,
-  event: Scroll, lore: BookOpen, deity: Church, encounter: Flame, shop: ShoppingBag,
-};
+import EntityAvatar from '@/components/entity/EntityAvatar';
 
 function InlineTimer({ session }) {
   const [elapsed, setElapsed] = useState(0);
@@ -77,8 +71,6 @@ function WorldSearch({ entities, campaignId }) {
           <p className="text-xs dark:text-zinc-600 text-zinc-400 text-center py-8">No entities found.</p>
         ) : (
           filtered.map(entity => {
-            const colors = getEntityColors(entity.entity_type);
-            const Icon = TYPE_ICONS[entity.entity_type] || Scroll;
             return (
               <button
                 key={entity.id}
@@ -88,9 +80,7 @@ function WorldSearch({ entities, campaignId }) {
                 }}
                 className="w-full flex items-center gap-2.5 px-3 py-2.5 text-left hover:dark:bg-zinc-800/40 hover:bg-zinc-50 transition-colors"
               >
-                <div className={cn('p-1.5 rounded-md border flex-shrink-0', colors.badge)}>
-                  <Icon className="w-3 h-3" />
-                </div>
+                <EntityAvatar entity={entity} size="sm" boxed />
                 <div className="flex-1 min-w-0">
                   <p className="text-xs font-medium dark:text-zinc-200 text-zinc-800 truncate">{entity.name}</p>
                   <p className={cn('text-[10px]', colors.text)}>{entity.entity_type.replace(/_/g, ' ')}</p>
