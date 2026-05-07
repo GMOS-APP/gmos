@@ -9,6 +9,7 @@ import {
 import StatBlock from '@/components/entity/StatBlock';
 import EntityStatBlockView from '@/components/entity/EntityStatBlockView';
 import DndBeyondImport from '@/components/entity/DndBeyondImport';
+import Open5eImport from '@/components/entity/Open5eImport';
 import InitiativeTracker from '@/components/encounter/InitiativeTracker';
 import TypeSpecificFields from '@/components/entity/TypeSpecificFields.jsx';
 import EntityMentionTextarea from '@/components/common/EntityMentionTextarea';
@@ -84,7 +85,7 @@ function EntityDetailInner() {
   const [newTag, setNewTag] = useState('');
   const [newFact, setNewFact] = useState('');
   const [saved, setSaved] = useState(false);
-  const [entryMode, setEntryMode] = useState(isNew ? null : 'manual');
+  const [entryMode, setEntryMode] = useState(isNew ? null : 'manual'); // null | 'manual' | 'dnd_import' | 'open5e'
   const [descriptionMode, setDescriptionMode] = useState('edit'); // 'edit' | 'preview'
 
   // Reset all state when navigating to a different entity
@@ -213,41 +214,50 @@ function EntityDetailInner() {
           </h2>
           <p className="text-sm dark:text-zinc-500 text-zinc-600 text-center mb-8">Choose how you'd like to create this {defaultType.replace('_', ' ')}</p>
 
-          <div className={`grid gap-4 ${defaultType === 'note' ? 'grid-cols-1 max-w-xs mx-auto' : 'grid-cols-1 max-w-xs mx-auto'}`}>
+          <div className="flex flex-col gap-3 max-w-sm mx-auto w-full">
             <button
               onClick={() => setEntryMode('manual')}
-              className="group p-6 rounded-xl dark:border-2 dark:border-zinc-800 dark:bg-zinc-900/40 border-2 border-zinc-300 bg-zinc-50 dark:hover:border-amber-500/50 dark:hover:bg-amber-500/5 hover:border-amber-500/50 hover:bg-amber-500/5 transition-all"
+              className="group flex items-center gap-4 w-full px-5 py-4 rounded-xl border-2 dark:border-zinc-800 dark:bg-zinc-900/40 border-zinc-200 bg-zinc-50 dark:hover:border-amber-500/50 dark:hover:bg-amber-500/5 hover:border-amber-400 hover:bg-amber-50 transition-all"
             >
-              <div className="flex flex-col items-center gap-3">
-                <div className="p-3 rounded-lg bg-amber-500/10 group-hover:bg-amber-500/20 transition-colors">
-                  <BookOpen className="w-6 h-6 text-amber-400" />
-                </div>
-                <div className="text-center">
-                  <h3 className="font-semibold dark:text-zinc-100 text-zinc-900 mb-1">Manual Entry</h3>
-                  <p className="text-xs dark:text-zinc-500 text-zinc-600">Write your own content from scratch</p>
-                </div>
+              <div className="p-2.5 rounded-lg bg-amber-500/10 group-hover:bg-amber-500/20 transition-colors flex-shrink-0">
+                <BookOpen className="w-5 h-5 text-amber-500 dark:text-amber-400" />
+              </div>
+              <div className="text-left">
+                <h3 className="font-semibold dark:text-zinc-100 text-zinc-900 text-sm">Create from scratch</h3>
+                <p className="text-xs dark:text-zinc-500 text-zinc-600">Write your own content and stat block</p>
               </div>
             </button>
-          </div>
 
-          {defaultType === 'player_character' && system.hasDndBeyondImport && (
-            <div className="mt-4">
+            {defaultType === 'creature' && system.hasSrdImport && (
               <button
-                onClick={() => setEntryMode('dnd_import')}
-                className="group w-full p-5 rounded-xl dark:border-2 dark:border-zinc-800 dark:bg-zinc-900/40 border-2 border-zinc-300 bg-zinc-50 dark:hover:border-purple-500/50 dark:hover:bg-purple-500/5 hover:border-purple-500/50 hover:bg-purple-500/5 transition-all"
+                onClick={() => setEntryMode('open5e')}
+                className="group flex items-center gap-4 w-full px-5 py-4 rounded-xl border-2 dark:border-zinc-800 dark:bg-zinc-900/40 border-zinc-200 bg-zinc-50 dark:hover:border-emerald-500/50 dark:hover:bg-emerald-500/5 hover:border-emerald-400 hover:bg-emerald-50 transition-all"
               >
-                <div className="flex items-center justify-center gap-3">
-                  <div className="p-2.5 rounded-lg bg-purple-500/10 group-hover:bg-purple-500/20 transition-colors">
-                    <Download className="w-5 h-5 text-purple-400" />
-                  </div>
-                  <div className="text-center">
-                    <h3 className="font-semibold dark:text-zinc-100 text-zinc-900 mb-0.5">Import from D&D Beyond</h3>
-                    <p className="text-xs dark:text-zinc-500 text-zinc-600">Pull character data directly from your D&D Beyond sheet</p>
-                  </div>
+                <div className="p-2.5 rounded-lg bg-emerald-500/10 group-hover:bg-emerald-500/20 transition-colors flex-shrink-0">
+                  <Download className="w-5 h-5 text-emerald-500 dark:text-emerald-400" />
+                </div>
+                <div className="text-left">
+                  <h3 className="font-semibold dark:text-zinc-100 text-zinc-900 text-sm">Import from Open5e</h3>
+                  <p className="text-xs dark:text-zinc-500 text-zinc-600">Search and import any monster's stat block</p>
                 </div>
               </button>
-            </div>
-          )}
+            )}
+
+            {defaultType === 'player_character' && system.hasDndBeyondImport && (
+              <button
+                onClick={() => setEntryMode('dnd_import')}
+                className="group flex items-center gap-4 w-full px-5 py-4 rounded-xl border-2 dark:border-zinc-800 dark:bg-zinc-900/40 border-zinc-200 bg-zinc-50 dark:hover:border-purple-500/50 dark:hover:bg-purple-500/5 hover:border-purple-400 hover:bg-purple-50 transition-all"
+              >
+                <div className="p-2.5 rounded-lg bg-purple-500/10 group-hover:bg-purple-500/20 transition-colors flex-shrink-0">
+                  <Download className="w-5 h-5 text-purple-500 dark:text-purple-400" />
+                </div>
+                <div className="text-left">
+                  <h3 className="font-semibold dark:text-zinc-100 text-zinc-900 text-sm">Import from D&D Beyond</h3>
+                  <p className="text-xs dark:text-zinc-500 text-zinc-600">Pull character data directly from your D&D Beyond sheet</p>
+                </div>
+              </button>
+            )}
+          </div>
 
         </div>
       </div>
@@ -261,6 +271,21 @@ function EntityDetailInner() {
         <DndBeyondImport
           onImport={(characterData) => {
             setForm((prev) => ({ ...prev, ...characterData }));
+            setEntryMode('manual');
+          }}
+          onCancel={() => setEntryMode(null)}
+        />
+      </div>
+    );
+  }
+
+  // Open5e Import mode
+  if (isNew && entryMode === 'open5e') {
+    return (
+      <div className="p-4 sm:p-6 lg:p-8 max-w-4xl">
+        <Open5eImport
+          onImport={(monsterData) => {
+            setForm((prev) => ({ ...prev, ...monsterData }));
             setEntryMode('manual');
           }}
           onCancel={() => setEntryMode(null)}
