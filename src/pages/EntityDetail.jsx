@@ -228,7 +228,7 @@ function EntityDetailInner() {
               </div>
             </button>
 
-            {defaultType === 'creature' && system.hasSrdImport && (
+            {['creature', 'item', 'lore'].includes(defaultType) && system.hasSrdImport && (
               <button
                 onClick={() => setEntryMode('open5e')}
                 className="group flex items-center gap-4 w-full px-5 py-4 rounded-xl border-2 dark:border-zinc-800 dark:bg-zinc-900/40 border-zinc-200 bg-zinc-50 dark:hover:border-emerald-500/50 dark:hover:bg-emerald-500/5 hover:border-emerald-400 hover:bg-emerald-50 transition-all"
@@ -238,7 +238,11 @@ function EntityDetailInner() {
                 </div>
                 <div className="text-left">
                   <h3 className="font-semibold dark:text-zinc-100 text-zinc-900 text-sm">Import from Open5e</h3>
-                  <p className="text-xs dark:text-zinc-500 text-zinc-600">Search and import any monster's stat block</p>
+                  <p className="text-xs dark:text-zinc-500 text-zinc-600">
+                    {defaultType === 'creature' && 'Search and import any monster\'s stat block'}
+                    {defaultType === 'item' && 'Search and import any magic item'}
+                    {defaultType === 'lore' && 'Search and import any spell'}
+                  </p>
                 </div>
               </button>
             )}
@@ -284,8 +288,9 @@ function EntityDetailInner() {
     return (
       <div className="p-4 sm:p-6 lg:p-8 max-w-4xl">
         <Open5eImport
-          onImport={(monsterData) => {
-            setForm((prev) => ({ ...prev, ...monsterData }));
+          entityType={defaultType}
+          onImport={(data) => {
+            setForm((prev) => ({ ...prev, ...data }));
             setEntryMode('manual');
           }}
           onCancel={() => setEntryMode(null)}
