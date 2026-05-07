@@ -31,7 +31,6 @@ import {
   Settings,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { getSystem } from '@/lib/systems';
 
 const entityGroups = [
   {
@@ -211,23 +210,6 @@ export default function Sidebar({ campaign, collapsed, onToggle, onNavClick }) {
             >
               <LogOut className="w-3.5 h-3.5" />
             </button>
-          </div>
-        )}
-        {!collapsed && (
-          <div className="space-y-1 px-1">
-            {getSystem(campaign?.system).hasSrdConditions && (
-              <p className="text-[10px] text-zinc-600 dark:text-zinc-700">
-                <a href="https://dnd.wizards.com/resources/systems-reference-document" target="_blank" rel="noreferrer" className="hover:text-zinc-500 underline underline-offset-2">D&amp;D SRD 5.1</a>
-                {' · © Wizards of the Coast · '}
-                <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noreferrer" className="hover:text-zinc-500 underline underline-offset-2">CC BY 4.0</a>
-              </p>
-            )}
-            <p className="text-[10px] text-zinc-600 dark:text-zinc-700">
-              {'Lazy RPG Prep method from '}
-              <a href="https://slyflourish.com/lazy_gm_resource_document.html" target="_blank" rel="noreferrer" className="hover:text-zinc-500 underline underline-offset-2">Lazy GM's Resource Document</a>
-              {' by Michael E. Shea · '}
-              <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noreferrer" className="hover:text-zinc-500 underline underline-offset-2">CC BY 4.0</a>
-            </p>
           </div>
         )}
         {user && collapsed && (

@@ -6,6 +6,7 @@ import Sidebar from '@/components/layout/Sidebar';
 import Breadcrumbs from '@/components/layout/Breadcrumbs';
 import GlobalSearch from '@/components/layout/GlobalSearch';
 import QuickCapture from '@/components/layout/QuickCapture';
+import Footer from '@/components/layout/Footer';
 import ThemeToggle from '@/components/ui/ThemeToggle';
 import { Menu, Loader2 } from 'lucide-react';
 const CAMPAIGN_PAGES = ['CampaignDashboard', 'EntityDetail', 'EntityBrowser', 'RelationshipMap', 'CampaignMap', 'SessionPage', 'SessionBrowser', 'RandomTableBrowser', 'CampaignTimeline', 'PlayerView', 'CampaignNotes', 'CampaignSettings'];
@@ -91,8 +92,9 @@ export default function Layout({ children, currentPageName }) {
             <GlobalSearch campaignId={campaignId} />
           </div>
         </div>
-        <div className="flex-1 overflow-y-auto">
+        <div className="flex-1 overflow-y-auto flex flex-col">
           {children}
+          <Footer />
         </div>
       </main>
       <QuickCapture campaignId={campaignId} />
