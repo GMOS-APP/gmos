@@ -297,6 +297,16 @@ export default function CampaignList() {
       </div>
 
 
+      {/* Footer */}
+      <div className="mt-16 pb-6 text-center">
+        <Link
+          to={createPageUrl('About')}
+          className="text-xs text-zinc-400 dark:text-zinc-700 hover:text-zinc-600 dark:hover:text-zinc-500 transition-colors"
+        >
+          About GM/OS &amp; Legal Attributions
+        </Link>
+      </div>
+
       {/* Create Dialog */}
       <Dialog open={showCreate} onOpenChange={setShowCreate}>
         <DialogContent className="bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 sm:max-w-md mx-4">

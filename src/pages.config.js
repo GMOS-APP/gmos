@@ -60,6 +60,7 @@ import RandomTableBrowser from './pages/RandomTableBrowser';
 import CampaignTimeline from './pages/CampaignTimeline';
 import PlayerView from './pages/PlayerView';
 import CampaignSettings from './pages/CampaignSettings';
+import About from './pages/About';
 import __Layout from './Layout.jsx';
 
 
@@ -77,6 +78,7 @@ export const PAGES = {
     "CampaignTimeline": CampaignTimeline,
     "PlayerView": PlayerView,
     "CampaignSettings": CampaignSettings,
+    "About": About,
 }
 
 export const pagesConfig = {

@@ -1,4 +1,6 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
+import { createPageUrl } from '@/utils';
 
 export default function Footer() {
   return (
@@ -47,6 +49,14 @@ export default function Footer() {
           Open Game License v1.0a
         </a>
         {'. See each entry\'s source for applicable license.'}
+      </p>
+      <p className="pt-1 dark:border-t dark:border-zinc-800/40 border-t border-zinc-100">
+        <Link
+          to={createPageUrl('About')}
+          className="underline underline-offset-2 hover:dark:text-zinc-400 hover:text-zinc-700 transition-colors"
+        >
+          About GM/OS &amp; Legal Attributions
+        </Link>
       </p>
     </footer>
   );
