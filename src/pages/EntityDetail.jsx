@@ -97,10 +97,7 @@ function EntityDetailInner() {
     setNewTag('');
     setNewFact('');
     setSaved(false);
-    setGenerating(false);
     setEntryMode(isNew ? null : 'manual');
-    setSrdSearch('');
-    setSrdResults([]);
     setDescriptionMode('edit');
     setPageMode(isNew ? 'edit' : 'view');
   }, [entityId]);
@@ -191,82 +188,6 @@ function EntityDetailInner() {
       setForm({ ...form, key_facts: [...form.key_facts, newFact.trim()] });
       setNewFact('');
     }
-  };
-
-  const _typePrompts = {
-      npc: `Generate content for this NPC suitable for ${systemName}, including:
-- Stat block or equivalent mechanics
-- Traits and special abilities
-- Actions and reactions
-- Personality traits, ideals, bonds, flaws
-- Physical description and mannerisms
-- Roleplay suggestions`,
-      creature: `Generate content for this creature suitable for ${systemName}, including:
-- Stat block or equivalent mechanics
-- Traits and special abilities
-- Actions and reactions
-- Physical description and mannerisms
-- Roleplay suggestions`,
-      location: `Generate content for this location suitable for ${systemName}, including:
-- Detailed physical description
-- Notable features and points of interest
-- Inhabitants and their motivations
-- Potential encounters or hazards
-- Secrets and hidden elements
-- Hooks for adventure`,
-      item: `Generate content for this item suitable for ${systemName}, including:
-- Item type and rarity
-- Properties and mechanics
-- History and lore
-- Potential side effects or drawbacks`,
-      faction: `Generate content for this faction suitable for ${systemName}, including:
-- Organizational structure
-- Goals and motivations
-- Resources and capabilities
-- Key figures and their roles
-- Joining requirements and ranks`,
-      thread: `Generate content for this plot thread suitable for ${systemName}, including:
-- Current situation and stakes
-- Key figures involved
-- Potential developments and branches
-- Success/failure outcomes
-- Connections to other threads`,
-      event: `Generate content for this event suitable for ${systemName}, including:
-- Timeline and trigger conditions
-- Key participants and witnesses
-- Aftermath and consequences
-- Ways players can influence the outcome`,
-      lore: `Generate content for this lore element suitable for ${systemName}, including:
-- Historical context and timeline
-- Key figures and their contributions
-- Impact on the current world state
-- Common knowledge vs. secret information`,
-      player_character: `Generate content for this player character suitable for ${systemName}, including:
-- Background suggestions
-- Personality traits, ideals, bonds, flaws
-- Character arc possibilities
-- Personal quest hooks
-- Roleplay suggestions`,
-      deity: `Generate content for this deity suitable for ${systemName}, including:
-- Domain(s) and alignment
-- Holy symbol and iconography
-- Tenets and commandments
-- Worshippers and clergy structure
-- Temples and sacred sites
-- Myths and legends`,
-      encounter: `Generate content for this encounter suitable for ${systemName}, including:
-- Encounter difficulty
-- Terrain and environmental features
-- Enemy composition and tactics
-- Treasure and rewards
-- Read-aloud description
-- Potential complications`,
-      shop: `Generate content for this shop suitable for ${systemName}, including:
-- Shop type and specialty
-- Shopkeeper personality and appearance
-- Available inventory with prices
-- Services offered
-- Quest hooks or rumors`,
   };
 
   if (isLoading && !isNew) {
