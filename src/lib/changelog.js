@@ -1,8 +1,15 @@
-export const CURRENT_VERSION = '2026-05-07b';
+export const CURRENT_VERSION = '2026-05-07c';
 
 // Entries are shown for all versions newer than what the user last acknowledged.
 // version must be a YYYY-MM-DD string so string comparison works for ordering.
 export const CHANGELOG = [
+  {
+    version: '2026-05-07c',
+    date: 'May 7, 2026',
+    entries: [
+      { type: 'improved', text: 'Linked map now shows as a thumbnail at the top of the entity view — click it to preview the full map in a modal' },
+    ],
+  },
   {
     version: '2026-05-07b',
     date: 'May 7, 2026',

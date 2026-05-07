@@ -4,7 +4,7 @@ import { WorldEntity, Relationship, Campaign, CampaignMap as CampaignMapEntity }
 import { createPageUrl } from '@/utils';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
-  ArrowLeft, Save, Trash2, Plus, X, BookOpen, Download, Pencil, Map,
+  ArrowLeft, Save, Trash2, Plus, X, BookOpen, Download, Pencil, Map, ImageOff,
 } from 'lucide-react';
 import StatBlock from '@/components/entity/StatBlock';
 import EntityStatBlockView from '@/components/entity/EntityStatBlockView';
@@ -22,6 +22,9 @@ import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
+import {
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter,
+} from '@/components/ui/dialog';
 import { CampaignProvider, useCampaign } from '@/lib/CampaignContext';
 
 const entityTypes = ['note', 'npc', 'creature', 'location', 'faction', 'thread', 'item', 'player_character', 'event', 'lore', 'deity', 'encounter', 'shop'];
@@ -66,6 +69,8 @@ function humanizeKey(key) {
 
 function LinkedMapSection({ entityId, entityName, campaignId, editMode }) {
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
+  const [previewOpen, setPreviewOpen] = useState(false);
 
   const { data: maps = [] } = useQuery({
     queryKey: ['campaign-maps', campaignId],
@@ -92,18 +97,76 @@ function LinkedMapSection({ entityId, entityName, campaignId, editMode }) {
   if (!editMode) {
     if (!linkedMap) return null;
     return (
-      <div>
-        <h3 className="text-xs dark:text-zinc-500 text-zinc-500 uppercase tracking-widest font-semibold mb-2">
-          Linked Map
-        </h3>
-        <Link
-          to={createPageUrl('CampaignMap') + `?campaign_id=${campaignId}`}
-          className="inline-flex items-center gap-2 text-sm dark:text-green-400 dark:hover:text-green-300 text-green-600 hover:text-green-700 transition-colors"
-        >
-          <Map className="w-3.5 h-3.5 flex-shrink-0" />
-          {linkedMap.name}
-        </Link>
-      </div>
+      <>
+        <div>
+          <h3 className="text-xs dark:text-zinc-500 text-zinc-500 uppercase tracking-widest font-semibold mb-3">
+            Linked Map
+          </h3>
+          <button
+            onClick={() => setPreviewOpen(true)}
+            className="group rounded-xl overflow-hidden border dark:border-zinc-800 border-zinc-200 dark:bg-zinc-900 bg-zinc-50 dark:hover:border-amber-500/50 hover:border-amber-400/60 text-left transition-colors w-full max-w-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500"
+          >
+            <div className="aspect-[4/3] dark:bg-zinc-800 bg-zinc-100 overflow-hidden">
+              {linkedMap.image_url ? (
+                <img
+                  src={linkedMap.image_url}
+                  alt={linkedMap.name}
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+                />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center">
+                  <ImageOff className="w-8 h-8 dark:text-zinc-700 text-zinc-400" />
+                </div>
+              )}
+            </div>
+            <div className="px-3 py-2.5">
+              <p className="text-sm font-medium dark:text-zinc-200 text-zinc-900 group-hover:dark:text-amber-400 group-hover:text-amber-600 transition-colors">
+                {linkedMap.name}
+              </p>
+              <p className="text-xs dark:text-zinc-600 text-zinc-500 mt-0.5">Click to preview</p>
+            </div>
+          </button>
+        </div>
+
+        <Dialog open={previewOpen} onOpenChange={setPreviewOpen}>
+          <DialogContent className="max-w-3xl dark:bg-zinc-900 dark:border-zinc-800 dark:text-zinc-100 bg-white border-zinc-200 text-zinc-900 p-0 overflow-hidden">
+            <DialogHeader className="px-5 pt-5 pb-3">
+              <DialogTitle className="dark:text-zinc-100 text-zinc-900">{linkedMap.name}</DialogTitle>
+            </DialogHeader>
+            <div className="dark:bg-zinc-800 bg-zinc-100 mx-5 rounded-lg overflow-hidden">
+              {linkedMap.image_url ? (
+                <img
+                  src={linkedMap.image_url}
+                  alt={linkedMap.name}
+                  className="w-full object-contain max-h-[60vh]"
+                />
+              ) : (
+                <div className="h-48 flex items-center justify-center">
+                  <ImageOff className="w-8 h-8 dark:text-zinc-700 text-zinc-400" />
+                </div>
+              )}
+            </div>
+            <DialogFooter className="px-5 py-4">
+              <Button
+                variant="ghost"
+                onClick={() => setPreviewOpen(false)}
+                className="dark:text-zinc-400 text-zinc-700"
+              >
+                Close
+              </Button>
+              <Button
+                onClick={() => {
+                  setPreviewOpen(false);
+                  navigate(createPageUrl('CampaignMap') + `?campaign_id=${campaignId}`);
+                }}
+                className="bg-amber-500 hover:bg-amber-400 text-zinc-950 font-semibold"
+              >
+                <Map className="w-3.5 h-3.5 mr-1.5" />Edit in Campaign Maps
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      </>
     );
   }
 
@@ -112,6 +175,15 @@ function LinkedMapSection({ entityId, entityName, campaignId, editMode }) {
       <label className="text-xs dark:text-zinc-500 text-zinc-600 uppercase tracking-widest font-semibold mb-2 block">
         Linked Map
       </label>
+      {linkedMap?.image_url && (
+        <div className="mb-3 rounded-lg overflow-hidden border dark:border-zinc-800 border-zinc-200 w-48">
+          <img
+            src={linkedMap.image_url}
+            alt={linkedMap.name}
+            className="w-full aspect-[4/3] object-cover"
+          />
+        </div>
+      )}
       <Select
         value={linkedMap?.id ?? '__none__'}
         onValueChange={(v) => linkMutation.mutate(v === '__none__' ? null : v)}
@@ -460,6 +532,14 @@ function EntityDetailInner() {
         </div>
 
         <div className="space-y-8">
+          {/* Linked Map — shown at top if one is linked */}
+          <LinkedMapSection
+            entityId={entityId}
+            entityName={form.name}
+            campaignId={form.campaign_id}
+            editMode={false}
+          />
+
           {/* Summary */}
           {form.summary && (
             <p className="text-base dark:text-zinc-400 text-zinc-600 italic leading-relaxed border-l-2 dark:border-amber-500/40 border-amber-400/50 pl-4">
@@ -599,13 +679,6 @@ function EntityDetailInner() {
             </div>
           )}
 
-          {/* Linked Map */}
-          <LinkedMapSection
-            entityId={entityId}
-            entityName={form.name}
-            campaignId={form.campaign_id}
-            editMode={false}
-          />
         </div>
       </div>
     );
