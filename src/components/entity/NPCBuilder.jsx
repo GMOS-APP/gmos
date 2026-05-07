@@ -1,46 +1,12 @@
 import React, { useState } from 'react';
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import EntityMentionTextarea from '@/components/common/EntityMentionTextarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Wand2, Loader2 } from 'lucide-react';
-import { InvokeLLM } from '@/api/entities';
-import AiGate from '@/components/ui/AiGate';
 import { useCampaign } from '@/lib/CampaignContext';
 
 const SRD_RACES = ['Human', 'Elf', 'Dwarf', 'Halfling', 'Dragonborn', 'Gnome', 'Half-Elf', 'Half-Orc', 'Tiefling'];
 const SRD_CLASSES = ['Barbarian', 'Bard', 'Cleric', 'Druid', 'Fighter', 'Monk', 'Paladin', 'Ranger', 'Rogue', 'Sorcerer', 'Warlock', 'Wizard'];
 const SRD_ALIGNMENTS = ['Lawful Good', 'Neutral Good', 'Chaotic Good', 'Lawful Neutral', 'True Neutral', 'Chaotic Neutral', 'Lawful Evil', 'Neutral Evil', 'Chaotic Evil'];
-
-const CLASS_PRIORITIES = {
-  'Barbarian': ['STR', 'CON', 'DEX', 'WIS', 'CHA', 'INT'],
-  'Bard': ['CHA', 'DEX', 'CON', 'WIS', 'INT', 'STR'],
-  'Cleric': ['WIS', 'CON', 'STR', 'CHA', 'DEX', 'INT'],
-  'Druid': ['WIS', 'CON', 'DEX', 'INT', 'CHA', 'STR'],
-  'Fighter': ['STR', 'CON', 'DEX', 'WIS', 'CHA', 'INT'],
-  'Monk': ['DEX', 'WIS', 'CON', 'STR', 'CHA', 'INT'],
-  'Paladin': ['STR', 'CHA', 'CON', 'WIS', 'DEX', 'INT'],
-  'Ranger': ['DEX', 'WIS', 'CON', 'STR', 'INT', 'CHA'],
-  'Rogue': ['DEX', 'INT', 'CHA', 'CON', 'WIS', 'STR'],
-  'Sorcerer': ['CHA', 'CON', 'DEX', 'INT', 'WIS', 'STR'],
-  'Warlock': ['CHA', 'CON', 'DEX', 'INT', 'WIS', 'STR'],
-  'Wizard': ['INT', 'DEX', 'CON', 'WIS', 'CHA', 'STR'],
-};
-
-const rollStats = () => {
-  const rolls = [];
-  for (let i = 0; i < 6; i++) {
-    const fourDice = [
-      Math.floor(Math.random() * 6) + 1,
-      Math.floor(Math.random() * 6) + 1,
-      Math.floor(Math.random() * 6) + 1,
-      Math.floor(Math.random() * 6) + 1,
-    ];
-    fourDice.sort((a, b) => b - a);
-    rolls.push(fourDice[0] + fourDice[1] + fourDice[2]);
-  }
-  return rolls.sort((a, b) => b - a);
-};
 
 export default function NPCBuilder({ npcData, onUpdate }) {
   const { system } = useCampaign();
@@ -56,42 +22,10 @@ export default function NPCBuilder({ npcData, onUpdate }) {
     motives: '',
     sample_dialogue: '',
   });
-  const [generating, setGenerating] = useState(null);
 
   const handleChange = (field, value) => {
     setData({ ...data, [field]: value });
     onUpdate({ ...data, [field]: value });
-  };
-
-  const generateField = async (field) => {
-    setGenerating(field);
-    
-    const prompts = {
-      appearance: `Generate a vivid physical appearance description for a ${data.gender || ''} ${data.race || 'humanoid'} ${data.class || 'NPC'} (${data.alignment || 'neutral'}). Include distinctive features, clothing style, and first impression details. Keep it 2-3 sentences.`,
-      traits: `Generate personality traits for a ${data.gender || ''} ${data.race || 'humanoid'} ${data.class || 'NPC'} (${data.alignment || 'neutral'}). Include mannerisms, speech patterns, and behavioral quirks. Keep it 2-3 sentences.`,
-      rumors: `Generate 3 rumors about a ${data.gender || ''} ${data.race || 'humanoid'} ${data.class || 'NPC'} (${data.alignment || 'neutral'}). One true, one false, one partially true. Format as a bulleted list.`,
-      quests: `Generate 2-3 potential quest hooks involving a ${data.gender || ''} ${data.race || 'humanoid'} ${data.class || 'NPC'} (${data.alignment || 'neutral'}). Format as a bulleted list with brief descriptions.`,
-      motives: `Generate the hidden motives and goals for a ${data.gender || ''} ${data.race || 'humanoid'} ${data.class || 'NPC'} (${data.alignment || 'neutral'}). What do they really want? What are they hiding? Keep it 2-3 sentences.`,
-      sample_dialogue: `Generate sample dialogue for when the party first meets a ${data.gender || ''} ${data.race || 'humanoid'} ${data.class || 'NPC'} (${data.alignment || 'neutral'}). Include their greeting and a few lines of conversation that reveal their personality. Format as quotes.`,
-    };
-
-    try {
-      const result = await InvokeLLM({
-        prompt: prompts[field],
-      });
-      handleChange(field, result);
-    } catch (error) {
-      console.error('Generation failed:', error);
-    }
-    
-    setGenerating(null);
-  };
-
-  const generateAllFields = async () => {
-    const fields = ['appearance', 'traits', 'rumors', 'quests', 'motives', 'sample_dialogue'];
-    for (const field of fields) {
-      await generateField(field);
-    }
   };
 
   return (
@@ -177,38 +111,9 @@ export default function NPCBuilder({ npcData, onUpdate }) {
         )}
       </div>
 
-      {/* Generate All Button */}
-      <AiGate>
-        <Button
-          onClick={generateAllFields}
-          disabled={generating !== null}
-          variant="outline"
-          className="w-full border-blue-500/30 text-blue-400 hover:bg-blue-500/10"
-        >
-          {generating ? (
-            <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Generating...</>
-          ) : (
-            <><Wand2 className="w-4 h-4 mr-2" /> Generate All NPC Details</>
-          )}
-        </Button>
-      </AiGate>
-
       {/* Appearance */}
       <div>
-        <div className="flex items-center justify-between mb-2">
-          <label className="text-xs text-zinc-500 uppercase tracking-widest font-semibold">Appearance</label>
-          <AiGate>
-            <Button
-              onClick={() => generateField('appearance')}
-              disabled={generating !== null}
-              size="sm"
-              variant="ghost"
-              className="text-zinc-500 hover:text-blue-400 h-7 text-xs"
-            >
-              {generating === 'appearance' ? <Loader2 className="w-3 h-3 animate-spin" /> : <Wand2 className="w-3 h-3" />}
-            </Button>
-          </AiGate>
-        </div>
+        <label className="text-xs text-zinc-500 uppercase tracking-widest font-semibold mb-2 block">Appearance</label>
         <EntityMentionTextarea
           value={data.appearance}
           onChange={(v) => handleChange('appearance', v)}
@@ -220,20 +125,7 @@ export default function NPCBuilder({ npcData, onUpdate }) {
 
       {/* Traits */}
       <div>
-        <div className="flex items-center justify-between mb-2">
-          <label className="text-xs text-zinc-500 uppercase tracking-widest font-semibold">Traits</label>
-          <AiGate>
-            <Button
-              onClick={() => generateField('traits')}
-              disabled={generating !== null}
-              size="sm"
-              variant="ghost"
-              className="text-zinc-500 hover:text-blue-400 h-7 text-xs"
-            >
-              {generating === 'traits' ? <Loader2 className="w-3 h-3 animate-spin" /> : <Wand2 className="w-3 h-3" />}
-            </Button>
-          </AiGate>
-        </div>
+        <label className="text-xs text-zinc-500 uppercase tracking-widest font-semibold mb-2 block">Traits</label>
         <EntityMentionTextarea
           value={data.traits}
           onChange={(v) => handleChange('traits', v)}
@@ -245,20 +137,7 @@ export default function NPCBuilder({ npcData, onUpdate }) {
 
       {/* Rumors */}
       <div>
-        <div className="flex items-center justify-between mb-2">
-          <label className="text-xs text-zinc-500 uppercase tracking-widest font-semibold">Rumors</label>
-          <AiGate>
-            <Button
-              onClick={() => generateField('rumors')}
-              disabled={generating !== null}
-              size="sm"
-              variant="ghost"
-              className="text-zinc-500 hover:text-blue-400 h-7 text-xs"
-            >
-              {generating === 'rumors' ? <Loader2 className="w-3 h-3 animate-spin" /> : <Wand2 className="w-3 h-3" />}
-            </Button>
-          </AiGate>
-        </div>
+        <label className="text-xs text-zinc-500 uppercase tracking-widest font-semibold mb-2 block">Rumors</label>
         <EntityMentionTextarea
           value={data.rumors}
           onChange={(v) => handleChange('rumors', v)}
@@ -270,20 +149,7 @@ export default function NPCBuilder({ npcData, onUpdate }) {
 
       {/* Quests */}
       <div>
-        <div className="flex items-center justify-between mb-2">
-          <label className="text-xs text-zinc-500 uppercase tracking-widest font-semibold">Quests</label>
-          <AiGate>
-            <Button
-              onClick={() => generateField('quests')}
-              disabled={generating !== null}
-              size="sm"
-              variant="ghost"
-              className="text-zinc-500 hover:text-blue-400 h-7 text-xs"
-            >
-              {generating === 'quests' ? <Loader2 className="w-3 h-3 animate-spin" /> : <Wand2 className="w-3 h-3" />}
-            </Button>
-          </AiGate>
-        </div>
+        <label className="text-xs text-zinc-500 uppercase tracking-widest font-semibold mb-2 block">Quests</label>
         <EntityMentionTextarea
           value={data.quests}
           onChange={(v) => handleChange('quests', v)}
@@ -295,20 +161,7 @@ export default function NPCBuilder({ npcData, onUpdate }) {
 
       {/* Motives */}
       <div>
-        <div className="flex items-center justify-between mb-2">
-          <label className="text-xs text-zinc-500 uppercase tracking-widest font-semibold">Motives</label>
-          <AiGate>
-            <Button
-              onClick={() => generateField('motives')}
-              disabled={generating !== null}
-              size="sm"
-              variant="ghost"
-              className="text-zinc-500 hover:text-blue-400 h-7 text-xs"
-            >
-              {generating === 'motives' ? <Loader2 className="w-3 h-3 animate-spin" /> : <Wand2 className="w-3 h-3" />}
-            </Button>
-          </AiGate>
-        </div>
+        <label className="text-xs text-zinc-500 uppercase tracking-widest font-semibold mb-2 block">Motives</label>
         <EntityMentionTextarea
           value={data.motives}
           onChange={(v) => handleChange('motives', v)}
@@ -320,20 +173,7 @@ export default function NPCBuilder({ npcData, onUpdate }) {
 
       {/* Sample Dialogue */}
       <div>
-        <div className="flex items-center justify-between mb-2">
-          <label className="text-xs text-zinc-500 uppercase tracking-widest font-semibold">Sample Dialogue</label>
-          <AiGate>
-            <Button
-              onClick={() => generateField('sample_dialogue')}
-              disabled={generating !== null}
-              size="sm"
-              variant="ghost"
-              className="text-zinc-500 hover:text-blue-400 h-7 text-xs"
-            >
-              {generating === 'sample_dialogue' ? <Loader2 className="w-3 h-3 animate-spin" /> : <Wand2 className="w-3 h-3" />}
-            </Button>
-          </AiGate>
-        </div>
+        <label className="text-xs text-zinc-500 uppercase tracking-widest font-semibold mb-2 block">Sample Dialogue</label>
         <EntityMentionTextarea
           value={data.sample_dialogue}
           onChange={(v) => handleChange('sample_dialogue', v)}

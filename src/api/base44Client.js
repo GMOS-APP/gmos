@@ -100,14 +100,6 @@ export const base44 = {
 
   integrations: {
     Core: {
-      InvokeLLM: async ({ prompt, response_json_schema, add_context_from_internet }) => {
-        const { data, error } = await supabase.functions.invoke('invoke-llm', {
-          body: { prompt, response_json_schema, add_context_from_internet },
-        });
-        if (error) throw error;
-        return data;
-      },
-
       UploadFile: async ({ file }) => {
         const ext = file.name.split('.').pop();
         const fileName = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;

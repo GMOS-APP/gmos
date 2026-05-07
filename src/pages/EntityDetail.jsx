@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { WorldEntity, Relationship, InvokeLLM, Campaign } from '@/api/entities';
+import { WorldEntity, Relationship, Campaign } from '@/api/entities';
 import { createPageUrl } from '@/utils';
 import { Link, useLocation } from 'react-router-dom';
 import {
-  ArrowLeft, Save, Trash2, Plus, X, BookOpen, Loader2, Wand2, Search, Download, Pencil,
+  ArrowLeft, Save, Trash2, Plus, X, BookOpen, Download, Pencil,
 } from 'lucide-react';
 import StatBlock from '@/components/entity/StatBlock';
 import EntityStatBlockView from '@/components/entity/EntityStatBlockView';
@@ -21,7 +21,6 @@ import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
-import AiGate from '@/components/ui/AiGate';
 import { CampaignProvider, useCampaign } from '@/lib/CampaignContext';
 
 const entityTypes = ['note', 'npc', 'creature', 'location', 'faction', 'thread', 'item', 'player_character', 'event', 'lore', 'deity', 'encounter', 'shop'];
@@ -84,11 +83,7 @@ function EntityDetailInner() {
   const [newTag, setNewTag] = useState('');
   const [newFact, setNewFact] = useState('');
   const [saved, setSaved] = useState(false);
-  const [generating, setGenerating] = useState(false);
   const [entryMode, setEntryMode] = useState(isNew ? null : 'manual');
-  const [srdSearch, setSrdSearch] = useState('');
-  const [srdResults, setSrdResults] = useState([]);
-  const [searching, setSearching] = useState(false);
   const [descriptionMode, setDescriptionMode] = useState('edit'); // 'edit' | 'preview'
 
   // Reset all state when navigating to a different entity
@@ -198,11 +193,7 @@ function EntityDetailInner() {
     }
   };
 
-  const generateContent = async () => {
-    setGenerating(true);
-    const systemName = system.promptName;
-
-    const typePrompts = {
+  const _typePrompts = {
       npc: `Generate content for this NPC suitable for ${systemName}, including:
 - Stat block or equivalent mechanics
 - Traits and special abilities
@@ -276,110 +267,6 @@ function EntityDetailInner() {
 - Available inventory with prices
 - Services offered
 - Quest hooks or rumors`,
-    };
-
-    const prompt = typePrompts[form.entity_type] || typePrompts.npc;
-
-    const context = `Entity: ${form.name || 'Unnamed'}
-Type: ${form.entity_type}
-System: ${systemName}
-Current Summary: ${form.summary || 'None'}
-Current Description: ${form.description || 'None'}
-Key Facts: ${form.key_facts?.join(', ') || 'None'}
-Tags: ${form.tags?.join(', ') || 'None'}
-
-${prompt}
-
-Keep content practical for table use. Use markdown formatting. Focus on actionable information for the GM.`;
-
-    const result = await InvokeLLM({
-      prompt: context,
-    });
-
-    setForm({ ...form, description: result });
-    setGenerating(false);
-  };
-
-  const searchSRD = async () => {
-    if (!srdSearch.trim()) return;
-    setSearching(true);
-
-    const prompt = `Search ${system.promptName} rules for creatures/adversaries matching: "${srdSearch}"
-
-Return a JSON array of matching creatures with this exact schema:
-{
-  "creatures": [
-    {
-      "name": "exact creature name",
-      "type": "creature type (e.g., humanoid, beast, undead)",
-      "cr": "challenge rating",
-      "summary": "one-line description"
-    }
-  ]
-}
-
-If no exact matches, find similar creatures. Return up to 5 matches.`;
-
-    const result = await InvokeLLM({
-      prompt: prompt,
-      add_context_from_internet: true,
-      response_json_schema: {
-        type: "object",
-        properties: {
-          creatures: {
-            type: "array",
-            items: {
-              type: "object",
-              properties: {
-                name: { type: "string" },
-                type: { type: "string" },
-                cr: { type: "string" },
-                summary: { type: "string" }
-              }
-            }
-          }
-        }
-      }
-    });
-
-    setSrdResults(result.creatures || []);
-    setSearching(false);
-  };
-
-  const importCreature = async (creature) => {
-    setGenerating(true);
-
-    const prompt = `Import the complete stat block and information for: ${creature.name} (from ${system.promptName})
-
-Include:
-- Full stat block (AC, HP, Speed, ability scores, skills, senses, languages)
-- Traits and special abilities
-- Actions, bonus actions, and reactions
-- Legendary actions (if applicable)
-- Lair actions (if applicable)
-- Description and lore
-- Tactics and combat behavior
-
-Format with markdown for readability.`;
-
-    const content = await InvokeLLM({
-      prompt: prompt,
-      add_context_from_internet: true,
-    });
-
-    setForm({
-      ...form,
-      name: creature.name,
-      entity_type: 'npc',
-      summary: creature.summary,
-      description: content,
-      tags: [creature.type, `CR ${creature.cr}`],
-    });
-
-    setEntryMode('manual');
-    setSrdResults([]);
-    setSrdSearch('');
-    setGenerating(false);
   };
 
   if (isLoading && !isNew) {
@@ -404,48 +291,7 @@ Format with markdown for readability.`;
           </h2>
           <p className="text-sm dark:text-zinc-500 text-zinc-600 text-center mb-8">Choose how you'd like to create this {defaultType.replace('_', ' ')}</p>
 
-          <div className={`grid gap-4 ${defaultType === 'note' ? 'grid-cols-1 max-w-xs mx-auto' : defaultType === 'creature' ? 'grid-cols-3' : 'grid-cols-2'}`}>
-            {defaultType !== 'note' && (
-            <AiGate>
-            <button
-              onClick={async () => {
-                setEntryMode('auto');
-                setGenerating(true);
-                await generateContent();
-                setGenerating(false);
-              }}
-              className="group p-6 rounded-xl dark:border-2 dark:border-zinc-800 dark:bg-zinc-900/40 border-2 border-zinc-300 bg-zinc-50 dark:hover:border-blue-500/50 dark:hover:bg-blue-500/5 hover:border-blue-500/50 hover:bg-blue-500/5 transition-all"
-            >
-              <div className="flex flex-col items-center gap-3">
-                <div className="p-3 rounded-lg bg-blue-500/10 group-hover:bg-blue-500/20 transition-colors">
-                  <Wand2 className="w-6 h-6 text-blue-400" />
-                </div>
-                <div className="text-center">
-                  <h3 className="font-semibold dark:text-zinc-100 text-zinc-900 mb-1">Auto Generate</h3>
-                  <p className="text-xs dark:text-zinc-500 text-zinc-600">AI generates content for your system</p>
-                </div>
-              </div>
-            </button>
-            </AiGate>
-            )}
-
-            {defaultType === 'creature' && system.hasSrdImport && (
-              <button
-                onClick={() => setEntryMode('srd_import')}
-                className="group p-6 rounded-xl dark:border-2 dark:border-zinc-800 dark:bg-zinc-900/40 border-2 border-zinc-300 bg-zinc-50 dark:hover:border-green-500/50 dark:hover:bg-green-500/5 hover:border-green-500/50 hover:bg-green-500/5 transition-all"
-              >
-                <div className="flex flex-col items-center gap-3">
-                  <div className="p-3 rounded-lg bg-green-500/10 group-hover:bg-green-500/20 transition-colors">
-                    <Download className="w-6 h-6 text-green-400" />
-                  </div>
-                  <div className="text-center">
-                    <h3 className="font-semibold dark:text-zinc-100 text-zinc-900 mb-1">Import from SRD</h3>
-                    <p className="text-xs dark:text-zinc-500 text-zinc-600">Search and import from the rulebook</p>
-                  </div>
-                </div>
-              </button>
-            )}
-
+          <div className={`grid gap-4 ${defaultType === 'note' ? 'grid-cols-1 max-w-xs mx-auto' : 'grid-cols-1 max-w-xs mx-auto'}`}>
             <button
               onClick={() => setEntryMode('manual')}
               className="group p-6 rounded-xl dark:border-2 dark:border-zinc-800 dark:bg-zinc-900/40 border-2 border-zinc-300 bg-zinc-50 dark:hover:border-amber-500/50 dark:hover:bg-amber-500/5 hover:border-amber-500/50 hover:bg-amber-500/5 transition-all"
@@ -481,12 +327,6 @@ Format with markdown for readability.`;
             </div>
           )}
 
-          {generating && (
-            <div className="mt-8 text-center">
-              <Loader2 className="w-6 h-6 animate-spin text-blue-400 mx-auto mb-2" />
-              <p className="text-sm dark:text-zinc-500 text-zinc-600">Generating content...</p>
-            </div>
-          )}
         </div>
       </div>
     );
@@ -503,99 +343,6 @@ Format with markdown for readability.`;
           }}
           onCancel={() => setEntryMode(null)}
         />
-      </div>
-    );
-  }
-
-  // SRD Import mode
-  if (isNew && entryMode === 'srd_import') {
-    return (
-      <div className="p-4 sm:p-6 lg:p-8 max-w-4xl">
-        <button
-          onClick={() => setEntryMode(null)}
-          className="inline-flex items-center gap-1.5 text-xs dark:text-zinc-500 dark:hover:text-zinc-300 text-zinc-600 hover:text-zinc-900 mb-6"
-        >
-          <ArrowLeft className="w-3.5 h-3.5" />
-          Back to options
-        </button>
-
-        <div className="max-w-2xl mx-auto mt-8">
-          <h2 className="text-2xl font-bold dark:text-zinc-100 text-zinc-900 mb-2">Import Creature from SRD</h2>
-          <p className="text-sm dark:text-zinc-500 text-zinc-600 mb-6">Search the D&D 5e System Reference Document 5.1</p>
-
-          <div className="flex gap-2 mb-6">
-            <Input
-              value={srdSearch}
-              onChange={(e) => setSrdSearch(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && searchSRD()}
-              placeholder="Search for creature (e.g., Goblin, Ancient Red Dragon)..."
-              className="dark:bg-zinc-900/60 dark:border-zinc-800 dark:text-zinc-200 bg-zinc-100 border-zinc-300 text-zinc-900"
-            />
-            <AiGate>
-              <Button
-                onClick={searchSRD}
-                disabled={searching || !srdSearch.trim()}
-                className="bg-green-500 hover:bg-green-400 text-zinc-950"
-              >
-                {searching ? <Loader2 className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
-              </Button>
-            </AiGate>
-          </div>
-
-          {searching && (
-            <div className="text-center py-8">
-              <Loader2 className="w-6 h-6 animate-spin text-green-400 mx-auto mb-2" />
-              <p className="text-sm dark:text-zinc-500 text-zinc-600">Searching SRD...</p>
-            </div>
-          )}
-
-          {!searching && srdResults.length > 0 && (
-            <div className="space-y-2">
-              <p className="text-xs dark:text-zinc-500 text-zinc-600 mb-3">Found {srdResults.length} creature(s):</p>
-              {srdResults.map((creature, idx) => (
-                <button
-                  key={idx}
-                  onClick={() => importCreature(creature)}
-                  disabled={generating}
-                  className="w-full p-4 rounded-lg dark:border-zinc-800 dark:bg-zinc-900/40 dark:hover:bg-zinc-800/60 dark:hover:border-green-500/50 border-zinc-300 bg-zinc-50 hover:bg-zinc-100 hover:border-green-500/50 transition-all text-left group"
-                >
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <h3 className="font-semibold dark:text-zinc-100 dark:group-hover:text-green-400 text-zinc-900 group-hover:text-green-600 mb-1">{creature.name}</h3>
-                      <p className="text-xs dark:text-zinc-500 text-zinc-600 mb-2">{creature.summary}</p>
-                      <div className="flex gap-2">
-                        <Badge variant="outline" className="text-[10px] border-zinc-700 text-zinc-500 capitalize">
-                          {creature.type}
-                        </Badge>
-                        <Badge variant="outline" className="text-[10px] border-zinc-700 text-zinc-500">
-                          CR {creature.cr}
-                        </Badge>
-                      </div>
-                    </div>
-                    {generating ? (
-                      <Loader2 className="w-4 h-4 animate-spin text-green-400 ml-4" />
-                    ) : (
-                      <Download className="w-4 h-4 dark:text-zinc-600 dark:group-hover:text-green-400 text-zinc-400 group-hover:text-green-600 ml-4" />
-                    )}
-                  </div>
-                </button>
-              ))}
-            </div>
-          )}
-
-          {!searching && srdResults.length === 0 && srdSearch && (
-            <div className="text-center py-8 dark:text-zinc-500 text-zinc-600 text-sm">
-              No creatures found. Try a different search term.
-            </div>
-          )}
-
-          {generating && (
-            <div className="mt-8 text-center">
-              <Loader2 className="w-6 h-6 animate-spin text-green-400 mx-auto mb-2" />
-              <p className="text-sm dark:text-zinc-500 text-zinc-600">Importing creature data...</p>
-            </div>
-          )}
-        </div>
       </div>
     );
   }
@@ -1036,21 +783,6 @@ Format with markdown for readability.`;
                 </button>
               </div>
             </div>
-            <AiGate>
-              <Button
-                onClick={generateContent}
-                disabled={generating || !form.name.trim()}
-                size="sm"
-                variant="outline"
-                className="border-blue-500/30 text-blue-400 hover:bg-blue-500/10 h-7 text-xs"
-              >
-                {generating ? (
-                  <><Loader2 className="w-3 h-3 mr-1.5 animate-spin" /> Generating...</>
-                ) : (
-                  <><Wand2 className="w-3 h-3 mr-1.5" /> Generate SRD Content</>
-                )}
-              </Button>
-            </AiGate>
           </div>
 
           {descriptionMode === 'edit' ? (

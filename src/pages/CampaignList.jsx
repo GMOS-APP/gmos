@@ -4,9 +4,8 @@ import { Campaign, functions } from '@/api/entities';
 import { supabase } from '@/api/supabaseClient';
 import { createPageUrl } from '@/utils';
 import { Link } from 'react-router-dom';
-import { Plus, FolderOpen, MoreHorizontal, Trash2, Download, Upload, FileText, Sparkles, LogOut, BookOpen, Loader2 } from 'lucide-react';
+import { Plus, FolderOpen, MoreHorizontal, Trash2, Download, Upload, FileText, LogOut, BookOpen, Loader2 } from 'lucide-react';
 import { useAuth } from '@/lib/AuthContext';
-import RawImportDialog from '@/components/campaign/RawImportDialog';
 import ThemeToggle from '@/components/ui/ThemeToggle';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -31,7 +30,6 @@ export default function CampaignList() {
   const [form, setForm] = useState({ name: '', description: '', setting: '', system: DEFAULT_SYSTEM_ID });
   const [exportingId, setExportingId] = useState(null);
   const [importing, setImporting] = useState(false);
-  const [showRawImport, setShowRawImport] = useState(false);
   const fileInputRef = useRef(null);
 
   const handleImport = async (e) => {
@@ -150,13 +148,6 @@ export default function CampaignList() {
                 >
                   <FileText className="w-3.5 h-3.5 mr-2" />
                   From File
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  onClick={() => setShowRawImport(true)}
-                  className="text-zinc-700 dark:text-zinc-300 focus:text-zinc-900 dark:focus:text-zinc-100"
-                >
-                  <Sparkles className="w-3.5 h-3.5 mr-2" />
-                  From Raw Data (AI)
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   onClick={handleLoadDemo}
@@ -305,14 +296,6 @@ export default function CampaignList() {
         )}
       </div>
 
-      <RawImportDialog
-        open={showRawImport}
-        onOpenChange={setShowRawImport}
-        onImported={() => {
-          queryClient.invalidateQueries({ queryKey: ['campaigns'] });
-          setShowRawImport(false);
-        }}
-      />
 
       {/* Create Dialog */}
       <Dialog open={showCreate} onOpenChange={setShowCreate}>

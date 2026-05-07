@@ -1,13 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import EntityMentionRenderer from '@/components/common/EntityMentionRenderer';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { Session, InvokeLLM } from '@/api/entities';
+import { Session } from '@/api/entities';
 import { useCampaign } from '@/lib/CampaignContext';
 import { Button } from '@/components/ui/button';
 import EntityMentionTextarea from '@/components/common/EntityMentionTextarea';
 import { Input } from '@/components/ui/input';
-import { Save, Loader2, Plus, X, CheckCircle2, Clock, CalendarDays, Wand2 } from 'lucide-react';
-import AiGate from '@/components/ui/AiGate';
+import { Save, Loader2, Plus, X, CheckCircle2, Clock, CalendarDays } from 'lucide-react';
 
 export default function SessionDebrief({ session, previousSession, notes = [], entities = [], campaignId }) {
   const { system } = useCampaign();
@@ -17,8 +16,6 @@ export default function SessionDebrief({ session, previousSession, notes = [], e
   const [keyEvents, setKeyEvents] = useState(session?.key_events || []);
   const [nextPrimer, setNextPrimer] = useState(session?.next_session_primer || '');
   const [newEvent, setNewEvent] = useState('');
-  const [generating, setGenerating] = useState(false);
-  const [generateError, setGenerateError] = useState(null);
   const [saved, setSaved] = useState(false);
   const [saveError, setSaveError] = useState(null);
 
@@ -45,68 +42,6 @@ export default function SessionDebrief({ session, previousSession, notes = [], e
       setSaveError(err?.message || 'Save failed. Please try again.');
     },
   });
-
-  const handleGenerate = async () => {
-    setGenerating(true);
-    setGenerateError(null);
-    try {
-      const notesText = notes.map((n, i) => {
-        const tags = n.tags?.length ? `[${n.tags.join(', ')}] ` : '';
-        return `${i + 1}. ${tags}${n.content}`;
-      }).join('\n');
-      const linkedNames = (session?.linked_entities || []).map((e) => e.entity_name).join(', ');
-
-      // Build previous session context from multiple sources
-      const prevLines = [];
-      if (session?.previous_session_recap) {
-        prevLines.push(`Recap (written by GM): ${session.previous_session_recap}`);
-      }
-      if (previousSession) {
-        const label = `Session #${previousSession.session_number}${previousSession.title ? ` — ${previousSession.title}` : ''}`;
-        if (previousSession.summary) prevLines.push(`${label} summary: ${previousSession.summary}`);
-        if (previousSession.key_events?.length) prevLines.push(`${label} key events: ${previousSession.key_events.join('; ')}`);
-        if (previousSession.next_session_primer) prevLines.push(`${label} cliffhanger/primer: ${previousSession.next_session_primer}`);
-      }
-      const prevContext = prevLines.length > 0
-        ? `\nPrevious session context:\n${prevLines.join('\n')}\n`
-        : '';
-
-      const existingKeyEventsText = keyEvents.length
-        ? `\nKey events already recorded (treat these as the factual backbone — use them verbatim or refine, do not ignore):\n${keyEvents.map((e, i) => `${i + 1}. ${e}`).join('\n')}\n`
-        : '';
-
-      const result = await InvokeLLM({
-        prompt: `You are a ${system.promptName} session chronicler. Given the following session data, generate:
-1. A vivid 2-3 paragraph narrative summary of the session — reference specific events from the key events and notes
-2. 4-6 bullet-point key events (short, punchy, present-tense) — if key events are already provided, refine rather than replace them
-3. A 1-2 sentence "next session primer" teaser for players
-${prevContext}${existingKeyEventsText}
-Current session: ${session?.title || `Session #${session?.session_number}`}
-Quick notes captured during play (with tags):
-${notesText || '(none)'}
-Linked entities/characters: ${linkedNames || '(none)'}
-Session goals: ${(session?.session_goals || []).map((g) => g.text).join(', ') || '(none)'}
-
-Respond as JSON.`,
-        response_json_schema: {
-          type: 'object',
-          properties: {
-            summary: { type: 'string' },
-            key_events: { type: 'array', items: { type: 'string' } },
-            next_session_primer: { type: 'string' },
-          },
-        },
-      });
-
-      if (result.summary) setSummary(result.summary);
-      if (result.key_events?.length) setKeyEvents(result.key_events);
-      if (result.next_session_primer) setNextPrimer(result.next_session_primer);
-    } catch (err) {
-      setGenerateError(err?.message || 'AI generation failed. Please try again.');
-    } finally {
-      setGenerating(false);
-    }
-  };
 
   const addEvent = () => {
     if (!newEvent.trim()) return;
@@ -142,22 +77,6 @@ Respond as JSON.`,
               </span>
             )}
           </div>
-        </div>
-        <div className="flex flex-col items-end gap-1">
-          <AiGate>
-            <Button
-              onClick={handleGenerate}
-              disabled={generating}
-              size="sm"
-              className="bg-violet-600 hover:bg-violet-500 text-white flex-shrink-0"
-            >
-              {generating ? <Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" /> : <Wand2 className="w-3.5 h-3.5 mr-1.5" />}
-              {generating ? 'Generating…' : `AI Generate${notes.length > 0 ? ` (${notes.length} notes)` : ''}`}
-            </Button>
-          </AiGate>
-          {generateError && (
-            <p className="text-xs text-red-500 dark:text-red-400 max-w-48 text-right">{generateError}</p>
-          )}
         </div>
       </div>
 

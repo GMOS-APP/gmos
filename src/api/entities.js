@@ -74,23 +74,6 @@ export const CampaignMap = createEntityAPI('campaign_maps');
 export const QuickNote = createEntityAPI('quick_notes');
 export const RandomTable = createEntityAPI('random_tables');
 
-export async function InvokeLLM({ prompt, response_json_schema, add_context_from_internet }) {
-  const { data, error } = await supabase.functions.invoke('invoke-llm', {
-    body: { prompt, response_json_schema, add_context_from_internet },
-  });
-  if (error) {
-    let detail = error.message;
-    try {
-      const body = await error.context?.json?.();
-      detail = body?.detail || body?.error || error.message;
-    } catch { /* ignore */ }
-    throw new Error(detail);
-  }
-  // Plain-text responses are wrapped in { result: "..." }; unwrap for callers expecting a string
-  if (!response_json_schema && data?.result !== undefined) return data.result;
-  return data;
-}
-
 export async function UploadFile({ file }) {
   const ext = file.name.split('.').pop();
   const fileName = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;

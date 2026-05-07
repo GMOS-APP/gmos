@@ -1,14 +1,13 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
-import { Session, Campaign, InvokeLLM } from '@/api/entities';
+import { Session, Campaign } from '@/api/entities';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import EntityMentionTextarea from '@/components/common/EntityMentionTextarea';
-import { Wand2, PenLine, ChevronRight, ChevronLeft, Plus, X, Loader2, Sparkles } from 'lucide-react';
-import AiGate from '@/components/ui/AiGate';
+import { Wand2, PenLine, ChevronRight, ChevronLeft, Plus, X, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const STEPS = ['Basics', 'Goals', 'Opening', 'Scenes'];
@@ -18,8 +17,6 @@ export default function NewSessionDialog({ open, onClose, campaignId, campaign }
   const queryClient = useQueryClient();
   const [mode, setMode] = useState(null); // null | 'wizard' | 'manual'
   const [step, setStep] = useState(0);
-  const [generating, setGenerating] = useState(false);
-
   const nextSessionNum = (campaign?.current_session_number || 0) + 1;
 
   const [form, setForm] = useState({
@@ -75,30 +72,6 @@ export default function NewSessionDialog({ open, onClose, campaignId, campaign }
     if (!sceneInput.trim()) return;
     setForm(f => ({ ...f, potential_scenes: [...f.potential_scenes, sceneInput.trim()] }));
     setSceneInput('');
-  };
-
-  const generateWithAI = async () => {
-    setGenerating(true);
-    const result = await InvokeLLM({
-      prompt: `You are helping a Game Master plan session ${nextSessionNum} of their campaign "${campaign?.name}". Setting: ${campaign?.setting || 'a fantasy world'}. Generate a compelling session title, a strong opening hook (2-3 sentences), 3 session goals, and 3 potential scenes. Keep it concise and evocative.`,
-      response_json_schema: {
-        type: 'object',
-        properties: {
-          title: { type: 'string' },
-          strong_start: { type: 'string' },
-          session_goals: { type: 'array', items: { type: 'string' } },
-          potential_scenes: { type: 'array', items: { type: 'string' } },
-        },
-      },
-    });
-    setForm(f => ({
-      ...f,
-      title: result.title || f.title,
-      strong_start: result.strong_start || f.strong_start,
-      session_goals: result.session_goals?.length ? result.session_goals : f.session_goals,
-      potential_scenes: result.potential_scenes?.length ? result.potential_scenes : f.potential_scenes,
-    }));
-    setGenerating(false);
   };
 
   // Mode selection screen
@@ -178,18 +151,6 @@ export default function NewSessionDialog({ open, onClose, campaignId, campaign }
                   className="dark:bg-zinc-800 dark:border-zinc-700 dark:text-zinc-200"
                 />
               </div>
-              <AiGate>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={generateWithAI}
-                  disabled={generating}
-                  className="dark:border-amber-500/30 dark:text-amber-400 dark:hover:bg-amber-500/10 border-amber-300 text-amber-600 hover:bg-amber-50"
-                >
-                  {generating ? <Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" /> : <Sparkles className="w-3.5 h-3.5 mr-1.5" />}
-                  AI Generate All Fields
-                </Button>
-              </AiGate>
             </div>
           )}
 

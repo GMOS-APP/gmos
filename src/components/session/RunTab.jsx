@@ -1,8 +1,6 @@
 import React from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import SessionTimer from '@/components/session/SessionTimer';
-import RandomNPCGenerator from '@/components/session/RandomNPCGenerator';
-import QuickDialogueGenerator from '@/components/session/QuickDialogueGenerator';
 import DiceRoller from '@/components/session/DiceRoller';
 import SessionNotesDisplay from '@/components/session/SessionNotesDisplay';
 import SessionNotesPanel from '@/components/session/SessionNotesPanel';
@@ -47,8 +45,6 @@ export default function RunTab({ session, entities, campaignId }) {
         <TabsContent value="tools" className="flex-1 m-0 overflow-y-auto">
           <div className="p-4 space-y-3">
             <DiceRoller />
-            <RandomNPCGenerator campaignId={campaignId} />
-            <QuickDialogueGenerator entities={entities} />
           </div>
         </TabsContent>
 

@@ -13,7 +13,6 @@ import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import PassiveStatsHub from '@/components/dashboard/PassiveStatsHub';
 import PartyInventory from '@/components/dashboard/PartyInventory';
-import RulesSearch from '@/components/dashboard/RulesSearch';
 import PrivateScratchpad from '@/components/dashboard/PrivateScratchpad';
 import StandaloneTimer from '@/components/dashboard/StandaloneTimer';
 import WeatherGenerator from '@/components/dashboard/WeatherGenerator';
@@ -433,9 +432,6 @@ export default function CampaignDashboard() {
         <h2 className="text-xs font-semibold text-zinc-600 dark:text-zinc-500 uppercase tracking-widest">GM Tools</h2>
         <div style={{ minHeight: '220px' }}>
           <StandaloneTimer />
-        </div>
-        <div style={{ minHeight: '280px' }}>
-          <RulesSearch />
         </div>
         <div style={{ minHeight: '220px' }}>
           <PrivateScratchpad campaignId={campaignId} />

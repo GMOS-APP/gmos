@@ -9,8 +9,6 @@ import SessionNotesPanel from '@/components/session/SessionNotesPanel';
 import ResourceTracker from '@/components/session/ResourceTracker';
 import SessionNotesDisplay from '@/components/session/SessionNotesDisplay';
 import EntityLinker from '@/components/session/EntityLinker';
-import RandomNPCGenerator from '@/components/session/RandomNPCGenerator';
-import QuickDialogueGenerator from '@/components/session/QuickDialogueGenerator';
 import CombatTracker from '@/components/session/CombatTracker';
 import EntityQuickViewModal from '@/components/common/EntityQuickViewModal';
 import { Minimize2, Clock, StickyNote, Scroll, Swords, Heart, Search, Users, MapPin, Shield, Waypoints, Package, Sparkles, BookOpen, Church, Flame, ShoppingBag } from 'lucide-react';
@@ -141,10 +139,6 @@ function RightPanelContent({ session, entities, campaignId }) {
       <TabsContent value="tools" className="flex-1 m-0 overflow-y-auto">
         <div className="p-3 space-y-3">
           <DiceRoller />
-          <div className="space-y-2">
-            <RandomNPCGenerator campaignId={campaignId} />
-            <QuickDialogueGenerator entities={entities} />
-          </div>
         </div>
       </TabsContent>
 

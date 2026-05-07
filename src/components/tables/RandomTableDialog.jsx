@@ -1,9 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { RandomTable, InvokeLLM } from '@/api/entities';
+import { RandomTable } from '@/api/entities';
 import { useCampaign } from '@/lib/CampaignContext';
-import { Sparkles, Plus, X, Loader2 } from 'lucide-react';
-import AiGate from '@/components/ui/AiGate';
+import { Plus, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -30,7 +29,6 @@ export default function RandomTableDialog({ open, onClose, campaignId, campaign,
   const { system } = useCampaign();
   const [form, setForm] = useState(EMPTY_FORM);
   const [entryInput, setEntryInput] = useState('');
-  const [generating, setGenerating] = useState(false);
   const entryListRef = useRef(null);
 
   useEffect(() => {
@@ -71,31 +69,6 @@ export default function RandomTableDialog({ open, onClose, campaignId, campaign,
       entries[i] = { result: val };
       return { ...f, entries };
     });
-  };
-
-  const generateEntries = async () => {
-    if (!form.name.trim()) return;
-    setGenerating(true);
-    try {
-      const categoryLabel = CATEGORIES.find(c => c.value === form.category)?.label || form.category;
-      const result = await InvokeLLM({
-        prompt: `You are helping a Game Master populate a random "${categoryLabel}" table for a ${system.promptName} campaign called "${campaign?.name || 'an unnamed campaign'}". Setting: ${campaign?.setting || 'a fantasy world'}. Table name: "${form.name}". Generate 10 varied, evocative entries suitable for this table. Return only the entries array.`,
-        response_json_schema: {
-          type: 'object',
-          properties: {
-            entries: { type: 'array', items: { type: 'string' } },
-          },
-          required: ['entries'],
-        },
-      });
-      if (result?.entries?.length) {
-        const newEntries = result.entries.map(e => ({ id: crypto.randomUUID(), result: e }));
-        setForm(f => ({ ...f, entries: [...f.entries, ...newEntries] }));
-        setTimeout(() => entryListRef.current?.scrollTo(0, entryListRef.current.scrollHeight), 50);
-      }
-    } finally {
-      setGenerating(false);
-    }
   };
 
   const handleSave = () => {
@@ -143,23 +116,11 @@ export default function RandomTableDialog({ open, onClose, campaignId, campaign,
             <span className="text-xs font-semibold uppercase tracking-wider dark:text-zinc-400 text-zinc-500">
               Entries ({form.entries.length})
             </span>
-            <AiGate>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={generateEntries}
-                disabled={generating || !form.name.trim()}
-                className="dark:border-zinc-700 dark:text-zinc-300 text-xs"
-              >
-                {generating ? <Loader2 className="w-3 h-3 mr-1.5 animate-spin" /> : <Sparkles className="w-3 h-3 mr-1.5" />}
-                Generate with AI
-              </Button>
-            </AiGate>
           </div>
 
           <div ref={entryListRef} className="max-h-52 overflow-y-auto space-y-1.5 pr-1">
             {form.entries.length === 0 && (
-              <p className="text-sm dark:text-zinc-600 text-zinc-400 text-center py-4">No entries yet — add some below or generate with AI.</p>
+              <p className="text-sm dark:text-zinc-600 text-zinc-400 text-center py-4">No entries yet — add some below.</p>
             )}
             {form.entries.map((e, i) => (
               <div key={e.id} className="flex gap-2 items-center">
@@ -199,7 +160,6 @@ export default function RandomTableDialog({ open, onClose, campaignId, campaign,
             disabled={saveMutation.isPending || !form.name.trim()}
             className="bg-amber-500 hover:bg-amber-400 text-zinc-950 font-semibold"
           >
-            {saveMutation.isPending && <Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" />}
             Save Table
           </Button>
         </div>
