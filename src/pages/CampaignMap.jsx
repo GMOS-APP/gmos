@@ -286,8 +286,8 @@ export default function CampaignMap() {
                       : 'dark:border-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-200 border-zinc-300 text-zinc-700 text-xs hover:text-zinc-900'}
                   >
                     {editMode
-                      ? <><Check className="w-3.5 h-3.5 mr-1.5" />Done Editing</>
-                      : <><Pencil className="w-3.5 h-3.5 mr-1.5" />Edit Pins</>}
+                      ? <><Check className="w-3.5 h-3.5 mr-1.5" />Done</>
+                      : <><Pencil className="w-3.5 h-3.5 mr-1.5" />Edit</>}
                   </Button>
                   {editMode && (
                     <Button
