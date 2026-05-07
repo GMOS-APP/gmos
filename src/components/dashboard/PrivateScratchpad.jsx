@@ -27,13 +27,13 @@ export default function PrivateScratchpad({ campaignId }) {
   };
 
   return (
-    <div className="bg-zinc-900/40 border border-zinc-800/50 rounded-xl p-4 flex flex-col h-full">
+    <div className="bg-zinc-100 dark:bg-zinc-900/40 border border-zinc-200 dark:border-zinc-800/50 rounded-xl p-4 flex flex-col h-full">
       <div className="flex items-center justify-between mb-3 flex-shrink-0">
         <div className="flex items-center gap-2">
-          <StickyNote className="w-3.5 h-3.5 text-amber-400" />
-          <h3 className="text-xs font-semibold text-zinc-400 uppercase tracking-widest">DM Scratchpad</h3>
+          <StickyNote className="w-3.5 h-3.5 text-amber-500 dark:text-amber-400" />
+          <h3 className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-widest">DM Scratchpad</h3>
         </div>
-        <span className={`text-[10px] transition-colors ${saved ? 'text-zinc-700' : 'text-amber-600'}`}>
+        <span className={`text-[10px] transition-colors ${saved ? 'text-zinc-400 dark:text-zinc-700' : 'text-amber-600'}`}>
           {saved ? '● Saved' : '● Saving…'}
         </span>
       </div>
@@ -41,7 +41,7 @@ export default function PrivateScratchpad({ campaignId }) {
         value={text}
         onChange={handleChange}
         placeholder={"DM eyes only…\n\nThe butler did it.\nThe dragon is actually a gold dragon.\nParty suspects the wrong person."}
-        className="flex-1 w-full bg-transparent text-xs text-zinc-300 placeholder:text-zinc-700 resize-none focus:outline-none leading-relaxed min-h-[140px] font-mono"
+        className="flex-1 w-full bg-transparent text-xs text-zinc-800 dark:text-zinc-300 placeholder:text-zinc-400 dark:placeholder:text-zinc-700 resize-none focus:outline-none leading-relaxed min-h-[140px] font-mono"
       />
     </div>
   );
