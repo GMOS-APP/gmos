@@ -2,7 +2,7 @@ import React, { useState, useRef, useCallback } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { CampaignMap as CampaignMapEntity, WorldEntity, UploadFile } from '@/api/entities';
 import {
-  Plus, Pencil, Check, Trash2, Upload, Map, ChevronDown, ImageOff
+  Plus, Pencil, Check, Trash2, Upload, Map, ChevronDown, ImageOff, BookImage,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -14,6 +14,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import MapPinMarker from '@/components/map/MapPin';
 import PinLocationPicker from '@/components/map/PinLocationPicker';
+import DysonLogosImporter from '@/components/map/DysonLogosImporter';
 
 export default function CampaignMap() {
   const params = new URLSearchParams(window.location.search);
@@ -26,6 +27,7 @@ export default function CampaignMap() {
   const [pendingColor, setPendingColor] = useState('amber');
   const [showNewMapDialog, setShowNewMapDialog] = useState(false);
   const [newMapForm, setNewMapForm] = useState({ name: '', image_url: '' });
+  const [showDysonBrowser, setShowDysonBrowser] = useState(false);
   const [uploading, setUploading] = useState(false);
   const fileRef = useRef(null);
   const mapRef = useRef(null);
@@ -170,6 +172,13 @@ export default function CampaignMap() {
           )}
           <Button
             size="sm"
+            onClick={() => setShowDysonBrowser(true)}
+            className="dark:bg-zinc-800 dark:hover:bg-zinc-700 dark:text-zinc-200 bg-zinc-200 hover:bg-zinc-300 text-zinc-900 text-xs"
+          >
+            <BookImage className="w-3.5 h-3.5 mr-1.5" />Dyson Logos
+          </Button>
+          <Button
+            size="sm"
             onClick={() => setShowNewMapDialog(true)}
             className="dark:bg-zinc-800 dark:hover:bg-zinc-700 dark:text-zinc-200 bg-zinc-200 hover:bg-zinc-300 text-zinc-900 text-xs"
           >
@@ -278,6 +287,16 @@ export default function CampaignMap() {
           </div>
         )}
       </div>
+
+      {/* Dyson Logos Browser */}
+      <DysonLogosImporter
+        open={showDysonBrowser}
+        onClose={() => setShowDysonBrowser(false)}
+        onImport={(mapData) => createMapMutation.mutate(mapData, {
+          onSuccess: () => setShowDysonBrowser(false),
+        })}
+        isImporting={createMapMutation.isPending}
+      />
 
       {/* New Map Dialog */}
       <Dialog open={showNewMapDialog} onOpenChange={setShowNewMapDialog}>
