@@ -91,7 +91,7 @@ export default function Open5eImport({ onImport, onCancel }) {
     setSearched(true);
     try {
       const res = await fetch(
-        `https://api.open5e.com/v1/monsters/?search=${encodeURIComponent(query.trim())}&limit=30&ordering=name`
+        `https://api.open5e.com/v1/monsters/?name__icontains=${encodeURIComponent(query.trim())}&limit=30&ordering=name`
       );
       if (!res.ok) throw new Error('Open5e API error');
       const json = await res.json();
