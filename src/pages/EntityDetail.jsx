@@ -468,11 +468,11 @@ function EntityDetailInner() {
 
         {/* Header */}
         <div className="flex items-start gap-5 mb-8">
-          {form.entity_type === 'player_character' && form.image_url && (
+          {form.image_url && (
             <img
               src={form.image_url}
               alt={form.name}
-              className="w-28 h-36 rounded-lg object-cover border-2 dark:border-zinc-800 border-zinc-200 shadow-lg flex-shrink-0"
+              className="w-28 h-28 rounded-lg object-cover border-2 dark:border-zinc-800 border-zinc-200 shadow-lg flex-shrink-0"
             />
           )}
           <div className="flex-1 min-w-0">
@@ -708,16 +708,21 @@ function EntityDetailInner() {
 
       {/* Header */}
       <div className="flex items-start justify-between mb-8">
-        {/* Portrait (PC only) */}
-        {form.entity_type === 'player_character' && form.image_url && (
-          <div className="flex-shrink-0 mr-6">
+        {/* Image thumbnail / placeholder */}
+        <div className="flex-shrink-0 mr-5">
+          {form.image_url ? (
             <img
               src={form.image_url}
               alt={form.name}
-              className="w-32 h-40 rounded-lg object-cover border-2 border-zinc-800 shadow-lg"
+              className="w-20 h-20 rounded-lg object-cover border-2 dark:border-zinc-800 border-zinc-200 shadow"
             />
-          </div>
-        )}
+          ) : (
+            <div className="w-20 h-20 rounded-lg border-2 border-dashed dark:border-zinc-700 border-zinc-300 dark:bg-zinc-900 bg-zinc-100 flex items-center justify-center">
+              <ImageOff className="w-6 h-6 dark:text-zinc-700 text-zinc-400" />
+            </div>
+          )}
+        </div>
+
         <div className="flex-1">
           <Input
             value={form.name}
@@ -758,6 +763,14 @@ function EntityDetailInner() {
                 ))}
               </SelectContent>
             </Select>
+          </div>
+          <div className="mt-3">
+            <Input
+              value={form.image_url}
+              onChange={(e) => setForm({ ...form, image_url: e.target.value })}
+              placeholder="Image URL (optional)…"
+              className="dark:bg-zinc-900/60 dark:border-zinc-800 dark:text-zinc-300 dark:placeholder:text-zinc-700 bg-zinc-100 border-zinc-300 text-zinc-900 placeholder:text-zinc-500 text-xs h-8"
+            />
           </div>
         </div>
         <div className="flex gap-2 ml-4">
