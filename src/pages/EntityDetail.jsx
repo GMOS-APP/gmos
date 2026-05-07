@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { WorldEntity, Relationship, Campaign } from '@/api/entities';
+import { WorldEntity, Relationship, Campaign, CampaignMap as CampaignMapEntity } from '@/api/entities';
 import { createPageUrl } from '@/utils';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
-  ArrowLeft, Save, Trash2, Plus, X, BookOpen, Download, Pencil,
+  ArrowLeft, Save, Trash2, Plus, X, BookOpen, Download, Pencil, Map,
 } from 'lucide-react';
 import StatBlock from '@/components/entity/StatBlock';
 import EntityStatBlockView from '@/components/entity/EntityStatBlockView';
@@ -62,6 +62,78 @@ const VISIBILITY_LABELS = {
 
 function humanizeKey(key) {
   return key.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
+function LinkedMapSection({ entityId, entityName, campaignId, editMode }) {
+  const queryClient = useQueryClient();
+
+  const { data: maps = [] } = useQuery({
+    queryKey: ['campaign-maps', campaignId],
+    queryFn: () => CampaignMapEntity.filter({ campaign_id: campaignId }),
+    enabled: !!campaignId && !!entityId,
+    staleTime: 30000,
+  });
+
+  const linkedMap = maps.find(m => m.linked_entity_id === entityId) || null;
+
+  const linkMutation = useMutation({
+    mutationFn: async (mapId) => {
+      if (mapId && linkedMap?.id === mapId) return;
+      if (linkedMap) {
+        await CampaignMapEntity.update(linkedMap.id, { linked_entity_id: null, linked_entity_name: null });
+      }
+      if (mapId) {
+        await CampaignMapEntity.update(mapId, { linked_entity_id: entityId, linked_entity_name: entityName });
+      }
+    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['campaign-maps', campaignId] }),
+  });
+
+  if (!editMode) {
+    if (!linkedMap) return null;
+    return (
+      <div>
+        <h3 className="text-xs dark:text-zinc-500 text-zinc-500 uppercase tracking-widest font-semibold mb-2">
+          Linked Map
+        </h3>
+        <Link
+          to={createPageUrl('CampaignMap') + `?campaign_id=${campaignId}`}
+          className="inline-flex items-center gap-2 text-sm dark:text-green-400 dark:hover:text-green-300 text-green-600 hover:text-green-700 transition-colors"
+        >
+          <Map className="w-3.5 h-3.5 flex-shrink-0" />
+          {linkedMap.name}
+        </Link>
+      </div>
+    );
+  }
+
+  return (
+    <div>
+      <label className="text-xs dark:text-zinc-500 text-zinc-600 uppercase tracking-widest font-semibold mb-2 block">
+        Linked Map
+      </label>
+      <Select
+        value={linkedMap?.id ?? '__none__'}
+        onValueChange={(v) => linkMutation.mutate(v === '__none__' ? null : v)}
+        disabled={linkMutation.isPending}
+      >
+        <SelectTrigger className="w-64 dark:bg-zinc-900/60 dark:border-zinc-800 dark:text-zinc-300 bg-zinc-100 border-zinc-300 text-zinc-900 text-sm">
+          <SelectValue placeholder="No map linked" />
+        </SelectTrigger>
+        <SelectContent className="dark:bg-zinc-900 dark:border-zinc-800 bg-white border-zinc-300">
+          <SelectItem value="__none__" className="dark:text-zinc-400 text-zinc-600 text-sm">No map linked</SelectItem>
+          {maps.map(m => (
+            <SelectItem key={m.id} value={m.id} className="dark:text-zinc-300 text-zinc-900 text-sm">
+              {m.name}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+      {maps.length === 0 && (
+        <p className="text-xs dark:text-zinc-600 text-zinc-500 mt-1">No maps imported yet</p>
+      )}
+    </div>
+  );
 }
 
 function EntityDetailInner() {
@@ -526,6 +598,14 @@ function EntityDetailInner() {
               </div>
             </div>
           )}
+
+          {/* Linked Map */}
+          <LinkedMapSection
+            entityId={entityId}
+            entityName={form.name}
+            campaignId={form.campaign_id}
+            editMode={false}
+          />
         </div>
       </div>
     );
@@ -810,6 +890,16 @@ function EntityDetailInner() {
               })}
             </div>
           </div>
+        )}
+
+        {/* Linked Map */}
+        {!isNew && (
+          <LinkedMapSection
+            entityId={entityId}
+            entityName={form.name}
+            campaignId={form.campaign_id}
+            editMode={true}
+          />
         )}
       </div>
     </div>
