@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Shield, Heart, Zap, Skull, ExternalLink, RefreshCw } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import EntityMentionRenderer from '@/components/common/EntityMentionRenderer';
@@ -297,6 +297,16 @@ function DndBeyondGMPanel({ form, d }) {
       queryClient.invalidateQueries({ queryKey: ['entities', form.campaign_id] });
     },
   });
+
+  useEffect(() => {
+    if (!d.dndbeyond_id) return;
+    const STALE_MS = 15 * 60 * 1000;
+    const POLL_MS  =  5 * 60 * 1000;
+    const stale = !d.last_synced_at || (Date.now() - new Date(d.last_synced_at).getTime()) > STALE_MS;
+    if (stale) syncMutation.mutate();
+    const intervalId = setInterval(() => syncMutation.mutate(), POLL_MS);
+    return () => clearInterval(intervalId);
+  }, [d.dndbeyond_id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const currentHp = d.current_hit_points ?? null;
   const maxHp = d.max_hit_points || 0;
