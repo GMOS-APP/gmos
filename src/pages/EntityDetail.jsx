@@ -279,13 +279,14 @@ function EntityDetailInner() {
   useEffect(() => {
     if (entity) {
       setForm({
+        id: entity.id,
         campaign_id: entity.campaign_id || campaignId || '',
         name: entity.name || '',
         entity_type: entity.entity_type || 'npc',
         summary: entity.summary || '',
         description: entity.description || '',
         status: entity.status || 'active',
-        visibility: entity.visibility || 'dm_only',
+        visibility: entity.visibility || 'gm_only',
         tags: entity.tags || [],
         key_facts: entity.key_facts || [],
         last_seen_session: entity.last_seen_session,
