@@ -1,8 +1,20 @@
-export const CURRENT_VERSION = '2026-05-07c';
+export const CURRENT_VERSION = '2026-05-07d';
 
 // Entries are shown for all versions newer than what the user last acknowledged.
 // version must be a YYYY-MM-DD string so string comparison works for ordering.
 export const CHANGELOG = [
+  {
+    version: '2026-05-07d',
+    date: 'May 7, 2026',
+    entries: [
+      { type: 'new',      text: 'Import session prep from Obsidian or any markdown file — paste a note and headers like ## Strong Start map to the right fields automatically' },
+      { type: 'new',      text: 'Export session prep as a markdown file — includes YAML frontmatter and Obsidian-compatible wikilinks' },
+      { type: 'new',      text: 'D&D Beyond PC sheets now auto-sync on load (if stale) and every 5 minutes while viewing' },
+      { type: 'new',      text: 'Bulk D&D Beyond import — paste multiple character IDs separated by commas' },
+      { type: 'fixed',    text: 'PC sheet Sync button now works correctly (was silently failing due to a missing entity ID)' },
+      { type: 'fixed',    text: 'Footer no longer overlaps the last prep fields on the session page' },
+    ],
+  },
   {
     version: '2026-05-07c',
     date: 'May 7, 2026',
