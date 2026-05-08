@@ -417,9 +417,14 @@ function EntityDetailInner() {
     return (
       <div className="p-4 sm:p-6 lg:p-8 max-w-4xl">
         <DndBeyondImport
+          campaignId={campaignId}
           onImport={(characterData) => {
             setForm((prev) => ({ ...prev, ...characterData }));
             setEntryMode('manual');
+          }}
+          onBulkDone={() => {
+            queryClient.invalidateQueries({ queryKey: ['entities', campaignId] });
+            navigate(createPageUrl('EntityBrowser') + `?campaign_id=${campaignId}`);
           }}
           onCancel={() => setEntryMode(null)}
         />
