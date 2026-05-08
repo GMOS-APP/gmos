@@ -4,7 +4,7 @@ import { createPageUrl } from '@/utils';
 
 export default function Footer() {
   return (
-    <footer className="mt-auto border-t border-zinc-200 dark:border-zinc-800/60 px-6 py-4 text-[11px] text-zinc-500 dark:text-zinc-600 space-y-1">
+    <footer className="border-t border-zinc-200 dark:border-zinc-800/60 px-6 py-4 text-[11px] text-zinc-500 dark:text-zinc-600 space-y-1">
       <p>
         {'Lazy RPG Prep method from the '}
         <a href="https://slyflourish.com/lazy_gm_resource_document.html" target="_blank" rel="noreferrer" className="underline underline-offset-2 hover:text-zinc-400">

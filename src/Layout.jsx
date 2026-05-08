@@ -92,7 +92,7 @@ export default function Layout({ children, currentPageName }) {
             <GlobalSearch campaignId={campaignId} />
           </div>
         </div>
-        <div className="flex-1 overflow-y-auto flex flex-col">
+        <div className="flex-1 overflow-y-auto min-h-0">
           {children}
           <Footer />
         </div>
