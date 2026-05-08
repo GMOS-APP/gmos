@@ -3,7 +3,9 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Campaign, Session, WorldEntity, QuickNote } from '@/api/entities';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
-import { BookOpen, Swords, FileText, Loader2, Printer } from 'lucide-react';
+import { BookOpen, Swords, FileText, Loader2, Printer, Upload, Download } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import { Textarea } from '@/components/ui/textarea';
 import PrepTab from '@/components/session/PrepTab';
 import { printSessionPrep } from '@/utils/printSessionPrep';
 import RunTab from '@/components/session/RunTab';
@@ -12,6 +14,98 @@ import SessionDebrief from '@/components/session/SessionDebrief';
 import SessionHeader from '@/components/session/SessionHeader';
 import { CampaignProvider } from '@/lib/CampaignContext';
 import { Maximize2 } from 'lucide-react';
+
+const PREP_FIELD_MAP = [
+  { keys: ['strong start', 'opening', 'hook', 'inciting'],                field: 'strong_start' },
+  { keys: ['npc', 'npcs', 'npc notes', 'characters', 'character'],        field: 'npc_notes' },
+  { keys: ['monster', 'monsters', 'encounter', 'encounters', 'combat'],   field: 'monster_notes' },
+  { keys: ['location', 'locations', 'location notes', 'scene', 'scenes'], field: 'location_notes' },
+  { keys: ['reward', 'rewards', 'treasure', 'loot'],                      field: 'treasure_notes' },
+  { keys: ['event', 'events', 'world events', 'timed events'],            field: 'event_notes' },
+  { keys: ['thread', 'threads', 'plot', 'hooks', 'hook'],                 field: 'thread_notes' },
+  { keys: ['recap', 'previous', 'last session'],                          field: 'previous_session_recap' },
+];
+
+function parseMarkdownToSession(raw) {
+  const result = {};
+  let text = raw;
+
+  // Strip YAML frontmatter
+  const fm = text.match(/^---\n([\s\S]*?)\n---\n?/);
+  if (fm) {
+    const block = fm[1];
+    const t = block.match(/^title:\s*["']?(.+?)["']?\s*$/m);
+    const d = block.match(/^date:\s*["']?(.+?)["']?\s*$/m);
+    if (t) result.title = t[1].trim();
+    if (d) { try { result.date = new Date(d[1].trim()).toISOString(); } catch {} }
+    text = text.slice(fm[0].length);
+  }
+
+  // Drop leading h1 (treated as title)
+  text = text.replace(/^# .+\n?/, '');
+
+  // Convert Obsidian [[Name|Alias]] / [[Name]] wikilinks to plain text
+  const stripWikilinks = (s) => s
+    .replace(/\[\[[^\]|]+\|([^\]]+)\]\]/g, '$1')
+    .replace(/\[\[([^\]]+)\]\]/g, '$1');
+
+  const overflow = [];
+  const sections = text.split(/^(?=## )/m);
+
+  for (const sec of sections) {
+    if (!sec.startsWith('## ')) {
+      const c = sec.trim();
+      if (c) overflow.push(c);
+      continue;
+    }
+    const nl = sec.indexOf('\n');
+    const header = sec.slice(3, nl < 0 ? undefined : nl).trim().toLowerCase();
+    const content = nl < 0 ? '' : stripWikilinks(sec.slice(nl + 1).trim());
+
+    let matched = false;
+    for (const { keys, field } of PREP_FIELD_MAP) {
+      if (keys.some(k => header.includes(k))) {
+        result[field] = content;
+        matched = true;
+        break;
+      }
+    }
+    if (!matched && content) overflow.push(`## ${sec.slice(3, nl).trim()}\n\n${content}`);
+  }
+
+  if (overflow.length) result.raw_notes = overflow.join('\n\n');
+  return result;
+}
+
+function exportSessionAsMarkdown(session, formData) {
+  const FIELDS = [
+    { field: 'previous_session_recap', header: 'Previous Session Recap' },
+    { field: 'strong_start',           header: 'Strong Start' },
+    { field: 'npc_notes',              header: 'NPCs' },
+    { field: 'monster_notes',          header: 'Monsters & Encounters' },
+    { field: 'location_notes',         header: 'Locations' },
+    { field: 'event_notes',            header: 'World Events' },
+    { field: 'thread_notes',           header: 'Threads & Plot Hooks' },
+    { field: 'treasure_notes',         header: 'Treasure & Rewards' },
+  ];
+
+  const title = formData.title || session?.title || `Session ${session?.session_number || ''}`;
+  const dateStr = (formData.date || session?.date || '').slice(0, 10);
+  const lines = ['---', `title: "${title}"`];
+  if (session?.session_number) lines.push(`session: ${session.session_number}`);
+  if (dateStr) lines.push(`date: ${dateStr}`);
+  lines.push('---', '', `# ${title}`, '');
+
+  for (const { field, header } of FIELDS) {
+    const value = formData[field] || session?.[field];
+    if (!value?.trim()) continue;
+    // Convert [[entity_id|entity_name]] → [[entity_name]] for Obsidian
+    const converted = value.replace(/\[\[[^\]|]+\|([^\]]+)\]\]/g, '[[$1]]');
+    lines.push(`## ${header}`, '', converted, '');
+  }
+
+  return lines.join('\n');
+}
 
 export default function SessionPage() {
   const params = new URLSearchParams(window.location.search);
@@ -26,6 +120,8 @@ export default function SessionPage() {
   const [activeTab, setActiveTab] = useState('prep');
   const [debriefStarted, setDebriefStarted] = useState(false);
   const [gmScreenOpen, setGmScreenOpen] = useState(false);
+  const [showImport, setShowImport] = useState(false);
+  const [importText, setImportText] = useState('');
 
   const { data: campaign } = useQuery({
     queryKey: ['campaign', campaignId],
@@ -131,6 +227,16 @@ export default function SessionPage() {
     setSaving(false);
   };
 
+  const handleExport = () => {
+    const md = exportSessionAsMarkdown(session, formData);
+    const slug = `session-${session?.session_number || 'prep'}-prep.md`;
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([md], { type: 'text/markdown' }));
+    a.download = slug;
+    a.click();
+    URL.revokeObjectURL(a.href);
+  };
+
   const isRunMode = session?.status === 'in_progress';
 
   // Auto-switch to Run tab and open GM Screen when session goes live
@@ -184,7 +290,25 @@ export default function SessionPage() {
           {/* PREP */}
           <TabsContent value="prep" className="m-0">
             <div className="p-4 lg:p-6">
-              <div className="flex justify-end mb-3">
+              <div className="flex justify-end gap-2 mb-3">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => { setImportText(''); setShowImport(true); }}
+                  className="dark:border-zinc-700 dark:text-zinc-400 text-xs gap-1.5"
+                >
+                  <Upload className="w-3.5 h-3.5" />
+                  Import Markdown
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleExport}
+                  className="dark:border-zinc-700 dark:text-zinc-400 text-xs gap-1.5"
+                >
+                  <Download className="w-3.5 h-3.5" />
+                  Export Markdown
+                </Button>
                 <Button
                   variant="outline"
                   size="sm"
@@ -192,7 +316,7 @@ export default function SessionPage() {
                   className="dark:border-zinc-700 dark:text-zinc-400 text-xs gap-1.5"
                 >
                   <Printer className="w-3.5 h-3.5" />
-                  Print Prep Sheet
+                  Print
                 </Button>
               </div>
               <PrepTab
@@ -284,6 +408,74 @@ export default function SessionPage() {
       </div>
 
     </div>
+
+    {/* ── Markdown Import Dialog ─────────────────────────────────────────── */}
+    <Dialog open={showImport} onOpenChange={setShowImport}>
+      <DialogContent className="max-w-2xl dark:bg-zinc-950 dark:border-zinc-800">
+        <DialogHeader>
+          <DialogTitle className="dark:text-zinc-100">Import from Markdown</DialogTitle>
+          <p className="text-xs dark:text-zinc-500 text-zinc-600 mt-1">
+            Paste your Obsidian note or any markdown session prep. Headers like <code className="dark:text-amber-400 text-amber-600">## Strong Start</code> and <code className="dark:text-amber-400 text-amber-600">## NPCs</code> map to prep fields automatically.
+          </p>
+        </DialogHeader>
+
+        <Textarea
+          value={importText}
+          onChange={e => setImportText(e.target.value)}
+          placeholder={`---\ntitle: Session 5\ndate: 2026-05-07\n---\n\n## Strong Start\nThe city bells toll at midnight...\n\n## NPCs\n**Lady Voss** — wants the deed recovered\n\n## Monsters & Encounters\n- 4× Thugs + Enforcer`}
+          className="font-mono text-xs min-h-[220px] dark:bg-zinc-900 dark:border-zinc-700 dark:text-zinc-300"
+        />
+
+        {/* Preview */}
+        {importText.trim() && (() => {
+          const parsed = parseMarkdownToSession(importText);
+          const fieldLabels = {
+            title: 'Title', date: 'Date',
+            strong_start: 'Strong Start', npc_notes: 'NPCs',
+            monster_notes: 'Monsters & Encounters', location_notes: 'Locations',
+            treasure_notes: 'Treasure', event_notes: 'World Events',
+            thread_notes: 'Threads', previous_session_recap: 'Previous Recap',
+            raw_notes: 'Unmatched sections → Raw Notes',
+          };
+          const hits = Object.keys(parsed).filter(k => parsed[k]);
+          return (
+            <div className="rounded-lg border dark:border-zinc-800 border-zinc-200 p-3">
+              <p className="text-[10px] uppercase tracking-widest dark:text-zinc-500 text-zinc-500 mb-2 font-semibold">Fields detected</p>
+              {hits.length === 0
+                ? <p className="text-xs dark:text-zinc-600 text-zinc-500">No prep sections recognised yet.</p>
+                : <div className="flex flex-wrap gap-1.5">
+                    {hits.map(k => (
+                      <span key={k} className="text-[11px] px-2 py-0.5 rounded-full dark:bg-zinc-800 dark:text-emerald-400 bg-emerald-50 text-emerald-700 border dark:border-zinc-700 border-emerald-200">
+                        {fieldLabels[k] || k}
+                      </span>
+                    ))}
+                  </div>
+              }
+            </div>
+          );
+        })()}
+
+        <DialogFooter className="gap-2">
+          <Button variant="ghost" size="sm" onClick={() => setShowImport(false)}
+            className="dark:text-zinc-400 text-xs">
+            Cancel
+          </Button>
+          <Button
+            size="sm"
+            disabled={!importText.trim()}
+            onClick={() => {
+              const parsed = parseMarkdownToSession(importText);
+              setFormData(prev => ({ ...prev, ...parsed }));
+              setShowImport(false);
+            }}
+            className="bg-amber-500 hover:bg-amber-400 text-zinc-950 font-semibold text-xs"
+          >
+            Apply to Session
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+
     </CampaignProvider>
   );
 }
