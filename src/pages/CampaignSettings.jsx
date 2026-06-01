@@ -10,8 +10,11 @@ import { Button } from '@/components/ui/button';
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from '@/components/ui/select';
+import { Switch } from '@/components/ui/switch';
 import { Loader2, Download, Trash2, Save } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
+import { useHotkeysEnabled, setHotkeysEnabled } from '@/lib/useHotkeysEnabled';
+import { MOD_LABEL } from '@/lib/useHotkeys';
 
 const STATUS_OPTIONS = [
   { value: 'active', label: 'Active' },
@@ -36,6 +39,7 @@ export default function CampaignSettings() {
   const [form, setForm] = useState(null);
   const [exportingId, setExportingId] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const hotkeysEnabled = useHotkeysEnabled();
 
   useEffect(() => {
     if (campaign && !form) {
@@ -188,6 +192,26 @@ export default function CampaignSettings() {
           Save Changes
         </Button>
       </div>
+
+      {/* Preferences (device-level) */}
+      <section className="space-y-4">
+        <h2 className="text-xs font-semibold uppercase tracking-widest text-zinc-500 dark:text-zinc-500">Preferences</h2>
+        <div className="bg-white dark:bg-zinc-900/40 border border-zinc-200 dark:border-zinc-800/50 rounded-xl p-4">
+          <div className="flex items-center justify-between gap-4">
+            <div>
+              <p className="text-sm font-medium text-zinc-900 dark:text-zinc-200">Keyboard shortcuts</p>
+              <p className="text-xs text-zinc-500 dark:text-zinc-500 mt-0.5">
+                Enable {MOD_LABEL}K command palette, ⌥N quick-create, and ? for help. Applies to this device.
+              </p>
+            </div>
+            <Switch
+              checked={hotkeysEnabled}
+              onCheckedChange={setHotkeysEnabled}
+              aria-label="Enable keyboard shortcuts"
+            />
+          </div>
+        </div>
+      </section>
 
       {/* Danger Zone */}
       <section className="space-y-4">
