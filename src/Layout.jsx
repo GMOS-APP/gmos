@@ -3,8 +3,6 @@ import { useQuery } from '@tanstack/react-query';
 import { Campaign } from '@/api/entities';
 import { useAuth } from '@/lib/AuthContext';
 import Sidebar from '@/components/layout/Sidebar';
-import Breadcrumbs from '@/components/layout/Breadcrumbs';
-import GlobalSearch from '@/components/layout/GlobalSearch';
 import QuickCapture from '@/components/layout/QuickCapture';
 import CommandPalette from '@/components/layout/CommandPalette';
 import ShortcutsHelp from '@/components/layout/ShortcutsHelp';
@@ -67,7 +65,13 @@ export default function Layout({ children, currentPageName }) {
     <div className="flex flex-col h-screen overflow-hidden max-w-[1920px] mx-auto">
       <style>{`body { overflow: hidden; }`}</style>
 
-      <Taskbar campaign={campaign} startActive={startOpen} onStart={() => setStartOpen((o) => !o)} />
+      <Taskbar
+        campaign={campaign}
+        currentPageName={currentPageName}
+        startActive={startOpen}
+        onStart={() => setStartOpen((o) => !o)}
+        onSearch={() => setPaletteOpen(true)}
+      />
 
       <div className="flex flex-1 overflow-hidden min-h-0">
         {/* Sidebar — desktop only, toggleable from the Start menu */}
@@ -83,12 +87,6 @@ export default function Layout({ children, currentPageName }) {
         )}
 
         <main className="flex-1 h-full overflow-hidden flex flex-col min-w-0">
-          <div className="flex items-center gap-3 px-3 py-1.5 border-b border-zinc-200 dark:border-zinc-800/60 bg-white dark:bg-zinc-950 flex-shrink-0">
-            <Breadcrumbs currentPageName={currentPageName} campaign={campaign} />
-            <div className="ml-auto hidden sm:block">
-              <GlobalSearch onClick={() => setPaletteOpen(true)} />
-            </div>
-          </div>
           <div className="flex-1 overflow-y-auto min-h-0">
             {children}
             <Footer />

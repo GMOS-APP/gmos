@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useIsFetching } from '@tanstack/react-query';
-import { LayoutGrid } from 'lucide-react';
+import { LayoutGrid, Search } from 'lucide-react';
+import Breadcrumbs from '@/components/layout/Breadcrumbs';
 import ThemeToggle from '@/components/ui/ThemeToggle';
+import { MOD_LABEL } from '@/lib/useHotkeys';
 import { cn } from '@/lib/utils';
 
 // System "modes" GM/OS can be in, driven by campaign.active_mode.
@@ -11,9 +13,9 @@ const MODES = {
   debrief: { label: 'DEBRIEF', dot: 'bg-sky-500', text: 'text-sky-600 dark:text-sky-400' },
 };
 
-// Full-width OS taskbar: Start button (left), system state, and a clustered
-// system tray (right) with live activity, theme, and clock.
-export default function Taskbar({ campaign, startActive, onStart }) {
+// Full-width OS taskbar: Start button, system state, breadcrumbs, and a
+// clustered system tray (search, live activity, theme, clock).
+export default function Taskbar({ campaign, currentPageName, startActive, onStart, onSearch }) {
   const fetching = useIsFetching();
   const [now, setNow] = useState(() => new Date());
 
@@ -42,18 +44,25 @@ export default function Taskbar({ campaign, startActive, onStart }) {
         <span>GM<span className="text-amber-500">/OS</span></span>
       </button>
 
-      <span className="hidden sm:flex items-center gap-2 min-w-0 font-mono text-[11px]">
-        <span className="text-zinc-300 dark:text-zinc-700">/</span>
-        <span className="truncate text-zinc-600 dark:text-zinc-400 max-w-[200px]">{campaign?.name}</span>
-      </span>
-
-      <span className={cn('flex items-center gap-1.5 font-mono text-[11px]', mode.text)}>
+      <span className={cn('flex items-center gap-1.5 font-mono text-[11px] flex-shrink-0', mode.text)}>
         <span className={cn('w-1.5 h-1.5 rounded-full', mode.dot)} />
         {mode.label}
       </span>
 
+      <div className="hidden md:flex flex-1 min-w-0 items-center pl-1">
+        <Breadcrumbs currentPageName={currentPageName} campaign={campaign} />
+      </div>
+
       {/* System tray */}
-      <div className="ml-auto flex items-center gap-0.5 pl-2 pr-1 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900/60">
+      <div className="ml-auto flex items-center gap-0.5 pl-1 pr-1 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900/60">
+        <button
+          onClick={onSearch}
+          title={`Search (${MOD_LABEL}K)`}
+          aria-label="Search"
+          className="h-7 w-7 flex items-center justify-center rounded-md text-zinc-500 hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-zinc-700 dark:hover:text-zinc-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/50"
+        >
+          <Search className="w-3.5 h-3.5" />
+        </button>
         {fetching > 0 && (
           <span className="hidden sm:flex items-center gap-1 px-1.5 text-[10px] font-mono text-zinc-400 dark:text-zinc-600">
             <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
