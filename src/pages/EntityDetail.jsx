@@ -736,9 +736,9 @@ function EntityDetailInner() {
             placeholder="Entity name"
             className="text-2xl font-bold bg-transparent border-none p-0 dark:text-zinc-100 dark:placeholder:text-zinc-700 text-zinc-900 placeholder:text-zinc-400 focus-visible:ring-0 h-auto"
           />
-          <div className="flex items-center gap-3 mt-3">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 mt-3">
             <Select value={form.entity_type} onValueChange={(v) => setForm({ ...form, entity_type: v })}>
-              <SelectTrigger className="w-40 dark:bg-zinc-900 dark:border-zinc-800 dark:text-zinc-300 bg-white border-zinc-300 text-zinc-900 text-xs h-8">
+              <SelectTrigger className="w-full sm:w-40 dark:bg-zinc-900 dark:border-zinc-800 dark:text-zinc-300 bg-white border-zinc-300 text-zinc-900 text-xs h-8">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent className="dark:bg-zinc-900 dark:border-zinc-800 bg-white border-zinc-300">
@@ -750,7 +750,7 @@ function EntityDetailInner() {
               </SelectContent>
             </Select>
             <Select value={form.status} onValueChange={(v) => setForm({ ...form, status: v })}>
-              <SelectTrigger className="w-32 dark:bg-zinc-900 dark:border-zinc-800 dark:text-zinc-300 bg-white border-zinc-300 text-zinc-900 text-xs h-8">
+              <SelectTrigger className="w-full sm:w-32 dark:bg-zinc-900 dark:border-zinc-800 dark:text-zinc-300 bg-white border-zinc-300 text-zinc-900 text-xs h-8">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent className="dark:bg-zinc-900 dark:border-zinc-800 bg-white border-zinc-300">
@@ -760,7 +760,7 @@ function EntityDetailInner() {
               </SelectContent>
             </Select>
             <Select value={form.visibility} onValueChange={(v) => setForm({ ...form, visibility: v })}>
-              <SelectTrigger className="w-36 dark:bg-zinc-900 dark:border-zinc-800 dark:text-zinc-300 bg-white border-zinc-300 text-zinc-900 text-xs h-8">
+              <SelectTrigger className="w-full sm:w-36 dark:bg-zinc-900 dark:border-zinc-800 dark:text-zinc-300 bg-white border-zinc-300 text-zinc-900 text-xs h-8">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent className="dark:bg-zinc-900 dark:border-zinc-800 bg-white border-zinc-300">

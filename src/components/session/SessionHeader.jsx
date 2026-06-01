@@ -23,7 +23,7 @@ export default function SessionHeader({ formData, setFormData, saving, saved, ha
           value={formData.title || ''}
           onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
           placeholder={`Session #${sessionNum}`}
-          className="bg-transparent border-0 dark:border-b dark:border-zinc-700 border-b border-zinc-300 rounded-none px-0 text-sm font-semibold dark:text-zinc-200 dark:placeholder:text-zinc-600 text-zinc-900 placeholder:text-zinc-500 focus-visible:ring-0 focus-visible:dark:border-amber-500/50 focus-visible:border-amber-600/50 w-36 sm:w-48"
+          className="bg-transparent border-0 dark:border-b dark:border-zinc-700 border-b border-zinc-300 rounded-none px-0 text-sm font-semibold dark:text-zinc-200 dark:placeholder:text-zinc-600 text-zinc-900 placeholder:text-zinc-500 focus-visible:ring-0 focus-visible:dark:border-amber-500/50 focus-visible:border-amber-600/50 flex-1 min-w-0 sm:flex-none sm:w-48"
         />
         <Input
           type="date"

@@ -56,7 +56,7 @@ export default function EncounterPicker({ campaignId, selectedIds = [], onChange
             Add Encounter
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-80 bg-zinc-900 border-zinc-800 p-3">
+        <PopoverContent className="w-80 max-w-[calc(100vw-2rem)] bg-zinc-900 border-zinc-800 p-3">
           <div className="space-y-2">
             <Input
               value={search}
