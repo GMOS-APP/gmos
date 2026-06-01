@@ -10,10 +10,8 @@ import {
   CommandDialog, CommandInput, CommandList, CommandEmpty,
   CommandGroup, CommandItem,
 } from '@/components/ui/command';
-import {
-  LayoutDashboard, Search, Network, Map, CalendarDays,
-  StickyNote, Dices, History, Eye, Settings, Plus,
-} from 'lucide-react';
+import { CalendarDays, Plus } from 'lucide-react';
+import { CAMPAIGN_NAV_ITEMS, navHref } from '@/lib/navItems';
 
 export default function CommandPalette({ open, onOpenChange, campaignId }) {
   const [query, setQuery] = useState('');
@@ -32,20 +30,6 @@ export default function CommandPalette({ open, onOpenChange, campaignId }) {
     enabled: !!campaignId,
     staleTime: 30000,
   });
-
-  // Go-to pages mirror the sidebar's URL construction (Dashboard uses ?id=).
-  const goToPages = useMemo(() => [
-    { page: 'CampaignDashboard', label: 'Dashboard', Icon: LayoutDashboard, query: `?id=${campaignId}` },
-    { page: 'EntityBrowser', label: 'All Entities', Icon: Search, query: `?campaign_id=${campaignId}` },
-    { page: 'RelationshipMap', label: 'Relationship Map', Icon: Network, query: `?campaign_id=${campaignId}` },
-    { page: 'CampaignMap', label: 'Campaign Map', Icon: Map, query: `?campaign_id=${campaignId}` },
-    { page: 'SessionBrowser', label: 'Sessions', Icon: CalendarDays, query: `?campaign_id=${campaignId}` },
-    { page: 'CampaignNotes', label: 'Notes', Icon: StickyNote, query: `?campaign_id=${campaignId}` },
-    { page: 'RandomTableBrowser', label: 'Random Tables', Icon: Dices, query: `?campaign_id=${campaignId}` },
-    { page: 'CampaignTimeline', label: 'Timeline', Icon: History, query: `?campaign_id=${campaignId}` },
-    { page: 'PlayerView', label: 'Player View', Icon: Eye, query: `?campaign_id=${campaignId}` },
-    { page: 'CampaignSettings', label: 'Settings', Icon: Settings, query: `?campaign_id=${campaignId}` },
-  ], [campaignId]);
 
   const q = query.trim().toLowerCase();
 
@@ -84,7 +68,7 @@ export default function CommandPalette({ open, onOpenChange, campaignId }) {
 
   const matches = (label) => !q || label.toLowerCase().includes(q);
   const createItems = ENTITY_CREATE_TYPES.filter((t) => matches(`new ${t.label}`) || matches(t.label));
-  const goToItems = goToPages.filter((p) => matches(p.label) || matches(`go to ${p.label}`));
+  const goToItems = CAMPAIGN_NAV_ITEMS.filter((p) => matches(p.label) || matches(`go to ${p.label}`));
 
   const run = (href) => {
     onOpenChange(false);
@@ -148,14 +132,14 @@ export default function CommandPalette({ open, onOpenChange, campaignId }) {
 
         {goToItems.length > 0 && (
           <CommandGroup heading="Go to">
-            {goToItems.map(({ page, label, Icon, query: pageQuery }) => (
+            {goToItems.map((item) => (
               <CommandItem
-                key={`goto-${page}`}
-                value={`goto-${page}`}
-                onSelect={() => run(createPageUrl(page) + pageQuery)}
+                key={`goto-${item.page}`}
+                value={`goto-${item.page}`}
+                onSelect={() => run(navHref(item, campaignId))}
               >
-                <Icon />
-                <span>{label}</span>
+                <item.Icon />
+                <span>{item.label}</span>
               </CommandItem>
             ))}
           </CommandGroup>

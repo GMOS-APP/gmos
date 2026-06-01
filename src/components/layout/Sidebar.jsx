@@ -13,23 +13,14 @@ import {
   Scroll,
   Sparkles,
   ChevronLeft,
-  LayoutDashboard,
-  Search,
   BookOpen,
   Swords,
   Church,
   Flame,
   ShoppingBag,
-  Network,
-  Map,
-  CalendarDays,
-  Dices,
-  History,
-  Eye,
   LogOut,
-  StickyNote,
-  Settings,
 } from 'lucide-react';
+import { CAMPAIGN_NAV_ITEMS, navHref } from '@/lib/navItems';
 import { cn } from '@/lib/utils';
 
 const entityGroups = [
@@ -96,7 +87,7 @@ export default function Sidebar({ campaign, collapsed, onToggle, onNavClick }) {
         )}
         <button
           onClick={onToggle}
-          className="p-1.5 rounded-md text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 dark:hover:bg-zinc-800 hover:bg-zinc-100"
+          className="p-1.5 rounded-md text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 dark:hover:bg-zinc-800 hover:bg-zinc-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/50"
         >
           <ChevronLeft className={cn("w-4 h-4 transition-transform", collapsed && "rotate-180")} />
         </button>
@@ -112,29 +103,18 @@ export default function Sidebar({ campaign, collapsed, onToggle, onNavClick }) {
 
       {/* Navigation */}
       <nav className="flex-1 overflow-y-auto p-2 space-y-1">
-        {[
-          { page: 'CampaignDashboard', label: 'Dashboard', icon: LayoutDashboard, query: `?id=${campaign.id}` },
-          { page: 'EntityBrowser', label: 'All Entities', icon: Search, query: `?campaign_id=${campaign.id}` },
-          { page: 'RelationshipMap', label: 'Relationship Map', icon: Network, query: `?campaign_id=${campaign.id}` },
-          { page: 'CampaignMap', label: 'Campaign Map', icon: Map, query: `?campaign_id=${campaign.id}` },
-          { page: 'SessionBrowser', label: 'Sessions', icon: CalendarDays, query: `?campaign_id=${campaign.id}` },
-          { page: 'CampaignNotes', label: 'Notes', icon: StickyNote, query: `?campaign_id=${campaign.id}` },
-          { page: 'RandomTableBrowser', label: 'Random Tables', icon: Dices, query: `?campaign_id=${campaign.id}` },
-          { page: 'CampaignTimeline', label: 'Timeline', icon: History, query: `?campaign_id=${campaign.id}` },
-          { page: 'PlayerView', label: 'Player View', icon: Eye, query: `?campaign_id=${campaign.id}` },
-          { page: 'CampaignSettings', label: 'Settings', icon: Settings, query: `?campaign_id=${campaign.id}` },
-        ].map(({ page, label, icon: Icon, query }) => {
+        {CAMPAIGN_NAV_ITEMS.map(({ page, label, Icon, param }) => {
           const isActive = location.pathname.includes(page.toLowerCase()) || location.search.includes(page.toLowerCase());
-          const href = createPageUrl(page) + query;
+          const href = navHref({ page, param }, campaign.id);
           return (
             <Link
               key={page}
               onClick={onNavClick}
               to={href}
               className={cn(
-                "relative overflow-hidden flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors",
+                "relative overflow-hidden flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/50",
                 isActive
-                  ? "bg-amber-500/8 dark:bg-amber-500/8 text-amber-700 dark:text-amber-400 font-medium before:absolute before:left-0 before:inset-y-1 before:w-0.5 before:rounded-r-full before:bg-amber-500 dark:before:bg-amber-400"
+                  ? "bg-amber-500/15 dark:bg-amber-500/10 text-amber-700 dark:text-amber-400 font-medium before:absolute before:left-0 before:inset-y-1 before:w-0.5 before:rounded-r-full before:bg-amber-500 dark:before:bg-amber-400"
                   : "text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800/50"
               )}
             >
@@ -166,9 +146,9 @@ export default function Sidebar({ campaign, collapsed, onToggle, onNavClick }) {
                   onClick={onNavClick}
                   to={createPageUrl('EntityBrowser') + `?campaign_id=${campaign.id}&type=${item.type}`}
                   className={cn(
-                    "relative overflow-hidden flex items-center gap-3 px-3 py-1.5 rounded-lg text-sm transition-colors",
+                    "relative overflow-hidden flex items-center gap-3 px-3 py-1.5 rounded-lg text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/50",
                     isActive
-                      ? "bg-amber-500/8 dark:bg-amber-500/8 text-amber-700 dark:text-amber-400 font-medium before:absolute before:left-0 before:inset-y-1 before:w-0.5 before:rounded-r-full before:bg-amber-500 dark:before:bg-amber-400"
+                      ? "bg-amber-500/15 dark:bg-amber-500/10 text-amber-700 dark:text-amber-400 font-medium before:absolute before:left-0 before:inset-y-1 before:w-0.5 before:rounded-r-full before:bg-amber-500 dark:before:bg-amber-400"
                       : "text-zinc-600 dark:text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800/50"
                   )}
                 >

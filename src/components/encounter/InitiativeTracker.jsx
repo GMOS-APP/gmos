@@ -121,7 +121,7 @@ function ConditionPicker({ conditions, onChange }) {
         + condition
       </button>
       {open && (
-        <div className="absolute left-0 top-full mt-1 z-50 bg-zinc-900 border border-zinc-700 rounded-lg p-2 grid grid-cols-2 gap-1 w-52 shadow-xl">
+        <div className="absolute left-0 top-full mt-1 z-50 bg-zinc-900 border border-zinc-700 rounded-lg p-2 grid grid-cols-2 gap-1 w-52 max-w-[calc(100vw-1rem)] shadow-xl">
           {CONDITIONS.map((c) => {
             const active = conditions.includes(c);
             return (
