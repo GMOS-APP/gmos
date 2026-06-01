@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { useIsFetching } from '@tanstack/react-query';
+import { useIsFetching, useQuery } from '@tanstack/react-query';
+import { useNavigate } from 'react-router-dom';
 import { LayoutGrid, Search } from 'lucide-react';
+import { Session } from '@/api/entities';
+import { createPageUrl } from '@/utils';
 import Breadcrumbs from '@/components/layout/Breadcrumbs';
 import TrayAudioPlayer from '@/components/layout/TrayAudioPlayer';
 import ThemeToggle from '@/components/ui/ThemeToggle';
@@ -18,6 +21,7 @@ const MODES = {
 // clustered system tray (search, live activity, theme, clock).
 export default function Taskbar({ campaign, currentPageName, startActive, onStart, onSearch }) {
   const fetching = useIsFetching();
+  const navigate = useNavigate();
   const [now, setNow] = useState(() => new Date());
 
   useEffect(() => {
@@ -25,8 +29,27 @@ export default function Taskbar({ campaign, currentPageName, startActive, onStar
     return () => clearInterval(id);
   }, []);
 
+  // Shares the command palette's cache (same queryKey), so no extra fetch.
+  const { data: sessions = [] } = useQuery({
+    queryKey: ['global-search-sessions', campaign?.id],
+    queryFn: () => Session.filter({ campaign_id: campaign?.id }, '-session_number', 100),
+    enabled: !!campaign?.id,
+    staleTime: 30000,
+  });
+
   const mode = MODES[campaign?.active_mode] || MODES.prep;
   const time = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+  // Jump to the live session (or the latest one) when the mode badge is clicked.
+  const goToSession = () => {
+    if (!campaign?.id) return;
+    const target = sessions.find((s) => s.status === 'in_progress') || sessions[0];
+    if (target) {
+      navigate(createPageUrl('SessionPage') + `?id=${campaign.id}&session_id=${target.id}`);
+    } else {
+      navigate(createPageUrl('SessionBrowser') + `?campaign_id=${campaign.id}`);
+    }
+  };
 
   return (
     <header className="flex items-center gap-2 h-10 px-2 border-b border-zinc-200 dark:border-zinc-800/70 bg-white dark:bg-zinc-950 flex-shrink-0 z-30 select-none">
@@ -45,10 +68,17 @@ export default function Taskbar({ campaign, currentPageName, startActive, onStar
         <span>GM<span className="text-amber-500">/OS</span></span>
       </button>
 
-      <span className={cn('flex items-center gap-1.5 font-mono text-[11px] flex-shrink-0', mode.text)}>
+      <button
+        onClick={goToSession}
+        title="Go to session"
+        className={cn(
+          'flex items-center gap-1.5 h-7 px-1.5 rounded-md font-mono text-[11px] flex-shrink-0 transition-colors hover:bg-zinc-100 dark:hover:bg-zinc-800/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/50',
+          mode.text
+        )}
+      >
         <span className={cn('w-1.5 h-1.5 rounded-full', mode.dot)} />
         {mode.label}
-      </span>
+      </button>
 
       <div className="hidden md:flex flex-1 min-w-0 items-center pl-1">
         <Breadcrumbs currentPageName={currentPageName} campaign={campaign} />
