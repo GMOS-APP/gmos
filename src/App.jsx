@@ -9,6 +9,7 @@ import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import LoginPage from '@/components/layout/LoginPage';
 import PublicPlayerView from '@/pages/PublicPlayerView';
 import ChangelogDialog from '@/components/layout/ChangelogDialog';
+import BootSequence from '@/components/layout/BootSequence';
 
 const { Pages, Layout, mainPage } = pagesConfig;
 const mainPageKey = mainPage ?? Object.keys(Pages)[0];
@@ -35,6 +36,7 @@ const AuthenticatedApp = () => {
 
   return (
     <>
+    <BootSequence />
     <ChangelogDialog />
     <Routes>
       <Route path="/" element={
