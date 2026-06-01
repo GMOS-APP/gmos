@@ -8,6 +8,7 @@ import GlobalSearch from '@/components/layout/GlobalSearch';
 import QuickCapture from '@/components/layout/QuickCapture';
 import CommandPalette from '@/components/layout/CommandPalette';
 import ShortcutsHelp from '@/components/layout/ShortcutsHelp';
+import StatusBar from '@/components/layout/StatusBar';
 import Footer from '@/components/layout/Footer';
 import ThemeToggle from '@/components/ui/ThemeToggle';
 import { useHotkeys } from '@/lib/useHotkeys';
@@ -112,6 +113,7 @@ export default function Layout({ children, currentPageName }) {
           {children}
           <Footer />
         </div>
+        <StatusBar campaign={campaign} />
       </main>
       <QuickCapture campaignId={campaignId} open={createOpen} onOpenChange={setCreateOpen} />
       <CommandPalette open={paletteOpen} onOpenChange={setPaletteOpen} campaignId={campaignId} />
