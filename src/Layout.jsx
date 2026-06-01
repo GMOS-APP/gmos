@@ -91,7 +91,7 @@ export default function Layout({ children, currentPageName }) {
         <div className="flex items-center gap-3 px-4 py-3 border-b border-zinc-200 dark:border-zinc-800/60 bg-white dark:bg-zinc-950 md:hidden flex-shrink-0">
           <button
             onClick={() => setMobileOpen(true)}
-            className="p-1.5 rounded-md text-zinc-600 dark:text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800"
+            className="p-1.5 rounded-md text-zinc-600 dark:text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/50"
           >
             <Menu className="w-5 h-5" />
           </button>
