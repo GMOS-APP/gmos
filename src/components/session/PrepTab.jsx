@@ -87,7 +87,7 @@ export default function PrepTab({ session, campaign, entities, formData, setForm
   });
 
   return (
-    <div className="space-y-8 max-w-3xl">
+    <div className="space-y-6 max-w-3xl">
 
       {/* Play Date */}
       <section className="flex items-center gap-3">

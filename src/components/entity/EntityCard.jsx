@@ -29,7 +29,7 @@ export default function EntityCard({ entity }) {
         <EntityAvatar entity={entity} size="md" boxed />
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
-            <h3 className="font-semibold dark:text-zinc-200 dark:group-hover:text-zinc-100 text-zinc-900 group-hover:text-zinc-950 truncate text-sm">
+            <h3 className="font-semibold dark:text-zinc-200 dark:group-hover:text-amber-400 text-zinc-900 group-hover:text-amber-700 truncate text-sm">
               {entity.name}
             </h3>
             <VisIcon className={cn("w-3 h-3 flex-shrink-0", vis.class)} />

@@ -134,7 +134,7 @@ export default function Sidebar({ campaign, collapsed, onToggle, onNavClick }) {
               className={cn(
                 "relative overflow-hidden flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors",
                 isActive
-                  ? "bg-amber-500/8 dark:bg-amber-500/8 text-amber-700 dark:text-amber-400 font-medium before:absolute before:left-0 before:inset-y-1 before:w-0.5 before:rounded-r-full before:bg-amber-500 dark:before:bg-amber-400"
+                  ? "bg-amber-500/15 dark:bg-amber-500/10 text-amber-700 dark:text-amber-400 font-medium before:absolute before:left-0 before:inset-y-1 before:w-0.5 before:rounded-r-full before:bg-amber-500 dark:before:bg-amber-400"
                   : "text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800/50"
               )}
             >
@@ -168,7 +168,7 @@ export default function Sidebar({ campaign, collapsed, onToggle, onNavClick }) {
                   className={cn(
                     "relative overflow-hidden flex items-center gap-3 px-3 py-1.5 rounded-lg text-sm transition-colors",
                     isActive
-                      ? "bg-amber-500/8 dark:bg-amber-500/8 text-amber-700 dark:text-amber-400 font-medium before:absolute before:left-0 before:inset-y-1 before:w-0.5 before:rounded-r-full before:bg-amber-500 dark:before:bg-amber-400"
+                      ? "bg-amber-500/15 dark:bg-amber-500/10 text-amber-700 dark:text-amber-400 font-medium before:absolute before:left-0 before:inset-y-1 before:w-0.5 before:rounded-r-full before:bg-amber-500 dark:before:bg-amber-400"
                       : "text-zinc-600 dark:text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800/50"
                   )}
                 >
