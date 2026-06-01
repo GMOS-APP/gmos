@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import EntityMentionRenderer from '@/components/common/EntityMentionRenderer';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { Session } from '@/api/entities';
+import { Session, Campaign } from '@/api/entities';
 import { useCampaign } from '@/lib/CampaignContext';
 import { Button } from '@/components/ui/button';
 import EntityMentionTextarea from '@/components/common/EntityMentionTextarea';
@@ -26,12 +26,16 @@ export default function SessionDebrief({ session, previousSession, notes = [], e
   }, [session?.id]);
 
   const saveMutation = useMutation({
-    mutationFn: () => Session.update(session.id, {
-      summary,
-      key_events: keyEvents,
-      next_session_primer: nextPrimer,
-      status: 'debriefed',
-    }),
+    mutationFn: async () => {
+      await Session.update(session.id, {
+        summary,
+        key_events: keyEvents,
+        next_session_primer: nextPrimer,
+        status: 'debriefed',
+      });
+      // Debrief done — return the system to prep so the mode badge reflects reality.
+      if (campaignId) await Campaign.update(campaignId, { active_mode: 'prep' });
+    },
     onSuccess: () => {
       queryClient.invalidateQueries();
       setSaved(true);

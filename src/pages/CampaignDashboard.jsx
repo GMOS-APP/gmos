@@ -97,6 +97,14 @@ export default function CampaignDashboard() {
   const inProgressSession = sessions.find((s) => s.status === 'in_progress');
   const currentSession = inProgressSession || upcomingSession;
 
+  // Always navigate to a concrete session by id — relying on
+  // current_session_number alone can miss (it advances past existing sessions
+  // after a debrief), which left the session page blank.
+  const sessionTarget = inProgressSession || upcomingSession || lastSession || sessions[0];
+  const sessionHref = sessionTarget
+    ? createPageUrl('SessionPage') + `?id=${campaignId}&session_id=${sessionTarget.id}`
+    : createPageUrl('SessionBrowser') + `?campaign_id=${campaignId}`;
+
   async function toggleSharing() {
     if (!campaign || togglingShare) return;
     setTogglingShare(true);
@@ -133,7 +141,7 @@ export default function CampaignDashboard() {
               <Settings className="w-4 h-4" />
             </Button>
           </Link>
-          <Link to={createPageUrl('SessionPage') + `?id=${campaignId}`}>
+          <Link to={sessionHref}>
             <Button size="sm" className="bg-amber-500 hover:bg-amber-400 text-zinc-950 font-semibold">
               <ArrowRight className="w-4 h-4 mr-1.5" />
               {inProgressSession ? 'Continue Session' : 'Go to Session'}
@@ -171,7 +179,7 @@ export default function CampaignDashboard() {
               <p className="text-xs text-zinc-700 dark:text-zinc-500 mt-1 line-clamp-1 italic">"{currentSession.strong_start}"</p>
             )}
           </div>
-          <Link to={createPageUrl('SessionPage') + `?id=${campaignId}`}>
+          <Link to={createPageUrl('SessionPage') + `?id=${campaignId}&session_id=${currentSession.id}`}>
             <Button size="sm" variant="outline" className={cn(
               "text-xs",
               inProgressSession
@@ -313,7 +321,7 @@ export default function CampaignDashboard() {
           <div>
             <h2 className="text-xs font-semibold text-zinc-600 dark:text-zinc-500 uppercase tracking-widest mb-3">Quick Actions</h2>
             <div className="space-y-2">
-              <Link to={createPageUrl('SessionPage') + `?id=${campaignId}`} className="block">
+              <Link to={sessionHref} className="block">
                 <Button variant="outline" size="sm" className="w-full justify-start dark:border-zinc-800 dark:text-zinc-400 dark:hover:text-zinc-200 dark:hover:border-zinc-700 border-zinc-300 text-zinc-700 hover:text-zinc-900 hover:border-zinc-400 text-xs">
                   <CalendarDays className="w-3.5 h-3.5 mr-2 text-amber-400" />
                   Go to Session
@@ -394,7 +402,7 @@ export default function CampaignDashboard() {
               {sessions.length === 0 ? (
                 <div className="text-center py-6 px-4">
                   <p className="text-zinc-600 dark:text-zinc-600 text-xs">No sessions yet</p>
-                  <Link to={createPageUrl('SessionPage') + `?id=${campaignId}`}>
+                  <Link to={createPageUrl('SessionBrowser') + `?campaign_id=${campaignId}`}>
                     <Button size="sm" variant="outline" className="mt-3 border-zinc-700 text-zinc-400 text-xs h-7">
                       Start First Session
                     </Button>
