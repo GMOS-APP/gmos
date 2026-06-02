@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import EntityMentionRenderer from '@/components/common/EntityMentionRenderer';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Session, Campaign } from '@/api/entities';
+import { useNotifications } from '@/lib/NotificationContext';
 import { Button } from '@/components/ui/button';
 import EntityMentionTextarea from '@/components/common/EntityMentionTextarea';
 import { Input } from '@/components/ui/input';
@@ -9,6 +10,7 @@ import { Save, Loader2, Plus, X, CheckCircle2, Clock, CalendarDays } from 'lucid
 
 export default function SessionDebrief({ session, notes = [], entities = [], campaignId }) {
   const queryClient = useQueryClient();
+  const notifier = useNotifications();
 
   const [summary, setSummary] = useState(session?.summary || '');
   const [keyEvents, setKeyEvents] = useState(session?.key_events || []);
@@ -38,6 +40,7 @@ export default function SessionDebrief({ session, notes = [], entities = [], cam
       queryClient.invalidateQueries();
       setSaved(true);
       setSaveError(null);
+      notifier?.notify({ title: `Session #${session?.session_number} debriefed`, type: 'success' });
       setTimeout(() => setSaved(false), 2500);
     },
     onError: (err) => {

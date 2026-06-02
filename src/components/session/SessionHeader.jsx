@@ -6,9 +6,11 @@ import { createPageUrl } from '@/utils';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Save, Loader2, PlayCircle, ChevronLeft } from 'lucide-react';
+import { useNotifications } from '@/lib/NotificationContext';
 
 export default function SessionHeader({ formData, setFormData, saving, saved, handleSave, session, isRunMode, campaignId, sessionNum }) {
   const queryClient = useQueryClient();
+  const notes = useNotifications();
 
   return (
     <div className="flex items-center justify-between px-4 py-2.5 border-b dark:border-zinc-800/60 dark:bg-zinc-950/80 border-zinc-200 bg-white/80 dark:backdrop-blur backdrop-blur flex-shrink-0">
@@ -49,6 +51,7 @@ export default function SessionHeader({ formData, setFormData, saving, saved, ha
               await Session.update(session.id, { status: 'in_progress', start_time: new Date().toISOString() });
               await Campaign.update(campaignId, { active_mode: 'session' });
               queryClient.invalidateQueries();
+              notes?.notify({ title: `Session #${sessionNum} started`, type: 'session' });
             }}
             size="sm"
             className="bg-emerald-600 hover:bg-emerald-500 text-white text-xs relative overflow-hidden group"
@@ -63,6 +66,7 @@ export default function SessionHeader({ formData, setFormData, saving, saved, ha
               await Session.update(session.id, { status: 'completed', end_time: new Date().toISOString() });
               await Campaign.update(campaignId, { active_mode: 'debrief' });
               queryClient.invalidateQueries();
+              notes?.notify({ title: `Session #${sessionNum} ended`, body: 'Time to debrief.', type: 'session' });
             }}
             size="sm"
             variant="outline"

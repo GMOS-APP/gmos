@@ -11,6 +11,7 @@ import PublicPlayerView from '@/pages/PublicPlayerView';
 import ChangelogDialog from '@/components/layout/ChangelogDialog';
 import BootSequence from '@/components/layout/BootSequence';
 import { AudioPlayerProvider } from '@/lib/AudioPlayerContext';
+import { NotificationProvider } from '@/lib/NotificationContext';
 
 const { Pages, Layout, mainPage } = pagesConfig;
 const mainPageKey = mainPage ?? Object.keys(Pages)[0];
@@ -67,14 +68,16 @@ function App() {
     <AuthProvider>
       <QueryClientProvider client={queryClientInstance}>
         <AudioPlayerProvider>
-          <Router basename={import.meta.env.BASE_URL}>
-            <NavigationTracker />
-            <Routes>
-              <Route path="/player-view/public" element={<PublicPlayerView />} />
-              <Route path="/*" element={<AuthenticatedApp />} />
-            </Routes>
-          </Router>
-          <Toaster />
+          <NotificationProvider>
+            <Router basename={import.meta.env.BASE_URL}>
+              <NavigationTracker />
+              <Routes>
+                <Route path="/player-view/public" element={<PublicPlayerView />} />
+                <Route path="/*" element={<AuthenticatedApp />} />
+              </Routes>
+            </Router>
+            <Toaster />
+          </NotificationProvider>
         </AudioPlayerProvider>
       </QueryClientProvider>
     </AuthProvider>
