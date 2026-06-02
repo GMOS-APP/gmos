@@ -59,7 +59,6 @@ function NoteCard({ note, entities, campaignId, onUpdate, onDelete }) {
   const [editTags, setEditTags] = useState(note.tags || []);
 
   const tags = note.tags || [];
-  const isFirst = false; // handled by parent
 
   const handleSave = () => {
     onUpdate(note.id, { content: editContent, tags: editTags });

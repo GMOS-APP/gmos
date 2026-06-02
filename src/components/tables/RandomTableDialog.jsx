@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { RandomTable } from '@/api/entities';
-import { useCampaign } from '@/lib/CampaignContext';
 import { Plus, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -24,9 +23,8 @@ const CATEGORIES = [
 
 const EMPTY_FORM = { name: '', description: '', category: 'custom', entries: [] };
 
-export default function RandomTableDialog({ open, onClose, campaignId, campaign, table }) {
+export default function RandomTableDialog({ open, onClose, campaignId, table }) {
   const queryClient = useQueryClient();
-  const { system } = useCampaign();
   const [form, setForm] = useState(EMPTY_FORM);
   const [entryInput, setEntryInput] = useState('');
   const entryListRef = useRef(null);

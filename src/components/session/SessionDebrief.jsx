@@ -2,14 +2,12 @@ import React, { useState, useEffect } from 'react';
 import EntityMentionRenderer from '@/components/common/EntityMentionRenderer';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Session, Campaign } from '@/api/entities';
-import { useCampaign } from '@/lib/CampaignContext';
 import { Button } from '@/components/ui/button';
 import EntityMentionTextarea from '@/components/common/EntityMentionTextarea';
 import { Input } from '@/components/ui/input';
 import { Save, Loader2, Plus, X, CheckCircle2, Clock, CalendarDays } from 'lucide-react';
 
-export default function SessionDebrief({ session, previousSession, notes = [], entities = [], campaignId }) {
-  const { system } = useCampaign();
+export default function SessionDebrief({ session, notes = [], entities = [], campaignId }) {
   const queryClient = useQueryClient();
 
   const [summary, setSummary] = useState(session?.summary || '');

@@ -66,7 +66,7 @@ function Counter({ counter, onChange, onRemove }) {
   );
 }
 
-function CharacterPanel({ charId, char, entity, onChange }) {
+function CharacterPanel({ char, entity, onChange }) {
   const [expanded, setExpanded] = useState(true);
   const [addingCounter, setAddingCounter] = useState(false);
   const [newName, setNewName] = useState('');
@@ -229,7 +229,7 @@ function CharacterPanel({ charId, char, entity, onChange }) {
   );
 }
 
-export default function ResourceTracker({ session, entities, campaignId }) {
+export default function ResourceTracker({ session, entities }) {
   const queryClient = useQueryClient();
   const playerCharacters = entities.filter(e => e.entity_type === 'player_character');
 

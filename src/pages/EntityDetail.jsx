@@ -262,8 +262,6 @@ function EntityDetailInner() {
     staleTime: 30000,
   });
 
-  const { campaign: campaignData } = useCampaign();
-
   const { data: relationships = [] } = useQuery({
     queryKey: ['relationships', entityId],
     queryFn: async () => {

@@ -50,7 +50,7 @@ export default function EntityMentionRenderer({ text, entities = [], campaignId,
   );
 }
 
-function EntityMentionLink({ entityId, entityName, entity, campaignId }) {
+function EntityMentionLink({ entityName, entity, campaignId }) {
   const [open, setOpen] = useState(false);
   const [anchorRect, setAnchorRect] = useState(null);
   const btnRef = useRef(null);

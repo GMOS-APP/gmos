@@ -62,7 +62,6 @@ export default function RelationshipGraph({ entities, relationships, onEditRelat
           // Centering force
           const dx = centerX - node.x;
           const dy = centerY - node.y;
-          const dist = Math.sqrt(dx * dx + dy * dy);
           node.vx += dx * 0.0001;
           node.vy += dy * 0.0001;
 
