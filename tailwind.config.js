@@ -17,6 +17,13 @@ module.exports = {
   				400: '#ff6a3d', 500: '#ff4d1c', 600: '#ed3c0c', 700: '#c42f0a',
   				800: '#9c2810', 900: '#7e2511', 950: '#451206',
   			},
+  			// Full-TE concept: flatten the cool zinc neutrals into a flat,
+  			// faintly-warm gray (the K.O.II "desk + device" greys).
+  			zinc: {
+  				50: '#f7f7f6', 100: '#efefed', 200: '#e3e2df', 300: '#d0cfca',
+  				400: '#a3a19b', 500: '#73716b', 600: '#56544f', 700: '#413f3a',
+  				800: '#272521', 900: '#1a1815', 950: '#0d0c0a',
+  			},
   			background: 'hsl(var(--background))',
   			foreground: 'hsl(var(--foreground))',
   			card: {
