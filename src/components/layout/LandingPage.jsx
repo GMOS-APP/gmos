@@ -6,12 +6,12 @@ import {
 } from 'lucide-react';
 
 const FEATURES = [
-  { Icon: BookOpen, title: 'Session prep, the lazy way', body: "The Lazy GM's 8-step method — strong start, scenes, secrets & clues, NPCs, monsters, and rewards — in a guided flow." },
-  { Icon: Globe, title: 'A living world bible', body: 'NPCs, locations, factions, items, deities, and lore — all linked, tagged, and instantly searchable.' },
-  { Icon: Swords, title: 'Run the table', body: 'Initiative tracker, dice roller, live notes, and a fullscreen GM screen built for game night.' },
-  { Icon: Network, title: 'Relationship map', body: 'See how every character, faction, and thread connects at a glance.' },
-  { Icon: Map, title: 'Maps & random tables', body: 'Pin locations on interactive campaign maps and roll on your own tables in a click.' },
-  { Icon: Eye, title: 'Player view', body: 'Share a live, spoiler-safe page with your players — you control what they see.' },
+  { Icon: Globe, title: 'Your world, in one place', body: 'Keep NPCs, locations, factions, items, deities, and lore together — linked, tagged, and searchable.' },
+  { Icon: BookOpen, title: 'Session prep', body: "A guided structure for prepping a session, based on the Lazy GM method: strong start, scenes, secrets, NPCs, monsters, and rewards." },
+  { Icon: Swords, title: 'Tools for the table', body: 'Notes, an initiative tracker, dice, and a fullscreen screen for while you run the game.' },
+  { Icon: Network, title: 'Relationship map', body: 'A visual map of how characters, factions, and threads connect.' },
+  { Icon: Map, title: 'Maps & tables', body: 'Interactive maps for your locations, and your own random tables to roll on.' },
+  { Icon: Eye, title: 'Player view', body: 'A separate page you can share with players, showing only what you choose.' },
 ];
 
 const SYSTEMS = ['D&D 5e', 'Pathfinder 2e', 'Call of Cthulhu', 'Blades in the Dark', 'Mothership', 'or any system'];
@@ -94,13 +94,13 @@ export default function LandingPage() {
           <div>
             <p className="text-xs font-mono uppercase tracking-[0.2em] text-amber-600 dark:text-amber-400 mb-4">For Game Masters</p>
             <h1 className="text-4xl sm:text-5xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100 leading-[1.1]">
-              The operating system for Game Masters.
+              A dedicated space for Game Masters.
             </h1>
             <p className="mt-5 text-lg text-zinc-600 dark:text-zinc-400 max-w-lg">
-              Prep faster, run smoother. Your campaigns, NPCs, sessions, maps, and dice — in one fast, keyboard-driven workspace.
+              GM/OS keeps your whole campaign in one place — your NPCs and locations, your session prep, and the tools you reach for while running the game.
             </p>
             <ul className="mt-6 space-y-2">
-              {['Guided session prep', 'A searchable world bible', 'Live tools for game night', 'Command palette + shortcuts'].map((t) => (
+              {['Your world: NPCs, locations, factions, lore', 'Guided session prep', 'Notes, initiative, and dice at the table', 'A player-facing view you control'].map((t) => (
                 <li key={t} className="flex items-center gap-2 text-sm text-zinc-600 dark:text-zinc-400">
                   <Check className="w-4 h-4 text-emerald-500 flex-shrink-0" /> {t}
                 </li>
@@ -108,7 +108,7 @@ export default function LandingPage() {
             </ul>
             <div className="mt-8 flex items-center gap-3">
               <a href="#signin" className="inline-flex items-center px-5 py-2.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-zinc-950 font-semibold transition-colors">
-                Get started — it's free
+                Get started
               </a>
             </div>
           </div>
@@ -121,8 +121,8 @@ export default function LandingPage() {
       {/* Features */}
       <section className="px-4 sm:px-6 py-16 border-t border-zinc-200/70 dark:border-zinc-800/60">
         <div className="max-w-6xl mx-auto">
-          <h2 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100 text-center mb-2">Everything your table needs</h2>
-          <p className="text-sm text-zinc-500 dark:text-zinc-500 text-center mb-10">From the first idea to the post-session debrief.</p>
+          <h2 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100 text-center mb-2">What's inside</h2>
+          <p className="text-sm text-zinc-500 dark:text-zinc-500 text-center mb-10">For prepping, running, and looking back on your sessions.</p>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {FEATURES.map(({ Icon, title, body }) => (
               <div key={title} className="rounded-xl border border-zinc-200 dark:border-zinc-800/60 bg-white dark:bg-zinc-900/40 p-5">
@@ -136,7 +136,7 @@ export default function LandingPage() {
           </div>
           <div className="mt-10 flex items-center justify-center gap-2 text-sm text-zinc-500 dark:text-zinc-500">
             <Command className="w-4 h-4 text-amber-500" />
-            <span>Plus a command palette (⌘K), keyboard shortcuts, inline dice, and background music.</span>
+            <span>It's keyboard-driven too: a command palette (⌘K), shortcuts, and inline dice.</span>
           </div>
         </div>
       </section>
@@ -156,8 +156,8 @@ export default function LandingPage() {
       {/* Sign-in */}
       <section id="signin" className="px-4 sm:px-6 py-16 border-t border-zinc-200/70 dark:border-zinc-800/60">
         <div className="max-w-md mx-auto text-center">
-          <h2 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100 mb-1">Ready to run your best session?</h2>
-          <p className="text-sm text-zinc-500 dark:text-zinc-500 mb-6">Create an account or sign in to get started.</p>
+          <h2 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100 mb-1">Get started</h2>
+          <p className="text-sm text-zinc-500 dark:text-zinc-500 mb-6">Create an account or sign in. It's free to start.</p>
           <div className="flex justify-center">
             <AuthPanel />
           </div>
@@ -166,7 +166,7 @@ export default function LandingPage() {
 
       <footer className="mt-auto px-4 sm:px-6 py-6 border-t border-zinc-200/70 dark:border-zinc-800/60">
         <p className="text-[11px] text-zinc-400 dark:text-zinc-600 text-center max-w-3xl mx-auto leading-relaxed">
-          GM/OS · The operating system for Game Masters. Includes the Lazy GM's Resource Document (CC BY 4.0, Michael E. Shea / SlyFlourish.com),
+          GM/OS · a dedicated space for Game Masters. Includes the Lazy GM's Resource Document (CC BY 4.0, Michael E. Shea / SlyFlourish.com),
           the D&D SRD 5.1 (CC BY 4.0, Wizards of the Coast), and Open5e content.
         </p>
       </footer>
