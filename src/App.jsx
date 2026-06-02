@@ -6,7 +6,7 @@ import { pagesConfig } from './pages.config'
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import PageNotFound from './lib/PageNotFound';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
-import LoginPage from '@/components/layout/LoginPage';
+import LandingPage from '@/components/layout/LandingPage';
 import PublicPlayerView from '@/pages/PublicPlayerView';
 import ChangelogDialog from '@/components/layout/ChangelogDialog';
 import BootSequence from '@/components/layout/BootSequence';
@@ -33,7 +33,7 @@ const AuthenticatedApp = () => {
   }
 
   if (!isAuthenticated) {
-    return <LoginPage />;
+    return <LandingPage />;
   }
 
   return (
