@@ -6,6 +6,7 @@ import { Session } from '@/api/entities';
 import { createPageUrl } from '@/utils';
 import Breadcrumbs from '@/components/layout/Breadcrumbs';
 import TrayAudioPlayer from '@/components/layout/TrayAudioPlayer';
+import TrayNotifications from '@/components/layout/TrayNotifications';
 import ThemeToggle from '@/components/ui/ThemeToggle';
 import { MOD_LABEL } from '@/lib/useHotkeys';
 import { cn } from '@/lib/utils';
@@ -95,6 +96,7 @@ export default function Taskbar({ campaign, currentPageName, startActive, onStar
           <Search className="w-3.5 h-3.5" />
         </button>
         <TrayAudioPlayer />
+        <TrayNotifications />
         {fetching > 0 && (
           <span className="hidden sm:flex items-center gap-1 px-1.5 text-[10px] font-mono text-zinc-400 dark:text-zinc-600">
             <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
