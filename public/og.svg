@@ -1,0 +1,14 @@
+<svg width="1200" height="630" viewBox="0 0 1200 630" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="glow" cx="50%" cy="2%" r="75%">
+      <stop offset="0%" stop-color="#f59e0b" stop-opacity="0.20"/>
+      <stop offset="55%" stop-color="#0a0a0b" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1200" height="630" fill="#0a0a0b"/>
+  <rect width="1200" height="630" fill="url(#glow)"/>
+  <rect x="1" y="1" width="1198" height="628" fill="none" stroke="#27272a" stroke-width="2"/>
+  <text x="600" y="290" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-weight="700" font-size="128" fill="#fafafa">GM<tspan fill="#f59e0b">/OS</tspan></text>
+  <text x="600" y="362" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="36" fill="#a1a1aa">The operating system for Game Masters</text>
+  <text x="600" y="452" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-weight="500" font-size="24" fill="#71717a" letter-spacing="2">PREP  ·  NPCS  ·  SESSIONS  ·  MAPS  ·  DICE</text>
+</svg>
