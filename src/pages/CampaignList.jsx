@@ -236,7 +236,9 @@ export default function CampaignList() {
                           <DropdownMenuItem
                             onClick={(e) => {
                               e.preventDefault();
-                              deleteMutation.mutate(c.id);
+                              if (window.confirm(`Delete "${c.name}"? This permanently removes the campaign and can't be undone.`)) {
+                                deleteMutation.mutate(c.id);
+                              }
                             }}
                             className="text-red-600 dark:text-red-400 focus:text-red-600 dark:focus:text-red-400"
                           >
