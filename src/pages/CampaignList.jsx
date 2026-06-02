@@ -29,6 +29,9 @@ const STATUS_DOT = {
   debriefed: 'bg-zinc-400',
 };
 
+// Classic raised-bevel look for desktop objects.
+const RETRO_BEVEL = 'shadow-[inset_1px_1px_0_rgba(255,255,255,0.6),inset_-2px_-2px_0_rgba(0,0,0,0.18)] dark:shadow-[inset_1px_1px_0_rgba(255,255,255,0.07),inset_-2px_-2px_0_rgba(0,0,0,0.5)]';
+
 // A single desktop icon (utility action or campaign).
 function DesktopIcon({ icon: Icon, label, onClick, busy, dashed, title, tint, dot, badge }) {
   return (
@@ -39,7 +42,8 @@ function DesktopIcon({ icon: Icon, label, onClick, busy, dashed, title, tint, do
       className="group w-24 flex flex-col items-center gap-1.5 p-2 rounded-lg hover:bg-white/70 dark:hover:bg-white/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/50 disabled:opacity-60 transition-colors"
     >
       <div className={cn(
-        'relative w-14 h-14 rounded-xl flex items-center justify-center border transition-colors',
+        'relative w-14 h-14 rounded-lg flex items-center justify-center border transition-colors',
+        RETRO_BEVEL,
         dashed
           ? 'border-dashed border-zinc-300 dark:border-zinc-700 group-hover:border-amber-500/50'
           : tint || 'bg-zinc-100 dark:bg-zinc-800/60 border-zinc-200 dark:border-zinc-700'
@@ -62,6 +66,8 @@ export default function CampaignList() {
   const [exportingId, setExportingId] = useState(null);
   const [importing, setImporting] = useState(false);
   const [loadingDemo, setLoadingDemo] = useState(false);
+  const [dragId, setDragId] = useState(null);
+  const [trashHover, setTrashHover] = useState(false);
   const fileInputRef = useRef(null);
 
   const [now, setNow] = useState(() => new Date());
@@ -136,6 +142,14 @@ export default function CampaignList() {
     }
   };
 
+  const handleTrashDrop = (e) => {
+    e.preventDefault();
+    setTrashHover(false);
+    const c = campaigns.find((x) => x.id === dragId);
+    setDragId(null);
+    if (c) confirmDelete(c);
+  };
+
   const open = (c) => navigate(createPageUrl('CampaignDashboard') + `?id=${c.id}`);
   const time = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
@@ -163,7 +177,7 @@ export default function CampaignList() {
       </header>
 
       {/* Desktop */}
-      <main className="flex-1 overflow-y-auto p-5 sm:p-8">
+      <main className="flex-1 overflow-y-auto p-5 sm:p-8 [background-image:radial-gradient(rgba(140,140,140,0.15)_1px,transparent_1px)] [background-size:16px_16px]">
         <div className="flex flex-wrap gap-2 content-start">
           <DesktopIcon icon={Plus} label="New Campaign" dashed onClick={() => setShowCreate(true)} />
           <DesktopIcon icon={Upload} label="Import" busy={importing} onClick={() => fileInputRef.current?.click()} />
@@ -179,7 +193,12 @@ export default function CampaignList() {
             : campaigns.map((c) => (
                 <ContextMenu key={c.id}>
                   <ContextMenuTrigger asChild>
-                    <div>
+                    <div
+                      draggable
+                      onDragStart={(e) => { setDragId(c.id); e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/plain', c.id); }}
+                      onDragEnd={() => { setDragId(null); setTrashHover(false); }}
+                      className={cn('transition-opacity', dragId === c.id && 'opacity-50')}
+                    >
                       <DesktopIcon
                         icon={Shield}
                         label={c.name}
@@ -219,6 +238,29 @@ export default function CampaignList() {
 
         <input ref={fileInputRef} type="file" accept=".json" className="hidden" onChange={handleImport} />
       </main>
+
+      {/* Trash bin — drag a campaign here to delete it */}
+      {campaigns.length > 0 && (
+        <div
+          onDragOver={(e) => { if (dragId) { e.preventDefault(); setTrashHover(true); } }}
+          onDragLeave={() => setTrashHover(false)}
+          onDrop={handleTrashDrop}
+          title="Drag a campaign here to delete it"
+          className={cn(
+            'hidden sm:flex fixed bottom-10 right-5 z-40 w-24 flex-col items-center gap-1.5 p-2 rounded-lg transition-all',
+            trashHover && 'bg-red-500/10 scale-105'
+          )}
+        >
+          <div className={cn(
+            'w-14 h-14 rounded-lg flex items-center justify-center border transition-colors bg-zinc-100 dark:bg-zinc-800/60',
+            RETRO_BEVEL,
+            trashHover ? 'border-red-500 text-red-500' : 'border-zinc-300 dark:border-zinc-700 text-zinc-500 dark:text-zinc-400'
+          )}>
+            <Trash2 className={cn('w-6 h-6 transition-transform', trashHover && 'scale-110')} />
+          </div>
+          <span className="text-[11px] font-mono text-zinc-600 dark:text-zinc-400">Trash</span>
+        </div>
+      )}
 
       {/* Status bar */}
       <footer className="flex items-center justify-between h-7 px-3 border-t border-zinc-200 dark:border-zinc-800/70 bg-white dark:bg-zinc-950 flex-shrink-0 text-[11px] font-mono text-zinc-500 dark:text-zinc-500">
