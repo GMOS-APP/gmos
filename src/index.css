@@ -4,7 +4,7 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
+    --background: 30 6% 95%;
     --foreground: 0 0% 9%;
     --card: 0 0% 100%;
     --card-foreground: 0 0% 9%;
@@ -37,34 +37,34 @@
     --info-foreground: 0 0% 100%;
     --surface-raised: 0 0% 97%;
     --sidebar-background: 13 30% 97%;
-    --sidebar-foreground: 240 5.3% 26%;
+    --sidebar-foreground: 30 5% 26%;
     --sidebar-primary: 13 96% 42%;
     --sidebar-primary-foreground: 0 0% 100%;
     --sidebar-accent: 13 96% 96%;
     --sidebar-accent-foreground: 13 85% 30%;
-    --sidebar-border: 220 13% 91%;
+    --sidebar-border: 30 6% 90%;
     --sidebar-ring: 13 96% 42%;
   }
 
   .dark {
-    --background: 240 6% 7%;
+    --background: 30 6% 7%;
     --foreground: 0 0% 93%;
-    --card: 240 5% 10%;
+    --card: 30 5% 10%;
     --card-foreground: 0 0% 93%;
-    --popover: 240 5% 10%;
+    --popover: 30 5% 10%;
     --popover-foreground: 0 0% 93%;
     --primary: 13 96% 50%;
-    --primary-foreground: 240 6% 7%;
-    --secondary: 240 4% 16%;
+    --primary-foreground: 30 6% 7%;
+    --secondary: 30 5% 16%;
     --secondary-foreground: 0 0% 93%;
-    --muted: 240 4% 16%;
-    --muted-foreground: 240 5% 58%;
-    --accent: 240 4% 16%;
+    --muted: 30 5% 16%;
+    --muted-foreground: 30 4% 58%;
+    --accent: 30 5% 16%;
     --accent-foreground: 0 0% 93%;
     --destructive: 0 72% 58%;
     --destructive-foreground: 0 0% 98%;
-    --border: 240 4% 18%;
-    --input: 240 4% 18%;
+    --border: 30 5% 18%;
+    --input: 30 5% 18%;
     --ring: 13 96% 50%;
     --chart-1: 13 96% 50%;
     --chart-2: 173 58% 45%;
@@ -73,19 +73,19 @@
     --chart-5: 27 87% 67%;
     --radius: 0.5rem;
     --success: 142 70% 45%;
-    --success-foreground: 240 6% 7%;
+    --success-foreground: 30 6% 7%;
     --warning: 13 96% 50%;
-    --warning-foreground: 240 6% 7%;
+    --warning-foreground: 30 6% 7%;
     --info: 210 90% 60%;
-    --info-foreground: 240 6% 7%;
-    --surface-raised: 240 4% 13%;
-    --sidebar-background: 240 6% 7%;
+    --info-foreground: 30 6% 7%;
+    --surface-raised: 30 5% 13%;
+    --sidebar-background: 30 6% 7%;
     --sidebar-foreground: 0 0% 93%;
     --sidebar-primary: 13 96% 50%;
-    --sidebar-primary-foreground: 240 6% 7%;
-    --sidebar-accent: 240 4% 16%;
+    --sidebar-primary-foreground: 30 6% 7%;
+    --sidebar-accent: 30 5% 16%;
     --sidebar-accent-foreground: 0 0% 93%;
-    --sidebar-border: 240 4% 18%;
+    --sidebar-border: 30 5% 18%;
     --sidebar-ring: 13 96% 50%;
   }
 }
@@ -138,10 +138,10 @@ body {
   background: hsl(0 0% 60%);
 }
 .dark ::-webkit-scrollbar-thumb {
-  background: hsl(240 4% 28%);
+  background: hsl(30 5% 28%);
 }
 .dark ::-webkit-scrollbar-thumb:hover {
-  background: hsl(240 4% 38%);
+  background: hsl(30 5% 38%);
 }
 
 /* Smooth theme transitions — only on background/border/color, not layout */
