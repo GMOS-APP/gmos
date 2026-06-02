@@ -306,7 +306,7 @@ function DndBeyondGMPanel({ form, d }) {
     if (stale) syncMutation.mutate();
     const intervalId = setInterval(() => syncMutation.mutate(), POLL_MS);
     return () => clearInterval(intervalId);
-  }, [d.dndbeyond_id]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [d.dndbeyond_id]);
 
   const currentHp = d.current_hit_points ?? null;
   const maxHp = d.max_hit_points || 0;

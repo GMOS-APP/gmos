@@ -40,17 +40,6 @@ const STATUS_COLORS = {
   debriefed: 'dark:text-zinc-500 dark:bg-zinc-800 text-zinc-600 bg-zinc-200',
 };
 
-function timeAgo(dateStr) {
-  if (!dateStr) return '';
-  const diff = Date.now() - new Date(dateStr).getTime();
-  const mins = Math.floor(diff / 60000);
-  if (mins < 60) return `${mins}m ago`;
-  const hrs = Math.floor(mins / 60);
-  if (hrs < 24) return `${hrs}h ago`;
-  const days = Math.floor(hrs / 24);
-  return `${days}d ago`;
-}
-
 export default function CampaignDashboard() {
   const params = new URLSearchParams(window.location.search);
   const campaignId = params.get('id');
@@ -84,9 +73,6 @@ export default function CampaignDashboard() {
   for (const e of entities) {
     countByType[e.entity_type] = (countByType[e.entity_type] || 0) + 1;
   }
-
-  // Recent activity: last 8 updated entities
-  const recentEntities = entities.slice(0, 8);
 
   // Active threads
   const activeThreads = entities.filter((e) => e.entity_type === 'thread' && e.status === 'active');

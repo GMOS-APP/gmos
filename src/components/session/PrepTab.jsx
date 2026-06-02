@@ -71,7 +71,7 @@ function LinkedEntitiesSection({ title, icon: Icon, color, entityType, linkedIds
   );
 }
 
-export default function PrepTab({ session, campaign, entities, formData, setFormData, campaignId }) {
+export default function PrepTab({ entities, formData, setFormData, campaignId }) {
   const setField = (key) => (val) => setFormData(prev => ({ ...prev, [key]: val }));
   const setIds = (key) => (updater) => setFormData(prev => ({
     ...prev,

@@ -39,7 +39,7 @@ export default function EntityCard({ entity }) {
           )}
           {entity.key_facts?.length > 0 && (
             <div className="flex flex-wrap gap-1 mt-2">
-              {entity.key_facts.slice(0, 2).map((fact, i) => (
+              {entity.key_facts.slice(0, 2).map((fact) => (
                <span key={fact} className="text-[10px] px-1.5 py-0.5 rounded dark:bg-zinc-800 dark:text-zinc-500 bg-zinc-200 text-zinc-700 truncate max-w-[180px]">
                  {fact}
                </span>
