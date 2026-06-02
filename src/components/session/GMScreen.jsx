@@ -11,7 +11,7 @@ import SessionNotesDisplay from '@/components/session/SessionNotesDisplay';
 import EntityLinker from '@/components/session/EntityLinker';
 import CombatTracker from '@/components/session/CombatTracker';
 import EntityQuickViewModal from '@/components/common/EntityQuickViewModal';
-import { Minimize2, Clock, StickyNote, Heart, Search } from 'lucide-react';
+import { Minimize2, Clock, StickyNote, Heart, Search, Scroll, Swords } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import EntityAvatar from '@/components/entity/EntityAvatar';
 
