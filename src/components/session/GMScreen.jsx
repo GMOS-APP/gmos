@@ -13,6 +13,7 @@ import CombatTracker from '@/components/session/CombatTracker';
 import EntityQuickViewModal from '@/components/common/EntityQuickViewModal';
 import { Minimize2, Clock, StickyNote, Heart, Search, Scroll, Swords } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { getEntityColors } from '@/lib/entityColors';
 import EntityAvatar from '@/components/entity/EntityAvatar';
 
 function InlineTimer({ session }) {
@@ -71,6 +72,7 @@ function WorldSearch({ entities, campaignId }) {
           <p className="text-xs dark:text-zinc-600 text-zinc-400 text-center py-8">No entities found.</p>
         ) : (
           filtered.map(entity => {
+            const colors = getEntityColors(entity.entity_type);
             return (
               <button
                 key={entity.id}
