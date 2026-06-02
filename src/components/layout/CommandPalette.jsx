@@ -10,12 +10,30 @@ import {
   CommandDialog, CommandInput, CommandList, CommandEmpty,
   CommandGroup, CommandItem,
 } from '@/components/ui/command';
-import { CalendarDays, Plus } from 'lucide-react';
+import { CalendarDays, Plus, Dices } from 'lucide-react';
 import { CAMPAIGN_NAV_ITEMS, navHref } from '@/lib/navItems';
+import { useNotifications } from '@/lib/NotificationContext';
+
+// Inline dice: "2d6+3", "d20", "roll 1d8-1".
+const DICE_RE = /^\s*(?:roll\s+)?(\d*)\s*d\s*(\d+)\s*([+-]\s*\d+)?\s*$/i;
+function parseDice(input) {
+  const m = (input || '').match(DICE_RE);
+  if (!m) return null;
+  const count = m[1] ? parseInt(m[1], 10) : 1;
+  const sides = parseInt(m[2], 10);
+  const mod = m[3] ? parseInt(m[3].replace(/\s+/g, ''), 10) : 0;
+  if (count < 1 || count > 100 || sides < 1 || sides > 1000) return null;
+  return { count, sides, mod, label: `${count}d${sides}${mod ? (mod > 0 ? `+${mod}` : `${mod}`) : ''}` };
+}
+function rollDice({ count, sides, mod }) {
+  const rolls = Array.from({ length: count }, () => Math.floor(Math.random() * sides) + 1);
+  return { rolls, total: rolls.reduce((a, b) => a + b, 0) + mod };
+}
 
 export default function CommandPalette({ open, onOpenChange, campaignId }) {
   const [query, setQuery] = useState('');
   const navigate = useNavigate();
+  const notifier = useNotifications();
 
   const { data: entities = [] } = useQuery({
     queryKey: ['global-search-entities', campaignId],
@@ -32,6 +50,8 @@ export default function CommandPalette({ open, onOpenChange, campaignId }) {
   });
 
   const q = query.trim().toLowerCase();
+  const dice = useMemo(() => parseDice(query), [query]);
+  const diceRoll = useMemo(() => (dice ? rollDice(dice) : null), [dice]);
 
   const searchResults = useMemo(() => {
     if (q.length < 1) return [];
@@ -84,12 +104,35 @@ export default function CommandPalette({ open, onOpenChange, campaignId }) {
   return (
     <CommandDialog open={open} onOpenChange={handleOpenChange} shouldFilter={false}>
       <CommandInput
-        placeholder="Search, create, or jump to…"
+        placeholder="Search, create, jump, or roll 2d6…"
         value={query}
         onValueChange={setQuery}
       />
       <CommandList>
         <CommandEmpty>No results.</CommandEmpty>
+
+        {dice && diceRoll && (
+          <CommandGroup heading="Command">
+            <CommandItem
+              value="cmd-roll"
+              onSelect={() => {
+                notifier?.notify({
+                  title: `🎲 ${dice.label} → ${diceRoll.total}`,
+                  body: `rolls: ${diceRoll.rolls.join(', ')}${dice.mod ? ` (${dice.mod > 0 ? '+' : ''}${dice.mod})` : ''}`,
+                  type: 'success',
+                });
+                handleOpenChange(false);
+              }}
+            >
+              <Dices className="text-amber-500" />
+              <span>Roll {dice.label}</span>
+              <span className="ml-auto font-mono text-sm tabular-nums">
+                {diceRoll.total}
+                <span className="text-[10px] text-muted-foreground ml-1.5">({diceRoll.rolls.join(', ')})</span>
+              </span>
+            </CommandItem>
+          </CommandGroup>
+        )}
 
         {searchResults.length > 0 && (
           <CommandGroup heading="Search results">
