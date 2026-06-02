@@ -10,6 +10,13 @@ module.exports = {
   			sm: 'calc(var(--radius) - 4px)'
   		},
   		colors: {
+  			// TE signal-orange concept — overrides Tailwind's default amber scale
+  			// so every existing amber-* class becomes the accent app-wide.
+  			amber: {
+  				50: '#fff3ee', 100: '#ffe4d8', 200: '#ffc6ad', 300: '#ff9e78',
+  				400: '#ff6a3d', 500: '#ff4d1c', 600: '#ed3c0c', 700: '#c42f0a',
+  				800: '#9c2810', 900: '#7e2511', 950: '#451206',
+  			},
   			background: 'hsl(var(--background))',
   			foreground: 'hsl(var(--foreground))',
   			card: {
