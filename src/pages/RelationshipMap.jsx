@@ -53,7 +53,7 @@ export default function RelationshipMap() {
   const queryClient = useQueryClient();
 
   const { data: entities = [] } = useQuery({
-    queryKey: ['entities', campaignId],
+    queryKey: ['entities', campaignId, 'all'],
     queryFn: () => WorldEntity.filter({ campaign_id: campaignId }),
     enabled: !!campaignId,
   });

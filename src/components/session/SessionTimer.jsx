@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { Session } from '@/api/entities';
+import { Session, Campaign } from '@/api/entities';
 import { Clock, Play, Square } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
@@ -28,22 +28,24 @@ export default function SessionTimer({ session }) {
   }, [isRunning, session?.start_time, session?.end_time]);
 
   const startMutation = useMutation({
-    mutationFn: () => Session.update(session.id, { 
-      start_time: new Date().toISOString(),
-      status: 'in_progress'
-    }),
+    mutationFn: async () => {
+      await Session.update(session.id, { start_time: new Date().toISOString(), status: 'in_progress' });
+      if (session.campaign_id) await Campaign.update(session.campaign_id, { active_mode: 'session' });
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['session'] });
+      queryClient.invalidateQueries({ queryKey: ['campaign'] });
     },
   });
 
   const endMutation = useMutation({
-    mutationFn: () => Session.update(session.id, { 
-      end_time: new Date().toISOString(),
-      status: 'completed'
-    }),
+    mutationFn: async () => {
+      await Session.update(session.id, { end_time: new Date().toISOString(), status: 'completed' });
+      if (session.campaign_id) await Campaign.update(session.campaign_id, { active_mode: 'debrief' });
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['session'] });
+      queryClient.invalidateQueries({ queryKey: ['campaign'] });
     },
   });
 

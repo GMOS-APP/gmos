@@ -104,7 +104,7 @@ export default function Sidebar({ campaign, collapsed, onToggle, onNavClick }) {
       {/* Navigation */}
       <nav className="flex-1 overflow-y-auto p-2 space-y-1">
         {CAMPAIGN_NAV_ITEMS.map(({ page, label, Icon, param }) => {
-          const isActive = location.pathname.includes(page.toLowerCase()) || location.search.includes(page.toLowerCase());
+          const isActive = location.pathname === createPageUrl(page);
           const href = navHref({ page, param }, campaign.id);
           return (
             <Link

@@ -1,5 +1,6 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import { supabase } from '@/api/supabaseClient';
+import { queryClientInstance } from '@/lib/query-client';
 
 const AuthContext = createContext();
 
@@ -12,13 +13,19 @@ async function fetchOrCreateProfile(userId, setPlan) {
     .from('user_profiles')
     .select('plan')
     .eq('id', userId)
-    .single();
+    .maybeSingle();
   if (data) {
     setPlan(data.plan);
-  } else {
-    await supabase.from('user_profiles').insert({ id: userId });
-    setPlan('free');
-    // Fire-and-forget: seed demo campaign for new users
+    return;
+  }
+  setPlan('free');
+  // Insert idempotently; only the call that actually creates the row seeds the
+  // demo, so concurrent init paths can't double-seed.
+  const { data: inserted } = await supabase
+    .from('user_profiles')
+    .upsert({ id: userId }, { onConflict: 'id', ignoreDuplicates: true })
+    .select();
+  if (inserted && inserted.length > 0) {
     supabase.functions.invoke('create-demo').catch(console.error);
   }
 }
@@ -49,6 +56,8 @@ export const AuthProvider = ({ children }) => {
 
   const logout = async () => {
     await supabase.auth.signOut();
+    // Clear cached data so the next user on a shared machine starts clean.
+    queryClientInstance.clear();
   };
 
   return (
