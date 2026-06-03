@@ -7,6 +7,7 @@ import QuickCapture from '@/components/layout/QuickCapture';
 import CommandPalette from '@/components/layout/CommandPalette';
 import ShortcutsHelp from '@/components/layout/ShortcutsHelp';
 import Taskbar from '@/components/layout/Taskbar';
+import NavMenu from '@/components/layout/NavMenu';
 import ToolDock from '@/components/layout/ToolDock';
 import Footer from '@/components/layout/Footer';
 import { useHotkeys } from '@/lib/useHotkeys';
@@ -17,9 +18,12 @@ import { Loader2 } from 'lucide-react';
 const CAMPAIGN_PAGES = ['CampaignDashboard', 'EntityDetail', 'EntityBrowser', 'RelationshipMap', 'CampaignMap', 'SessionPage', 'SessionBrowser', 'RandomTableBrowser', 'CampaignTimeline', 'PlayerView', 'CampaignNotes', 'CampaignSettings'];
 
 export default function Layout({ children, currentPageName }) {
-  const [collapsed, setCollapsed] = useState(false);
+  // Desktop sidebar can be 'docked' (left) or 'floating' (Start dropdown). Persisted.
+  const [navMode, setNavMode] = useState(() => {
+    try { return localStorage.getItem('gmos_nav_mode') === 'floating' ? 'floating' : 'docked'; } catch { return 'docked'; }
+  });
+  const [floatingMenuOpen, setFloatingMenuOpen] = useState(false);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
-  const [desktopNavHidden, setDesktopNavHidden] = useState(false);
   const { isLoadingAuth } = useAuth();
   const wide = useMediaQuery('(min-width: 768px)');
 
@@ -46,10 +50,23 @@ export default function Layout({ children, currentPageName }) {
     { code: 'Slash', shift: true, handler: () => setHelpOpen(true) },
   ] : []);
 
-  // The Start button toggles the sidebar: a drawer on mobile, show/hide on desktop.
-  const toggleNav = () => {
-    if (wide) setDesktopNavHidden((h) => !h);
-    else setMobileNavOpen((o) => !o);
+  const setMode = (mode) => {
+    setNavMode(mode);
+    try { localStorage.setItem('gmos_nav_mode', mode); } catch { /* ignore */ }
+    if (mode === 'docked') setFloatingMenuOpen(false);
+  };
+
+  // Start button: mobile drawer; desktop undocks (docked) or opens the nav dropdown (floating).
+  const onStart = () => {
+    if (!wide) { setMobileNavOpen((o) => !o); return; }
+    if (navMode === 'docked') setMode('floating');
+    else setFloatingMenuOpen((o) => !o);
+  };
+
+  // Sidebar collapse chevron: undock on desktop, close the drawer on mobile.
+  const onSidebarToggle = () => {
+    if (wide) setMode('floating');
+    else setMobileNavOpen(false);
   };
 
   if (isLoadingAuth) {
@@ -76,8 +93,8 @@ export default function Layout({ children, currentPageName }) {
       <Taskbar
         campaign={campaign}
         currentPageName={currentPageName}
-        startActive={!wide && mobileNavOpen}
-        onStart={toggleNav}
+        startActive={wide ? floatingMenuOpen : mobileNavOpen}
+        onStart={onStart}
         onSearch={() => setPaletteOpen(true)}
       />
 
@@ -90,17 +107,17 @@ export default function Layout({ children, currentPageName }) {
           />
         )}
 
-        {/* Sidebar — mobile drawer / desktop in-flow, toggled by the Start button */}
+        {/* Sidebar — mobile drawer always; desktop in-flow only when docked */}
         <div className={cn(
           'z-40 transition-transform duration-300',
           'fixed top-12 bottom-0 left-0 md:static md:top-auto md:bottom-auto md:z-auto',
           mobileNavOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0',
-          desktopNavHidden ? 'md:hidden' : 'md:flex md:flex-col md:flex-shrink-0'
+          navMode === 'docked' ? 'md:flex md:flex-col md:flex-shrink-0' : 'md:hidden'
         )}>
           <Sidebar
             campaign={campaign}
-            collapsed={collapsed}
-            onToggle={() => setCollapsed(!collapsed)}
+            collapsed={false}
+            onToggle={onSidebarToggle}
             onNavClick={() => setMobileNavOpen(false)}
           />
         </div>
@@ -113,6 +130,12 @@ export default function Layout({ children, currentPageName }) {
         </main>
       </div>
 
+      <NavMenu
+        open={wide && navMode === 'floating' && floatingMenuOpen}
+        onClose={() => setFloatingMenuOpen(false)}
+        campaignId={campaignId}
+        onDock={() => setMode('docked')}
+      />
       <ToolDock />
       <QuickCapture campaignId={campaignId} open={createOpen} onOpenChange={setCreateOpen} />
       <CommandPalette open={paletteOpen} onOpenChange={setPaletteOpen} campaignId={campaignId} />
