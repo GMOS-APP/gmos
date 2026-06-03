@@ -192,13 +192,19 @@ export default function SessionPage() {
         thread_notes: session.thread_notes || '',
         treasure_notes: session.treasure_notes || '',
       });
-    } else if (!sessionId && previousSession) {
+    }
+  }, [session?.id, sessionId]);
+
+  // For a brand-new session, prefill the recap once the previous session loads,
+  // without rebuilding (and wiping) the rest of the form the user is editing.
+  useEffect(() => {
+    if (!session && !sessionId && previousSession) {
       setFormData(prev => ({
         ...prev,
-        previous_session_recap: buildRecap(previousSession),
+        previous_session_recap: prev.previous_session_recap || buildRecap(previousSession),
       }));
     }
-  }, [session?.id, previousSession?.id, sessionId]);
+  }, [previousSession?.id, session?.id, sessionId]);
 
   const saveMutation = useMutation({
     mutationFn: async () => {
