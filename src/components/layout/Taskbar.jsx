@@ -53,13 +53,14 @@ export default function Taskbar({ campaign, currentPageName, startActive, onStar
   };
 
   return (
-    <header className="flex items-center gap-2 h-10 px-2 border-b border-zinc-200 dark:border-zinc-800/70 bg-white dark:bg-zinc-950 flex-shrink-0 z-30 select-none">
+    <header className="flex items-center gap-2 h-12 sm:h-10 px-2 border-b border-zinc-200 dark:border-zinc-800/70 bg-white dark:bg-zinc-950 flex-shrink-0 z-30 select-none">
       <button
         data-start-button
         onClick={onStart}
-        aria-label="Start menu"
+        aria-label="Toggle menu"
+        title="Toggle menu"
         className={cn(
-          'flex items-center gap-1.5 h-7 px-2.5 rounded-md text-sm font-bold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/50',
+          'flex items-center gap-1.5 h-10 sm:h-7 px-2.5 rounded-md text-sm font-bold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/50',
           startActive
             ? 'bg-amber-500/15 text-amber-600 dark:text-amber-400'
             : 'text-zinc-800 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800/60'
@@ -73,7 +74,7 @@ export default function Taskbar({ campaign, currentPageName, startActive, onStar
         onClick={goToSession}
         title="Go to session"
         className={cn(
-          'flex items-center gap-1.5 h-7 px-1.5 rounded-md font-mono text-[11px] flex-shrink-0 transition-colors hover:bg-zinc-100 dark:hover:bg-zinc-800/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/50',
+          'flex items-center gap-1.5 h-9 sm:h-7 px-2 sm:px-1.5 rounded-md font-mono text-[11px] flex-shrink-0 transition-colors hover:bg-zinc-100 dark:hover:bg-zinc-800/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/50',
           mode.text
         )}
       >
@@ -91,9 +92,9 @@ export default function Taskbar({ campaign, currentPageName, startActive, onStar
           onClick={onSearch}
           title={`Search (${MOD_LABEL}K)`}
           aria-label="Search"
-          className="h-7 w-7 flex items-center justify-center rounded-md text-zinc-500 hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-zinc-700 dark:hover:text-zinc-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/50"
+          className="h-10 w-10 sm:h-7 sm:w-7 flex items-center justify-center rounded-md text-zinc-500 hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-zinc-700 dark:hover:text-zinc-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/50"
         >
-          <Search className="w-3.5 h-3.5" />
+          <Search className="w-4 h-4 sm:w-3.5 sm:h-3.5" />
         </button>
         <TrayAudioPlayer />
         <TrayNotifications />
@@ -103,8 +104,8 @@ export default function Taskbar({ campaign, currentPageName, startActive, onStar
             sync
           </span>
         )}
-        <ThemeToggle />
-        <span className="px-2 font-mono text-[11px] tabular-nums text-zinc-600 dark:text-zinc-400">{time}</span>
+        <ThemeToggle className="h-10 w-10 sm:h-7 sm:w-7 flex items-center justify-center" />
+        <span className="hidden sm:inline px-2 font-mono text-[11px] tabular-nums text-zinc-600 dark:text-zinc-400">{time}</span>
       </div>
     </header>
   );

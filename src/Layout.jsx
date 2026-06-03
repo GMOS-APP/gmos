@@ -7,19 +7,21 @@ import QuickCapture from '@/components/layout/QuickCapture';
 import CommandPalette from '@/components/layout/CommandPalette';
 import ShortcutsHelp from '@/components/layout/ShortcutsHelp';
 import Taskbar from '@/components/layout/Taskbar';
-import StartMenu from '@/components/layout/StartMenu';
 import ToolDock from '@/components/layout/ToolDock';
 import Footer from '@/components/layout/Footer';
 import { useHotkeys } from '@/lib/useHotkeys';
 import { useHotkeysEnabled } from '@/lib/useHotkeysEnabled';
+import { useMediaQuery } from '@/lib/useMediaQuery';
+import { cn } from '@/lib/utils';
 import { Loader2 } from 'lucide-react';
 const CAMPAIGN_PAGES = ['CampaignDashboard', 'EntityDetail', 'EntityBrowser', 'RelationshipMap', 'CampaignMap', 'SessionPage', 'SessionBrowser', 'RandomTableBrowser', 'CampaignTimeline', 'PlayerView', 'CampaignNotes', 'CampaignSettings'];
 
 export default function Layout({ children, currentPageName }) {
   const [collapsed, setCollapsed] = useState(false);
-  const [startOpen, setStartOpen] = useState(false);
-  const [sidebarHidden, setSidebarHidden] = useState(false);
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  const [desktopNavHidden, setDesktopNavHidden] = useState(false);
   const { isLoadingAuth } = useAuth();
+  const wide = useMediaQuery('(min-width: 768px)');
 
   const params = new URLSearchParams(window.location.search);
   const campaignId = params.get('campaign_id') || (CAMPAIGN_PAGES.includes(currentPageName) && !params.get('campaign_id') ? params.get('id') : null);
@@ -43,6 +45,12 @@ export default function Layout({ children, currentPageName }) {
     { code: 'KeyN', alt: true, handler: () => setCreateOpen(true) },
     { code: 'Slash', shift: true, handler: () => setHelpOpen(true) },
   ] : []);
+
+  // The Start button toggles the sidebar: a drawer on mobile, show/hide on desktop.
+  const toggleNav = () => {
+    if (wide) setDesktopNavHidden((h) => !h);
+    else setMobileNavOpen((o) => !o);
+  };
 
   if (isLoadingAuth) {
     return (
@@ -68,23 +76,34 @@ export default function Layout({ children, currentPageName }) {
       <Taskbar
         campaign={campaign}
         currentPageName={currentPageName}
-        startActive={startOpen}
-        onStart={() => setStartOpen((o) => !o)}
+        startActive={!wide && mobileNavOpen}
+        onStart={toggleNav}
         onSearch={() => setPaletteOpen(true)}
       />
 
       <div className="flex flex-1 overflow-hidden min-h-0">
-        {/* Sidebar — desktop only, toggleable from the Start menu */}
-        {!sidebarHidden && (
-          <div className="hidden md:flex md:flex-col flex-shrink-0">
-            <Sidebar
-              campaign={campaign}
-              collapsed={collapsed}
-              onToggle={() => setCollapsed(!collapsed)}
-              onNavClick={() => {}}
-            />
-          </div>
+        {/* Mobile drawer backdrop */}
+        {mobileNavOpen && (
+          <div
+            className="fixed left-0 right-0 bottom-0 top-12 z-30 bg-black/60 md:hidden"
+            onClick={() => setMobileNavOpen(false)}
+          />
         )}
+
+        {/* Sidebar — mobile drawer / desktop in-flow, toggled by the Start button */}
+        <div className={cn(
+          'z-40 transition-transform duration-300',
+          'fixed top-12 bottom-0 left-0 md:static md:top-auto md:bottom-auto md:z-auto',
+          mobileNavOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0',
+          desktopNavHidden ? 'md:hidden' : 'md:flex md:flex-col md:flex-shrink-0'
+        )}>
+          <Sidebar
+            campaign={campaign}
+            collapsed={collapsed}
+            onToggle={() => setCollapsed(!collapsed)}
+            onNavClick={() => setMobileNavOpen(false)}
+          />
+        </div>
 
         <main className="flex-1 h-full overflow-hidden flex flex-col min-w-0">
           <div className="flex-1 overflow-y-auto min-h-0">
@@ -94,16 +113,6 @@ export default function Layout({ children, currentPageName }) {
         </main>
       </div>
 
-      <StartMenu
-        open={startOpen}
-        onClose={() => setStartOpen(false)}
-        campaign={campaign}
-        campaignId={campaignId}
-        onOpenPalette={() => setPaletteOpen(true)}
-        onCreate={() => setCreateOpen(true)}
-        onToggleSidebar={() => setSidebarHidden((h) => !h)}
-        sidebarHidden={sidebarHidden}
-      />
       <ToolDock />
       <QuickCapture campaignId={campaignId} open={createOpen} onOpenChange={setCreateOpen} />
       <CommandPalette open={paletteOpen} onOpenChange={setPaletteOpen} campaignId={campaignId} />
