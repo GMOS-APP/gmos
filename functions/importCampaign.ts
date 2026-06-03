@@ -15,6 +15,7 @@ Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: CORS_HEADERS });
   }
+  let createdCampaignId: string | null = null;
   try {
     const authHeader = req.headers.get('Authorization');
     if (!authHeader) {
@@ -55,6 +56,7 @@ Deno.serve(async (req) => {
       .single();
     if (campErr) throw campErr;
     const newCampaignId = newCampaign.id;
+    createdCampaignId = newCampaignId;
 
     // 2. Create world entities, build old-id → new-id map
     const entityIdMap: Record<string, string> = {};
@@ -150,6 +152,16 @@ Deno.serve(async (req) => {
       },
     }, { headers: CORS_HEADERS });
   } catch (error) {
+    // Roll back a partial import so a failed import never leaves an orphan campaign.
+    if (createdCampaignId) {
+      try {
+        const cleanup = createClient(SUPABASE_URL, SERVICE_ROLE_KEY);
+        for (const table of ['world_entities', 'sessions', 'relationships', 'campaign_maps', 'quick_notes', 'random_tables']) {
+          await cleanup.from(table).delete().eq('campaign_id', createdCampaignId);
+        }
+        await cleanup.from('campaigns').delete().eq('id', createdCampaignId);
+      } catch { /* best-effort cleanup */ }
+    }
     return Response.json({ error: error.message }, { status: 500, headers: CORS_HEADERS });
   }
 });
