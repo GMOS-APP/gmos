@@ -39,17 +39,17 @@ export default function TrayAudioPlayer() {
         title="Audio"
         aria-label="Audio player"
         className={cn(
-          'h-7 w-7 flex items-center justify-center rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/50',
+          'h-10 w-10 sm:h-7 sm:w-7 flex items-center justify-center rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/50',
           audio.playing
             ? 'text-amber-500'
             : 'text-zinc-500 hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-zinc-700 dark:hover:text-zinc-300'
         )}
       >
-        <Music className={cn('w-3.5 h-3.5', audio.playing && 'animate-pulse')} />
+        <Music className={cn('w-4 h-4 sm:w-3.5 sm:h-3.5', audio.playing && 'animate-pulse')} />
       </button>
 
       {open && (
-        <div ref={ref} className="fixed right-2 top-11 z-50 w-72 max-w-[calc(100vw-1rem)] rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 shadow-2xl overflow-hidden">
+        <div ref={ref} className="fixed right-2 top-14 sm:top-11 z-50 w-72 max-w-[calc(100vw-1rem)] rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 shadow-2xl overflow-hidden">
           <div className="flex items-center gap-2 px-3 py-1.5 border-b border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-950/50">
             <span className="flex items-center gap-1.5">
               <span className="w-2.5 h-2.5 rounded-full bg-red-400/70" />

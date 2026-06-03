@@ -51,9 +51,9 @@ export default function TrayNotifications() {
         onClick={() => setOpen((o) => !o)}
         title="Notifications"
         aria-label="Notifications"
-        className="relative h-7 w-7 flex items-center justify-center rounded-md text-zinc-500 hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-zinc-700 dark:hover:text-zinc-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/50"
+        className="relative h-10 w-10 sm:h-7 sm:w-7 flex items-center justify-center rounded-md text-zinc-500 hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-zinc-700 dark:hover:text-zinc-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/50"
       >
-        <Bell className="w-3.5 h-3.5" />
+        <Bell className="w-4 h-4 sm:w-3.5 sm:h-3.5" />
         {unread > 0 && (
           <span className="absolute -top-0.5 -right-0.5 min-w-[14px] h-[14px] px-1 flex items-center justify-center rounded-full bg-amber-500 text-[9px] font-bold text-zinc-950 tabular-nums">
             {unread > 9 ? '9+' : unread}
@@ -62,7 +62,7 @@ export default function TrayNotifications() {
       </button>
 
       {open && (
-        <div ref={ref} className="fixed right-2 top-11 z-50 w-80 max-w-[calc(100vw-1rem)] rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 shadow-2xl overflow-hidden">
+        <div ref={ref} className="fixed right-2 top-14 sm:top-11 z-50 w-80 max-w-[calc(100vw-1rem)] rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 shadow-2xl overflow-hidden">
           <div className="flex items-center justify-between px-3 py-2 border-b border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-950/50">
             <span className="text-[11px] font-mono uppercase tracking-wider text-zinc-500 dark:text-zinc-400">notifications</span>
             {items.length > 0 && (
