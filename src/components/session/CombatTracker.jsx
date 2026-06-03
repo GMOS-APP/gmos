@@ -323,11 +323,22 @@ function AddCombatantForm({ entities, onAdd, onCancel }) {
 }
 
 export default function CombatTracker({ entities, campaignId }) {
-  const [round, setRound] = useState(1);
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [combatants, setCombatants] = useState([]);
+  // Persist combat per-campaign so an in-progress fight survives the GM Screen
+  // being minimized/reopened (a full remount) instead of being wiped.
+  const STORAGE_KEY = campaignId ? `gmos_combat_${campaignId}` : null;
+  const initial = (() => {
+    try { return STORAGE_KEY ? JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null') : null; } catch { return null; }
+  })();
+  const [round, setRound] = useState(initial?.round ?? 1);
+  const [currentIndex, setCurrentIndex] = useState(initial?.currentIndex ?? 0);
+  const [combatants, setCombatants] = useState(initial?.combatants ?? []);
   const [adding, setAdding] = useState(false);
   const [confirmReset, setConfirmReset] = useState(false);
+
+  useEffect(() => {
+    if (!STORAGE_KEY) return;
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify({ round, currentIndex, combatants })); } catch { /* ignore */ }
+  }, [round, currentIndex, combatants, STORAGE_KEY]);
 
   // Sort combatants by initiative descending
   const sorted = [...combatants].sort((a, b) => b.initiative - a.initiative);
