@@ -24,11 +24,13 @@ let apiPromise = null;
 function loadYouTubeAPI() {
   if (window.YT && window.YT.Player) return Promise.resolve(window.YT);
   if (apiPromise) return apiPromise;
-  apiPromise = new Promise((resolve) => {
+  apiPromise = new Promise((resolve, reject) => {
     const prev = window.onYouTubeIframeAPIReady;
-    window.onYouTubeIframeAPIReady = () => { if (prev) prev(); resolve(window.YT); };
+    const timer = setTimeout(() => { apiPromise = null; reject(new Error('YouTube API load timed out')); }, 10000);
+    window.onYouTubeIframeAPIReady = () => { clearTimeout(timer); if (prev) prev(); resolve(window.YT); };
     const tag = document.createElement('script');
     tag.src = 'https://www.youtube.com/iframe_api';
+    tag.onerror = () => { clearTimeout(timer); apiPromise = null; reject(new Error('Failed to load YouTube API')); };
     document.head.appendChild(tag);
   });
   return apiPromise;
@@ -62,7 +64,9 @@ export function AudioPlayerProvider({ children }) {
           onReady: (e) => { e.target.setVolume(volumeRef.current); resolve(); },
           onStateChange: (e) => {
             const PS = window.YT.PlayerState;
-            setPlaying(e.data === PS.PLAYING);
+            // Ignore BUFFERING/CUED so the play state doesn't flicker mid-playback.
+            if (e.data === PS.PLAYING) setPlaying(true);
+            else if (e.data === PS.PAUSED || e.data === PS.ENDED) setPlaying(false);
             if (e.data === PS.PLAYING || e.data === PS.PAUSED) {
               const data = playerRef.current?.getVideoData?.();
               if (data?.title) setTrack({ title: data.title });
@@ -77,7 +81,8 @@ export function AudioPlayerProvider({ children }) {
   const load = useCallback(async (input) => {
     const parsed = parseYouTube(input);
     if (!parsed) return false;
-    const p = await ensurePlayer();
+    let p;
+    try { p = await ensurePlayer(); } catch { return false; }
     if (parsed.listId) {
       p.loadPlaylist({ list: parsed.listId, listType: 'playlist', index: 0 });
     } else if (parsed.videoId) {

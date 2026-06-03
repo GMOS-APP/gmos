@@ -40,11 +40,11 @@ export default function EntityMentionTextarea({
   const filtered = query.length === 0
     ? allEntities.slice(0, 8)
     : allEntities
-        .filter((e) => e.name.toLowerCase().includes(query.toLowerCase()))
+        .filter((e) => e.name?.toLowerCase().includes(query.toLowerCase()))
         .slice(0, 8);
 
   const showCreateOption = query.trim().length > 1 && !allEntities.some(
-    (e) => e.name.toLowerCase() === query.toLowerCase()
+    (e) => e.name?.toLowerCase() === query.toLowerCase()
   );
 
   // Use fixed positioning so the dropdown escapes any overflow:hidden ancestors
