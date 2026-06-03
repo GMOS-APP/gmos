@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Campaign } from '@/api/entities';
 import { useAuth } from '@/lib/AuthContext';
@@ -68,6 +68,12 @@ export default function Layout({ children, currentPageName }) {
     if (wide) setMode('floating');
     else setMobileNavOpen(false);
   };
+
+  // Reset transient nav state when crossing the mobile/desktop breakpoint.
+  useEffect(() => {
+    setMobileNavOpen(false);
+    setFloatingMenuOpen(false);
+  }, [wide]);
 
   if (isLoadingAuth) {
     return (

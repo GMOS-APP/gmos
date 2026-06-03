@@ -36,7 +36,7 @@ export const AuthProvider = ({ children }) => {
       fetchOrCreateProfile(session?.user?.id ?? null, setPlan).finally(() => {
         setIsLoadingAuth(false);
       });
-    });
+    }).catch(() => setIsLoadingAuth(false));
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);

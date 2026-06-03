@@ -64,7 +64,7 @@ export default function RandomTableDialog({ open, onClose, campaignId, table }) 
   const updateEntry = (i, val) => {
     setForm(f => {
       const entries = [...f.entries];
-      entries[i] = { result: val };
+      entries[i] = { ...entries[i], result: val };
       return { ...f, entries };
     });
   };
