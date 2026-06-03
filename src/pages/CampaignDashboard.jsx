@@ -103,7 +103,7 @@ export default function CampaignDashboard() {
   }
 
   function copyShareUrl() {
-    const url = `${window.location.origin}/player-view/public?token=${campaign?.player_share_token}`;
+    const url = `${window.location.origin}${import.meta.env.BASE_URL}player-view/public?token=${campaign?.player_share_token}`;
     navigator.clipboard.writeText(url);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
@@ -357,7 +357,7 @@ export default function CampaignDashboard() {
                   <div className="flex gap-1.5">
                     <div className="flex-1 min-w-0 rounded-md border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 px-2 py-1">
                       <p className="text-[10px] text-zinc-600 dark:text-zinc-400 truncate font-mono">
-                        {`${window.location.origin}/player-view/public?token=${campaign.player_share_token}`}
+                        {`${window.location.origin}${import.meta.env.BASE_URL}player-view/public?token=${campaign.player_share_token}`}
                       </p>
                     </div>
                     <button
