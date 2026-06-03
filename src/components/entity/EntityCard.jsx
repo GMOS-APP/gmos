@@ -12,22 +12,22 @@ import { cn } from '@/lib/utils';
 import EntityAvatar from '@/components/entity/EntityAvatar';
 
 const visibilityIcons = {
-  dm_only: { icon: EyeOff, label: 'DM Only', class: 'text-zinc-500' },
+  gm_only: { icon: EyeOff, label: 'DM Only', class: 'text-zinc-500' },
   players_know: { icon: Eye, label: 'Known', class: 'text-green-500' },
   players_suspect: { icon: Eye, label: 'Suspected', class: 'text-yellow-500' },
   false_info: { icon: AlertTriangle, label: 'False', class: 'text-red-500' },
 };
 
 export default function EntityCard({ entity }) {
-  const vis = visibilityIcons[entity.visibility] || visibilityIcons.dm_only;
+  const vis = visibilityIcons[entity.visibility] || visibilityIcons.gm_only;
   const VisIcon = vis.icon;
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const href = createPageUrl('EntityDetail') + `?id=${entity.id}&campaign_id=${entity.campaign_id}`;
-  const hidden = entity.visibility === 'dm_only';
+  const hidden = entity.visibility === 'gm_only';
 
   const toggleVisibility = async () => {
-    await WorldEntity.update(entity.id, { visibility: hidden ? 'players_know' : 'dm_only' });
+    await WorldEntity.update(entity.id, { visibility: hidden ? 'players_know' : 'gm_only' });
     queryClient.invalidateQueries();
   };
 

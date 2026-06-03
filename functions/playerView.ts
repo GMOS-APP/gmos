@@ -34,10 +34,14 @@ Deno.serve(async (req) => {
 
     const admin = createClient(SUPABASE_URL, SERVICE_ROLE_KEY);
 
-    // Find campaign by share token where sharing is enabled
+    // Player-facing entity types only (never creatures/encounters/PCs/shops).
+    const PLAYER_TYPES = ['npc', 'location', 'faction', 'item', 'thread', 'event', 'lore', 'deity'];
+
+    // Find campaign by share token where sharing is enabled.
+    // Project to only player-safe columns — never the share token, created_by, etc.
     const { data: campaigns, error: campError } = await admin
       .from('campaigns')
-      .select('*')
+      .select('id, name, setting')
       .eq('player_share_token', token)
       .eq('is_shared', true)
       .limit(1);
@@ -48,24 +52,29 @@ Deno.serve(async (req) => {
 
     const campaign = campaigns[0];
 
-    // Fetch player-visible entities
+    // Player-visible entities — safe fields only (no description/extra_data/secrets).
     const { data: entities } = await admin
       .from('world_entities')
-      .select('*')
+      .select('id, entity_type, name, summary, visibility')
       .eq('campaign_id', campaign.id)
       .in('visibility', ['players_know', 'players_suspect'])
+      .in('entity_type', PLAYER_TYPES)
       .order('updated_date', { ascending: false });
 
-    // Fetch 5 most recent sessions
+    // 5 most recent sessions — only the player-facing recap, no prep/secrets/GM notes.
     const { data: sessions } = await admin
       .from('sessions')
-      .select('*')
+      .select('status, previous_session_recap')
       .eq('campaign_id', campaign.id)
       .order('session_number', { ascending: false })
       .limit(5);
 
     return Response.json(
-      { campaign, entities: entities || [], sessions: sessions || [] },
+      {
+        campaign: { name: campaign.name, setting: campaign.setting },
+        entities: entities || [],
+        sessions: sessions || [],
+      },
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   } catch (error) {

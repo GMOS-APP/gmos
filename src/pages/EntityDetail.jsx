@@ -309,7 +309,7 @@ function EntityDetailInner() {
       setTimeout(() => setSaved(false), 2000);
       setPageMode('view');
       if (isNew && result?.id) {
-        window.history.replaceState(null, '', `/${window.location.pathname.split('/').pop()}?id=${result.id}&campaign_id=${form.campaign_id}`);
+        navigate(createPageUrl('EntityDetail') + `?id=${result.id}&campaign_id=${form.campaign_id}`, { replace: true });
       }
     },
   });

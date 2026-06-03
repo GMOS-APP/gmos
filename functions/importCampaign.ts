@@ -4,13 +4,21 @@ const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!;
 const SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
 const ANON_KEY = Deno.env.get('SUPABASE_ANON_KEY')!;
 
+const CORS_HEADERS = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+};
+
 const strip = ({ id, created_date, updated_date, created_by, ...rest }: Record<string, unknown>) => rest;
 
 Deno.serve(async (req) => {
+  if (req.method === 'OPTIONS') {
+    return new Response('ok', { headers: CORS_HEADERS });
+  }
   try {
     const authHeader = req.headers.get('Authorization');
     if (!authHeader) {
-      return Response.json({ error: 'Unauthorized' }, { status: 401 });
+      return Response.json({ error: 'Unauthorized' }, { status: 401, headers: CORS_HEADERS });
     }
 
     // Verify the user's JWT
@@ -19,7 +27,7 @@ Deno.serve(async (req) => {
     });
     const { data: { user }, error: authError } = await userClient.auth.getUser();
     if (authError || !user) {
-      return Response.json({ error: 'Unauthorized' }, { status: 401 });
+      return Response.json({ error: 'Unauthorized' }, { status: 401, headers: CORS_HEADERS });
     }
 
     const body = await req.json();
@@ -34,7 +42,7 @@ Deno.serve(async (req) => {
     } = body;
 
     if (!campaign) {
-      return Response.json({ error: 'Invalid backup file: missing campaign data' }, { status: 400 });
+      return Response.json({ error: 'Invalid backup file: missing campaign data' }, { status: 400, headers: CORS_HEADERS });
     }
 
     const admin = createClient(SUPABASE_URL, SERVICE_ROLE_KEY);
@@ -140,8 +148,8 @@ Deno.serve(async (req) => {
         quick_notes: quick_notes.length,
         random_tables: random_tables.length,
       },
-    });
+    }, { headers: CORS_HEADERS });
   } catch (error) {
-    return Response.json({ error: error.message }, { status: 500 });
+    return Response.json({ error: error.message }, { status: 500, headers: CORS_HEADERS });
   }
 });
