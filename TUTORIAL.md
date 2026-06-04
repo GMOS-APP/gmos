@@ -13,11 +13,12 @@ A step-by-step guide to using GM-OS for your tabletop RPG campaigns.
 5. [Preparing a Session](#preparing-a-session)
 6. [Running a Session](#running-a-session)
 7. [After the Session (Debrief)](#after-the-session-debrief)
-8. [Random Tables](#random-tables)
-9. [The Campaign Map](#the-campaign-map)
-10. [Campaign Timeline](#campaign-timeline)
-11. [Player View](#player-view)
-12. [Tips & Shortcuts](#tips--shortcuts)
+8. [Campaign Notes](#campaign-notes)
+9. [Random Tables](#random-tables)
+10. [The Campaign Map](#the-campaign-map)
+11. [Campaign Timeline](#campaign-timeline)
+12. [Player View](#player-view)
+13. [Tips & Shortcuts](#tips--shortcuts)
 
 ---
 
@@ -257,6 +258,32 @@ The **Debrief** tab captures:
 - **Loot** — what the party found and who took what
 
 Well-written debrief notes make the Recap AI feature dramatically better for your next session.
+
+---
+
+## Campaign Notes
+
+**Notes** (in the sidebar) is your campaign notebook — a single place for ideas, reminders, clues, and reveals.
+
+### Writing a Note
+
+Use the composer at the top of the page:
+
+1. Type your note. Use **@** to link any world entity (it becomes a clickable mention).
+2. Tag it (Combat, Clue, NPC, Item, Plot, Important) so you can filter later.
+3. Choose where it lives: **Campaign note** (the default — not tied to any session) or link it to a specific session.
+4. Press **⌘/Ctrl+Enter** or the send button to save.
+
+Notes you capture mid-session (the GM Screen's Quick Notes, or the **+** Quick Capture button) also show up here, grouped under their session.
+
+### Organizing Notes
+
+- **Pin** the notes that matter most — they float to a **Pinned** band at the top, across every session.
+- **Mark done** (the check) when a note is handled — it dims and strikes through, and you can **Hide done** to clear the clutter. Reopen it any time.
+- **Edit** a note's text and tags inline, or delete it.
+- **Search** across every note, and filter by tag.
+
+Notes are grouped **Pinned → Campaign → by session** (newest first), so the page reads as a running log of your campaign.
 
 ---
 
