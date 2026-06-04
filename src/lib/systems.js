@@ -1,3 +1,7 @@
+// GM/OS is built for D&D 5e. The system config stays a single source of truth
+// so stat blocks, SRD / D&D Beyond import, ability scores, and field labels stay
+// 5e-aware — but there is no user-facing system selection. getSystem() always
+// resolves to 5e (including for any legacy campaigns saved with another id).
 export const SYSTEMS = {
   dnd5e: {
     id: 'dnd5e',
@@ -12,76 +16,10 @@ export const SYSTEMS = {
     locationTypes: ['City', 'Town', 'Village', 'Dungeon', 'Wilderness', 'Building', 'Ruins', 'Landmark', 'Region', 'Plane'],
     characterFields: { species: 'Race', role: 'Class', background: 'Background' },
   },
-  pathfinder2e: {
-    id: 'pathfinder2e',
-    label: 'Pathfinder 2e',
-    shortLabel: 'PF2e',
-    promptName: 'Pathfinder 2nd Edition',
-    hasAbilityScores: true,
-    hasXpCrSystem: false,
-    hasSrdImport: false,
-    hasDndBeyondImport: false,
-    hasSrdConditions: false,
-    locationTypes: ['City', 'Town', 'Village', 'Dungeon', 'Wilderness', 'Building', 'Ruins', 'Landmark', 'Region', 'Ethereal Plane'],
-    characterFields: { species: 'Ancestry', role: 'Class', background: 'Background' },
-  },
-  call_of_cthulhu: {
-    id: 'call_of_cthulhu',
-    label: 'Call of Cthulhu',
-    shortLabel: 'CoC',
-    promptName: 'Call of Cthulhu 7th Edition',
-    hasAbilityScores: false,
-    hasXpCrSystem: false,
-    hasSrdImport: false,
-    hasDndBeyondImport: false,
-    hasSrdConditions: false,
-    locationTypes: ['City', 'Town', 'Village', 'Wilderness', 'Building', 'Ruins', 'Landmark', 'Region', 'Underground'],
-    characterFields: { species: 'Nationality/Era', role: 'Occupation', background: 'Background' },
-  },
-  blades_in_the_dark: {
-    id: 'blades_in_the_dark',
-    label: 'Blades in the Dark',
-    shortLabel: 'BitD',
-    promptName: 'Blades in the Dark',
-    hasAbilityScores: false,
-    hasXpCrSystem: false,
-    hasSrdImport: false,
-    hasDndBeyondImport: false,
-    hasSrdConditions: false,
-    locationTypes: ['District', 'Building', 'Hideout', 'Ruins', 'Underworld', 'Landmark'],
-    characterFields: { species: 'Heritage', role: 'Playbook', background: 'Background' },
-  },
-  mothership: {
-    id: 'mothership',
-    label: 'Mothership',
-    shortLabel: 'MoSh',
-    promptName: 'Mothership RPG 1e',
-    hasAbilityScores: false,
-    hasXpCrSystem: false,
-    hasSrdImport: false,
-    hasDndBeyondImport: false,
-    hasSrdConditions: false,
-    locationTypes: ['Ship', 'Station', 'Planet', 'Derelict', 'Colony', 'Wilderness', 'Structure'],
-    characterFields: { species: 'Species', role: 'Class', background: 'Background' },
-  },
-  generic: {
-    id: 'generic',
-    label: 'Generic / Custom',
-    shortLabel: 'Custom',
-    promptName: 'a tabletop RPG',
-    hasAbilityScores: false,
-    hasXpCrSystem: false,
-    hasSrdImport: false,
-    hasDndBeyondImport: false,
-    hasSrdConditions: false,
-    locationTypes: ['City', 'Town', 'Village', 'Wilderness', 'Building', 'Ruins', 'Landmark', 'Region'],
-    characterFields: { species: 'Species/Origin', role: 'Class/Role', background: 'Background' },
-  },
 };
 
-export const SYSTEM_OPTIONS = Object.values(SYSTEMS);
 export const DEFAULT_SYSTEM_ID = 'dnd5e';
 
-export function getSystem(systemId) {
-  return SYSTEMS[systemId] ?? SYSTEMS.dnd5e;
+export function getSystem() {
+  return SYSTEMS.dnd5e;
 }

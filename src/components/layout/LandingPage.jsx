@@ -14,8 +14,6 @@ const FEATURES = [
   { Icon: Eye, title: 'Player view', body: 'A separate page you can share with players, showing only what you choose.' },
 ];
 
-const SYSTEMS = ['D&D 5e', 'Pathfinder 2e', 'Call of Cthulhu', 'Blades in the Dark', 'Mothership', 'or any system'];
-
 // A code-rendered preview of the GM/OS UI (not a screenshot) for the hero.
 function ProductPreview() {
   return (
@@ -137,18 +135,6 @@ export default function LandingPage() {
           <div className="mt-10 flex items-center justify-center gap-2 text-sm text-zinc-500 dark:text-zinc-500">
             <Command className="w-4 h-4 text-amber-500" />
             <span>It's keyboard-driven too: a command palette (⌘K), shortcuts, and inline dice.</span>
-          </div>
-        </div>
-      </section>
-
-      {/* Systems */}
-      <section className="px-4 sm:px-6 py-10 border-t border-zinc-200/70 dark:border-zinc-800/60">
-        <div className="max-w-4xl mx-auto text-center">
-          <p className="text-xs font-mono uppercase tracking-widest text-zinc-400 dark:text-zinc-600 mb-3">Built for</p>
-          <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2">
-            {SYSTEMS.map((s) => (
-              <span key={s} className="text-sm font-medium text-zinc-700 dark:text-zinc-300">{s}</span>
-            ))}
           </div>
         </div>
       </section>
