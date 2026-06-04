@@ -168,6 +168,11 @@ export default function EntityMentionTextarea({
         <div
           ref={dropdownRef}
           style={{ top: dropdownPos.top, left: dropdownPos.left }}
+          // Keep taps inside the picker from reaching outside-click handlers of any
+          // parent popover (QuickCapture, session notes), which would otherwise close
+          // the parent — especially on touch, where the synthesized mousedown bubbles.
+          onPointerDown={(e) => e.stopPropagation()}
+          onMouseDown={(e) => e.stopPropagation()}
           className="fixed z-[200] w-72 dark:bg-zinc-900 dark:border-zinc-700 bg-white border-zinc-300 border rounded-xl shadow-2xl overflow-hidden"
         >
           <div className="px-3 py-2 dark:border-b dark:border-zinc-800 border-b border-zinc-200 flex items-center gap-2">
@@ -185,7 +190,7 @@ export default function EntityMentionTextarea({
             {filtered.map((entity) => (
               <button
                 key={entity.id}
-                onMouseDown={(e) => { e.preventDefault(); insertMention(entity); }}
+                onPointerDown={(e) => { e.preventDefault(); insertMention(entity); }}
                 className="w-full text-left px-3 py-2.5 dark:hover:bg-zinc-800 hover:bg-zinc-100 flex items-start gap-3 group"
               >
                 <div className="flex-1 min-w-0">
@@ -201,7 +206,7 @@ export default function EntityMentionTextarea({
 
             {showCreateOption && (
               <button
-                onMouseDown={(e) => { e.preventDefault(); createAndInsert(); }}
+                onPointerDown={(e) => { e.preventDefault(); createAndInsert(); }}
                 disabled={creating}
                 className="w-full text-left px-3 py-2.5 dark:hover:bg-zinc-800/80 dark:border-t dark:border-zinc-800 hover:bg-zinc-100 border-t border-zinc-200 flex items-center gap-2"
               >
