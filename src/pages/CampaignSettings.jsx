@@ -3,7 +3,6 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Campaign, functions } from '@/api/entities';
 import { useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
-import { SYSTEM_OPTIONS } from '@/lib/systems';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
@@ -145,23 +144,10 @@ export default function CampaignSettings() {
         </div>
       </section>
 
-      {/* System & Status */}
+      {/* Status */}
       <section className="space-y-4">
-        <h2 className="text-xs font-semibold uppercase tracking-widest text-zinc-500 dark:text-zinc-500">System & Status</h2>
+        <h2 className="text-xs font-semibold uppercase tracking-widest text-zinc-500 dark:text-zinc-500">Status</h2>
         <div className="space-y-3 bg-white dark:bg-zinc-900/40 border border-zinc-200 dark:border-zinc-800/50 rounded-xl p-4">
-          <div className="space-y-1.5">
-            <label className="text-xs font-medium text-zinc-700 dark:text-zinc-400">Game System</label>
-            <Select value={form.system} onValueChange={(v) => setForm({ ...form, system: v })}>
-              <SelectTrigger className="dark:bg-zinc-950 dark:border-zinc-800">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {SYSTEM_OPTIONS.map((s) => (
-                  <SelectItem key={s.id} value={s.id}>{s.label}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
           <div className="space-y-1.5">
             <label className="text-xs font-medium text-zinc-700 dark:text-zinc-400">Status</label>
             <Select value={form.status} onValueChange={(v) => setForm({ ...form, status: v })}>

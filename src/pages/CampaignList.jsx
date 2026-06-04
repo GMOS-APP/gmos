@@ -16,12 +16,9 @@ import {
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import {
-  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
-} from '@/components/ui/select';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
-import { SYSTEM_OPTIONS, DEFAULT_SYSTEM_ID, getSystem } from '@/lib/systems';
+import { DEFAULT_SYSTEM_ID } from '@/lib/systems';
 
 export default function CampaignList() {
   const queryClient = useQueryClient();
@@ -272,8 +269,6 @@ export default function CampaignList() {
 
                     {/* Meta row */}
                     <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-zinc-500 dark:text-zinc-600 mt-auto">
-                      <span className="font-medium dark:text-zinc-500 text-zinc-600">{getSystem(c.system).shortLabel}</span>
-                      <span className="w-1 h-1 rounded-full bg-zinc-300 dark:bg-zinc-700 shrink-0" />
                       <span>Session #{c.current_session_number || 0}</span>
                       <span className="w-1 h-1 rounded-full bg-zinc-300 dark:bg-zinc-700 shrink-0" />
                       <span className={cn(
@@ -330,16 +325,6 @@ export default function CampaignList() {
               rows={2}
               className="bg-white dark:bg-zinc-950 border-zinc-300 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 resize-none"
             />
-            <Select value={form.system} onValueChange={(v) => setForm({ ...form, system: v })}>
-              <SelectTrigger className="bg-white dark:bg-zinc-950 border-zinc-300 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100">
-                <SelectValue placeholder="Select game system" />
-              </SelectTrigger>
-              <SelectContent>
-                {SYSTEM_OPTIONS.map((s) => (
-                  <SelectItem key={s.id} value={s.id}>{s.label}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
             <Textarea
               placeholder="World setting notes (optional)"
               value={form.setting}

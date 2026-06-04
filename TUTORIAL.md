@@ -50,8 +50,10 @@ Open the **audio player** in the system tray and paste a YouTube link (an ambien
 From the campaigns list, click **New Campaign** and fill in:
 
 - **Name** — your campaign title
-- **System** — the ruleset you're using (D&D 5e, Pathfinder 2e, etc.)
-- **Setting** — a brief description of the world (used by AI features for context)
+- **Description** — an optional one-liner about the campaign
+- **Setting** — a brief description of the world
+
+GM/OS is built for **D&D 5e**.
 
 Click **Save** to open the campaign dashboard.
 

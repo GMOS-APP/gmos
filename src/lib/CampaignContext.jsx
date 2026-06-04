@@ -4,7 +4,7 @@ import { getSystem } from './systems';
 const CampaignContext = createContext(null);
 
 export function CampaignProvider({ campaign, children }) {
-  const system = getSystem(campaign?.system);
+  const system = getSystem();
   return (
     <CampaignContext.Provider value={{ campaign, system }}>
       {children}
@@ -14,6 +14,6 @@ export function CampaignProvider({ campaign, children }) {
 
 export function useCampaign() {
   const ctx = useContext(CampaignContext);
-  if (!ctx) return { campaign: null, system: getSystem('dnd5e') };
+  if (!ctx) return { campaign: null, system: getSystem() };
   return ctx;
 }
