@@ -44,21 +44,21 @@ export default function BootSequence() {
   if (done) return null;
 
   return (
-    <div className={`fixed inset-0 z-[100] flex items-center justify-center bg-zinc-950 transition-opacity duration-300 ${closing ? 'opacity-0' : 'opacity-100'}`}>
+    <div className={`fixed inset-0 z-[100] flex items-center justify-center bg-white dark:bg-zinc-950 transition-opacity duration-300 ${closing ? 'opacity-0' : 'opacity-100'}`}>
       <div className="font-mono text-sm w-72">
-        <div className="text-3xl font-bold tracking-tight text-zinc-100">GM<span className="text-amber-500">/OS</span></div>
-        <div className="text-[11px] text-zinc-600 mb-5">v2026.05</div>
+        <div className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100">GM<span className="text-amber-500">/OS</span></div>
+        <div className="text-[11px] text-zinc-400 dark:text-zinc-600 mb-5">v2026.05</div>
         <div className="space-y-1.5">
           {STEPS.map((line, i) => (
             <div key={line} className={`flex items-center gap-2 transition-opacity duration-200 ${i < step ? 'opacity-100' : 'opacity-0'}`}>
-              <span className="text-emerald-500">▸</span>
-              <span className="text-zinc-400">{line}…</span>
-              <span className="ml-auto text-emerald-500">✓</span>
+              <span className="text-emerald-600 dark:text-emerald-500">▸</span>
+              <span className="text-zinc-500 dark:text-zinc-400">{line}…</span>
+              <span className="ml-auto text-emerald-600 dark:text-emerald-500">✓</span>
             </div>
           ))}
         </div>
         <div className={`mt-5 text-amber-500 transition-opacity duration-200 ${step >= STEPS.length ? 'opacity-100' : 'opacity-0'}`}>ready.</div>
-        <div className="mt-2 text-[10px] text-zinc-700">press any key to skip</div>
+        <div className="mt-2 text-[10px] text-zinc-300 dark:text-zinc-700">press any key to skip</div>
       </div>
     </div>
   );
