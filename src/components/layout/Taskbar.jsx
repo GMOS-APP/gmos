@@ -7,6 +7,7 @@ import { createPageUrl } from '@/utils';
 import Breadcrumbs from '@/components/layout/Breadcrumbs';
 import TrayAudioPlayer from '@/components/layout/TrayAudioPlayer';
 import TrayNotifications from '@/components/layout/TrayNotifications';
+import TrayTools from '@/components/layout/TrayTools';
 import ThemeToggle from '@/components/ui/ThemeToggle';
 import { MOD_LABEL } from '@/lib/useHotkeys';
 import { cn } from '@/lib/utils';
@@ -99,6 +100,8 @@ export default function Taskbar({ campaign, currentPageName, startActive, onStar
         >
           <Search className="w-4 h-4 sm:w-3.5 sm:h-3.5" />
         </button>
+        <TrayTools campaignId={campaign?.id} />
+        <span className="hidden md:block w-px h-4 bg-zinc-200 dark:bg-zinc-800 mx-0.5" />
         <TrayAudioPlayer />
         <TrayNotifications />
         {fetching > 0 && (
