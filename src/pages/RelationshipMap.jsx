@@ -224,7 +224,7 @@ export default function RelationshipMap() {
             {filteredRelationships.length === 0 ? (
               <p className="text-center text-sm dark:text-zinc-600 text-zinc-400 py-12">No relationships yet.</p>
             ) : (
-              <div className="divide-y dark:divide-zinc-800 divide-gray-200">
+              <div className="divide-y dark:divide-zinc-800 divide-zinc-200">
                 {filteredRelationships.map((r) => {
                   const from = entities.find(e => e.id === r.source_entity_id);
                   const to = entities.find(e => e.id === r.target_entity_id);

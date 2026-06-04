@@ -87,7 +87,7 @@ function StructuredStatBlock({ extraData, system }) {
   const hasCombatStats = extraData.ac || extraData.hp || extraData.speed;
 
   return (
-    <div className="rounded-xl border-2 dark:border-amber-500/30 dark:bg-gradient-to-br dark:from-zinc-900 dark:to-zinc-950 border-amber-600/30 bg-gradient-to-br from-white to-gray-50 p-5 space-y-4">
+    <div className="rounded-xl border-2 dark:border-amber-500/30 dark:bg-gradient-to-br dark:from-zinc-900 dark:to-zinc-950 border-amber-600/30 bg-gradient-to-br from-white to-zinc-50 p-5 space-y-4">
       {(extraData.size || extraData.creature_type) && (
         <div className="border-b-2 dark:border-amber-500/20 border-amber-600/20 pb-2">
           <p className="text-xs dark:text-zinc-400 text-zinc-500 italic">
@@ -215,7 +215,7 @@ function ParsedStatBlock({ description }) {
   if (!stats) return null;
 
   return (
-    <div className="rounded-xl border-2 dark:border-amber-500/30 dark:bg-gradient-to-br dark:from-zinc-900 dark:to-zinc-950 border-amber-600/30 bg-gradient-to-br from-white to-gray-50 p-5 space-y-4">
+    <div className="rounded-xl border-2 dark:border-amber-500/30 dark:bg-gradient-to-br dark:from-zinc-900 dark:to-zinc-950 border-amber-600/30 bg-gradient-to-br from-white to-zinc-50 p-5 space-y-4">
       {stats.size && stats.type && (
         <div className="border-b-2 dark:border-amber-500/20 border-amber-600/20 pb-2">
           <p className="text-xs dark:text-zinc-400 text-zinc-500 italic">

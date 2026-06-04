@@ -121,10 +121,10 @@ export default function RelationshipGraph({ entities, relationships, onEditRelat
       member_of: '#8b5cf6',
       loves: '#ec4899',
       hates: '#dc2626',
-      fears: '#f59e0b',
-      knows: '#6b7280',
+      fears: '#ff4d1c',
+      knows: '#73716b',
     };
-    return colors[type] || '#6b7280';
+    return colors[type] || '#73716b';
   };
 
   return (
@@ -149,7 +149,7 @@ export default function RelationshipGraph({ entities, relationships, onEditRelat
                   y1={source.y}
                   x2={target.x}
                   y2={target.y}
-                  stroke={isHighlighted ? getRelationshipColor(rel.relationship_type) : '#3f3f46'}
+                  stroke={isHighlighted ? getRelationshipColor(rel.relationship_type) : '#413f3a'}
                   strokeWidth={isHighlighted ? 2 : 1}
                   strokeOpacity={isHighlighted ? 0.8 : 0.3}
                   className="cursor-pointer hover:stroke-amber-500 transition-colors"
@@ -159,7 +159,7 @@ export default function RelationshipGraph({ entities, relationships, onEditRelat
                   <text
                     x={(source.x + target.x) / 2}
                     y={(source.y + target.y) / 2}
-                    fill="#a1a1aa"
+                    fill="#a3a19b"
                     fontSize="10"
                     textAnchor="middle"
                     className="pointer-events-none"
@@ -185,8 +185,8 @@ export default function RelationshipGraph({ entities, relationships, onEditRelat
                   cx={node.x}
                   cy={node.y}
                   r={highlight ? 28 : 24}
-                  fill={highlight ? '#27272a' : '#18181b'}
-                  stroke={highlight ? '#f59e0b' : '#3f3f46'}
+                  fill={highlight ? '#272521' : '#1a1815'}
+                  stroke={highlight ? '#ff4d1c' : '#413f3a'}
                   strokeWidth={highlight ? 2 : 1}
                   className="cursor-pointer transition-all"
                   onClick={() => setSelectedNode(node)}
@@ -207,7 +207,7 @@ export default function RelationshipGraph({ entities, relationships, onEditRelat
                   x={node.x}
                   y={node.y + 40}
                   textAnchor="middle"
-                  fill="#a1a1aa"
+                  fill="#a3a19b"
                   fontSize="11"
                   className="pointer-events-none select-none"
                 >
@@ -218,7 +218,7 @@ export default function RelationshipGraph({ entities, relationships, onEditRelat
                     cx={node.x + 18}
                     cy={node.y - 18}
                     r="8"
-                    fill="#f59e0b"
+                    fill="#ff4d1c"
                     className="pointer-events-none"
                   />
                 )}
@@ -228,7 +228,7 @@ export default function RelationshipGraph({ entities, relationships, onEditRelat
                     y={node.y - 18}
                     textAnchor="middle"
                     dominantBaseline="central"
-                    fill="#18181b"
+                    fill="#1a1815"
                     fontSize="10"
                     fontWeight="bold"
                     className="pointer-events-none select-none"
