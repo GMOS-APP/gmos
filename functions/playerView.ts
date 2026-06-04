@@ -55,7 +55,7 @@ Deno.serve(async (req) => {
     // Player-visible entities — safe fields only (no description/extra_data/secrets).
     const { data: entities } = await admin
       .from('world_entities')
-      .select('id, entity_type, name, summary, visibility')
+      .select('id, entity_type, name, summary, image_url, visibility')
       .eq('campaign_id', campaign.id)
       .in('visibility', ['players_know', 'players_suspect'])
       .in('entity_type', PLAYER_TYPES)

@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Campaign, WorldEntity, Session } from '@/api/entities';
-import { Link } from 'react-router-dom';
-import { createPageUrl } from '@/utils';
+import PlayerEntityModal from '@/components/common/PlayerEntityModal';
 import { Eye, EyeOff } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ENTITY_TYPE_META } from '@/lib/entityColors';
@@ -24,6 +23,7 @@ export default function PlayerView() {
   const params = new URLSearchParams(window.location.search);
   const campaignId = params.get('campaign_id');
   const [activeType, setActiveType] = useState('all');
+  const [selected, setSelected] = useState(null);
 
   const { data: campaign } = useQuery({
     queryKey: ['campaign', campaignId],
@@ -127,10 +127,10 @@ export default function PlayerView() {
             const VisIcon = vis?.icon;
 
             return (
-              <Link
+              <button
                 key={entity.id}
-                to={createPageUrl('EntityDetail') + `?id=${entity.id}&campaign_id=${campaignId}`}
-                className="group flex gap-3 p-3 rounded-xl border dark:border-zinc-800 dark:bg-zinc-900/40 bg-white border-zinc-200 hover:border-amber-500/40 transition-colors"
+                onClick={() => setSelected(entity)}
+                className="group text-left flex gap-3 p-3 rounded-xl border dark:border-zinc-800 dark:bg-zinc-900/40 bg-white border-zinc-200 hover:border-amber-500/40 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/50"
               >
                 <div className={cn('w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5', meta.bg)}>
                   <Icon className={cn('w-4 h-4', meta.accent)} />
@@ -151,7 +151,7 @@ export default function PlayerView() {
                     <p className="text-xs dark:text-zinc-500 text-zinc-500 line-clamp-2 leading-snug">{entity.summary}</p>
                   )}
                 </div>
-              </Link>
+              </button>
             );
           })}
         </div>
@@ -163,6 +163,8 @@ export default function PlayerView() {
           {sessions.length} session{sessions.length !== 1 ? 's' : ''} played · {visible.length} revealed {visible.length !== 1 ? 'entries' : 'entry'}
         </p>
       </div>
+
+      <PlayerEntityModal entity={selected} open={!!selected} onOpenChange={(o) => !o && setSelected(null)} />
     </div>
   );
 }
