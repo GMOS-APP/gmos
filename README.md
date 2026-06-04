@@ -15,6 +15,7 @@ GM-OS presents itself as a lightweight operating system for running games:
 - **System tray** — quick search, the audio player, the notification center, a theme toggle, and a live clock
 - **Command Palette (⌘K)** — fuzzy search across entities, create actions, and navigation, with inline dice rolling (type `2d6` and hit enter)
 - **Dockable / floating sidebar** — collapse the left sidebar into a Start-menu dropdown, or dock it back into the left rail; preference persists
+- **Guided tour** — a first-visit spotlight walkthrough of the shell and GM workflow; relaunchable any time from the `?` help dialog or the Command Palette (`⌘K → "tour"`)
 - **Boot sequence** — a brief startup animation on first load (tracked in `localStorage`)
 - **Tool Dock & Notification Center** — quick-access tools and an in-app notification feed
 - **Audio player** — play a YouTube link (ambient music, battle tracks) as a tray app while you run the game
