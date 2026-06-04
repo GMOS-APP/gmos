@@ -14,7 +14,7 @@ Deno.serve(async (req) => {
     if (!characterId) {
       return Response.json({ error: 'characterId is required' }, { status: 400, headers: CORS_HEADERS });
     }
-    // characterId must be a plain integer — prevents path traversal / SSRF via the fetch URL.
+    // characterId must be a plain integer - prevents path traversal / SSRF via the fetch URL.
     if (!/^\d+$/.test(String(characterId))) {
       return Response.json({ error: 'Invalid characterId' }, { status: 400, headers: CORS_HEADERS });
     }
