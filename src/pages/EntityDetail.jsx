@@ -29,7 +29,7 @@ import {
 import { CampaignProvider, useCampaign } from '@/lib/CampaignContext';
 import { getEntityColors } from '@/lib/entityColors';
 
-const entityTypes = ['note', 'npc', 'creature', 'location', 'faction', 'thread', 'item', 'player_character', 'event', 'lore', 'deity', 'encounter', 'shop'];
+const entityTypes = ['npc', 'creature', 'location', 'faction', 'thread', 'item', 'player_character', 'event', 'lore', 'deity', 'encounter', 'shop'];
 const statuses = ['active', 'inactive', 'dead', 'destroyed', 'resolved', 'unknown'];
 const visibilities = ['gm_only', 'players_know', 'players_suspect', 'false_info'];
 

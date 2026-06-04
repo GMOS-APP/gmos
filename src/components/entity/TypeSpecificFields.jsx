@@ -10,10 +10,8 @@ import LoreFields from './LoreFields';
 import DeityFields from './DeityFields';
 import EncounterFields from './EncounterFields';
 import ShopFields from './ShopFields';
-import NoteFields from './NoteFields';
 
 const FIELD_MAP = {
-  note: NoteFields,
   npc: NPCFields,
   creature: CreatureFields,
   location: LocationFields,

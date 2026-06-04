@@ -1,12 +1,21 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { Plus, X } from 'lucide-react';
+import { QuickNote } from '@/api/entities';
+import QuickNoteInput from '@/components/session/QuickNoteInput';
 import { ENTITY_CREATE_TYPES } from '@/lib/entityCreateTypes';
 
 export default function QuickCapture({ campaignId, open, onOpenChange }) {
   const cardRef = useRef(null);
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const [saved, setSaved] = useState(false);
+
+  // Link the note to the current session when we're on a session page;
+  // otherwise it's a campaign-wide note. Read at render so it tracks the page.
+  const sessionId = new URLSearchParams(window.location.search).get('session_id');
 
   useEffect(() => {
     if (!open) return;
@@ -24,6 +33,22 @@ export default function QuickCapture({ campaignId, open, onOpenChange }) {
     };
   }, [open, onOpenChange]);
 
+  const addNote = useMutation({
+    mutationFn: (content) => QuickNote.create({
+      campaign_id: campaignId,
+      session_id: sessionId || null,
+      content,
+      tags: [],
+      pinned: false,
+      processed: false,
+    }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['quick-notes'] });
+      setSaved(true);
+      setTimeout(() => setSaved(false), 2500);
+    },
+  });
+
   if (!campaignId) return null;
 
   function handleSelect(type) {
@@ -39,7 +64,7 @@ export default function QuickCapture({ campaignId, open, onOpenChange }) {
           className="fixed bottom-20 right-5 z-50 w-80 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 shadow-xl p-4"
         >
           <div className="flex items-center justify-between mb-3">
-            <span className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">Create…</span>
+            <span className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">Quick capture</span>
             <button
               onClick={() => onOpenChange(false)}
               className="p-0.5 rounded text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 transition-colors"
@@ -47,6 +72,35 @@ export default function QuickCapture({ campaignId, open, onOpenChange }) {
               <X className="w-3.5 h-3.5" />
             </button>
           </div>
+
+          {/* Quick note → saves to Campaign Notes */}
+          <QuickNoteInput
+            onSubmit={(content) => addNote.mutate(content)}
+            isSubmitting={addNote.isPending}
+            campaignId={campaignId}
+            placeholder={sessionId ? "Note this session… (⌘+Enter)" : "Jot a note… (⌘+Enter)"}
+          />
+          <div className="flex items-center justify-between mt-1 min-h-[16px]">
+            <span className="text-[10px] text-zinc-400 dark:text-zinc-600">
+              {sessionId ? 'Saves to this session’s notes' : 'Saves to Campaign Notes'}
+            </span>
+            {saved && (
+              <button
+                onClick={() => { onOpenChange(false); navigate(createPageUrl('CampaignNotes') + `?campaign_id=${campaignId}`); }}
+                className="text-[10px] font-medium text-emerald-600 dark:text-emerald-400 hover:underline"
+              >
+                ✓ Saved — view
+              </button>
+            )}
+          </div>
+
+          {/* Divider */}
+          <div className="flex items-center gap-2 my-3">
+            <span className="h-px flex-1 bg-zinc-200 dark:bg-zinc-800" />
+            <span className="text-[10px] uppercase tracking-wider text-zinc-400 dark:text-zinc-600">or create an entity</span>
+            <span className="h-px flex-1 bg-zinc-200 dark:bg-zinc-800" />
+          </div>
+
           <div className="grid grid-cols-3 gap-2">
             {ENTITY_CREATE_TYPES.map(({ type, label, Icon }) => (
               <button
@@ -68,7 +122,7 @@ export default function QuickCapture({ campaignId, open, onOpenChange }) {
         data-tour="quick-capture"
         onClick={() => onOpenChange(!open)}
         className="fixed bottom-5 right-5 z-50 w-11 h-11 rounded-full bg-amber-500 hover:bg-amber-400 shadow-lg flex items-center justify-center transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/60 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-zinc-950"
-        title="Create entity (⌥N)"
+        title="Quick capture (⌥N)"
       >
         <Plus className="w-5 h-5 text-zinc-950" />
       </button>
