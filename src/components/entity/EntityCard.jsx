@@ -13,8 +13,8 @@ import EntityAvatar from '@/components/entity/EntityAvatar';
 
 const visibilityIcons = {
   gm_only: { icon: EyeOff, label: 'DM Only', class: 'text-zinc-500' },
-  players_know: { icon: Eye, label: 'Known', class: 'text-green-500' },
-  players_suspect: { icon: Eye, label: 'Suspected', class: 'text-yellow-500' },
+  players_know: { icon: Eye, label: 'Known', class: 'text-emerald-500' },
+  players_suspect: { icon: Eye, label: 'Suspected', class: 'text-amber-500' },
   false_info: { icon: AlertTriangle, label: 'False', class: 'text-red-500' },
 };
 

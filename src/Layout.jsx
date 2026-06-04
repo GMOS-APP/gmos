@@ -78,7 +78,7 @@ export default function Layout({ children, currentPageName }) {
   if (isLoadingAuth) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-black">
-        <Loader2 className="w-6 h-6 text-green-500 animate-spin" />
+        <Loader2 className="w-6 h-6 text-amber-500 animate-spin" />
       </div>
     );
   }

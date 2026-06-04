@@ -37,7 +37,7 @@ export function printSessionPrep(session, formData, entities) {
     .content { white-space: pre-wrap; font-size: 11pt; }
     ul { padding-left: 18pt; }
     li { margin-bottom: 3pt; }
-    .strong-start { background: #fffbeb; border-left: 3px solid #f59e0b;
+    .strong-start { background: #fffbeb; border-left: 3px solid #ff4d1c;
                     padding: 8pt 12pt; font-style: italic; }
     @media print { body { padding: 1cm; } }
   </style>

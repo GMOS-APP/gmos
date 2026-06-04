@@ -151,7 +151,7 @@ export default function SessionBrowser() {
               width: 4px;
               height: 4px;
               border-radius: 50%;
-              background-color: #f59e0b;
+              background-color: #ff4d1c;
             }
           `}</style>
           <div className="flex justify-center">

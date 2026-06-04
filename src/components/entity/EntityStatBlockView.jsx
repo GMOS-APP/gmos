@@ -178,7 +178,7 @@ function InfoGrid({ fields }) {
 // ── Stat block card wrapper ───────────────────────────────────────────────────
 function StatCard({ children }) {
   return (
-    <div className="rounded-xl border-2 dark:border-amber-500/30 dark:bg-gradient-to-br dark:from-zinc-900 dark:to-zinc-950 border-amber-600/30 bg-gradient-to-br from-white to-gray-50 p-5 space-y-5">
+    <div className="rounded-xl border-2 dark:border-amber-500/30 dark:bg-gradient-to-br dark:from-zinc-900 dark:to-zinc-950 border-amber-600/30 bg-gradient-to-br from-white to-zinc-50 p-5 space-y-5">
       {children}
     </div>
   );
