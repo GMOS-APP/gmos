@@ -110,10 +110,11 @@ Per-type accent for icons, dots, tags, and badges. Single source: `src/lib/entit
 | Encounter | `fuchsia` | |
 | Shop | `teal` | |
 | Thread | `blue` | |
-| Note | `zinc` | renders **warm-gray** (overridden) |
 
-> Only `amber` (Item) and `zinc` (Note) are affected by the TE override; the rest are
-> stock Tailwind hues and intentionally untouched so the categories stay distinguishable.
+> In the entity rainbow only `amber` (Item) is touched by the TE override (it renders
+> signal-orange); the rest are stock Tailwind hues, kept distinct so the categories stay
+> distinguishable. (`zinc`, the warm-gray neutral, is overridden everywhere but isn't an
+> entity color. Notes are not entities — they live in the Campaign Notes section.)
 
 ---
 
