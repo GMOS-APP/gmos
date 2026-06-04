@@ -4,7 +4,6 @@ import { createPageUrl } from '@/utils';
 import { auth } from '@/api/entities';
 import ThemeToggle from '@/components/ui/ThemeToggle';
 import {
-  Globe,
   Users,
   MapPin,
   Shield,
@@ -19,6 +18,7 @@ import {
   Flame,
   ShoppingBag,
   LogOut,
+  UserCog,
 } from 'lucide-react';
 import { CAMPAIGN_NAV_ITEMS, navHref } from '@/lib/navItems';
 import { cn } from '@/lib/utils';
@@ -166,12 +166,17 @@ export default function Sidebar({ campaign, collapsed, onToggle, onNavClick }) {
 
       {/* Footer */}
       <div className="p-3 border-t border-zinc-200 dark:border-zinc-800/60 space-y-2">
-        {!collapsed && (
-          <div className="flex items-center gap-2 text-xs text-zinc-600 dark:text-zinc-600">
-            <Globe className="w-3 h-3" />
-            <span>World State</span>
-          </div>
-        )}
+        <Link
+          to={createPageUrl('AccountSettings')}
+          onClick={onNavClick}
+          className={cn(
+            'flex items-center gap-3 rounded-lg text-sm text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800/50 transition-colors',
+            collapsed ? 'justify-center p-2' : 'px-3 py-2'
+          )}
+        >
+          <UserCog className="w-4 h-4 flex-shrink-0" />
+          {!collapsed && <span>Account settings</span>}
+        </Link>
         <div className={collapsed ? "flex justify-center" : "flex items-center gap-2 px-1"}>
           <ThemeToggle />
           {!collapsed && <span className="text-sm text-zinc-600 dark:text-zinc-400">Theme</span>}
