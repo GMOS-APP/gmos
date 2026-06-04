@@ -156,7 +156,7 @@ export default function CampaignNotes() {
   const sessionsWithNotes = new Set(notes.map(n => n.session_id)).size;
 
   return (
-    <div className="p-4 sm:p-6 lg:p-8 max-w-3xl">
+    <div className="p-4 sm:p-6 lg:p-8 max-w-3xl mx-auto">
 
       {/* Header */}
       <div className="mb-6">

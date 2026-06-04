@@ -14,6 +14,7 @@ import EntityQuickViewModal from '@/components/common/EntityQuickViewModal';
 import { Minimize2, Clock, StickyNote, Heart, Search, Scroll, Swords } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { getEntityColors } from '@/lib/entityColors';
+import { useMediaQuery } from '@/lib/useMediaQuery';
 import EntityAvatar from '@/components/entity/EntityAvatar';
 
 function InlineTimer({ session }) {
@@ -146,6 +147,10 @@ function RightPanelContent({ session, entities, campaignId }) {
 export default function GMScreen({ session, entities, campaignId, onMinimize }) {
   // Mobile panel: 'notes' | 'reference' | 'tools'
   const [mobilePanel, setMobilePanel] = useState('notes');
+  // On tablet, tools live in the center "Tools" tab; on mobile/desktop they live
+  // in the right column. Gate the two render sites so only ONE mounts (no
+  // diverging duplicate combat/resource state).
+  const isTablet = useMediaQuery('(min-width: 768px) and (max-width: 1023px)');
   const queryClient = useQueryClient();
 
   const endSession = async () => {
@@ -236,7 +241,7 @@ export default function GMScreen({ session, entities, campaignId, onMinimize }) 
                   World
                 </TabsTrigger>
                 {/* Tools tab visible on tablet only (hidden on desktop where right panel shows) */}
-                <TabsTrigger value="tools" className="text-xs lg:hidden">Tools</TabsTrigger>
+                <TabsTrigger value="tools" className="text-xs hidden md:inline-flex lg:hidden">Tools</TabsTrigger>
               </TabsList>
             </div>
             <TabsContent value="prep" className="flex-1 m-0 overflow-y-auto">
@@ -248,10 +253,12 @@ export default function GMScreen({ session, entities, campaignId, onMinimize }) 
             <TabsContent value="world" className="flex-1 m-0 overflow-hidden min-h-0">
               <WorldSearch entities={entities} campaignId={campaignId} />
             </TabsContent>
-            {/* Tools tab content — tablet only */}
-            <TabsContent value="tools" className="flex-1 m-0 overflow-hidden min-h-0 lg:hidden">
-              <RightPanelContent session={session} entities={entities} campaignId={campaignId} />
-            </TabsContent>
+            {/* Tools tab content — tablet only (single mount; mobile/desktop use the right column) */}
+            {isTablet && (
+              <TabsContent value="tools" className="flex-1 m-0 overflow-hidden min-h-0">
+                <RightPanelContent session={session} entities={entities} campaignId={campaignId} />
+              </TabsContent>
+            )}
           </Tabs>
         </div>
 
@@ -259,13 +266,15 @@ export default function GMScreen({ session, entities, campaignId, onMinimize }) 
             Mobile: full-width when active
             Tablet (md): hidden — tools live in center tabs instead
             Desktop (lg+): always visible fixed-width column           */}
-        <div className={cn(
-          'flex-col overflow-hidden',
-          'md:hidden lg:flex lg:w-80 lg:flex-shrink-0 lg:border-l lg:border-zinc-200 lg:dark:border-zinc-800',
-          mobilePanel === 'tools' ? 'flex w-full' : 'hidden',
-        )}>
-          <RightPanelContent session={session} entities={entities} campaignId={campaignId} />
-        </div>
+        {!isTablet && (
+          <div className={cn(
+            'flex-col overflow-hidden',
+            'md:hidden lg:flex lg:w-80 lg:flex-shrink-0 lg:border-l lg:border-zinc-200 lg:dark:border-zinc-800',
+            mobilePanel === 'tools' ? 'flex w-full' : 'hidden',
+          )}>
+            <RightPanelContent session={session} entities={entities} campaignId={campaignId} />
+          </div>
+        )}
 
       </div>
 
