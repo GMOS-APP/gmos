@@ -37,7 +37,7 @@ Deno.serve(async (req) => {
     if (action === 'list') {
       const { data: items } = await admin
         .from('party_inventory')
-        .select('id, name, quantity, carried_by, notes, created_date')
+        .select('id, name, quantity, carried_by, notes, equipped, created_date')
         .eq('campaign_id', campaign.id)
         .order('created_date', { ascending: true });
       return json({ items: items || [], currency: campaign.party_currency || {} });
@@ -53,7 +53,8 @@ Deno.serve(async (req) => {
         quantity: it.quantity == null ? 1 : qty(it.quantity),
         carried_by: str(it.carried_by, 80),
         notes: str(it.notes, 500),
-      }).select('id, name, quantity, carried_by, notes, created_date').single();
+        equipped: !!it.equipped,
+      }).select('id, name, quantity, carried_by, notes, equipped, created_date').single();
       if (error) return json({ error: error.message }, 400);
       return json({ item: data });
     }
@@ -66,10 +67,11 @@ Deno.serve(async (req) => {
       if ('quantity' in patch) upd.quantity = qty(patch.quantity);
       if ('carried_by' in patch) upd.carried_by = str(patch.carried_by, 80);
       if ('notes' in patch) upd.notes = str(patch.notes, 500);
+      if ('equipped' in patch) upd.equipped = !!patch.equipped;
       const { data, error } = await admin
         .from('party_inventory').update(upd)
         .eq('id', body.id).eq('campaign_id', campaign.id)
-        .select('id, name, quantity, carried_by, notes, created_date').single();
+        .select('id, name, quantity, carried_by, notes, equipped, created_date').single();
       if (error) return json({ error: error.message }, 400);
       return json({ item: data });
     }

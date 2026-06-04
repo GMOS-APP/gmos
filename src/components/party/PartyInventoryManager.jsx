@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Plus, Trash2, Coins, Package } from 'lucide-react';
+import { Plus, Minus, Trash2, Coins, Package, Shield } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const COINS = [
@@ -23,27 +23,65 @@ function CoinInput({ value, onCommit, color }) {
 }
 
 function ItemRow({ item, onUpdate, onDelete }) {
+  const [qty, setQty] = useState(item.quantity ?? 1);
+  const [equipped, setEquipped] = useState(!!item.equipped);
+
   const commit = (field, value) => {
     const cur = item[field] ?? '';
     if (String(value) !== String(cur)) onUpdate(item.id, { [field]: value });
   };
+  const changeQty = (delta) => {
+    const next = Math.max(0, qty + delta);
+    setQty(next);
+    onUpdate(item.id, { quantity: next });
+  };
+  const toggleEquipped = () => {
+    const v = !equipped;
+    setEquipped(v);
+    onUpdate(item.id, { equipped: v });
+  };
+
   return (
-    <div className="group flex flex-wrap items-center gap-1.5 px-2 py-1.5 rounded-lg hover:bg-zinc-50 dark:hover:bg-zinc-800/40">
-      <div className="flex items-center gap-1 flex-shrink-0">
-        <span className="text-xs text-zinc-400 dark:text-zinc-600">×</span>
+    <div className={cn(
+      'group flex flex-wrap items-center gap-1.5 px-2 py-1.5 rounded-lg transition-colors',
+      equipped ? 'bg-emerald-500/[0.06] hover:bg-emerald-500/[0.1]' : 'hover:bg-zinc-50 dark:hover:bg-zinc-800/40'
+    )}>
+      {/* Quantity stepper — tap to consume/restock */}
+      <div className="flex items-center rounded-md border border-zinc-200 dark:border-zinc-700 overflow-hidden flex-shrink-0 bg-white dark:bg-zinc-950">
+        <button onClick={() => changeQty(-1)} disabled={qty <= 0} title="Use one"
+          className="w-6 h-7 flex items-center justify-center text-zinc-500 hover:bg-zinc-100 dark:hover:bg-zinc-800 disabled:opacity-30">
+          <Minus className="w-3 h-3" />
+        </button>
         <input
-          type="number" min="0" inputMode="numeric"
-          defaultValue={item.quantity ?? 1}
-          onBlur={(e) => commit('quantity', Math.max(0, parseInt(e.target.value, 10) || 0))}
-          className={cn(inputCls, 'w-12 text-center font-mono')}
+          type="number" min="0" inputMode="numeric" value={qty}
+          onChange={(e) => setQty(Math.max(0, parseInt(e.target.value, 10) || 0))}
+          onBlur={() => commit('quantity', qty)}
+          className="w-9 text-center font-mono text-sm bg-transparent text-zinc-800 dark:text-zinc-200 focus:outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none"
         />
+        <button onClick={() => changeQty(1)} title="Add one"
+          className="w-6 h-7 flex items-center justify-center text-zinc-500 hover:bg-zinc-100 dark:hover:bg-zinc-800">
+          <Plus className="w-3 h-3" />
+        </button>
       </div>
+
       <input defaultValue={item.name} onBlur={(e) => commit('name', e.target.value)} placeholder="Item"
         className={cn(inputCls, 'flex-1 min-w-[7rem] font-medium')} />
+
+      {/* Equipped toggle */}
+      <button onClick={toggleEquipped} title={equipped ? 'Equipped — click to unequip' : 'Mark as equipped'}
+        aria-pressed={equipped}
+        className={cn('flex items-center gap-1 text-[10px] font-medium pl-1.5 pr-2 py-0.5 rounded-full border transition-colors flex-shrink-0',
+          equipped
+            ? 'border-emerald-500/40 text-emerald-600 dark:text-emerald-400 bg-emerald-500/10'
+            : 'border-zinc-200 dark:border-zinc-700 text-zinc-400 dark:text-zinc-500 hover:text-zinc-600 dark:hover:text-zinc-300 hover:border-zinc-300 dark:hover:border-zinc-600')}>
+        <Shield className={cn('w-3 h-3', equipped && 'fill-current')} />
+        {equipped ? 'Equipped' : 'Equip'}
+      </button>
+
       <input defaultValue={item.carried_by || ''} onBlur={(e) => commit('carried_by', e.target.value)} placeholder="Carried by…"
-        className={cn(inputCls, 'w-32 text-zinc-600 dark:text-zinc-400')} />
+        className={cn(inputCls, 'w-28 text-zinc-600 dark:text-zinc-400')} />
       <input defaultValue={item.notes || ''} onBlur={(e) => commit('notes', e.target.value)} placeholder="Notes…"
-        className={cn(inputCls, 'flex-1 min-w-[7rem] text-zinc-500 dark:text-zinc-500 text-xs')} />
+        className={cn(inputCls, 'flex-1 min-w-[6rem] text-zinc-500 dark:text-zinc-500 text-xs')} />
       <button onClick={() => onDelete(item.id)} title="Remove"
         className="w-7 h-7 flex items-center justify-center rounded text-zinc-400 dark:text-zinc-600 hover:text-red-500 opacity-0 group-hover:opacity-100 focus:opacity-100 transition-opacity flex-shrink-0">
         <Trash2 className="w-3.5 h-3.5" />
