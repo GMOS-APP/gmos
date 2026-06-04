@@ -3,11 +3,11 @@ import LegalShell, { H2, P, UL } from '@/components/layout/LegalShell';
 
 export default function PrivacyPolicy() {
   return (
-    <LegalShell title="Privacy Policy" updated="June 2026">
+    <LegalShell title="Privacy Policy" updated="June 4, 2026">
       <P>
         This Privacy Policy explains how GM/OS (“we”, “us”) collects, uses, and protects your personal information,
-        and the rights you have over it. The data controller is <strong>[Operator legal name]</strong>, contactable at{' '}
-        <strong>[privacy@yourdomain]</strong>.
+        and the rights you have over it. GM/OS is operated by <strong>Hook &amp; Quill LLC</strong> (Pennsylvania,
+        USA), the data controller, contactable at <strong>contact@hookandquill.com</strong>.
       </P>
 
       <H2>Information we collect</H2>
@@ -41,11 +41,11 @@ export default function PrivacyPolicy() {
         <li><strong>GitHub Pages</strong> — static hosting of the web application.</li>
       </UL>
 
-      <H2>International transfers</H2>
+      <H2>Where your data is processed</H2>
       <P>
-        Your data is stored in the United States. Where you access GM/OS from another region, your information is
-        transferred to and processed in the US. We rely on appropriate safeguards such as Standard Contractual Clauses
-        with our providers. <strong>[Confirm transfer mechanism with counsel.]</strong>
+        Your data is stored and processed in the United States by our service providers. If you access GM/OS from
+        outside the United States, you understand and agree that your information is transferred to and processed in
+        the US in order to provide the service to you.
       </P>
 
       <H2>Data retention</H2>
@@ -71,8 +71,8 @@ export default function PrivacyPolicy() {
         <li>The right to lodge a complaint with your local supervisory authority.</li>
       </UL>
       <P>
-        Exercise access and erasure instantly in-app, or contact <strong>[privacy@yourdomain]</strong> for any other
-        request. We respond within the timeframes required by applicable law.
+        Exercise access and erasure instantly in-app, or contact <strong>contact@hookandquill.com</strong> for any
+        other request. We respond within the timeframes required by applicable law.
       </P>
 
       <H2>Cookies &amp; local storage</H2>
@@ -98,7 +98,10 @@ export default function PrivacyPolicy() {
       <P>We may update this policy; we will revise the “Last updated” date and, for material changes, notify you in-app or by email.</P>
 
       <H2>Contact</H2>
-      <P>Questions or requests: <strong>[privacy@yourdomain]</strong>. Postal: <strong>[Operator address]</strong>.</P>
+      <P>
+        Questions or requests: <strong>contact@hookandquill.com</strong>. Postal: <strong>Hook &amp; Quill LLC</strong>,
+        Pennsylvania, USA (full mailing address available on request).
+      </P>
     </LegalShell>
   );
 }
