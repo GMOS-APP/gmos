@@ -102,13 +102,14 @@ export default function Sidebar({ campaign, collapsed, onToggle, onNavClick }) {
       )}
 
       {/* Navigation */}
-      <nav className="flex-1 overflow-y-auto p-2 space-y-1">
+      <nav data-tour="nav" className="flex-1 overflow-y-auto p-2 space-y-1">
         {CAMPAIGN_NAV_ITEMS.map(({ page, label, Icon, param }) => {
           const isActive = location.pathname === createPageUrl(page);
           const href = navHref({ page, param }, campaign.id);
           return (
             <Link
               key={page}
+              data-tour={`nav-${page}`}
               onClick={onNavClick}
               to={href}
               className={cn(
@@ -124,6 +125,7 @@ export default function Sidebar({ campaign, collapsed, onToggle, onNavClick }) {
           );
         })}
 
+        <div data-tour="nav-world">
         {!collapsed && (
           <div className="pt-3 pb-1 px-3">
             <span className="text-[10px] uppercase tracking-widest text-zinc-500 dark:text-zinc-600 font-semibold">World</span>
@@ -159,6 +161,7 @@ export default function Sidebar({ campaign, collapsed, onToggle, onNavClick }) {
             })}
           </div>
         ))}
+        </div>
       </nav>
 
       {/* Footer */}
