@@ -1,6 +1,6 @@
 import {
   Users, Swords, MapPin, Shield, Waypoints, Package, Sparkles,
-  Scroll, BookOpen, Church, Flame, ShoppingBag, StickyNote,
+  Scroll, BookOpen, Church, Flame, ShoppingBag,
 } from 'lucide-react';
 
 // Single source of truth for entity-type presentation (color + icon + label).
@@ -89,12 +89,6 @@ export const ENTITY_TYPE_META = {
     text: 'text-blue-400', dot: 'bg-blue-400', bg: 'bg-blue-500/10',
     tag: 'bg-blue-500/15 text-blue-400 border-blue-500/30',
     badge: 'text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-500/10 border-blue-200 dark:border-blue-500/20',
-  },
-  note: {
-    label: 'Notes', Icon: StickyNote,
-    text: 'text-zinc-400', dot: 'bg-zinc-400', bg: 'bg-zinc-500/10',
-    tag: 'bg-zinc-500/15 text-zinc-400 border-zinc-500/30',
-    badge: 'text-zinc-600 dark:text-zinc-400 bg-zinc-50 dark:bg-zinc-500/10 border-zinc-200 dark:border-zinc-500/20',
   },
 };
 

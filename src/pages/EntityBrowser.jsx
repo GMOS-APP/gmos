@@ -11,7 +11,6 @@ import { cn } from '@/lib/utils';
 
 const entityTypes = [
   { value: '', label: 'All' },
-  { value: 'note', label: 'Notes' },
   { value: 'npc', label: 'NPCs' },
   { value: 'location', label: 'Locations' },
   { value: 'faction', label: 'Factions' },

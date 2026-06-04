@@ -137,10 +137,6 @@ const PRESENTATION = {
       { key: 'mechanics', label: 'Mechanical Benefits', Icon: Sparkles },
     ],
   },
-  note: {
-    specs: [{ key: 'category', label: 'Category', humanize: true }],
-    sections: [],
-  },
 };
 
 const humanize = (v) =>

@@ -1,12 +1,13 @@
 import {
-  StickyNote, Users, User, Skull, MapPin, Shield, GitBranch,
+  Users, User, Skull, MapPin, Shield, GitBranch,
   Package, CalendarDays, BookOpen, Flame, Swords, ShoppingBag,
 } from 'lucide-react';
 
-// Single source of truth for the "Create…" actions shared by QuickCapture,
-// the command palette, and the shortcuts help overlay.
+// Single source of truth for the entity "Create…" actions shared by
+// QuickCapture, the command palette, and the shortcuts help overlay.
+// (Notes are not entities — capture them via QuickCapture's note composer,
+// which writes to the Campaign Notes section.)
 export const ENTITY_CREATE_TYPES = [
-  { type: 'note', label: 'Note', Icon: StickyNote },
   { type: 'npc', label: 'NPC', Icon: Users },
   { type: 'player_character', label: 'Player Character', Icon: User },
   { type: 'creature', label: 'Creature', Icon: Skull },
