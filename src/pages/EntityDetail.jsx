@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import StatBlock from '@/components/entity/StatBlock';
 import EntityStatBlockView from '@/components/entity/EntityStatBlockView';
+import EntityTypeView from '@/components/entity/EntityTypeView';
 import DndBeyondImport from '@/components/entity/DndBeyondImport';
 import Open5eImport from '@/components/entity/Open5eImport';
 import InitiativeTracker from '@/components/encounter/InitiativeTracker';
@@ -49,10 +50,6 @@ const VISIBILITY_LABELS = {
   players_suspect: 'Players Suspect',
   false_info:      'False Info',
 };
-
-function humanizeKey(key) {
-  return key.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
-}
 
 function LinkedMapSection({ entityId, entityName, campaignId, editMode }) {
   const queryClient = useQueryClient();
@@ -436,16 +433,6 @@ function EntityDetailInner() {
 
   // ── Read-only view ──────────────────────────────────────────────────────────
   if (!isNew && pageMode === 'view') {
-    // Classify extra_data fields for display
-    const extraFields = Object.entries(form.extra_data || {}).filter(([_, v]) => {
-      if (v === null || v === undefined || v === '') return false;
-      if (typeof v === 'object') return false; // skip nested objects (ability_scores etc.)
-      return true;
-    });
-    const isLongValue = (v) => typeof v === 'string' && (v.includes('\n') || v.length > 120);
-    const shortFields = extraFields.filter(([_, v]) => !isLongValue(v));
-    const longFields  = extraFields.filter(([_, v]) =>  isLongValue(v));
-
     return (
       <div className="p-4 sm:p-6 lg:p-8 max-w-4xl">
         {/* Back */}
@@ -565,41 +552,14 @@ function EntityDetailInner() {
             <StatBlock extraData={form.extra_data} system={system} description={form.description} />
           )}
 
-          {/* All other types — generic key-value grid */}
+          {/* All other types — type-tailored presentation */}
           {!['npc', 'creature', 'player_character', 'encounter'].includes(form.entity_type) && (
-            <>
-              {shortFields.length > 0 && (
-                <div>
-                  <h3 className="text-xs dark:text-zinc-500 text-zinc-500 uppercase tracking-widest font-semibold mb-3 capitalize">
-                    {form.entity_type.replace('_', ' ')} Details
-                  </h3>
-                  <div className="grid grid-cols-2 gap-x-8 gap-y-4">
-                    {shortFields.map(([key, val]) => (
-                      <div key={key}>
-                        <span className="text-[11px] dark:text-zinc-600 text-zinc-500 uppercase tracking-wide block mb-0.5">
-                          {humanizeKey(key)}
-                        </span>
-                        <span className="text-sm dark:text-zinc-300 text-zinc-900">{String(val)}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-              {longFields.length > 0 && (
-                <div className="space-y-6">
-                  {longFields.map(([key, val]) => (
-                    <div key={key}>
-                      <h3 className="text-xs dark:text-zinc-500 text-zinc-500 uppercase tracking-widest font-semibold mb-2">
-                        {humanizeKey(key)}
-                      </h3>
-                      <p className="text-sm dark:text-zinc-300 text-zinc-800 leading-relaxed whitespace-pre-wrap">
-                        {String(val)}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </>
+            <EntityTypeView
+              entityType={form.entity_type}
+              extraData={form.extra_data}
+              campaignEntities={campaignEntities}
+              campaignId={form.campaign_id}
+            />
           )}
 
           {/* Description — shown for all types (GM notes, AI-generated prose, etc.) */}
