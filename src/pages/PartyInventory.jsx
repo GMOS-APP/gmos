@@ -1,7 +1,8 @@
 import React from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { PartyInventory, Campaign } from '@/api/entities';
+import { PartyInventory, PlayerNote, Campaign } from '@/api/entities';
 import PartyInventoryManager from '@/components/party/PartyInventoryManager';
+import PartyNotes from '@/components/party/PartyNotes';
 import { Backpack } from 'lucide-react';
 
 export default function PartyInventoryPage() {
@@ -22,6 +23,12 @@ export default function PartyInventoryPage() {
     enabled: !!campaignId,
   });
 
+  const { data: notes = [] } = useQuery({
+    queryKey: ['player-notes', campaignId],
+    queryFn: () => PlayerNote.filter({ campaign_id: campaignId }, '-created_date'),
+    enabled: !!campaignId,
+  });
+
   const invalidate = () => qc.invalidateQueries({ queryKey: ['party-inventory', campaignId] });
   const addM = useMutation({ mutationFn: (item) => PartyInventory.create({ campaign_id: campaignId, ...item }), onSuccess: invalidate });
   const updM = useMutation({ mutationFn: ({ id, patch }) => PartyInventory.update(id, patch), onSuccess: invalidate });
@@ -30,6 +37,9 @@ export default function PartyInventoryPage() {
     mutationFn: (currency) => Campaign.update(campaignId, { party_currency: currency }),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['campaign', campaignId] }),
   });
+  const invNotes = () => qc.invalidateQueries({ queryKey: ['player-notes', campaignId] });
+  const addNoteM = useMutation({ mutationFn: (note) => PlayerNote.create({ campaign_id: campaignId, ...note }), onSuccess: invNotes });
+  const delNoteM = useMutation({ mutationFn: (id) => PlayerNote.delete(id), onSuccess: invNotes });
 
   return (
     <div className="p-4 sm:p-6 lg:p-8 max-w-3xl mx-auto">
@@ -49,6 +59,14 @@ export default function PartyInventoryPage() {
         onDelete={(id) => delM.mutate(id)}
         onCurrency={(currency) => curM.mutate(currency)}
       />
+
+      <div className="mt-8">
+        <PartyNotes
+          notes={notes}
+          onAdd={(note) => addNoteM.mutate(note)}
+          onDelete={(id) => delNoteM.mutate(id)}
+        />
+      </div>
     </div>
   );
 }

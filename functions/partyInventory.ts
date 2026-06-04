@@ -35,12 +35,32 @@ Deno.serve(async (req) => {
     const action = body?.action || 'list';
 
     if (action === 'list') {
-      const { data: items } = await admin
-        .from('party_inventory')
-        .select('id, name, quantity, carried_by, notes, equipped, created_date')
-        .eq('campaign_id', campaign.id)
-        .order('created_date', { ascending: true });
-      return json({ items: items || [], currency: campaign.party_currency || {} });
+      const [{ data: items }, { data: notes }] = await Promise.all([
+        admin.from('party_inventory')
+          .select('id, name, quantity, carried_by, notes, equipped, created_date')
+          .eq('campaign_id', campaign.id).order('created_date', { ascending: true }),
+        admin.from('player_notes')
+          .select('id, content, author, created_date')
+          .eq('campaign_id', campaign.id).order('created_date', { ascending: false }),
+      ]);
+      return json({ items: items || [], currency: campaign.party_currency || {}, notes: notes || [] });
+    }
+
+    if (action === 'note-add') {
+      const n = body.note || {};
+      const content = str(n.content, 2000)?.trim();
+      if (!content) return json({ error: 'content is required' }, 400);
+      const { data, error } = await admin.from('player_notes').insert({
+        campaign_id: campaign.id, content, author: str(n.author, 60),
+      }).select('id, content, author, created_date').single();
+      if (error) return json({ error: error.message }, 400);
+      return json({ note: data });
+    }
+
+    if (action === 'note-delete') {
+      if (!body.id) return json({ error: 'id is required' }, 400);
+      await admin.from('player_notes').delete().eq('id', body.id).eq('campaign_id', campaign.id);
+      return json({ ok: true });
     }
 
     if (action === 'add') {

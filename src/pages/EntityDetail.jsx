@@ -201,35 +201,39 @@ function EntityDetailInner() {
   const campaignId = params.get('campaign_id');
   const isNew = params.get('new') === 'true';
   const defaultType = params.get('type') || 'npc';
+  const nameParam = params.get('name') || '';
   const queryClient = useQueryClient();
 
   const [pageMode, setPageMode] = useState(isNew ? 'edit' : 'view'); // 'view' | 'edit'
   const [form, setForm] = useState({
     campaign_id: campaignId || '',
-    name: '', entity_type: defaultType, summary: '', description: '',
+    name: nameParam, entity_type: defaultType, summary: '', description: '',
     status: 'active', visibility: 'gm_only', tags: [], key_facts: [],
     last_seen_session: null, image_url: '', npc_data: null, extra_data: {},
   });
   const [newTag, setNewTag] = useState('');
   const [newFact, setNewFact] = useState('');
   const [saved, setSaved] = useState(false);
-  const [entryMode, setEntryMode] = useState(isNew ? null : 'manual'); // null | 'manual' | 'dnd_import' | 'open5e'
+  // Skip the "how to create" chooser when we already have a name (e.g. from the
+  // Name Generator) — jump straight to the manual form with the name prefilled.
+  const [entryMode, setEntryMode] = useState(isNew && !nameParam ? null : 'manual'); // null | 'manual' | 'dnd_import' | 'open5e'
   const [descriptionMode, setDescriptionMode] = useState('edit'); // 'edit' | 'preview'
 
   // Reset all state when navigating to a different entity
   useEffect(() => {
     setForm({
       campaign_id: campaignId || '',
-      name: '', entity_type: defaultType, summary: '', description: '',
+      name: nameParam, entity_type: defaultType, summary: '', description: '',
       status: 'active', visibility: 'gm_only', tags: [], key_facts: [],
       last_seen_session: null, image_url: '', npc_data: null, extra_data: {},
     });
     setNewTag('');
     setNewFact('');
     setSaved(false);
-    setEntryMode(isNew ? null : 'manual');
+    setEntryMode(isNew && !nameParam ? null : 'manual');
     setDescriptionMode('edit');
     setPageMode(isNew ? 'edit' : 'view');
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [entityId]);
 
   const { data: entity, isLoading } = useQuery({
