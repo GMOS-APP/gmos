@@ -223,8 +223,12 @@ function AddCombatantForm({ entities, onAdd, onCancel }) {
   const [query, setQuery] = useState('');
   const [showEntitySearch, setShowEntitySearch] = useState(false);
 
+  // Only things you'd actually roll initiative for — not locations, items, factions, etc.
+  const COMBATANT_TYPES = ['player_character', 'npc', 'creature'];
   const filtered = query.trim().length > 0
-    ? entities.filter(e => e.name.toLowerCase().includes(query.toLowerCase())).slice(0, 8)
+    ? entities
+        .filter(e => COMBATANT_TYPES.includes(e.entity_type) && e.name.toLowerCase().includes(query.toLowerCase()))
+        .slice(0, 8)
     : [];
 
   const selectEntity = (entity) => {
