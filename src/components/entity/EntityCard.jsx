@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useQueryClient } from '@tanstack/react-query';
+import { useQueryClient, useMutation } from '@tanstack/react-query';
 import { createPageUrl } from '@/utils';
 import { WorldEntity } from '@/api/entities';
 import { Eye, EyeOff, AlertTriangle, ExternalLink, Link2, Trash2 } from 'lucide-react';
@@ -12,10 +12,10 @@ import { cn } from '@/lib/utils';
 import EntityAvatar from '@/components/entity/EntityAvatar';
 
 const visibilityIcons = {
-  gm_only: { icon: EyeOff, label: 'DM Only', class: 'text-zinc-500' },
-  players_know: { icon: Eye, label: 'Known', class: 'text-emerald-500' },
-  players_suspect: { icon: Eye, label: 'Suspected', class: 'text-amber-500' },
-  false_info: { icon: AlertTriangle, label: 'False', class: 'text-red-500' },
+  gm_only: { icon: EyeOff, label: 'DM Only', class: 'text-zinc-500', pill: '' },
+  players_know: { icon: Eye, label: 'Known', class: 'text-emerald-500', pill: 'text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 border-emerald-500/30' },
+  players_suspect: { icon: Eye, label: 'Suspected', class: 'text-amber-500', pill: 'text-amber-600 dark:text-amber-400 bg-amber-500/10 border-amber-500/30' },
+  false_info: { icon: AlertTriangle, label: 'False', class: 'text-red-500', pill: 'text-red-600 dark:text-red-400 bg-red-500/10 border-red-500/30' },
 };
 
 export default function EntityCard({ entity }) {
@@ -26,10 +26,22 @@ export default function EntityCard({ entity }) {
   const href = createPageUrl('EntityDetail') + `?id=${entity.id}&campaign_id=${entity.campaign_id}`;
   const hidden = entity.visibility === 'gm_only';
 
-  const toggleVisibility = async () => {
-    await WorldEntity.update(entity.id, { visibility: hidden ? 'players_know' : 'gm_only' });
-    queryClient.invalidateQueries();
-  };
+  // Optimistic visibility toggle so the player-facing state flips instantly,
+  // no edit/save round-trip.
+  const setVisibility = useMutation({
+    mutationFn: (visibility) => WorldEntity.update(entity.id, { visibility }),
+    onMutate: async (visibility) => {
+      await queryClient.cancelQueries({ queryKey: ['entities'] });
+      const prev = queryClient.getQueriesData({ queryKey: ['entities'] });
+      queryClient.setQueriesData({ queryKey: ['entities'] }, (old) =>
+        Array.isArray(old) ? old.map((e) => (e.id === entity.id ? { ...e, visibility } : e)) : old);
+      return { prev };
+    },
+    onError: (_e, _v, ctx) => ctx?.prev?.forEach(([key, data]) => queryClient.setQueryData(key, data)),
+    onSettled: () => queryClient.invalidateQueries({ queryKey: ['entities'] }),
+  });
+
+  const toggleVisibility = () => setVisibility.mutate(hidden ? 'players_know' : 'gm_only');
 
   const copyLink = () => {
     const base = (import.meta.env.BASE_URL || '/').replace(/\/$/, '');
@@ -56,10 +68,24 @@ export default function EntityCard({ entity }) {
             <EntityAvatar entity={entity} size="md" boxed />
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2">
-                <h3 className="font-semibold dark:text-zinc-200 dark:group-hover:text-amber-400 text-zinc-900 group-hover:text-amber-700 truncate text-sm">
+                <h3 className="font-semibold dark:text-zinc-200 dark:group-hover:text-amber-400 text-zinc-900 group-hover:text-amber-700 truncate text-sm min-w-0 flex-1">
                   {entity.name}
                 </h3>
-                <VisIcon className={cn("w-3 h-3 flex-shrink-0", vis.class)} />
+                <button
+                  onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleVisibility(); }}
+                  disabled={setVisibility.isPending}
+                  title={hidden ? 'Hidden from players — click to reveal' : `Visible to players (${vis.label}) — click to hide`}
+                  aria-pressed={!hidden}
+                  className={cn(
+                    'flex items-center gap-1 text-[10px] font-medium pl-1.5 pr-2 py-0.5 rounded-full border transition-colors flex-shrink-0',
+                    hidden
+                      ? 'border-zinc-200 dark:border-zinc-700/70 text-zinc-400 dark:text-zinc-500 hover:border-zinc-300 dark:hover:border-zinc-600 hover:text-zinc-600 dark:hover:text-zinc-300'
+                      : vis.pill
+                  )}
+                >
+                  <VisIcon className="w-3 h-3" />
+                  {hidden ? 'Hidden' : 'Players'}
+                </button>
               </div>
               {entity.summary && (
                <p className="text-xs dark:text-zinc-500 text-zinc-600 mt-1 line-clamp-2">{entity.summary}</p>
