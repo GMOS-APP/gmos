@@ -6,6 +6,7 @@ import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import {
   Waypoints, Plus, ArrowRight, CalendarDays, Activity, Share2, Copy, Check, Settings,
+  BookOpen, Map, Sparkles, ChevronDown,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -30,6 +31,52 @@ const STATUS_COLORS = {
   completed: 'dark:text-blue-400 dark:bg-blue-500/10 text-blue-700 bg-blue-100',
   debriefed: 'dark:text-zinc-500 dark:bg-zinc-800 text-zinc-600 bg-zinc-200',
 };
+
+// Reads the campaign like a published adventure: Background & Setting as prose,
+// the Hook as an accented call-to-adventure callout.
+function CampaignBrief({ campaign }) {
+  const [open, setOpen] = useState(true);
+  const sections = [
+    { key: 'background', label: 'Background', Icon: BookOpen },
+    { key: 'setting', label: 'Setting', Icon: Map },
+  ].filter((s) => campaign?.[s.key]?.trim());
+  const hook = campaign?.hook?.trim();
+  if (sections.length === 0 && !hook) return null;
+
+  return (
+    <section className="rounded-xl border border-zinc-200 dark:border-zinc-800/60 bg-white dark:bg-zinc-900/40 overflow-hidden">
+      <button
+        onClick={() => setOpen((o) => !o)}
+        className="w-full flex items-center justify-between px-4 py-3 text-left hover:bg-zinc-50 dark:hover:bg-zinc-800/30 transition-colors"
+      >
+        <span className="text-xs font-semibold uppercase tracking-widest text-zinc-600 dark:text-zinc-500">Campaign Brief</span>
+        <ChevronDown className={cn('w-4 h-4 text-zinc-400 dark:text-zinc-600 transition-transform', !open && '-rotate-90')} />
+      </button>
+      {open && (
+        <div className="px-4 pb-4 space-y-4">
+          {sections.map((s) => (
+            <div key={s.key}>
+              <div className="flex items-center gap-1.5 mb-1">
+                <s.Icon className="w-3.5 h-3.5 text-amber-500" />
+                <h3 className="text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-500">{s.label}</h3>
+              </div>
+              <p className="text-sm text-zinc-700 dark:text-zinc-300 leading-relaxed whitespace-pre-wrap">{campaign[s.key]}</p>
+            </div>
+          ))}
+          {hook && (
+            <div className="rounded-lg border-l-2 border-amber-500/50 bg-amber-500/5 dark:bg-amber-500/[0.07] pl-3.5 pr-3 py-2.5">
+              <div className="flex items-center gap-1.5 mb-1">
+                <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+                <h3 className="text-xs font-semibold uppercase tracking-wider text-amber-600 dark:text-amber-400">The Hook</h3>
+              </div>
+              <p className="text-sm text-zinc-700 dark:text-zinc-200 leading-relaxed italic whitespace-pre-wrap">{hook}</p>
+            </div>
+          )}
+        </div>
+      )}
+    </section>
+  );
+}
 
 export default function CampaignDashboard() {
   const params = new URLSearchParams(window.location.search);
@@ -108,11 +155,6 @@ export default function CampaignDashboard() {
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
         <div className="min-w-0">
           <h1 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100">{campaign?.name || 'Campaign'}</h1>
-          {campaign?.setting && (
-            <p className="text-sm text-zinc-600 dark:text-zinc-400 mt-1 leading-relaxed line-clamp-2 max-w-2xl">
-              {campaign.setting}
-            </p>
-          )}
           <p className="text-xs text-zinc-400 dark:text-zinc-600 mt-1.5">
             {sessions.length} session{sessions.length !== 1 ? 's' : ''} · {entities.length} world entit{entities.length !== 1 ? 'ies' : 'y'}
           </p>
@@ -173,6 +215,9 @@ export default function CampaignDashboard() {
           </Link>
         </div>
       )}
+
+      {/* ── Campaign Brief ──────────────────────────────────────────── */}
+      <CampaignBrief campaign={campaign} />
 
       {/* ── Passive Stats Hub ───────────────────────────────────────── */}
       <div>

@@ -24,7 +24,7 @@ export default function CampaignList() {
   const queryClient = useQueryClient();
   const { user, isPlus, logout } = useAuth();
   const [showCreate, setShowCreate] = useState(false);
-  const [form, setForm] = useState({ name: '', description: '', setting: '', system: DEFAULT_SYSTEM_ID });
+  const [form, setForm] = useState({ name: '', background: '', setting: '', hook: '', system: DEFAULT_SYSTEM_ID });
   const [exportingId, setExportingId] = useState(null);
   const [importing, setImporting] = useState(false);
   const fileInputRef = useRef(null);
@@ -83,7 +83,7 @@ export default function CampaignList() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['campaigns'] });
       setShowCreate(false);
-      setForm({ name: '', description: '', setting: '', system: DEFAULT_SYSTEM_ID });
+      setForm({ name: '', background: '', setting: '', hook: '', system: DEFAULT_SYSTEM_ID });
     },
   });
 
@@ -267,10 +267,10 @@ export default function CampaignList() {
                       </div>
                     </div>
 
-                    {/* Description or setting */}
-                    {(c.description || c.setting) && (
+                    {/* Setting / background snippet */}
+                    {(c.setting || c.background || c.description) && (
                       <p className="text-xs text-zinc-500 dark:text-zinc-500 line-clamp-2 mb-3 leading-relaxed">
-                        {c.description || c.setting}
+                        {c.setting || c.background || c.description}
                       </p>
                     )}
 
@@ -317,28 +317,47 @@ export default function CampaignList() {
           <DialogHeader>
             <DialogTitle>New Campaign</DialogTitle>
           </DialogHeader>
-          <div className="space-y-4 py-2">
-            <Input
-              placeholder="Campaign name"
-              value={form.name}
-              onChange={(e) => setForm({ ...form, name: e.target.value })}
-              className="bg-white dark:bg-zinc-950 border-zinc-300 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100"
-              autoFocus
-            />
-            <Textarea
-              placeholder="Brief description (optional)"
-              value={form.description}
-              onChange={(e) => setForm({ ...form, description: e.target.value })}
-              rows={2}
-              className="bg-white dark:bg-zinc-950 border-zinc-300 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 resize-none"
-            />
-            <Textarea
-              placeholder="World setting notes (optional)"
-              value={form.setting}
-              onChange={(e) => setForm({ ...form, setting: e.target.value })}
-              rows={3}
-              className="bg-white dark:bg-zinc-950 border-zinc-300 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 resize-none"
-            />
+          <div className="space-y-3 py-2">
+            <div className="space-y-1">
+              <label className="text-xs font-medium text-zinc-600 dark:text-zinc-400">Campaign name</label>
+              <Input
+                placeholder="e.g. The Sundered Crown"
+                value={form.name}
+                onChange={(e) => setForm({ ...form, name: e.target.value })}
+                className="bg-white dark:bg-zinc-950 border-zinc-300 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100"
+                autoFocus
+              />
+            </div>
+            <div className="space-y-1">
+              <label className="text-xs font-medium text-zinc-600 dark:text-zinc-400">Background <span className="text-zinc-400 dark:text-zinc-600 font-normal">· what led to now</span></label>
+              <Textarea
+                placeholder="The history and events that set the stage…"
+                value={form.background}
+                onChange={(e) => setForm({ ...form, background: e.target.value })}
+                rows={3}
+                className="bg-white dark:bg-zinc-950 border-zinc-300 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 resize-none"
+              />
+            </div>
+            <div className="space-y-1">
+              <label className="text-xs font-medium text-zinc-600 dark:text-zinc-400">Setting <span className="text-zinc-400 dark:text-zinc-600 font-normal">· where &amp; when</span></label>
+              <Textarea
+                placeholder="The world, region, and tone of the adventure…"
+                value={form.setting}
+                onChange={(e) => setForm({ ...form, setting: e.target.value })}
+                rows={3}
+                className="bg-white dark:bg-zinc-950 border-zinc-300 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 resize-none"
+              />
+            </div>
+            <div className="space-y-1">
+              <label className="text-xs font-medium text-zinc-600 dark:text-zinc-400">Hook <span className="text-zinc-400 dark:text-zinc-600 font-normal">· the call to adventure</span></label>
+              <Textarea
+                placeholder="What draws the party in and sets them in motion…"
+                value={form.hook}
+                onChange={(e) => setForm({ ...form, hook: e.target.value })}
+                rows={2}
+                className="bg-white dark:bg-zinc-950 border-zinc-300 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 resize-none"
+              />
+            </div>
           </div>
           <DialogFooter>
             <Button variant="ghost" onClick={() => setShowCreate(false)} className="text-zinc-600 dark:text-zinc-400">
