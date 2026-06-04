@@ -44,8 +44,9 @@ export default function CampaignSettings() {
     if (campaign && !form) {
       setForm({
         name: campaign.name || '',
-        description: campaign.description || '',
+        background: campaign.background || '',
         setting: campaign.setting || '',
+        hook: campaign.hook || '',
         system: campaign.system || 'dnd5e',
         status: campaign.status || 'active',
       });
@@ -86,9 +87,9 @@ export default function CampaignSettings() {
 
   const isDirty = form && campaign && (
     form.name !== campaign.name ||
-    form.description !== (campaign.description || '') ||
+    form.background !== (campaign.background || '') ||
     form.setting !== (campaign.setting || '') ||
-    form.system !== campaign.system ||
+    form.hook !== (campaign.hook || '') ||
     form.status !== (campaign.status || 'active')
   );
 
@@ -122,23 +123,33 @@ export default function CampaignSettings() {
             />
           </div>
           <div className="space-y-1.5">
-            <label className="text-xs font-medium text-zinc-700 dark:text-zinc-400">Description</label>
+            <label className="text-xs font-medium text-zinc-700 dark:text-zinc-400">Background <span className="text-zinc-400 dark:text-zinc-600 font-normal">· what led to now</span></label>
             <Textarea
-              value={form.description}
-              onChange={(e) => setForm({ ...form, description: e.target.value })}
-              rows={3}
+              value={form.background}
+              onChange={(e) => setForm({ ...form, background: e.target.value })}
+              rows={4}
               className="dark:bg-zinc-950 dark:border-zinc-800 resize-none"
-              placeholder="A brief description of the campaign…"
+              placeholder="The history and events that set the stage…"
             />
           </div>
           <div className="space-y-1.5">
-            <label className="text-xs font-medium text-zinc-700 dark:text-zinc-400">World Setting</label>
+            <label className="text-xs font-medium text-zinc-700 dark:text-zinc-400">Setting <span className="text-zinc-400 dark:text-zinc-600 font-normal">· where &amp; when</span></label>
             <Textarea
               value={form.setting}
               onChange={(e) => setForm({ ...form, setting: e.target.value })}
               rows={4}
               className="dark:bg-zinc-950 dark:border-zinc-800 resize-none"
-              placeholder="Setting notes, tone, themes, world details…"
+              placeholder="The world, region, and tone of the adventure…"
+            />
+          </div>
+          <div className="space-y-1.5">
+            <label className="text-xs font-medium text-zinc-700 dark:text-zinc-400">Hook <span className="text-zinc-400 dark:text-zinc-600 font-normal">· the call to adventure</span></label>
+            <Textarea
+              value={form.hook}
+              onChange={(e) => setForm({ ...form, hook: e.target.value })}
+              rows={3}
+              className="dark:bg-zinc-950 dark:border-zinc-800 resize-none"
+              placeholder="What draws the party in and sets them in motion…"
             />
           </div>
         </div>
