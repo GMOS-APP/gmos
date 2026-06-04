@@ -62,6 +62,7 @@ import PlayerView from './pages/PlayerView';
 import CampaignSettings from './pages/CampaignSettings';
 import About from './pages/About';
 import AccountSettings from './pages/AccountSettings';
+import PartyInventory from './pages/PartyInventory';
 import __Layout from './Layout.jsx';
 
 
@@ -81,6 +82,7 @@ export const PAGES = {
     "CampaignSettings": CampaignSettings,
     "About": About,
     "AccountSettings": AccountSettings,
+    "PartyInventory": PartyInventory,
 }
 
 export const pagesConfig = {
