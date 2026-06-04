@@ -36,6 +36,10 @@ GM-OS is laid out like a small operating system:
 - **Sidebar** — your campaign navigation. Click the chevron (or the Start button) to **undock** it into a Start-menu dropdown; an icon docks it back to the left. Your preference is remembered.
 - **Command Palette** — press **⌘K / Ctrl+K** anywhere to search, create, jump to a page, or roll dice inline (type `2d6` and press Enter).
 
+### Take the Tour
+
+The first time you open a campaign, GM/OS offers a **30-second guided tour** that spotlights each part of the interface — the Start button, the mode badge, the Command Palette, the system tray, your navigation, and Quick Capture. You can dismiss it ("I'll figure it out") and relaunch it any time: press **?** and click **Take the interactive tour**, or open the Command Palette (**⌘K**) and type "tour".
+
 ### Music & Ambience
 
 Open the **audio player** in the system tray and paste a YouTube link (an ambient track, a battle loop, a tavern playlist). It keeps playing as a tray app while you navigate and run the game.
@@ -332,6 +336,7 @@ The Player View is available at a campaign-specific URL. Copy the URL and share 
 | **Quick-create menu** | **Alt/Option+N** |
 | **Keyboard shortcuts help** | Press **?** |
 | **Close any palette / menu / overlay** | Press **Esc** |
+| **Take the interactive tour** | Press **?** → "Take the interactive tour", or **⌘K** → "tour" |
 | **Quick note from anywhere** | Click the **+** button (bottom-right floating button) |
 | **Dock / undock the sidebar** | Click the chevron on the sidebar, or the **Start** button |
 | **Open entity quick-view** | @mention an entity in any text field — click the mention to preview |
