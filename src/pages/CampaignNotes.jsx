@@ -71,7 +71,7 @@ function NoteCard({ note, entities, campaignId, sessionLabel, onUpdate, onDelete
 
   if (editing) {
     return (
-      <div className="p-3 space-y-2 bg-white dark:bg-zinc-900/40">
+      <div className="break-inside-avoid mb-3 rounded-xl border border-zinc-200 dark:border-zinc-800 p-3 space-y-2 bg-white dark:bg-zinc-900/40">
         <EntityMentionTextarea
           value={editContent}
           onChange={setEditContent}
@@ -94,53 +94,48 @@ function NoteCard({ note, entities, campaignId, sessionLabel, onUpdate, onDelete
   }
 
   return (
-    <div className={cn('group flex items-start gap-3 py-3 px-3 transition-opacity', done && 'opacity-55')}>
-      <div className="flex-1 min-w-0">
-        <NoteTags tags={note.tags} />
-        <EntityMentionRenderer
-          text={note.content}
-          entities={entities}
-          campaignId={campaignId}
-          className={cn('text-sm leading-relaxed whitespace-pre-wrap', done ? 'text-zinc-500 dark:text-zinc-500 line-through decoration-zinc-400/50' : 'text-zinc-800 dark:text-zinc-300')}
-        />
-        <div className="flex items-center gap-2 mt-1.5">
-          <span className="text-[10px] text-zinc-400 dark:text-zinc-600 font-mono">
-            {new Date(note.created_date).toLocaleDateString([], { month: 'short', day: 'numeric' })} · {new Date(note.created_date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+    <div className={cn('group break-inside-avoid mb-3 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/40 p-3 transition-all hover:border-zinc-300 dark:hover:border-zinc-700', done && 'opacity-60')}>
+      <NoteTags tags={note.tags} />
+      <EntityMentionRenderer
+        text={note.content}
+        entities={entities}
+        campaignId={campaignId}
+        className={cn('text-sm leading-relaxed whitespace-pre-wrap', done ? 'text-zinc-500 dark:text-zinc-500 line-through decoration-zinc-400/50' : 'text-zinc-800 dark:text-zinc-300')}
+      />
+      <div className="flex items-center justify-between gap-2 mt-2">
+        <div className="flex items-center gap-1.5 min-w-0 text-[10px] text-zinc-400 dark:text-zinc-600">
+          <span className="font-mono truncate">
+            {new Date(note.created_date).toLocaleDateString([], { month: 'short', day: 'numeric' })}
           </span>
-          {sessionLabel && (
-            <span className="text-[10px] text-zinc-400 dark:text-zinc-600">· {sessionLabel}</span>
-          )}
-          {done && <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-medium">· done</span>}
+          {sessionLabel && <span className="truncate">· {sessionLabel}</span>}
+          {done && <span className="text-emerald-600 dark:text-emerald-400 font-medium flex-shrink-0">· done</span>}
         </div>
-      </div>
-      <div className="flex items-center gap-0.5 flex-shrink-0 pt-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
-        <button onClick={() => onUpdate(note.id, { pinned: !note.pinned })} title={note.pinned ? 'Unpin' : 'Pin'}
-          className={cn('w-6 h-6 flex items-center justify-center rounded transition-colors', note.pinned ? 'text-amber-500' : 'text-zinc-400 dark:text-zinc-600 hover:text-amber-500')}>
-          <Pin className={cn('w-3.5 h-3.5', note.pinned && 'fill-current')} />
-        </button>
-        <button onClick={() => onUpdate(note.id, { processed: !done })} title={done ? 'Mark as not done' : 'Mark as done'}
-          className={cn('w-6 h-6 flex items-center justify-center rounded transition-colors', done ? 'text-emerald-500' : 'text-zinc-400 dark:text-zinc-600 hover:text-emerald-500')}>
-          {done ? <RotateCcw className="w-3.5 h-3.5" /> : <Check className="w-3.5 h-3.5" />}
-        </button>
-        <button onClick={() => setEditing(true)} title="Edit"
-          className="w-6 h-6 flex items-center justify-center rounded text-zinc-400 dark:text-zinc-600 hover:text-zinc-700 dark:hover:text-zinc-300 transition-colors">
-          <Pencil className="w-3.5 h-3.5" />
-        </button>
-        <button onClick={() => onDelete(note.id)} title="Delete"
-          className="w-6 h-6 flex items-center justify-center rounded text-zinc-400 dark:text-zinc-600 hover:text-red-400 transition-colors">
-          <Trash2 className="w-3.5 h-3.5" />
-        </button>
+        <div className="flex items-center gap-0.5 flex-shrink-0 opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity">
+          <button onClick={() => onUpdate(note.id, { pinned: !note.pinned })} title={note.pinned ? 'Unpin' : 'Pin'}
+            className={cn('w-6 h-6 flex items-center justify-center rounded transition-colors', note.pinned ? 'text-amber-500' : 'text-zinc-400 dark:text-zinc-600 hover:text-amber-500')}>
+            <Pin className={cn('w-3.5 h-3.5', note.pinned && 'fill-current')} />
+          </button>
+          <button onClick={() => onUpdate(note.id, { processed: !done })} title={done ? 'Mark as not done' : 'Mark as done'}
+            className={cn('w-6 h-6 flex items-center justify-center rounded transition-colors', done ? 'text-emerald-500' : 'text-zinc-400 dark:text-zinc-600 hover:text-emerald-500')}>
+            {done ? <RotateCcw className="w-3.5 h-3.5" /> : <Check className="w-3.5 h-3.5" />}
+          </button>
+          <button onClick={() => setEditing(true)} title="Edit"
+            className="w-6 h-6 flex items-center justify-center rounded text-zinc-400 dark:text-zinc-600 hover:text-zinc-700 dark:hover:text-zinc-300 transition-colors">
+            <Pencil className="w-3.5 h-3.5" />
+          </button>
+          <button onClick={() => onDelete(note.id)} title="Delete"
+            className="w-6 h-6 flex items-center justify-center rounded text-zinc-400 dark:text-zinc-600 hover:text-red-400 transition-colors">
+            <Trash2 className="w-3.5 h-3.5" />
+          </button>
+        </div>
       </div>
     </div>
   );
 }
 
-function NoteList({ children }) {
-  return (
-    <div className="divide-y divide-zinc-100 dark:divide-zinc-800/60 border border-zinc-200 dark:border-zinc-800 rounded-xl overflow-hidden">
-      {children}
-    </div>
-  );
+// Masonry-style two-column flow (Notion/OneNote-ish); single column on mobile.
+function NoteColumns({ children }) {
+  return <div className="columns-1 sm:columns-2 gap-3">{children}</div>;
 }
 
 export default function CampaignNotes() {
@@ -236,7 +231,7 @@ export default function CampaignNotes() {
   const hasActiveFilters = query.trim() !== '' || activeTagFilters.size > 0 || !showDone;
 
   return (
-    <div className="p-4 sm:p-6 lg:p-8 max-w-3xl mx-auto">
+    <div className="p-4 sm:p-6 lg:p-8 max-w-4xl mx-auto">
       {/* Header */}
       <div className="mb-5">
         <div className="flex items-center justify-between">
@@ -351,14 +346,14 @@ export default function CampaignNotes() {
                 <span className="text-xs font-semibold text-zinc-500 dark:text-zinc-500 uppercase tracking-widest">Pinned</span>
                 <span className="text-[11px] text-zinc-400 dark:text-zinc-600">{pinned.length}</span>
               </div>
-              <NoteList>
+              <NoteColumns>
                 {pinned.map(note => (
                   <NoteCard key={note.id} note={note} entities={entities} campaignId={campaignId}
                     sessionLabel={note.session_id ? sessionLabel(sessionMap[note.session_id]) : null}
                     onUpdate={(id, payload) => updateMutation.mutate({ id, payload })}
                     onDelete={(id) => deleteMutation.mutate(id)} />
                 ))}
-              </NoteList>
+              </NoteColumns>
             </div>
           )}
 
@@ -387,13 +382,13 @@ export default function CampaignNotes() {
                   </Link>
                 )}
               </div>
-              <NoteList>
+              <NoteColumns>
                 {groupNotes.map(note => (
                   <NoteCard key={note.id} note={note} entities={entities} campaignId={campaignId}
                     onUpdate={(id, payload) => updateMutation.mutate({ id, payload })}
                     onDelete={(id) => deleteMutation.mutate(id)} />
                 ))}
-              </NoteList>
+              </NoteColumns>
             </div>
           ))}
         </div>
