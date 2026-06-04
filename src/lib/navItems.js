@@ -1,6 +1,6 @@
 import {
   LayoutDashboard, Search, Network, Map, CalendarDays,
-  StickyNote, Dices, History, Eye, Settings,
+  StickyNote, Dices, History, Eye, Settings, Backpack,
 } from 'lucide-react';
 import { createPageUrl } from '@/utils';
 
@@ -13,6 +13,7 @@ export const CAMPAIGN_NAV_ITEMS = [
   { page: 'RelationshipMap', label: 'Relationship Map', Icon: Network, param: 'campaign_id' },
   { page: 'CampaignMap', label: 'Campaign Map', Icon: Map, param: 'campaign_id' },
   { page: 'SessionBrowser', label: 'Sessions', Icon: CalendarDays, param: 'campaign_id' },
+  { page: 'PartyInventory', label: 'Party Inventory', Icon: Backpack, param: 'campaign_id' },
   { page: 'CampaignNotes', label: 'Notes', Icon: StickyNote, param: 'campaign_id' },
   { page: 'RandomTableBrowser', label: 'Random Tables', Icon: Dices, param: 'campaign_id' },
   { page: 'CampaignTimeline', label: 'Timeline', Icon: History, param: 'campaign_id' },

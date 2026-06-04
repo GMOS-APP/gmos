@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '@/api/supabaseClient';
-import { Eye, EyeOff, Loader2 } from 'lucide-react';
+import { Eye, EyeOff, Loader2, Backpack } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ENTITY_TYPE_META } from '@/lib/entityColors';
 import PlayerEntityModal from '@/components/common/PlayerEntityModal';
+import PartyInventoryManager from '@/components/party/PartyInventoryManager';
 
 // Player-facing types, derived from the single source.
 const TYPE_META = Object.fromEntries(
@@ -29,6 +30,8 @@ export default function PublicPlayerView() {
   const [sessions, setSessions] = useState([]);
   const [activeType, setActiveType] = useState('all');
   const [selected, setSelected] = useState(null);
+  const [inv, setInv] = useState([]);
+  const [currency, setCurrency] = useState({});
 
   // The public share view is dark-only; ensure the `dark` class is set so
   // themed components (the entity modal) render consistently.
@@ -52,6 +55,11 @@ export default function PublicPlayerView() {
         setCampaign(data.campaign);
         setEntities(data.entities || []);
         setSessions(data.sessions || []);
+        // Party inventory (best-effort — never blocks the page).
+        try {
+          const { data: invData } = await supabase.functions.invoke('party-inventory', { body: { token, action: 'list' } });
+          if (invData && !invData.error) { setInv(invData.items || []); setCurrency(invData.currency || {}); }
+        } catch { /* non-fatal */ }
       } catch (e) {
         setError(e.message || 'This campaign is not shared or the link is invalid.');
       } finally {
@@ -65,6 +73,25 @@ export default function PublicPlayerView() {
   const types = [...new Set(visible.map(e => e.entity_type))];
   const filtered = activeType === 'all' ? visible : visible.filter(e => e.entity_type === activeType);
   const lastDebriefed = sessions.find(s => s.status === 'debriefed' || s.status === 'completed');
+
+  // Party inventory mutations via the token-authenticated edge function.
+  const invCall = (payload) => supabase.functions.invoke('party-inventory', { body: { token, ...payload } });
+  const addItem = async (item) => {
+    const { data } = await invCall({ action: 'add', item });
+    if (data?.item) setInv(prev => [...prev, data.item]);
+  };
+  const updItem = (id, patch) => {
+    setInv(prev => prev.map(i => (i.id === id ? { ...i, ...patch } : i)));
+    invCall({ action: 'update', id, patch });
+  };
+  const delItem = (id) => {
+    setInv(prev => prev.filter(i => i.id !== id));
+    invCall({ action: 'delete', id });
+  };
+  const setCur = (c) => {
+    setCurrency(c);
+    invCall({ action: 'currency', currency: c });
+  };
 
   if (loading) {
     return (
@@ -186,6 +213,22 @@ export default function PublicPlayerView() {
             })}
           </div>
         )}
+
+        {/* Party Inventory — players manage this together */}
+        <div className="mt-12">
+          <div className="flex items-center gap-2 mb-3">
+            <Backpack className="w-4 h-4 text-amber-400" />
+            <h2 className="text-xs font-semibold uppercase tracking-widest text-zinc-500">Party Inventory</h2>
+          </div>
+          <PartyInventoryManager
+            items={inv}
+            currency={currency}
+            onAdd={addItem}
+            onUpdate={updItem}
+            onDelete={delItem}
+            onCurrency={setCur}
+          />
+        </div>
 
         {/* Footer */}
         <div className="mt-12 pt-6 border-t border-zinc-800 text-center">

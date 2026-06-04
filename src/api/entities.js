@@ -73,6 +73,7 @@ export const Relationship = createEntityAPI('relationships');
 export const CampaignMap = createEntityAPI('campaign_maps');
 export const QuickNote = createEntityAPI('quick_notes');
 export const RandomTable = createEntityAPI('random_tables');
+export const PartyInventory = createEntityAPI('party_inventory');
 
 export async function UploadFile({ file }) {
   const ext = file.name.split('.').pop();
@@ -91,6 +92,7 @@ export const functions = {
       importDndBeyondCharacter: 'import-dndbeyond',
       exportAccount: 'export-account',
       deleteAccount: 'delete-account',
+      partyInventory: 'party-inventory',
     };
     const fnName = FUNCTION_MAP[name] || name;
     const { data, error } = await supabase.functions.invoke(fnName, { body: payload });
