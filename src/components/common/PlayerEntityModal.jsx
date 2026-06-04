@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { ENTITY_TYPE_META } from '@/lib/entityColors';
-import { Eye, EyeOff } from 'lucide-react';
+import { Eye, EyeOff, Backpack, Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const VIS = {
@@ -15,11 +15,19 @@ const typeLabel = (t) => (t === 'npc' ? 'NPC' : (t || '').replace(/_/g, ' '));
  * Read-only entity detail for the player views (in-app preview + public share).
  * Shows only player-safe fields: portrait, name, type, visibility, and summary.
  */
-export default function PlayerEntityModal({ entity, open, onOpenChange }) {
+export default function PlayerEntityModal({ entity, open, onOpenChange, onAddToInventory }) {
+  const [added, setAdded] = useState(false);
   if (!entity) return null;
   const meta = ENTITY_TYPE_META[entity.entity_type] || ENTITY_TYPE_META.npc;
   const Icon = meta.Icon;
   const vis = VIS[entity.visibility];
+  const canAdd = onAddToInventory && entity.entity_type === 'item';
+
+  const addToInventory = () => {
+    onAddToInventory(entity);
+    setAdded(true);
+    setTimeout(() => setAdded(false), 1800);
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -59,6 +67,21 @@ export default function PlayerEntityModal({ entity, open, onOpenChange }) {
             <p className="text-sm text-zinc-400 dark:text-zinc-600 italic mt-3">
               Little is known about this yet.
             </p>
+          )}
+
+          {canAdd && (
+            <button
+              onClick={addToInventory}
+              disabled={added}
+              className={cn(
+                'mt-4 w-full inline-flex items-center justify-center gap-1.5 h-9 rounded-lg text-sm font-medium transition-colors',
+                added
+                  ? 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400'
+                  : 'bg-amber-500 hover:bg-amber-400 text-zinc-950'
+              )}
+            >
+              {added ? <><Check className="w-4 h-4" /> Added to party inventory</> : <><Backpack className="w-4 h-4" /> Add to party inventory</>}
+            </button>
           )}
         </div>
       </DialogContent>

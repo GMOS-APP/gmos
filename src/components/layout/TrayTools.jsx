@@ -12,7 +12,7 @@ import { cn } from '@/lib/utils';
 const TOOLS = [
   { id: 'dice', label: 'Dice', Icon: Dices, width: 'w-72', render: () => <DiceRoller /> },
   { id: 'timer', label: 'Countdown', Icon: Timer, width: 'w-64', render: () => <div className="h-52"><StandaloneTimer /></div> },
-  { id: 'names', label: 'Names', Icon: Wand2, width: 'w-60', render: () => <NameGenerator /> },
+  { id: 'names', label: 'Names', Icon: Wand2, width: 'w-64', render: (cid) => <NameGenerator campaignId={cid} /> },
   { id: 'tables', label: 'Tables', Icon: ListChecks, width: 'w-64', render: (cid) => <QuickTableRoll campaignId={cid} /> },
 ];
 
@@ -31,21 +31,24 @@ export default function TrayTools({ campaignId }) {
   return (
     <>
       {TOOLS.map(({ id, label, Icon }) => (
-        <button
-          key={id}
-          data-tray-tool={id}
-          onClick={() => setActive((cur) => (cur === id ? null : id))}
-          title={label}
-          aria-label={label}
-          className={cn(
-            'hidden md:flex h-7 w-7 items-center justify-center rounded-md transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/50',
-            active === id
-              ? 'bg-amber-500/15 text-amber-600 dark:text-amber-400'
-              : 'text-zinc-500 hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-zinc-700 dark:hover:text-zinc-300'
-          )}
-        >
-          <Icon className="w-3.5 h-3.5" />
-        </button>
+        <span key={id} className="relative hidden md:flex group/tt">
+          <button
+            data-tray-tool={id}
+            onClick={() => setActive((cur) => (cur === id ? null : id))}
+            aria-label={label}
+            className={cn(
+              'h-7 w-7 flex items-center justify-center rounded-md transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/50',
+              active === id
+                ? 'bg-amber-500/15 text-amber-600 dark:text-amber-400'
+                : 'text-zinc-500 hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-zinc-700 dark:hover:text-zinc-300'
+            )}
+          >
+            <Icon className="w-3.5 h-3.5" />
+          </button>
+          <span className="pointer-events-none absolute top-full mt-1.5 left-1/2 -translate-x-1/2 whitespace-nowrap rounded bg-zinc-900 dark:bg-zinc-700 text-white text-[10px] font-medium px-1.5 py-0.5 opacity-0 group-hover/tt:opacity-100 transition-opacity z-[60] shadow-lg">
+            {label}
+          </span>
+        </span>
       ))}
 
       {tool && createPortal(

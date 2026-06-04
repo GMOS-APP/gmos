@@ -74,6 +74,7 @@ export const CampaignMap = createEntityAPI('campaign_maps');
 export const QuickNote = createEntityAPI('quick_notes');
 export const RandomTable = createEntityAPI('random_tables');
 export const PartyInventory = createEntityAPI('party_inventory');
+export const PlayerNote = createEntityAPI('player_notes');
 
 export async function UploadFile({ file }) {
   const ext = file.name.split('.').pop();

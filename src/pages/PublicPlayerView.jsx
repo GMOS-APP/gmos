@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '@/api/supabaseClient';
-import { Eye, EyeOff, Loader2, Backpack } from 'lucide-react';
+import { Eye, EyeOff, Loader2, Backpack, MessageSquare } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ENTITY_TYPE_META } from '@/lib/entityColors';
 import PlayerEntityModal from '@/components/common/PlayerEntityModal';
 import PartyInventoryManager from '@/components/party/PartyInventoryManager';
+import PartyNotes from '@/components/party/PartyNotes';
 
 // Player-facing types, derived from the single source.
 const TYPE_META = Object.fromEntries(
@@ -32,6 +33,7 @@ export default function PublicPlayerView() {
   const [selected, setSelected] = useState(null);
   const [inv, setInv] = useState([]);
   const [currency, setCurrency] = useState({});
+  const [pnotes, setPnotes] = useState([]);
 
   // The public share view is dark-only; ensure the `dark` class is set so
   // themed components (the entity modal) render consistently.
@@ -58,7 +60,7 @@ export default function PublicPlayerView() {
         // Party inventory (best-effort — never blocks the page).
         try {
           const { data: invData } = await supabase.functions.invoke('party-inventory', { body: { token, action: 'list' } });
-          if (invData && !invData.error) { setInv(invData.items || []); setCurrency(invData.currency || {}); }
+          if (invData && !invData.error) { setInv(invData.items || []); setCurrency(invData.currency || {}); setPnotes(invData.notes || []); }
         } catch { /* non-fatal */ }
       } catch (e) {
         setError(e.message || 'This campaign is not shared or the link is invalid.');
@@ -91,6 +93,14 @@ export default function PublicPlayerView() {
   const setCur = (c) => {
     setCurrency(c);
     invCall({ action: 'currency', currency: c });
+  };
+  const addNote = async (note) => {
+    const { data } = await invCall({ action: 'note-add', note });
+    if (data?.note) setPnotes((prev) => [data.note, ...prev]);
+  };
+  const delNote = (id) => {
+    setPnotes((prev) => prev.filter((n) => n.id !== id));
+    invCall({ action: 'note-delete', id });
   };
 
   if (loading) {
@@ -230,6 +240,15 @@ export default function PublicPlayerView() {
           />
         </div>
 
+        {/* Party Notes — players keep track together */}
+        <div className="mt-10">
+          <div className="flex items-center gap-2 mb-3">
+            <MessageSquare className="w-4 h-4 text-amber-400" />
+            <h2 className="text-xs font-semibold uppercase tracking-widest text-zinc-500">Party Notes</h2>
+          </div>
+          <PartyNotes notes={pnotes} onAdd={addNote} onDelete={delNote} />
+        </div>
+
         {/* Footer */}
         <div className="mt-12 pt-6 border-t border-zinc-800 text-center">
           <p className="text-xs text-zinc-600">
@@ -238,7 +257,12 @@ export default function PublicPlayerView() {
         </div>
       </div>
 
-      <PlayerEntityModal entity={selected} open={!!selected} onOpenChange={(o) => !o && setSelected(null)} />
+      <PlayerEntityModal
+        entity={selected}
+        open={!!selected}
+        onOpenChange={(o) => !o && setSelected(null)}
+        onAddToInventory={(e) => addItem({ name: e.name, quantity: 1 })}
+      />
     </div>
   );
 }

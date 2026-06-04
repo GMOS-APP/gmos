@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { RefreshCw, Check, Copy } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { createPageUrl } from '@/utils';
+import { RefreshCw, Check, Copy, UserPlus } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const GIVEN = ['Aldric', 'Bryn', 'Cael', 'Dara', 'Eris', 'Fenn', 'Gwen', 'Hale', 'Isolde', 'Joren', 'Kira', 'Loras', 'Mira', 'Nox', 'Orin', 'Petra', 'Quill', 'Rowan', 'Sera', 'Talia', 'Ulric', 'Vesper', 'Wren', 'Yara', 'Zephyr', 'Bram', 'Cordelia', 'Doran', 'Elowen', 'Garrick', 'Halric', 'Ingrid', 'Lysa', 'Mabon', 'Niamh', 'Osric', 'Perrin', 'Roesia', 'Soren', 'Thea'];
@@ -11,15 +13,22 @@ const TAV_NOUN = ['Rat', 'Lily', 'Crown', 'Dragon', 'Tankard', 'Stag', 'Mermaid'
 
 const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
 const TABS = [
-  { id: 'npc', label: 'NPC', gen: () => `${pick(GIVEN)} ${pick(SURNAME)}` },
-  { id: 'place', label: 'Place', gen: () => `${pick(PLACE_PRE)}${pick(PLACE_SUF)}` },
-  { id: 'tavern', label: 'Tavern', gen: () => `The ${pick(TAV_ADJ)} ${pick(TAV_NOUN)}` },
+  { id: 'npc', label: 'NPC', entityType: 'npc', gen: () => `${pick(GIVEN)} ${pick(SURNAME)}` },
+  { id: 'place', label: 'Place', entityType: 'location', gen: () => `${pick(PLACE_PRE)}${pick(PLACE_SUF)}` },
+  { id: 'tavern', label: 'Tavern', entityType: 'shop', gen: () => `The ${pick(TAV_ADJ)} ${pick(TAV_NOUN)}` },
 ];
 
-export default function NameGenerator() {
+export default function NameGenerator({ campaignId }) {
+  const navigate = useNavigate();
   const [tab, setTab] = useState('npc');
   const [names, setNames] = useState([]);
   const [copied, setCopied] = useState(null);
+
+  const makeEntity = (name) => {
+    if (!campaignId) return;
+    const { entityType } = TABS.find((t) => t.id === tab);
+    navigate(createPageUrl('EntityDetail') + `?new=true&type=${entityType}&campaign_id=${campaignId}&name=${encodeURIComponent(name)}`);
+  };
 
   const roll = useCallback((id = tab) => {
     const gen = TABS.find((t) => t.id === id).gen;
@@ -58,17 +67,22 @@ export default function NameGenerator() {
 
       <div className="space-y-0.5">
         {names.map((name) => (
-          <button
-            key={name}
-            onClick={() => copy(name)}
-            title="Click to copy"
-            className="w-full flex items-center justify-between gap-2 px-2 py-1.5 rounded-md text-left text-sm text-zinc-800 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800/60 group"
-          >
-            <span className="truncate">{name}</span>
-            {copied === name
-              ? <Check className="w-3.5 h-3.5 text-emerald-500 flex-shrink-0" />
-              : <Copy className="w-3.5 h-3.5 text-zinc-300 dark:text-zinc-600 opacity-0 group-hover:opacity-100 flex-shrink-0" />}
-          </button>
+          <div key={name} className="group flex items-center gap-1 px-2 py-1 rounded-md hover:bg-zinc-100 dark:hover:bg-zinc-800/60">
+            <button onClick={() => copy(name)} title="Click to copy" className="flex-1 flex items-center gap-2 text-left text-sm text-zinc-800 dark:text-zinc-200 min-w-0">
+              <span className="truncate">{name}</span>
+              {copied === name && <Check className="w-3.5 h-3.5 text-emerald-500 flex-shrink-0" />}
+            </button>
+            <button onClick={() => copy(name)} title="Copy"
+              className="w-6 h-6 flex items-center justify-center rounded text-zinc-400 dark:text-zinc-600 hover:text-zinc-700 dark:hover:text-zinc-300 opacity-0 group-hover:opacity-100 flex-shrink-0">
+              <Copy className="w-3.5 h-3.5" />
+            </button>
+            {campaignId && (
+              <button onClick={() => makeEntity(name)} title="Create as entity"
+                className="w-6 h-6 flex items-center justify-center rounded text-zinc-400 dark:text-zinc-600 hover:text-amber-500 opacity-0 group-hover:opacity-100 flex-shrink-0">
+                <UserPlus className="w-3.5 h-3.5" />
+              </button>
+            )}
+          </div>
         ))}
       </div>
 
