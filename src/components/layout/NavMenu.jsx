@@ -1,8 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { CAMPAIGN_NAV_ITEMS, navHref } from '@/lib/navItems';
+import { createPageUrl } from '@/utils';
 import { auth } from '@/api/entities';
-import { PanelLeft, LogOut } from 'lucide-react';
+import { PanelLeft, LogOut, UserCog } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 // Floating navigation dropdown shown when the sidebar is undocked. Includes a
@@ -65,6 +66,10 @@ export default function NavMenu({ open, onClose, campaignId, onDock }) {
             <span className="text-xs text-zinc-600 dark:text-zinc-400 truncate">{user.full_name || user.email}</span>
           </div>
         )}
+        <button onClick={() => go(createPageUrl('AccountSettings'))} className={itemClass}>
+          <UserCog className="w-4 h-4 text-zinc-400 dark:text-zinc-500 flex-shrink-0" />
+          <span>Account settings</span>
+        </button>
         <button
           onClick={signOut}
           className={cn(itemClass, 'text-zinc-600 dark:text-zinc-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-500/10 dark:hover:bg-red-500/10')}
