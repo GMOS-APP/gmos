@@ -106,13 +106,18 @@ export default function CampaignDashboard() {
 
       {/* ── Header ─────────────────────────────────────────────────── */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-        <div>
+        <div className="min-w-0">
           <h1 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100">{campaign?.name || 'Campaign'}</h1>
-          <p className="text-sm text-zinc-600 dark:text-zinc-500 mt-1">
-            {sessions.length} session{sessions.length !== 1 ? 's' : ''} · {entities.length} world entities · {campaign?.setting || 'No setting defined'}
+          {campaign?.setting && (
+            <p className="text-sm text-zinc-600 dark:text-zinc-400 mt-1 leading-relaxed line-clamp-2 max-w-2xl">
+              {campaign.setting}
+            </p>
+          )}
+          <p className="text-xs text-zinc-400 dark:text-zinc-600 mt-1.5">
+            {sessions.length} session{sessions.length !== 1 ? 's' : ''} · {entities.length} world entit{entities.length !== 1 ? 'ies' : 'y'}
           </p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex gap-2 flex-shrink-0">
           <Link to={createPageUrl('CampaignSettings') + `?campaign_id=${campaignId}`}>
             <Button size="sm" variant="outline" className="dark:border-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-200 border-zinc-300 text-zinc-600">
               <Settings className="w-4 h-4" />
