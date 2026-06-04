@@ -3,6 +3,7 @@ import { supabase } from '@/api/supabaseClient';
 import { Eye, EyeOff, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ENTITY_TYPE_META } from '@/lib/entityColors';
+import PlayerEntityModal from '@/components/common/PlayerEntityModal';
 
 // Player-facing types, derived from the single source.
 const TYPE_META = Object.fromEntries(
@@ -27,6 +28,13 @@ export default function PublicPlayerView() {
   const [entities, setEntities] = useState([]);
   const [sessions, setSessions] = useState([]);
   const [activeType, setActiveType] = useState('all');
+  const [selected, setSelected] = useState(null);
+
+  // The public share view is dark-only; ensure the `dark` class is set so
+  // themed components (the entity modal) render consistently.
+  useEffect(() => {
+    document.documentElement.classList.add('dark');
+  }, []);
 
   useEffect(() => {
     if (!token) {
@@ -151,9 +159,10 @@ export default function PublicPlayerView() {
               const vis = VISIBILITY_LABELS[entity.visibility];
               const VisIcon = vis?.icon;
               return (
-                <div
+                <button
                   key={entity.id}
-                  className="flex gap-3 p-3 rounded-xl border border-zinc-800 bg-zinc-900/40"
+                  onClick={() => setSelected(entity)}
+                  className="text-left flex gap-3 p-3 rounded-xl border border-zinc-800 bg-zinc-900/40 hover:border-amber-500/40 hover:bg-zinc-900 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/50"
                 >
                   <div className={cn('w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5', meta.bg)}>
                     <Icon className={cn('w-4 h-4', meta.accent)} />
@@ -172,7 +181,7 @@ export default function PublicPlayerView() {
                       <p className="text-xs text-zinc-500 line-clamp-2 leading-snug">{entity.summary}</p>
                     )}
                   </div>
-                </div>
+                </button>
               );
             })}
           </div>
@@ -185,6 +194,8 @@ export default function PublicPlayerView() {
           </p>
         </div>
       </div>
+
+      <PlayerEntityModal entity={selected} open={!!selected} onOpenChange={(o) => !o && setSelected(null)} />
     </div>
   );
 }
