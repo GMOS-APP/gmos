@@ -26,26 +26,13 @@ import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter,
 } from '@/components/ui/dialog';
 import { CampaignProvider, useCampaign } from '@/lib/CampaignContext';
+import { getEntityColors } from '@/lib/entityColors';
 
 const entityTypes = ['note', 'npc', 'creature', 'location', 'faction', 'thread', 'item', 'player_character', 'event', 'lore', 'deity', 'encounter', 'shop'];
 const statuses = ['active', 'inactive', 'dead', 'destroyed', 'resolved', 'unknown'];
 const visibilities = ['gm_only', 'players_know', 'players_suspect', 'false_info'];
 
-const TYPE_COLORS = {
-  npc:              'bg-blue-500/15 text-blue-400 border-blue-500/30',
-  creature:         'bg-red-500/15 text-red-400 border-red-500/30',
-  location:         'bg-green-500/15 text-green-400 border-green-500/30',
-  faction:          'bg-purple-500/15 text-purple-400 border-purple-500/30',
-  thread:           'bg-orange-500/15 text-orange-400 border-orange-500/30',
-  item:             'bg-yellow-500/15 text-yellow-400 border-yellow-500/30',
-  player_character: 'bg-cyan-500/15 text-cyan-400 border-cyan-500/30',
-  event:            'bg-pink-500/15 text-pink-400 border-pink-500/30',
-  lore:             'bg-indigo-500/15 text-indigo-400 border-indigo-500/30',
-  deity:            'bg-amber-500/15 text-amber-400 border-amber-500/30',
-  encounter:        'bg-rose-500/15 text-rose-400 border-rose-500/30',
-  shop:             'bg-emerald-500/15 text-emerald-400 border-emerald-500/30',
-  note:             'bg-zinc-500/15 text-zinc-400 border-zinc-500/30',
-};
+// Entity-type badge colors come from the centralized source — getEntityColors().tag
 
 const STATUS_COLORS = {
   active:    'bg-green-500/15 text-green-400 border-green-500/30',
@@ -484,7 +471,7 @@ function EntityDetailInner() {
               {form.name || 'Unnamed'}
             </h1>
             <div className="flex flex-wrap items-center gap-2">
-              <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border capitalize ${TYPE_COLORS[form.entity_type] || 'bg-zinc-500/15 text-zinc-400 border-zinc-500/30'}`}>
+              <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border capitalize ${getEntityColors(form.entity_type).tag}`}>
                 {form.entity_type.replace('_', ' ')}
               </span>
               <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border capitalize ${STATUS_COLORS[form.status] || 'bg-zinc-500/15 text-zinc-400 border-zinc-500/30'}`}>

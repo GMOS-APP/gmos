@@ -1,18 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '@/api/supabaseClient';
-import { Users, MapPin, Shield, Package, Waypoints, Scroll, BookOpen, Church, Eye, EyeOff, Loader2 } from 'lucide-react';
+import { Eye, EyeOff, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { ENTITY_TYPE_META } from '@/lib/entityColors';
 
-const TYPE_META = {
-  npc:      { label: 'NPCs',      icon: Users,     accent: 'text-violet-400', bg: 'bg-violet-500/10' },
-  location: { label: 'Locations', icon: MapPin,     accent: 'text-emerald-400', bg: 'bg-emerald-500/10' },
-  faction:  { label: 'Factions',  icon: Shield,    accent: 'text-red-400',    bg: 'bg-red-500/10' },
-  item:     { label: 'Items',     icon: Package,   accent: 'text-amber-400',  bg: 'bg-amber-500/10' },
-  thread:   { label: 'Threads',   icon: Waypoints, accent: 'text-blue-400',   bg: 'bg-blue-500/10' },
-  event:    { label: 'Events',    icon: Scroll,    accent: 'text-cyan-400',   bg: 'bg-cyan-500/10' },
-  lore:     { label: 'Lore',      icon: BookOpen,  accent: 'text-lime-400',   bg: 'bg-lime-500/10' },
-  deity:    { label: 'Deities',   icon: Church,    accent: 'text-yellow-400', bg: 'bg-yellow-500/10' },
-};
+// Player-facing types, derived from the single source.
+const TYPE_META = Object.fromEntries(
+  ['npc', 'location', 'faction', 'item', 'thread', 'event', 'lore', 'deity'].map((t) => {
+    const m = ENTITY_TYPE_META[t];
+    return [t, { label: m.label, icon: m.Icon, accent: m.text, bg: m.bg }];
+  })
+);
 
 const VISIBILITY_LABELS = {
   players_know:    { label: 'Known',   icon: Eye,    color: 'text-emerald-600 dark:text-emerald-400' },

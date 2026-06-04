@@ -3,15 +3,7 @@ import { createPortal } from 'react-dom';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { ExternalLink, X } from 'lucide-react';
-import { Users, MapPin, Shield, Waypoints, Package, Sparkles, Scroll, BookOpen, Swords, Church, Flame, ShoppingBag, StickyNote } from 'lucide-react';
 import { getEntityColors } from '@/lib/entityColors';
-
-const typeIcons = {
-  npc: Users, creature: Swords, location: MapPin, faction: Shield,
-  thread: Waypoints, item: Package, player_character: Sparkles,
-  event: Scroll, lore: BookOpen, deity: Church, encounter: Flame,
-  shop: ShoppingBag, note: StickyNote,
-};
 
 const POPUP_WIDTH = 300;
 
@@ -53,8 +45,9 @@ export default function EntityQuickViewModal({ entity, campaignId, open, onOpenC
     left = vw / 2 - POPUP_WIDTH / 2;
   }
 
-  const Icon = typeIcons[entity.entity_type] || Scroll;
-  const colors = getEntityColors(entity.entity_type).badge;
+  const meta = getEntityColors(entity.entity_type);
+  const Icon = meta.Icon;
+  const colors = meta.badge;
   const detailUrl = createPageUrl('EntityDetail') + `?id=${entity.id}&campaign_id=${campaignId || entity.campaign_id}`;
 
   return createPortal(

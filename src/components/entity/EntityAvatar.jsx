@@ -1,23 +1,6 @@
 import React from 'react';
-import { Users, MapPin, Shield, Waypoints, Package, Sparkles, Scroll, BookOpen, Swords, Church, Flame, ShoppingBag, StickyNote } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { getEntityColors } from '@/lib/entityColors';
-
-const TYPE_ICONS = {
-  npc: Users,
-  creature: Swords,
-  location: MapPin,
-  faction: Shield,
-  thread: Waypoints,
-  item: Package,
-  player_character: Sparkles,
-  event: Scroll,
-  lore: BookOpen,
-  deity: Church,
-  encounter: Flame,
-  shop: ShoppingBag,
-  note: StickyNote,
-};
 
 const IMAGE_SIZE = { xs: 'w-4 h-4', sm: 'w-6 h-6', md: 'w-8 h-8', lg: 'w-10 h-10' };
 const ICON_SIZE  = { xs: 'w-3 h-3', sm: 'w-3 h-3', md: 'w-4 h-4', lg: 'w-5 h-5' };
@@ -28,8 +11,8 @@ const BOX_ROUND  = { xs: 'rounded', sm: 'rounded-md', md: 'rounded-lg', lg: 'rou
 // size: 'xs' | 'sm' | 'md' | 'lg'
 // boxed: when true renders the icon inside a colored bordered box (matches the common card style)
 export default function EntityAvatar({ entity, size = 'md', boxed = false, className }) {
-  const Icon = TYPE_ICONS[entity.entity_type] || Scroll;
   const colors = getEntityColors(entity.entity_type);
+  const Icon = colors.Icon;
 
   if (entity.image_url) {
     return (

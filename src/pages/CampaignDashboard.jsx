@@ -5,12 +5,11 @@ import { Campaign, WorldEntity, Session } from '@/api/entities';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import {
-  Users, MapPin, Shield, Waypoints, Package, Sparkles, Scroll,
-  BookOpen, Plus, ArrowRight, Swords, Church, Flame, ShoppingBag,
-  CalendarDays, Activity, Share2, Copy, Check, Settings,
+  Waypoints, Plus, ArrowRight, CalendarDays, Activity, Share2, Copy, Check, Settings,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { ENTITY_TYPE_META } from '@/lib/entityColors';
 import PassiveStatsHub from '@/components/dashboard/PassiveStatsHub';
 import PartyInventory from '@/components/dashboard/PartyInventory';
 import PrivateScratchpad from '@/components/dashboard/PrivateScratchpad';
@@ -18,20 +17,12 @@ import StandaloneTimer from '@/components/dashboard/StandaloneTimer';
 import WeatherGenerator from '@/components/dashboard/WeatherGenerator';
 import SessionCalendar from '@/components/dashboard/SessionCalendar';
 
-const ENTITY_TYPES = [
-  { type: 'npc', label: 'NPCs', icon: Users, accent: 'text-violet-400', bg: 'bg-violet-500/10' },
-  { type: 'location', label: 'Locations', icon: MapPin, accent: 'text-emerald-400', bg: 'bg-emerald-500/10' },
-  { type: 'faction', label: 'Factions', icon: Shield, accent: 'text-red-400', bg: 'bg-red-500/10' },
-  { type: 'thread', label: 'Threads', icon: Waypoints, accent: 'text-blue-400', bg: 'bg-blue-500/10' },
-  { type: 'item', label: 'Items', icon: Package, accent: 'text-amber-400', bg: 'bg-amber-500/10' },
-  { type: 'player_character', label: 'PCs', icon: Sparkles, accent: 'text-pink-400', bg: 'bg-pink-500/10' },
-  { type: 'creature', label: 'Creatures', icon: Swords, accent: 'text-orange-400', bg: 'bg-orange-500/10' },
-  { type: 'event', label: 'Events', icon: Scroll, accent: 'text-cyan-400', bg: 'bg-cyan-500/10' },
-  { type: 'lore', label: 'Lore', icon: BookOpen, accent: 'text-lime-400', bg: 'bg-lime-500/10' },
-  { type: 'deity', label: 'Deities', icon: Church, accent: 'text-yellow-400', bg: 'bg-yellow-500/10' },
-  { type: 'encounter', label: 'Encounters', icon: Flame, accent: 'text-rose-400', bg: 'bg-rose-500/10' },
-  { type: 'shop', label: 'Shops', icon: ShoppingBag, accent: 'text-teal-400', bg: 'bg-teal-500/10' },
-];
+// Derived from the single source so colors/icons/labels can't drift.
+const ENTITY_TYPES = ['npc', 'location', 'faction', 'thread', 'item', 'player_character', 'creature', 'event', 'lore', 'deity', 'encounter', 'shop']
+  .map((type) => {
+    const m = ENTITY_TYPE_META[type];
+    return { type, label: m.label, icon: m.Icon, accent: m.text, bg: m.bg };
+  });
 
 const STATUS_COLORS = {
   planned: 'dark:text-zinc-400 dark:bg-zinc-800 text-zinc-600 bg-zinc-200',
