@@ -1,13 +1,22 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { CAMPAIGN_NAV_ITEMS, navHref } from '@/lib/navItems';
-import { PanelLeft } from 'lucide-react';
+import { auth } from '@/api/entities';
+import { PanelLeft, LogOut } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 // Floating navigation dropdown shown when the sidebar is undocked. Includes a
-// "Dock sidebar" action to bring it back to the left.
+// "Dock sidebar" action to bring it back to the left, plus the signed-in user
+// and a sign-out action so it stands in fully for the docked sidebar.
 export default function NavMenu({ open, onClose, campaignId, onDock }) {
   const navigate = useNavigate();
   const ref = useRef(null);
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    if (!open) return;
+    auth.me().then(setUser).catch(() => {});
+  }, [open]);
 
   useEffect(() => {
     if (!open) return undefined;
@@ -27,6 +36,7 @@ export default function NavMenu({ open, onClose, campaignId, onDock }) {
 
   const itemClass = 'w-full flex items-center gap-2.5 px-2 py-1.5 rounded-md text-sm text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/50';
   const go = (href) => { onClose(); navigate(href); };
+  const signOut = () => { onClose(); sessionStorage.removeItem('gmos_booted'); auth.logout(); };
 
   return (
     <div ref={ref} className="fixed left-2 top-12 sm:top-11 z-50 w-60 max-w-[calc(100vw-1rem)] rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-2xl overflow-hidden">
@@ -43,6 +53,25 @@ export default function NavMenu({ open, onClose, campaignId, onDock }) {
             <span>{it.label}</span>
           </button>
         ))}
+      </div>
+      <div className="p-1.5 border-t border-zinc-100 dark:border-zinc-800">
+        {user && (
+          <div className="flex items-center gap-2 px-2 py-1.5">
+            <div className="w-6 h-6 rounded-full bg-amber-500/20 flex items-center justify-center flex-shrink-0">
+              <span className="text-[10px] font-bold text-amber-600 dark:text-amber-400">
+                {(user.full_name?.[0] || user.email?.[0] || '?').toUpperCase()}
+              </span>
+            </div>
+            <span className="text-xs text-zinc-600 dark:text-zinc-400 truncate">{user.full_name || user.email}</span>
+          </div>
+        )}
+        <button
+          onClick={signOut}
+          className={cn(itemClass, 'text-zinc-600 dark:text-zinc-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-500/10 dark:hover:bg-red-500/10')}
+        >
+          <LogOut className="w-4 h-4 flex-shrink-0" />
+          <span>Sign out</span>
+        </button>
       </div>
     </div>
   );
