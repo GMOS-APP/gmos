@@ -25,7 +25,20 @@ A step-by-step guide to using GM-OS for your tabletop RPG campaigns.
 
 ### Sign In
 
-GM-OS uses Google sign-in via Supabase Auth. Click **Sign in with Google** on the login page. All your data is private to your account.
+GM-OS uses Supabase Auth. From the landing page, click **Sign in** and choose **Continue with Google** or sign in with an email and password. All your data is private to your account.
+
+### The Desktop
+
+GM-OS is laid out like a small operating system:
+
+- **Taskbar** (top) — a **Start** button, the current campaign's **mode badge** (Prep / Session / Debrief), breadcrumbs showing where you are, and a **system tray** on the right.
+- **System tray** — quick search, the **audio player**, the **notification center**, a **light/dark theme toggle**, and a clock.
+- **Sidebar** — your campaign navigation. Click the chevron (or the Start button) to **undock** it into a Start-menu dropdown; an icon docks it back to the left. Your preference is remembered.
+- **Command Palette** — press **⌘K / Ctrl+K** anywhere to search, create, jump to a page, or roll dice inline (type `2d6` and press Enter).
+
+### Music & Ambience
+
+Open the **audio player** in the system tray and paste a YouTube link (an ambient track, a battle loop, a tavern playlist). It keeps playing as a tray app while you navigate and run the game.
 
 ### Create Your First Campaign
 
@@ -224,9 +237,9 @@ The Resource Tracker shows all Player Characters linked to the campaign. Click a
 
 The **+** button (floating, bottom-right corner) is available from *any page*. Click it to open a quick note that saves directly to your campaign. Use this when something happens mid-combat and you don't want to navigate away.
 
-### Global Search
+### Command Palette
 
-The search icon in the top bar (or **Cmd/Ctrl+K**) searches all entities in the current campaign by name. Use it to pull up an NPC stat block or location detail when players go somewhere unexpected.
+Press **Cmd/Ctrl+K** (or click the search icon in the tray) to open the Command Palette. It searches all entities in the current campaign by name, offers quick **Create** and **Go to** actions, and rolls dice inline (type `2d6` and press Enter). Use it to pull up an NPC stat block or location detail when players go somewhere unexpected — without leaving the Run tab.
 
 ---
 
@@ -315,11 +328,17 @@ The Player View is available at a campaign-specific URL. Copy the URL and share 
 
 | Action | How |
 |--------|-----|
-| **Global search** | Click search icon in top bar, or **Cmd/Ctrl+K** |
+| **Command Palette** (search / create / go to / roll dice) | **Cmd/Ctrl+K**, or click the tray search icon |
+| **Quick-create menu** | **Alt/Option+N** |
+| **Keyboard shortcuts help** | Press **?** |
+| **Close any palette / menu / overlay** | Press **Esc** |
 | **Quick note from anywhere** | Click the **+** button (bottom-right floating button) |
-| **Collapse the sidebar** | Click the arrow at the bottom of the sidebar |
+| **Dock / undock the sidebar** | Click the chevron on the sidebar, or the **Start** button |
 | **Open entity quick-view** | @mention an entity in any text field — click the mention to preview |
-| **Collapse the sidebar on mobile** | Tap the hamburger icon in the top bar |
+| **Switch light / dark theme** | Click the theme toggle in the system tray |
+| **Play music** | Open the audio player in the tray and paste a YouTube link |
+
+> Shortcuts are suppressed while you're typing in a text field, so they won't fire mid-sentence.
 
 ### Workflow Tips
 
