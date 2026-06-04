@@ -1,4 +1,6 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
+import { createPageUrl } from '@/utils';
 import AuthPanel from '@/components/layout/AuthPanel';
 import ThemeToggle from '@/components/ui/ThemeToggle';
 import {
@@ -154,6 +156,11 @@ export default function LandingPage() {
         <p className="text-[11px] text-zinc-400 dark:text-zinc-600 text-center max-w-3xl mx-auto leading-relaxed">
           GM/OS · a dedicated space for Game Masters. Includes the Lazy GM's Resource Document (CC BY 4.0, Michael E. Shea / SlyFlourish.com),
           the D&D SRD 5.1 (CC BY 4.0, Wizards of the Coast), and Open5e content.
+        </p>
+        <p className="text-[11px] text-zinc-400 dark:text-zinc-600 text-center mt-2">
+          <Link to={createPageUrl('PrivacyPolicy')} className="hover:text-zinc-600 dark:hover:text-zinc-400 hover:underline">Privacy Policy</Link>
+          <span className="mx-2" aria-hidden>·</span>
+          <Link to={createPageUrl('Terms')} className="hover:text-zinc-600 dark:hover:text-zinc-400 hover:underline">Terms of Service</Link>
         </p>
       </footer>
     </div>

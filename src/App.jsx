@@ -8,6 +8,8 @@ import PageNotFound from './lib/PageNotFound';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import LandingPage from '@/components/layout/LandingPage';
 import PublicPlayerView from '@/pages/PublicPlayerView';
+import PrivacyPolicy from '@/pages/PrivacyPolicy';
+import Terms from '@/pages/Terms';
 import ChangelogDialog from '@/components/layout/ChangelogDialog';
 import BootSequence from '@/components/layout/BootSequence';
 import { AudioPlayerProvider } from '@/lib/AudioPlayerContext';
@@ -73,6 +75,8 @@ function App() {
               <NavigationTracker />
               <Routes>
                 <Route path="/player-view/public" element={<PublicPlayerView />} />
+                <Route path="/PrivacyPolicy" element={<PrivacyPolicy />} />
+                <Route path="/Terms" element={<Terms />} />
                 <Route path="/*" element={<AuthenticatedApp />} />
               </Routes>
             </Router>

@@ -61,6 +61,7 @@ import CampaignTimeline from './pages/CampaignTimeline';
 import PlayerView from './pages/PlayerView';
 import CampaignSettings from './pages/CampaignSettings';
 import About from './pages/About';
+import AccountSettings from './pages/AccountSettings';
 import __Layout from './Layout.jsx';
 
 
@@ -79,6 +80,7 @@ export const PAGES = {
     "PlayerView": PlayerView,
     "CampaignSettings": CampaignSettings,
     "About": About,
+    "AccountSettings": AccountSettings,
 }
 
 export const pagesConfig = {

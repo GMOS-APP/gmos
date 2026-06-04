@@ -89,6 +89,8 @@ export const functions = {
       exportCampaign: 'export-campaign',
       importCampaign: 'import-campaign',
       importDndBeyondCharacter: 'import-dndbeyond',
+      exportAccount: 'export-account',
+      deleteAccount: 'delete-account',
     };
     const fnName = FUNCTION_MAP[name] || name;
     const { data, error } = await supabase.functions.invoke(fnName, { body: payload });

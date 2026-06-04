@@ -4,7 +4,7 @@ import { Campaign, functions } from '@/api/entities';
 import { supabase } from '@/api/supabaseClient';
 import { createPageUrl } from '@/utils';
 import { Link } from 'react-router-dom';
-import { Plus, FolderOpen, MoreHorizontal, Trash2, Download, Upload, FileText, LogOut, BookOpen, Loader2 } from 'lucide-react';
+import { Plus, FolderOpen, MoreHorizontal, Trash2, Download, Upload, FileText, LogOut, BookOpen, Loader2, UserCog } from 'lucide-react';
 import { useAuth } from '@/lib/AuthContext';
 import ThemeToggle from '@/components/ui/ThemeToggle';
 import { Button } from '@/components/ui/button';
@@ -99,6 +99,13 @@ export default function CampaignList() {
       <div className="w-full max-w-3xl flex justify-end items-center gap-2 sm:gap-3 mb-8 sm:mb-10">
         <ThemeToggle className="mr-1" />
         <span className="hidden sm:block text-xs text-zinc-500 dark:text-zinc-600 truncate max-w-[200px]">{user?.email}</span>
+        <Link
+          to={createPageUrl('AccountSettings')}
+          className="flex items-center gap-1.5 text-xs text-zinc-500 dark:text-zinc-600 hover:text-zinc-700 dark:hover:text-zinc-300 transition-colors"
+        >
+          <UserCog className="w-3.5 h-3.5" />
+          <span className="hidden sm:inline">Account</span>
+        </Link>
         <button
           onClick={logout}
           className="flex items-center gap-1.5 text-xs text-zinc-500 dark:text-zinc-600 hover:text-zinc-700 dark:hover:text-zinc-300 transition-colors"
