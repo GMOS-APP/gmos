@@ -8,7 +8,6 @@ import CommandPalette from '@/components/layout/CommandPalette';
 import ShortcutsHelp from '@/components/layout/ShortcutsHelp';
 import Taskbar from '@/components/layout/Taskbar';
 import NavMenu from '@/components/layout/NavMenu';
-import ToolDock from '@/components/layout/ToolDock';
 import Tour from '@/components/layout/Tour';
 import Footer from '@/components/layout/Footer';
 import { useHotkeys } from '@/lib/useHotkeys';
@@ -147,7 +146,6 @@ export default function Layout({ children, currentPageName }) {
         campaignId={campaignId}
         onDock={() => setMode('docked')}
       />
-      <ToolDock />
       <QuickCapture campaignId={campaignId} open={createOpen} onOpenChange={setCreateOpen} />
       <CommandPalette open={paletteOpen} onOpenChange={setPaletteOpen} campaignId={campaignId} onStartTour={startTour} />
       <ShortcutsHelp open={helpOpen} onOpenChange={setHelpOpen} onStartTour={startTour} />
