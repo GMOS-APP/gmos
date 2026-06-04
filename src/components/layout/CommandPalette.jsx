@@ -10,7 +10,7 @@ import {
   CommandDialog, CommandInput, CommandList, CommandEmpty,
   CommandGroup, CommandItem,
 } from '@/components/ui/command';
-import { CalendarDays, Plus, Dices } from 'lucide-react';
+import { CalendarDays, Plus, Dices, Compass } from 'lucide-react';
 import { CAMPAIGN_NAV_ITEMS, navHref } from '@/lib/navItems';
 import { useNotifications } from '@/lib/NotificationContext';
 
@@ -30,7 +30,7 @@ function rollDice({ count, sides, mod }) {
   return { rolls, total: rolls.reduce((a, b) => a + b, 0) + mod };
 }
 
-export default function CommandPalette({ open, onOpenChange, campaignId }) {
+export default function CommandPalette({ open, onOpenChange, campaignId, onStartTour }) {
   const [query, setQuery] = useState('');
   const navigate = useNavigate();
   const notifier = useNotifications();
@@ -185,6 +185,18 @@ export default function CommandPalette({ open, onOpenChange, campaignId }) {
                 <span>{item.label}</span>
               </CommandItem>
             ))}
+          </CommandGroup>
+        )}
+
+        {onStartTour && (matches('take the tour') || matches('tour') || matches('help') || matches('walkthrough')) && (
+          <CommandGroup heading="Help">
+            <CommandItem
+              value="start-tour"
+              onSelect={() => { onOpenChange(false); setQuery(''); onStartTour(); }}
+            >
+              <Compass className="text-amber-500" />
+              <span>Take the interactive tour</span>
+            </CommandItem>
           </CommandGroup>
         )}
       </CommandList>

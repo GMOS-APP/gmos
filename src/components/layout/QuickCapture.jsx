@@ -65,6 +65,7 @@ export default function QuickCapture({ campaignId, open, onOpenChange }) {
       )}
 
       <button
+        data-tour="quick-capture"
         onClick={() => onOpenChange(!open)}
         className="fixed bottom-5 right-5 z-50 w-11 h-11 rounded-full bg-amber-500 hover:bg-amber-400 shadow-lg flex items-center justify-center transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/60 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-zinc-950"
         title="Create entity (⌥N)"

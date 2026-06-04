@@ -3,6 +3,7 @@ import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription,
 } from '@/components/ui/dialog';
 import { Switch } from '@/components/ui/switch';
+import { Compass } from 'lucide-react';
 import { MOD_LABEL, ALT_LABEL } from '@/lib/useHotkeys';
 import { useHotkeysEnabled, setHotkeysEnabled } from '@/lib/useHotkeysEnabled';
 
@@ -28,7 +29,7 @@ const SHORTCUTS = [
   { combo: ['Esc'], desc: 'Close the palette, menu, or this dialog' },
 ];
 
-export default function ShortcutsHelp({ open, onOpenChange }) {
+export default function ShortcutsHelp({ open, onOpenChange, onStartTour }) {
   const enabled = useHotkeysEnabled();
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -52,6 +53,15 @@ export default function ShortcutsHelp({ open, onOpenChange }) {
           </div>
           <Switch checked={enabled} onCheckedChange={setHotkeysEnabled} aria-label="Enable keyboard shortcuts" />
         </div>
+        {onStartTour && (
+          <button
+            onClick={() => { onOpenChange(false); onStartTour(); }}
+            className="mt-1 flex items-center justify-center gap-2 h-9 rounded-lg border border-amber-500/30 bg-amber-500/10 text-sm font-medium text-amber-700 dark:text-amber-400 hover:bg-amber-500/20 transition-colors"
+          >
+            <Compass className="w-4 h-4" />
+            Take the interactive tour
+          </button>
+        )}
       </DialogContent>
     </Dialog>
   );

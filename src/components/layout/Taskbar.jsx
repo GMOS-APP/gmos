@@ -56,6 +56,7 @@ export default function Taskbar({ campaign, currentPageName, startActive, onStar
     <header className="flex items-center gap-2 h-12 sm:h-10 px-2 border-b border-zinc-200 dark:border-zinc-800/70 bg-white dark:bg-zinc-950 flex-shrink-0 z-30 select-none">
       <button
         data-start-button
+        data-tour="start"
         onClick={onStart}
         aria-label="Toggle menu"
         title="Toggle menu"
@@ -71,6 +72,7 @@ export default function Taskbar({ campaign, currentPageName, startActive, onStar
       </button>
 
       <button
+        data-tour="mode"
         onClick={goToSession}
         title="Go to session"
         className={cn(
@@ -87,8 +89,9 @@ export default function Taskbar({ campaign, currentPageName, startActive, onStar
       </div>
 
       {/* System tray */}
-      <div className="ml-auto flex items-center gap-0.5 pl-1 pr-1 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900/60">
+      <div data-tour="tray" className="ml-auto flex items-center gap-0.5 pl-1 pr-1 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900/60">
         <button
+          data-tour="search"
           onClick={onSearch}
           title={`Search (${MOD_LABEL}K)`}
           aria-label="Search"

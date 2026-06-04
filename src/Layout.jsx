@@ -9,6 +9,7 @@ import ShortcutsHelp from '@/components/layout/ShortcutsHelp';
 import Taskbar from '@/components/layout/Taskbar';
 import NavMenu from '@/components/layout/NavMenu';
 import ToolDock from '@/components/layout/ToolDock';
+import Tour from '@/components/layout/Tour';
 import Footer from '@/components/layout/Footer';
 import { useHotkeys } from '@/lib/useHotkeys';
 import { useHotkeysEnabled } from '@/lib/useHotkeysEnabled';
@@ -41,6 +42,8 @@ export default function Layout({ children, currentPageName }) {
   const [paletteOpen, setPaletteOpen] = useState(false);
   const [helpOpen, setHelpOpen] = useState(false);
   const [createOpen, setCreateOpen] = useState(false);
+  const [tourOpen, setTourOpen] = useState(false);
+  const startTour = () => { setPaletteOpen(false); setHelpOpen(false); setTourOpen(true); };
 
   const hotkeysEnabled = useHotkeysEnabled();
   const hotkeysActive = isCampaignPage && !!campaignId && hotkeysEnabled;
@@ -144,8 +147,9 @@ export default function Layout({ children, currentPageName }) {
       />
       <ToolDock />
       <QuickCapture campaignId={campaignId} open={createOpen} onOpenChange={setCreateOpen} />
-      <CommandPalette open={paletteOpen} onOpenChange={setPaletteOpen} campaignId={campaignId} />
-      <ShortcutsHelp open={helpOpen} onOpenChange={setHelpOpen} />
+      <CommandPalette open={paletteOpen} onOpenChange={setPaletteOpen} campaignId={campaignId} onStartTour={startTour} />
+      <ShortcutsHelp open={helpOpen} onOpenChange={setHelpOpen} onStartTour={startTour} />
+      <Tour open={tourOpen} onOpenChange={setTourOpen} campaignId={campaignId} />
     </div>
   );
 }
