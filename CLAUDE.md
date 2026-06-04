@@ -68,7 +68,7 @@ VITE_SUPABASE_ANON_KEY=<anon_key>
 Supabase project: `suofaewpbrzbixplwzvs` (us-east-1). Tables (8): `campaigns`, `world_entities`, `sessions`, `relationships`, `quick_notes`, `campaign_maps`, `random_tables`, `user_profiles`. RLS on all tables (owner-based: `created_by = auth.uid()`; child tables gated through campaign ownership; `user_profiles` has no UPDATE policy so users can't self-modify their plan).
 
 ### Routing
-Pages are auto-registered from `src/pages/` via `src/pages.config.js` (auto-generated — do not manually edit). Page components: CampaignList, CampaignDashboard, CampaignMap, CampaignNotes, CampaignSettings, EntityBrowser, EntityDetail, RelationshipMap, SessionBrowser, SessionPage, RandomTableBrowser, CampaignTimeline, PlayerView, About. The public player share route (`/player-view/public`, rendered by `PublicPlayerView.jsx`) is wired directly in `src/App.jsx` outside the authenticated app and needs no account.
+Pages are registered in `src/pages.config.js` (despite the "auto-generated" header, there is no generator — add new pages here by hand, like `About`/`AccountSettings`). Page components: CampaignList, CampaignDashboard, CampaignMap, CampaignNotes, CampaignSettings, EntityBrowser, EntityDetail, RelationshipMap, SessionBrowser, SessionPage, RandomTableBrowser, CampaignTimeline, PlayerView, About, AccountSettings. Account-level, non-campaign pages (e.g. `AccountSettings`) are not in `CAMPAIGN_PAGES`, so they render full-bleed. Public routes wired directly in `src/App.jsx` outside the authenticated app (no account needed): `/player-view/public` (`PublicPlayerView.jsx`), `/PrivacyPolicy` and `/Terms` (legal pages via `LegalShell`).
 
 **Important:** `CAMPAIGN_PAGES` array in `src/Layout.jsx` controls which pages get the sidebar layout. Any new campaign-scoped page must be added to this array or it will load without a sidebar.
 
@@ -97,6 +97,8 @@ Entity types: NPCs, Player Characters, Creatures, Locations, Factions, Deities, 
 - `import-campaign` (`importCampaign.ts`) — full campaign restore with ID remapping; new records owned by importing user; CORS + transactional rollback on partial failure (`verify_jwt=false`)
 - `import-dndbeyond` (`importDndBeyondCharacter.ts`) — fetches public D&D Beyond character (numeric-ID validated) and maps to WorldEntity shape
 - `player-view` (`playerView.ts`) — player-safe projection for the public share link; returns only whitelisted columns, player-visible entity types, and `players_know`/`players_suspect` visibility (`verify_jwt=false`)
+- `export-account` (`exportAccount.ts`) — data-governance access/portability (GDPR/CCPA/LGPD): returns the caller's full identity, profile, and all content across every table. Manual JWT verify, then service role for that user's own rows only (`verify_jwt=false`).
+- `delete-account` (`deleteAccount.ts`) — right to erasure: permanently deletes the caller's rows across all tables, profile, and Supabase Auth identity (best-effort Stripe cancel if `STRIPE_SECRET_KEY` set). Requires a valid JWT **and** `confirm:true` in the body (`verify_jwt=false`).
 - `invoke-llm` (`invoke-llm.ts`) — **decommissioned.** Returns HTTP 410 and never reads `ANTHROPIC_API_KEY`. There are no AI features in the app; do not re-introduce LLM calls without revisiting the key-exposure/cost surface.
 
 ### Path Aliases
