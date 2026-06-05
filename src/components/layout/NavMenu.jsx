@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { CAMPAIGN_NAV_ITEMS, navHref } from '@/lib/navItems';
 import { createPageUrl } from '@/utils';
 import { auth } from '@/api/entities';
+import FeedbackButton from '@/components/layout/FeedbackButton';
 import { PanelLeft, LogOut, UserCog } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -70,6 +71,7 @@ export default function NavMenu({ open, onClose, campaignId, onDock }) {
           <UserCog className="w-4 h-4 text-zinc-400 dark:text-zinc-500 flex-shrink-0" />
           <span>Account settings</span>
         </button>
+        <FeedbackButton onOpen={onClose} className={itemClass} />
         <button
           onClick={signOut}
           className={cn(itemClass, 'text-zinc-600 dark:text-zinc-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-500/10 dark:hover:bg-red-500/10')}

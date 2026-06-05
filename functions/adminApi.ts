@@ -103,6 +103,23 @@ Deno.serve(async (req) => {
       return json({ ok: true });
     }
 
+    if (action === 'feedback-list') {
+      const { data } = await admin.from('feedback').select('*').order('created_date', { ascending: false }).limit(500);
+      return json({ feedback: data || [] });
+    }
+
+    if (action === 'feedback-status') {
+      if (!body.id) return json({ error: 'id is required' }, 400);
+      await admin.from('feedback').update({ status: body.status === 'resolved' ? 'resolved' : 'open' }).eq('id', body.id);
+      return json({ ok: true });
+    }
+
+    if (action === 'feedback-delete') {
+      if (!body.id) return json({ error: 'id is required' }, 400);
+      await admin.from('feedback').delete().eq('id', body.id);
+      return json({ ok: true });
+    }
+
     return json({ error: 'Unknown action' }, 400);
   } catch (e) {
     if (e instanceof Response) return e;

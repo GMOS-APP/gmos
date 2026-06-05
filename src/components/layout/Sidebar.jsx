@@ -21,6 +21,7 @@ import {
   UserCog,
 } from 'lucide-react';
 import { CAMPAIGN_NAV_ITEMS, navHref } from '@/lib/navItems';
+import FeedbackButton from '@/components/layout/FeedbackButton';
 import { cn } from '@/lib/utils';
 
 const entityGroups = [
@@ -177,6 +178,12 @@ export default function Sidebar({ campaign, collapsed, onToggle, onNavClick }) {
           <UserCog className="w-4 h-4 flex-shrink-0" />
           {!collapsed && <span>Account settings</span>}
         </Link>
+        {!collapsed && (
+          <FeedbackButton
+            onOpen={onNavClick}
+            className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800/50 transition-colors"
+          />
+        )}
         <div className={collapsed ? "flex justify-center" : "flex items-center gap-2 px-1"}>
           <ThemeToggle />
           {!collapsed && <span className="text-sm text-zinc-600 dark:text-zinc-400">Theme</span>}

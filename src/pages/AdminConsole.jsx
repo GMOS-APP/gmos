@@ -5,7 +5,14 @@ import AuthPanel from '@/components/layout/AuthPanel';
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter,
 } from '@/components/ui/dialog';
-import { Loader2, ShieldAlert, Users, Crown, BookOpen, Layers, Boxes, Trash2, RefreshCw } from 'lucide-react';
+import { Loader2, ShieldAlert, Users, Crown, BookOpen, Layers, Boxes, Trash2, RefreshCw, Bug, Lightbulb, LifeBuoy, Check, Inbox, RotateCcw } from 'lucide-react';
+import { cn } from '@/lib/utils';
+
+const FB_META = {
+  bug: { label: 'Bug', Icon: Bug, color: 'text-red-400 bg-red-500/10 border-red-500/30' },
+  feedback: { label: 'Idea', Icon: Lightbulb, color: 'text-amber-400 bg-amber-500/10 border-amber-500/30' },
+  help: { label: 'Help', Icon: LifeBuoy, color: 'text-sky-400 bg-sky-500/10 border-sky-500/30' },
+};
 
 function callAdmin(body) {
   return supabase.functions.invoke('admin-api', { body }).then(({ data, error }) => {
@@ -33,17 +40,31 @@ export default function AdminConsole() {
   const [phase, setPhase] = useState('checking'); // checking | signin | denied | ok
   const [stats, setStats] = useState(null);
   const [users, setUsers] = useState([]);
+  const [feedback, setFeedback] = useState([]);
   const [busy, setBusy] = useState(null);
+  const [showResolved, setShowResolved] = useState(false);
   const [delTarget, setDelTarget] = useState(null);
   const [delConfirm, setDelConfirm] = useState('');
 
   useEffect(() => { document.documentElement.classList.add('dark'); }, []);
 
   const load = useCallback(async () => {
-    const [s, u] = await Promise.all([callAdmin({ action: 'stats' }), callAdmin({ action: 'users' })]);
+    const [s, u, f] = await Promise.all([
+      callAdmin({ action: 'stats' }), callAdmin({ action: 'users' }), callAdmin({ action: 'feedback-list' }),
+    ]);
     setStats(s.stats);
     setUsers(u.users);
+    setFeedback(f.feedback);
   }, []);
+
+  const fbStatus = async (f, status) => {
+    setFeedback((prev) => prev.map((x) => (x.id === f.id ? { ...x, status } : x)));
+    await callAdmin({ action: 'feedback-status', id: f.id, status });
+  };
+  const fbDelete = async (f) => {
+    setFeedback((prev) => prev.filter((x) => x.id !== f.id));
+    await callAdmin({ action: 'feedback-delete', id: f.id });
+  };
 
   useEffect(() => {
     if (isLoadingAuth) return;
@@ -193,6 +214,49 @@ export default function AdminConsole() {
                 </tbody>
               </table>
             </div>
+          </div>
+        </section>
+
+        {/* Feedback inbox */}
+        <section>
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-widest text-zinc-500">
+              <Inbox className="w-3.5 h-3.5 text-amber-500" /> Feedback ({feedback.filter((f) => f.status !== 'resolved').length} open)
+            </h2>
+            <button onClick={() => setShowResolved((v) => !v)} className="text-xs text-zinc-500 hover:text-zinc-300">
+              {showResolved ? 'Hide resolved' : 'Show resolved'}
+            </button>
+          </div>
+          <div className="space-y-2">
+            {feedback.filter((f) => showResolved || f.status !== 'resolved').length === 0 && (
+              <p className="text-sm text-zinc-600 text-center py-6">No {showResolved ? '' : 'open '}feedback.</p>
+            )}
+            {feedback.filter((f) => showResolved || f.status !== 'resolved').map((f) => {
+              const m = FB_META[f.type] || FB_META.feedback;
+              const resolved = f.status === 'resolved';
+              return (
+                <div key={f.id} className={cn('rounded-xl border border-zinc-800 bg-zinc-900/40 p-3', resolved && 'opacity-60')}>
+                  <div className="flex items-center gap-2 mb-1.5 flex-wrap">
+                    <span className={cn('text-[10px] font-medium px-1.5 py-0.5 rounded-full border inline-flex items-center gap-1', m.color)}>
+                      <m.Icon className="w-3 h-3" /> {m.label}
+                    </span>
+                    <span className="text-xs text-zinc-400 truncate max-w-[200px]">{f.user_email || 'anonymous'}</span>
+                    <span className="text-[10px] text-zinc-600">{fmtDate(f.created_date)}</span>
+                    <div className="ml-auto flex items-center gap-1">
+                      <button onClick={() => fbStatus(f, resolved ? 'open' : 'resolved')} title={resolved ? 'Reopen' : 'Mark resolved'}
+                        className={cn('w-6 h-6 flex items-center justify-center rounded', resolved ? 'text-zinc-500 hover:text-zinc-300' : 'text-emerald-500 hover:text-emerald-400')}>
+                        {resolved ? <RotateCcw className="w-3.5 h-3.5" /> : <Check className="w-3.5 h-3.5" />}
+                      </button>
+                      <button onClick={() => fbDelete(f)} title="Delete" className="w-6 h-6 flex items-center justify-center rounded text-zinc-600 hover:text-red-400">
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  </div>
+                  <p className="text-sm text-zinc-300 whitespace-pre-wrap leading-relaxed">{f.message}</p>
+                  {f.page && <p className="text-[10px] text-zinc-600 mt-1.5 font-mono truncate">{f.page}</p>}
+                </div>
+              );
+            })}
           </div>
         </section>
       </main>
