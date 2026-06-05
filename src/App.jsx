@@ -10,6 +10,7 @@ import LandingPage from '@/components/layout/LandingPage';
 import PublicPlayerView from '@/pages/PublicPlayerView';
 import PrivacyPolicy from '@/pages/PrivacyPolicy';
 import Terms from '@/pages/Terms';
+import AdminConsole from '@/pages/AdminConsole';
 import ChangelogDialog from '@/components/layout/ChangelogDialog';
 import BootSequence from '@/components/layout/BootSequence';
 import { AudioPlayerProvider } from '@/lib/AudioPlayerContext';
@@ -77,6 +78,7 @@ function App() {
                 <Route path="/player-view/public" element={<PublicPlayerView />} />
                 <Route path="/PrivacyPolicy" element={<PrivacyPolicy />} />
                 <Route path="/Terms" element={<Terms />} />
+                <Route path="/admin" element={<AdminConsole />} />
                 <Route path="/*" element={<AuthenticatedApp />} />
               </Routes>
             </Router>
