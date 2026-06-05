@@ -152,6 +152,39 @@ Deno.serve(async (req) => {
       return json({ ok: true });
     }
 
+    if (action === 'changelog-list') {
+      const { data } = await admin.from('changelog').select('*').order('version', { ascending: false }).limit(200);
+      return json({ changelog: data || [] });
+    }
+
+    if (action === 'changelog-save') {
+      const c = body.entry || {};
+      const version = (c.version || '').trim();
+      if (!version) return json({ error: 'version is required' }, 400);
+      const entries = Array.isArray(c.entries)
+        ? c.entries.filter((e) => e && e.text).map((e) => ({
+            type: ['new', 'improved', 'fixed'].includes(e.type) ? e.type : 'new',
+            text: String(e.text).slice(0, 500),
+          }))
+        : [];
+      const row = { version: version.slice(0, 40), date: (c.date || '').slice(0, 60) || null, entries, published: c.published !== false };
+      if (c.id) {
+        const { data, error } = await admin.from('changelog')
+          .update({ ...row, updated_date: new Date().toISOString() }).eq('id', c.id).select().single();
+        if (error) return json({ error: error.message }, 400);
+        return json({ entry: data });
+      }
+      const { data, error } = await admin.from('changelog').insert({ ...row, created_by: me.id }).select().single();
+      if (error) return json({ error: error.message }, 400);
+      return json({ entry: data });
+    }
+
+    if (action === 'changelog-delete') {
+      if (!body.id) return json({ error: 'id is required' }, 400);
+      await admin.from('changelog').delete().eq('id', body.id);
+      return json({ ok: true });
+    }
+
     return json({ error: 'Unknown action' }, 400);
   } catch (e) {
     if (e instanceof Response) return e;

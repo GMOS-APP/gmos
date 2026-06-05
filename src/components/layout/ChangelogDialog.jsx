@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { CURRENT_VERSION, CHANGELOG } from '@/lib/changelog';
+import { Changelog } from '@/api/entities';
 
 const STORAGE_KEY = 'gmos_changelog_version';
 
@@ -18,28 +19,28 @@ const TYPE_LABELS = {
   fixed:    'Fixed',
 };
 
-function getUnseenVersions(lastSeen) {
-  return CHANGELOG.filter(entry =>
-    !lastSeen || entry.version > lastSeen
-  );
-}
-
 export default function ChangelogDialog() {
   const [open, setOpen] = useState(false);
   const [unseenVersions, setUnseenVersions] = useState([]);
 
+  const { data: releases = [] } = useQuery({
+    queryKey: ['changelog'],
+    queryFn: () => Changelog.filter({ published: true }, '-version', 30),
+    staleTime: 300000,
+  });
+  const currentVersion = releases[0]?.version;
+
   useEffect(() => {
-    const lastSeen = localStorage.getItem(STORAGE_KEY);
-    if (lastSeen === CURRENT_VERSION) return;
-    const unseen = getUnseenVersions(lastSeen);
-    if (unseen.length > 0) {
-      setUnseenVersions(unseen);
-      setOpen(true);
-    }
-  }, []);
+    if (!releases.length) return;
+    let lastSeen = null;
+    try { lastSeen = localStorage.getItem(STORAGE_KEY); } catch { /* ignore */ }
+    if (lastSeen === currentVersion) return;
+    const unseen = releases.filter((r) => !lastSeen || r.version > lastSeen);
+    if (unseen.length > 0) { setUnseenVersions(unseen); setOpen(true); }
+  }, [releases, currentVersion]);
 
   const dismiss = () => {
-    localStorage.setItem(STORAGE_KEY, CURRENT_VERSION);
+    try { localStorage.setItem(STORAGE_KEY, currentVersion); } catch { /* ignore */ }
     setOpen(false);
   };
 
