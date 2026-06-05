@@ -78,6 +78,7 @@ export const PlayerNote = createEntityAPI('player_notes');
 export const Feedback = createEntityAPI('feedback');
 export const Announcement = createEntityAPI('announcements');
 export const Changelog = createEntityAPI('changelog');
+export const Setting = createEntityAPI('app_settings');
 
 export async function UploadFile({ file }) {
   const ext = file.name.split('.').pop();

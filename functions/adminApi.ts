@@ -185,6 +185,15 @@ Deno.serve(async (req) => {
       return json({ ok: true });
     }
 
+    if (action === 'set-accent') {
+      const accent = body.accent;
+      if (accent !== null && !/^#[0-9a-fA-F]{6}$/.test(String(accent || ''))) {
+        return json({ error: 'Invalid color' }, 400);
+      }
+      await admin.from('app_settings').upsert({ id: 'global', accent: accent || null, updated_at: new Date().toISOString() });
+      return json({ ok: true, accent: accent || null });
+    }
+
     return json({ error: 'Unknown action' }, 400);
   } catch (e) {
     if (e instanceof Response) return e;

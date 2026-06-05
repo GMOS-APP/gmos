@@ -11,11 +11,21 @@ module.exports = {
   		},
   		colors: {
   			// TE signal-orange concept — overrides Tailwind's default amber scale
-  			// so every existing amber-* class becomes the accent app-wide.
+  			// so every existing amber-* class becomes the accent app-wide. Driven by
+  			// CSS variables (--accent-*) so the brand accent is themeable at runtime
+  			// (defaults live in index.css; admins can override via the console).
   			amber: {
-  				50: '#fff3ee', 100: '#ffe4d8', 200: '#ffc6ad', 300: '#ff9e78',
-  				400: '#ff6a3d', 500: '#ff4d1c', 600: '#ed3c0c', 700: '#c42f0a',
-  				800: '#9c2810', 900: '#7e2511', 950: '#451206',
+  				50: 'rgb(var(--accent-50) / <alpha-value>)',
+  				100: 'rgb(var(--accent-100) / <alpha-value>)',
+  				200: 'rgb(var(--accent-200) / <alpha-value>)',
+  				300: 'rgb(var(--accent-300) / <alpha-value>)',
+  				400: 'rgb(var(--accent-400) / <alpha-value>)',
+  				500: 'rgb(var(--accent-500) / <alpha-value>)',
+  				600: 'rgb(var(--accent-600) / <alpha-value>)',
+  				700: 'rgb(var(--accent-700) / <alpha-value>)',
+  				800: 'rgb(var(--accent-800) / <alpha-value>)',
+  				900: 'rgb(var(--accent-900) / <alpha-value>)',
+  				950: 'rgb(var(--accent-950) / <alpha-value>)',
   			},
   			// Full-TE concept: flatten the cool zinc neutrals into a flat,
   			// faintly-warm gray (the K.O.II "desk + device" greys).
