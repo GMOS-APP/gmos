@@ -11,6 +11,7 @@ import PublicPlayerView from '@/pages/PublicPlayerView';
 import PrivacyPolicy from '@/pages/PrivacyPolicy';
 import Terms from '@/pages/Terms';
 import AdminConsole from '@/pages/AdminConsole';
+import AccentSync from '@/lib/AccentSync';
 import ChangelogDialog from '@/components/layout/ChangelogDialog';
 import BootSequence from '@/components/layout/BootSequence';
 import { AudioPlayerProvider } from '@/lib/AudioPlayerContext';
@@ -72,6 +73,7 @@ function App() {
       <QueryClientProvider client={queryClientInstance}>
         <AudioPlayerProvider>
           <NotificationProvider>
+            <AccentSync />
             <Router basename={import.meta.env.BASE_URL}>
               <NavigationTracker />
               <Routes>
