@@ -9,6 +9,7 @@ import ShortcutsHelp from '@/components/layout/ShortcutsHelp';
 import Taskbar from '@/components/layout/Taskbar';
 import NavMenu from '@/components/layout/NavMenu';
 import Tour from '@/components/layout/Tour';
+import AnnouncementBanner from '@/components/layout/AnnouncementBanner';
 import Footer from '@/components/layout/Footer';
 import { useHotkeys } from '@/lib/useHotkeys';
 import { useHotkeysEnabled } from '@/lib/useHotkeysEnabled';
@@ -89,6 +90,7 @@ export default function Layout({ children, currentPageName }) {
   if (!isCampaignPage || !campaignId) {
     return (
       <div className="min-h-screen">
+        <AnnouncementBanner />
         {children}
       </div>
     );
@@ -105,6 +107,8 @@ export default function Layout({ children, currentPageName }) {
         onStart={onStart}
         onSearch={() => setPaletteOpen(true)}
       />
+
+      <AnnouncementBanner />
 
       <div className="flex flex-1 overflow-hidden min-h-0">
         {/* Mobile drawer backdrop */}
