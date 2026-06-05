@@ -5,7 +5,7 @@ import AuthPanel from '@/components/layout/AuthPanel';
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter,
 } from '@/components/ui/dialog';
-import { Loader2, ShieldAlert, Users, Crown, BookOpen, Layers, Boxes, Trash2, RefreshCw, Bug, Lightbulb, LifeBuoy, Check, Inbox, RotateCcw, Megaphone, Pencil } from 'lucide-react';
+import { Loader2, ShieldAlert, Users, Crown, BookOpen, Layers, Boxes, Trash2, RefreshCw, Bug, Lightbulb, LifeBuoy, Check, Inbox, RotateCcw, Megaphone, Pencil, ScrollText } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const FB_META = {
@@ -13,6 +13,12 @@ const FB_META = {
   feedback: { label: 'Idea', Icon: Lightbulb, color: 'text-amber-400 bg-amber-500/10 border-amber-500/30' },
   help: { label: 'Help', Icon: LifeBuoy, color: 'text-sky-400 bg-sky-500/10 border-sky-500/30' },
 };
+
+const parseEntries = (text) => (text || '').split('\n').map((l) => l.trim()).filter(Boolean).map((l) => {
+  const m = l.match(/^(new|improved|fixed):\s*(.*)$/i);
+  return m ? { type: m[1].toLowerCase(), text: m[2] } : { type: 'new', text: l };
+});
+const entriesToText = (entries) => (entries || []).map((e) => `${e.type}: ${e.text}`).join('\n');
 
 function callAdmin(body) {
   return supabase.functions.invoke('admin-api', { body }).then(({ data, error }) => {
@@ -43,6 +49,8 @@ export default function AdminConsole() {
   const [feedback, setFeedback] = useState([]);
   const [announcements, setAnnouncements] = useState([]);
   const [annDraft, setAnnDraft] = useState({ title: '', body: '', level: 'info', published: false });
+  const [changelog, setChangelog] = useState([]);
+  const [clDraft, setClDraft] = useState({ version: '', date: '', entriesText: '', published: true });
   const [busy, setBusy] = useState(null);
   const [showResolved, setShowResolved] = useState(false);
   const [delTarget, setDelTarget] = useState(null);
@@ -51,15 +59,38 @@ export default function AdminConsole() {
   useEffect(() => { document.documentElement.classList.add('dark'); }, []);
 
   const load = useCallback(async () => {
-    const [s, u, f, a] = await Promise.all([
+    const [s, u, f, a, c] = await Promise.all([
       callAdmin({ action: 'stats' }), callAdmin({ action: 'users' }),
       callAdmin({ action: 'feedback-list' }), callAdmin({ action: 'announcement-list' }),
+      callAdmin({ action: 'changelog-list' }),
     ]);
     setStats(s.stats);
     setUsers(u.users);
     setFeedback(f.feedback);
     setAnnouncements(a.announcements);
+    setChangelog(c.changelog);
   }, []);
+
+  const saveCl = async () => {
+    if (!clDraft.version.trim()) return;
+    const { entry } = await callAdmin({ action: 'changelog-save', entry: {
+      id: clDraft.id, version: clDraft.version.trim(), date: clDraft.date,
+      entries: parseEntries(clDraft.entriesText), published: clDraft.published,
+    } });
+    setChangelog((prev) => (prev.some((x) => x.id === entry.id)
+      ? prev.map((x) => (x.id === entry.id ? entry : x))
+      : [entry, ...prev]).sort((a, b) => (b.version || '').localeCompare(a.version || '')));
+    setClDraft({ version: '', date: '', entriesText: '', published: true });
+  };
+  const togglePubCl = async (c) => {
+    const published = !c.published;
+    setChangelog((prev) => prev.map((x) => (x.id === c.id ? { ...x, published } : x)));
+    await callAdmin({ action: 'changelog-save', entry: { ...c, entries: c.entries, published } });
+  };
+  const delCl = async (c) => {
+    setChangelog((prev) => prev.filter((x) => x.id !== c.id));
+    await callAdmin({ action: 'changelog-delete', id: c.id });
+  };
 
   const saveAnn = async () => {
     if (!annDraft.title.trim()) return;
@@ -217,6 +248,46 @@ export default function AdminConsole() {
                 <button onClick={() => togglePub(a)} className="text-xs text-zinc-400 hover:text-zinc-200">{a.published ? 'Unpublish' : 'Publish'}</button>
                 <button onClick={() => setAnnDraft({ id: a.id, title: a.title, body: a.body || '', level: a.level, published: a.published })} className="text-zinc-500 hover:text-zinc-300"><Pencil className="w-3.5 h-3.5" /></button>
                 <button onClick={() => delAnn(a)} className="text-zinc-600 hover:text-red-400"><Trash2 className="w-3.5 h-3.5" /></button>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* Changelog */}
+        <section>
+          <h2 className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-widest text-zinc-500 mb-3">
+            <ScrollText className="w-3.5 h-3.5 text-amber-500" /> Changelog
+          </h2>
+          <div className="rounded-xl border border-zinc-800 bg-zinc-900/40 p-3 space-y-2 mb-3">
+            <div className="flex gap-2">
+              <input value={clDraft.version} onChange={(e) => setClDraft({ ...clDraft, version: e.target.value })}
+                placeholder="Version (e.g. 2026-06-04)" className="flex-1 text-sm rounded-md border border-zinc-700 bg-zinc-950 text-zinc-100 px-2.5 py-1.5 font-mono focus:outline-none focus:border-amber-500/50" />
+              <input value={clDraft.date} onChange={(e) => setClDraft({ ...clDraft, date: e.target.value })}
+                placeholder="Date label (Jun 4, 2026)" className="flex-1 text-sm rounded-md border border-zinc-700 bg-zinc-950 text-zinc-200 px-2.5 py-1.5 focus:outline-none focus:border-amber-500/50" />
+            </div>
+            <textarea value={clDraft.entriesText} onChange={(e) => setClDraft({ ...clDraft, entriesText: e.target.value })}
+              placeholder={'One change per line. Prefix with new: / improved: / fixed:\nnew: Added a thing\nfixed: Squashed a bug'}
+              rows={4} className="w-full text-sm rounded-md border border-zinc-700 bg-zinc-950 text-zinc-200 px-2.5 py-1.5 resize-none font-mono focus:outline-none focus:border-amber-500/50" />
+            <div className="flex items-center gap-2">
+              <label className="flex items-center gap-1.5 text-xs text-zinc-400">
+                <input type="checkbox" checked={clDraft.published} onChange={(e) => setClDraft({ ...clDraft, published: e.target.checked })} /> Published
+              </label>
+              {clDraft.id && <button onClick={() => setClDraft({ version: '', date: '', entriesText: '', published: true })} className="text-xs text-zinc-500 hover:text-zinc-300">Cancel</button>}
+              <button onClick={saveCl} disabled={!clDraft.version.trim()}
+                className="ml-auto px-3 py-1.5 rounded-md bg-amber-500 hover:bg-amber-400 disabled:opacity-40 text-zinc-950 text-sm font-medium">
+                {clDraft.id ? 'Update' : 'Add release'}
+              </button>
+            </div>
+          </div>
+          <div className="space-y-1.5">
+            {changelog.map((c) => (
+              <div key={c.id} className="flex items-center gap-2 rounded-lg border border-zinc-800 bg-zinc-900/40 px-3 py-2">
+                <span className="text-xs font-mono text-zinc-400">{c.version}</span>
+                <span className="text-[11px] text-zinc-600 truncate flex-1">{(c.entries || []).length} change{(c.entries || []).length !== 1 ? 's' : ''}{c.date ? ` · ${c.date}` : ''}</span>
+                <span className={cn('text-[10px] font-medium', c.published ? 'text-emerald-400' : 'text-zinc-500')}>{c.published ? 'Published' : 'Draft'}</span>
+                <button onClick={() => togglePubCl(c)} className="text-xs text-zinc-400 hover:text-zinc-200">{c.published ? 'Unpublish' : 'Publish'}</button>
+                <button onClick={() => setClDraft({ id: c.id, version: c.version, date: c.date || '', entriesText: entriesToText(c.entries), published: c.published })} className="text-zinc-500 hover:text-zinc-300"><Pencil className="w-3.5 h-3.5" /></button>
+                <button onClick={() => delCl(c)} className="text-zinc-600 hover:text-red-400"><Trash2 className="w-3.5 h-3.5" /></button>
               </div>
             ))}
           </div>
