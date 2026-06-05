@@ -120,6 +120,38 @@ Deno.serve(async (req) => {
       return json({ ok: true });
     }
 
+    if (action === 'announcement-list') {
+      const { data } = await admin.from('announcements').select('*').order('created_date', { ascending: false }).limit(200);
+      return json({ announcements: data || [] });
+    }
+
+    if (action === 'announcement-save') {
+      const a = body.announcement || {};
+      const title = (a.title || '').trim();
+      if (!title) return json({ error: 'title is required' }, 400);
+      const row = {
+        title: title.slice(0, 200),
+        body: (a.body || '').slice(0, 2000) || null,
+        level: ['info', 'warning', 'success'].includes(a.level) ? a.level : 'info',
+        published: !!a.published,
+      };
+      if (a.id) {
+        const { data, error } = await admin.from('announcements')
+          .update({ ...row, updated_date: new Date().toISOString() }).eq('id', a.id).select().single();
+        if (error) return json({ error: error.message }, 400);
+        return json({ announcement: data });
+      }
+      const { data, error } = await admin.from('announcements').insert({ ...row, created_by: me.id }).select().single();
+      if (error) return json({ error: error.message }, 400);
+      return json({ announcement: data });
+    }
+
+    if (action === 'announcement-delete') {
+      if (!body.id) return json({ error: 'id is required' }, 400);
+      await admin.from('announcements').delete().eq('id', body.id);
+      return json({ ok: true });
+    }
+
     return json({ error: 'Unknown action' }, 400);
   } catch (e) {
     if (e instanceof Response) return e;
