@@ -5,7 +5,7 @@ import AuthPanel from '@/components/layout/AuthPanel';
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter,
 } from '@/components/ui/dialog';
-import { Loader2, ShieldAlert, Users, Crown, BookOpen, Layers, Boxes, Trash2, RefreshCw, Bug, Lightbulb, LifeBuoy, Check, Inbox, RotateCcw, Megaphone, Pencil, ScrollText, Palette } from 'lucide-react';
+import { Loader2, ShieldAlert, Users, Crown, BookOpen, Layers, Boxes, Trash2, RefreshCw, Bug, Lightbulb, LifeBuoy, Check, Inbox, RotateCcw, Megaphone, Pencil, ScrollText, Palette, Sun, Moon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Setting } from '@/api/entities';
 import { applyAccent, clearAccent, setAccentCached, DEFAULT_ACCENT } from '@/lib/theme';
@@ -22,9 +22,9 @@ const ACCENT_PRESETS = [
 ];
 
 const FB_META = {
-  bug: { label: 'Bug', Icon: Bug, color: 'text-red-400 bg-red-500/10 border-red-500/30' },
-  feedback: { label: 'Idea', Icon: Lightbulb, color: 'text-amber-400 bg-amber-500/10 border-amber-500/30' },
-  help: { label: 'Help', Icon: LifeBuoy, color: 'text-sky-400 bg-sky-500/10 border-sky-500/30' },
+  bug: { label: 'Bug', Icon: Bug, color: 'text-red-600 dark:text-red-400 bg-red-500/10 border-red-500/30' },
+  feedback: { label: 'Idea', Icon: Lightbulb, color: 'text-amber-600 dark:text-amber-400 bg-amber-500/10 border-amber-500/30' },
+  help: { label: 'Help', Icon: LifeBuoy, color: 'text-sky-600 dark:text-sky-400 bg-sky-500/10 border-sky-500/30' },
 };
 
 const parseEntries = (text) => (text || '').split('\n').map((l) => l.trim()).filter(Boolean).map((l) => {
@@ -43,13 +43,18 @@ function callAdmin(body) {
 
 const fmtDate = (s) => (s ? new Date(s).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '—');
 
+// Shared input styling — light/dark aware.
+const INPUT = 'rounded-md border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:border-amber-500/50';
+const CARD = 'rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/40';
+const ROW = 'rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/40';
+
 function StatCard({ icon: Icon, label, value }) {
   return (
-    <div className="rounded-xl border border-zinc-800 bg-zinc-900/50 p-4">
+    <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/50 p-4">
       <div className="flex items-center gap-2 text-zinc-500 text-xs uppercase tracking-widest mb-1.5">
         <Icon className="w-3.5 h-3.5 text-amber-500" /> {label}
       </div>
-      <p className="text-2xl font-bold text-zinc-100 tabular-nums">{value}</p>
+      <p className="text-2xl font-bold text-zinc-900 dark:text-zinc-100 tabular-nums">{value}</p>
     </div>
   );
 }
@@ -72,7 +77,19 @@ export default function AdminConsole() {
   const [delTarget, setDelTarget] = useState(null);
   const [delConfirm, setDelConfirm] = useState('');
 
-  useEffect(() => { document.documentElement.classList.add('dark'); }, []);
+  // Light/dark theme — shares the app-wide `theme` localStorage key; admin defaults to dark.
+  const [dark, setDark] = useState(() => {
+    const saved = localStorage.getItem('theme');
+    return saved ? saved !== 'light' : true;
+  });
+  useEffect(() => { document.documentElement.classList.toggle('dark', dark); }, [dark]);
+  const toggleTheme = () => {
+    setDark((d) => {
+      const next = !d;
+      localStorage.setItem('theme', next ? 'dark' : 'light');
+      return next;
+    });
+  };
 
   // If the admin previews a color but navigates away without saving, restore the persisted accent.
   const savedAccentRef = React.useRef(null);
@@ -207,6 +224,13 @@ export default function AdminConsole() {
     } finally { setBusy(null); }
   };
 
+  const ThemeButton = (
+    <button onClick={toggleTheme} title={dark ? 'Switch to light mode' : 'Switch to dark mode'}
+      className="p-1.5 rounded-md text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors">
+      {dark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+    </button>
+  );
+
   // ---- gates ----
   if (phase === 'checking' || isLoadingAuth) {
     return <Center><Loader2 className="w-6 h-6 text-amber-500 animate-spin" /></Center>;
@@ -216,7 +240,7 @@ export default function AdminConsole() {
       <Center>
         <div className="text-center">
           <ShieldAlert className="w-10 h-10 text-amber-500 mx-auto mb-3" />
-          <h1 className="text-xl font-bold text-zinc-100 mb-1">GM/OS Admin</h1>
+          <h1 className="text-xl font-bold text-zinc-900 dark:text-zinc-100 mb-1">GM/OS Admin</h1>
           <p className="text-sm text-zinc-500 mb-6">Sign in with an admin account to continue.</p>
           <div className="flex justify-center"><AuthPanel /></div>
         </div>
@@ -228,10 +252,10 @@ export default function AdminConsole() {
       <Center>
         <div className="text-center">
           <ShieldAlert className="w-10 h-10 text-red-500 mx-auto mb-3" />
-          <h1 className="text-xl font-bold text-zinc-100 mb-1">Access denied</h1>
+          <h1 className="text-xl font-bold text-zinc-900 dark:text-zinc-100 mb-1">Access denied</h1>
           <p className="text-sm text-zinc-500 mb-1">{user?.email}</p>
           <p className="text-sm text-zinc-500 mb-6">This account is not an administrator.</p>
-          <button onClick={logout} className="text-sm text-amber-400 hover:underline">Sign out</button>
+          <button onClick={logout} className="text-sm text-amber-600 dark:text-amber-400 hover:underline">Sign out</button>
         </div>
       </Center>
     );
@@ -239,15 +263,16 @@ export default function AdminConsole() {
 
   // ---- console ----
   return (
-    <div className="min-h-screen bg-zinc-950 text-zinc-100">
-      <header className="border-b border-zinc-800 sticky top-0 z-10 bg-zinc-950/90 backdrop-blur">
+    <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100">
+      <header className="border-b border-zinc-200 dark:border-zinc-800 sticky top-0 z-10 bg-zinc-50/90 dark:bg-zinc-950/90 backdrop-blur">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 h-14 flex items-center gap-3">
           <span className="font-bold tracking-tight">GM<span className="text-amber-500">/OS</span> <span className="text-zinc-500 font-normal">Admin</span></span>
-          <button onClick={load} title="Refresh" className="text-zinc-500 hover:text-zinc-300"><RefreshCw className="w-4 h-4" /></button>
+          <button onClick={load} title="Refresh" className="text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300"><RefreshCw className="w-4 h-4" /></button>
           <div className="ml-auto flex items-center gap-3 text-xs text-zinc-500">
             <span className="hidden sm:inline">{user?.email}</span>
-            <a href={import.meta.env.BASE_URL} className="hover:text-zinc-300">← App</a>
-            <button onClick={logout} className="hover:text-zinc-300">Sign out</button>
+            {ThemeButton}
+            <a href={import.meta.env.BASE_URL} className="hover:text-zinc-700 dark:hover:text-zinc-300">← App</a>
+            <button onClick={logout} className="hover:text-zinc-700 dark:hover:text-zinc-300">Sign out</button>
           </div>
         </div>
       </header>
@@ -269,24 +294,24 @@ export default function AdminConsole() {
           <h2 className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-widest text-zinc-500 mb-3">
             <Palette className="w-3.5 h-3.5 text-amber-500" /> Appearance
           </h2>
-          <div className="rounded-xl border border-zinc-800 bg-zinc-900/40 p-4">
-            <p className="text-sm text-zinc-400 mb-4">Brand accent color, applied to every user across the app.</p>
+          <div className={cn(CARD, 'p-4')}>
+            <p className="text-sm text-zinc-600 dark:text-zinc-400 mb-4">Brand accent color, applied to every user across the app.</p>
             <div className="flex flex-wrap items-center gap-4">
-              <label className="relative w-14 h-14 rounded-lg border border-zinc-700 overflow-hidden cursor-pointer shrink-0" style={{ background: accent }} title="Pick a custom color">
+              <label className="relative w-14 h-14 rounded-lg border border-zinc-300 dark:border-zinc-700 overflow-hidden cursor-pointer shrink-0" style={{ background: accent }} title="Pick a custom color">
                 <input type="color" value={accent} onChange={(e) => previewAccent(e.target.value)}
                   className="absolute inset-0 opacity-0 cursor-pointer" />
               </label>
               <div className="flex flex-col gap-1">
-                <span className="text-sm font-mono text-zinc-200 uppercase">{accent}</span>
+                <span className="text-sm font-mono text-zinc-800 dark:text-zinc-200 uppercase">{accent}</span>
                 <span className="text-[11px] text-zinc-500">
                   {savedAccent ? 'Custom accent saved' : 'Using default signal-orange'}
-                  {accentDirty && <span className="text-amber-400"> · unsaved preview</span>}
+                  {accentDirty && <span className="text-amber-600 dark:text-amber-400"> · unsaved preview</span>}
                 </span>
               </div>
               <div className="flex flex-wrap gap-1.5 sm:ml-auto">
                 {ACCENT_PRESETS.map((p) => (
                   <button key={p.hex} onClick={() => previewAccent(p.hex)} title={p.name}
-                    className={cn('w-7 h-7 rounded-md border transition', accent.toLowerCase() === p.hex.toLowerCase() ? 'border-zinc-100 ring-2 ring-zinc-100/30' : 'border-zinc-700 hover:border-zinc-500')}
+                    className={cn('w-7 h-7 rounded-md border transition', accent.toLowerCase() === p.hex.toLowerCase() ? 'border-zinc-900 ring-2 ring-zinc-900/20 dark:border-zinc-100 dark:ring-zinc-100/30' : 'border-zinc-300 dark:border-zinc-700 hover:border-zinc-500')}
                     style={{ background: p.hex }} />
                 ))}
               </div>
@@ -294,15 +319,15 @@ export default function AdminConsole() {
             {/* Live swatch row — these use the accent (amber) scale so they update with the preview */}
             <div className="flex flex-wrap items-center gap-2 mt-4">
               <span className="text-xs px-2.5 py-1 rounded-md bg-amber-500 text-zinc-950 font-medium">Primary button</span>
-              <span className="text-xs px-2.5 py-1 rounded-md border border-amber-500/40 text-amber-400 bg-amber-500/10">Accent tag</span>
+              <span className="text-xs px-2.5 py-1 rounded-md border border-amber-500/40 text-amber-600 dark:text-amber-400 bg-amber-500/10">Accent tag</span>
               <span className="text-amber-500 text-sm font-semibold">Accent text</span>
               <span className="w-5 h-5 rounded-full bg-amber-500 inline-block" />
             </div>
-            <div className="flex items-center gap-2 mt-4 pt-3 border-t border-zinc-800">
+            <div className="flex items-center gap-2 mt-4 pt-3 border-t border-zinc-200 dark:border-zinc-800">
               <button onClick={resetAccent} disabled={accentBusy || (!savedAccent && !accentDirty)}
-                className="text-xs text-zinc-400 hover:text-zinc-200 disabled:opacity-40">Reset to default</button>
+                className="text-xs text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200 disabled:opacity-40">Reset to default</button>
               {accentDirty && <button onClick={() => previewAccent(savedAccent || DEFAULT_ACCENT)} disabled={accentBusy}
-                className="text-xs text-zinc-500 hover:text-zinc-300 disabled:opacity-40">Discard</button>}
+                className="text-xs text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 disabled:opacity-40">Discard</button>}
               <button onClick={saveAccent} disabled={accentBusy || !accentDirty}
                 className="ml-auto inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-amber-500 hover:bg-amber-400 disabled:opacity-40 text-zinc-950 text-sm font-medium">
                 {accentBusy ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />} Save color
@@ -316,21 +341,21 @@ export default function AdminConsole() {
           <h2 className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-widest text-zinc-500 mb-3">
             <Megaphone className="w-3.5 h-3.5 text-amber-500" /> Announcements
           </h2>
-          <div className="rounded-xl border border-zinc-800 bg-zinc-900/40 p-3 space-y-2 mb-3">
+          <div className={cn(CARD, 'p-3 space-y-2 mb-3')}>
             <input value={annDraft.title} onChange={(e) => setAnnDraft({ ...annDraft, title: e.target.value })}
-              placeholder="Title" className="w-full text-sm rounded-md border border-zinc-700 bg-zinc-950 text-zinc-100 px-2.5 py-1.5 focus:outline-none focus:border-amber-500/50" />
+              placeholder="Title" className={cn('w-full text-sm px-2.5 py-1.5', INPUT)} />
             <textarea value={annDraft.body} onChange={(e) => setAnnDraft({ ...annDraft, body: e.target.value })}
-              placeholder="Body (optional)" rows={2} className="w-full text-sm rounded-md border border-zinc-700 bg-zinc-950 text-zinc-200 px-2.5 py-1.5 resize-none focus:outline-none focus:border-amber-500/50" />
+              placeholder="Body (optional)" rows={2} className={cn('w-full text-sm px-2.5 py-1.5 resize-none', INPUT)} />
             <div className="flex items-center gap-2">
               <select value={annDraft.level} onChange={(e) => setAnnDraft({ ...annDraft, level: e.target.value })}
-                className="text-xs rounded border border-zinc-700 bg-zinc-950 text-zinc-200 px-1.5 py-1 focus:outline-none">
+                className={cn('text-xs px-1.5 py-1', INPUT)}>
                 <option value="info">info</option><option value="warning">warning</option><option value="success">success</option>
               </select>
-              <label className="flex items-center gap-1.5 text-xs text-zinc-400">
+              <label className="flex items-center gap-1.5 text-xs text-zinc-600 dark:text-zinc-400">
                 <input type="checkbox" checked={annDraft.published} onChange={(e) => setAnnDraft({ ...annDraft, published: e.target.checked })} /> Published
               </label>
               {annDraft.id && (
-                <button onClick={() => setAnnDraft({ title: '', body: '', level: 'info', published: false })} className="text-xs text-zinc-500 hover:text-zinc-300">Cancel</button>
+                <button onClick={() => setAnnDraft({ title: '', body: '', level: 'info', published: false })} className="text-xs text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300">Cancel</button>
               )}
               <button onClick={saveAnn} disabled={!annDraft.title.trim()}
                 className="ml-auto px-3 py-1.5 rounded-md bg-amber-500 hover:bg-amber-400 disabled:opacity-40 text-zinc-950 text-sm font-medium">
@@ -339,16 +364,16 @@ export default function AdminConsole() {
             </div>
           </div>
           <div className="space-y-1.5">
-            {announcements.length === 0 && <p className="text-sm text-zinc-600 text-center py-3">No announcements yet.</p>}
+            {announcements.length === 0 && <p className="text-sm text-zinc-400 dark:text-zinc-600 text-center py-3">No announcements yet.</p>}
             {announcements.map((a) => (
-              <div key={a.id} className="flex items-center gap-2 rounded-lg border border-zinc-800 bg-zinc-900/40 px-3 py-2">
+              <div key={a.id} className={cn('flex items-center gap-2 px-3 py-2', ROW)}>
                 <span className={cn('text-[10px] font-medium px-1.5 py-0.5 rounded-full border',
-                  a.level === 'warning' ? 'text-red-400 border-red-500/30' : a.level === 'success' ? 'text-emerald-400 border-emerald-500/30' : 'text-amber-400 border-amber-500/30')}>{a.level}</span>
-                <span className="text-sm text-zinc-200 truncate flex-1">{a.title}</span>
-                <span className={cn('text-[10px] font-medium', a.published ? 'text-emerald-400' : 'text-zinc-500')}>{a.published ? 'Published' : 'Draft'}</span>
-                <button onClick={() => togglePub(a)} className="text-xs text-zinc-400 hover:text-zinc-200">{a.published ? 'Unpublish' : 'Publish'}</button>
-                <button onClick={() => setAnnDraft({ id: a.id, title: a.title, body: a.body || '', level: a.level, published: a.published })} className="text-zinc-500 hover:text-zinc-300"><Pencil className="w-3.5 h-3.5" /></button>
-                <button onClick={() => delAnn(a)} className="text-zinc-600 hover:text-red-400"><Trash2 className="w-3.5 h-3.5" /></button>
+                  a.level === 'warning' ? 'text-red-600 dark:text-red-400 border-red-500/30' : a.level === 'success' ? 'text-emerald-600 dark:text-emerald-400 border-emerald-500/30' : 'text-amber-600 dark:text-amber-400 border-amber-500/30')}>{a.level}</span>
+                <span className="text-sm text-zinc-800 dark:text-zinc-200 truncate flex-1">{a.title}</span>
+                <span className={cn('text-[10px] font-medium', a.published ? 'text-emerald-600 dark:text-emerald-400' : 'text-zinc-500')}>{a.published ? 'Published' : 'Draft'}</span>
+                <button onClick={() => togglePub(a)} className="text-xs text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200">{a.published ? 'Unpublish' : 'Publish'}</button>
+                <button onClick={() => setAnnDraft({ id: a.id, title: a.title, body: a.body || '', level: a.level, published: a.published })} className="text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300"><Pencil className="w-3.5 h-3.5" /></button>
+                <button onClick={() => delAnn(a)} className="text-zinc-400 dark:text-zinc-600 hover:text-red-500 dark:hover:text-red-400"><Trash2 className="w-3.5 h-3.5" /></button>
               </div>
             ))}
           </div>
@@ -359,21 +384,21 @@ export default function AdminConsole() {
           <h2 className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-widest text-zinc-500 mb-3">
             <ScrollText className="w-3.5 h-3.5 text-amber-500" /> Changelog
           </h2>
-          <div className="rounded-xl border border-zinc-800 bg-zinc-900/40 p-3 space-y-2 mb-3">
+          <div className={cn(CARD, 'p-3 space-y-2 mb-3')}>
             <div className="flex gap-2">
               <input value={clDraft.version} onChange={(e) => setClDraft({ ...clDraft, version: e.target.value })}
-                placeholder="Version (e.g. 2026-06-04)" className="flex-1 text-sm rounded-md border border-zinc-700 bg-zinc-950 text-zinc-100 px-2.5 py-1.5 font-mono focus:outline-none focus:border-amber-500/50" />
+                placeholder="Version (e.g. 2026-06-04)" className={cn('flex-1 text-sm px-2.5 py-1.5 font-mono', INPUT)} />
               <input value={clDraft.date} onChange={(e) => setClDraft({ ...clDraft, date: e.target.value })}
-                placeholder="Date label (Jun 4, 2026)" className="flex-1 text-sm rounded-md border border-zinc-700 bg-zinc-950 text-zinc-200 px-2.5 py-1.5 focus:outline-none focus:border-amber-500/50" />
+                placeholder="Date label (Jun 4, 2026)" className={cn('flex-1 text-sm px-2.5 py-1.5', INPUT)} />
             </div>
             <textarea value={clDraft.entriesText} onChange={(e) => setClDraft({ ...clDraft, entriesText: e.target.value })}
               placeholder={'One change per line. Prefix with new: / improved: / fixed:\nnew: Added a thing\nfixed: Squashed a bug'}
-              rows={4} className="w-full text-sm rounded-md border border-zinc-700 bg-zinc-950 text-zinc-200 px-2.5 py-1.5 resize-none font-mono focus:outline-none focus:border-amber-500/50" />
+              rows={4} className={cn('w-full text-sm px-2.5 py-1.5 resize-none font-mono', INPUT)} />
             <div className="flex items-center gap-2">
-              <label className="flex items-center gap-1.5 text-xs text-zinc-400">
+              <label className="flex items-center gap-1.5 text-xs text-zinc-600 dark:text-zinc-400">
                 <input type="checkbox" checked={clDraft.published} onChange={(e) => setClDraft({ ...clDraft, published: e.target.checked })} /> Published
               </label>
-              {clDraft.id && <button onClick={() => setClDraft({ version: '', date: '', entriesText: '', published: true })} className="text-xs text-zinc-500 hover:text-zinc-300">Cancel</button>}
+              {clDraft.id && <button onClick={() => setClDraft({ version: '', date: '', entriesText: '', published: true })} className="text-xs text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300">Cancel</button>}
               <button onClick={saveCl} disabled={!clDraft.version.trim()}
                 className="ml-auto px-3 py-1.5 rounded-md bg-amber-500 hover:bg-amber-400 disabled:opacity-40 text-zinc-950 text-sm font-medium">
                 {clDraft.id ? 'Update' : 'Add release'}
@@ -382,13 +407,13 @@ export default function AdminConsole() {
           </div>
           <div className="space-y-1.5">
             {changelog.map((c) => (
-              <div key={c.id} className="flex items-center gap-2 rounded-lg border border-zinc-800 bg-zinc-900/40 px-3 py-2">
-                <span className="text-xs font-mono text-zinc-400">{c.version}</span>
-                <span className="text-[11px] text-zinc-600 truncate flex-1">{(c.entries || []).length} change{(c.entries || []).length !== 1 ? 's' : ''}{c.date ? ` · ${c.date}` : ''}</span>
-                <span className={cn('text-[10px] font-medium', c.published ? 'text-emerald-400' : 'text-zinc-500')}>{c.published ? 'Published' : 'Draft'}</span>
-                <button onClick={() => togglePubCl(c)} className="text-xs text-zinc-400 hover:text-zinc-200">{c.published ? 'Unpublish' : 'Publish'}</button>
-                <button onClick={() => setClDraft({ id: c.id, version: c.version, date: c.date || '', entriesText: entriesToText(c.entries), published: c.published })} className="text-zinc-500 hover:text-zinc-300"><Pencil className="w-3.5 h-3.5" /></button>
-                <button onClick={() => delCl(c)} className="text-zinc-600 hover:text-red-400"><Trash2 className="w-3.5 h-3.5" /></button>
+              <div key={c.id} className={cn('flex items-center gap-2 px-3 py-2', ROW)}>
+                <span className="text-xs font-mono text-zinc-600 dark:text-zinc-400">{c.version}</span>
+                <span className="text-[11px] text-zinc-400 dark:text-zinc-600 truncate flex-1">{(c.entries || []).length} change{(c.entries || []).length !== 1 ? 's' : ''}{c.date ? ` · ${c.date}` : ''}</span>
+                <span className={cn('text-[10px] font-medium', c.published ? 'text-emerald-600 dark:text-emerald-400' : 'text-zinc-500')}>{c.published ? 'Published' : 'Draft'}</span>
+                <button onClick={() => togglePubCl(c)} className="text-xs text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200">{c.published ? 'Unpublish' : 'Publish'}</button>
+                <button onClick={() => setClDraft({ id: c.id, version: c.version, date: c.date || '', entriesText: entriesToText(c.entries), published: c.published })} className="text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300"><Pencil className="w-3.5 h-3.5" /></button>
+                <button onClick={() => delCl(c)} className="text-zinc-400 dark:text-zinc-600 hover:text-red-500 dark:hover:text-red-400"><Trash2 className="w-3.5 h-3.5" /></button>
               </div>
             ))}
           </div>
@@ -397,10 +422,10 @@ export default function AdminConsole() {
         {/* Users */}
         <section>
           <h2 className="text-xs font-semibold uppercase tracking-widest text-zinc-500 mb-3">Users ({users.length})</h2>
-          <div className="rounded-xl border border-zinc-800 overflow-hidden">
+          <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
-                <thead className="bg-zinc-900/60 text-zinc-500 text-xs uppercase tracking-wider">
+                <thead className="bg-zinc-100 dark:bg-zinc-900/60 text-zinc-500 text-xs uppercase tracking-wider">
                   <tr>
                     <th className="text-left font-medium px-3 py-2">User</th>
                     <th className="text-left font-medium px-3 py-2">Plan</th>
@@ -410,28 +435,28 @@ export default function AdminConsole() {
                     <th className="px-3 py-2"></th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-zinc-800/70">
+                <tbody className="divide-y divide-zinc-200 dark:divide-zinc-800/70">
                   {users.map((u) => (
-                    <tr key={u.id} className="hover:bg-zinc-900/40">
+                    <tr key={u.id} className="bg-white dark:bg-transparent hover:bg-zinc-50 dark:hover:bg-zinc-900/40">
                       <td className="px-3 py-2">
                         <div className="flex items-center gap-2">
-                          <span className="text-zinc-200 truncate max-w-[220px]">{u.email}</span>
-                          {u.is_admin && <span className="text-[10px] font-bold text-amber-400 border border-amber-500/30 bg-amber-500/10 rounded px-1">ADMIN</span>}
+                          <span className="text-zinc-800 dark:text-zinc-200 truncate max-w-[220px]">{u.email}</span>
+                          {u.is_admin && <span className="text-[10px] font-bold text-amber-600 dark:text-amber-400 border border-amber-500/30 bg-amber-500/10 rounded px-1">ADMIN</span>}
                         </div>
-                        {u.name && <span className="text-[11px] text-zinc-600">{u.name} · {u.provider}</span>}
+                        {u.name && <span className="text-[11px] text-zinc-400 dark:text-zinc-600">{u.name} · {u.provider}</span>}
                       </td>
                       <td className="px-3 py-2">
                         <select
                           value={u.plan}
                           disabled={busy === u.id || u.is_admin}
                           onChange={(e) => setPlan(u, e.target.value)}
-                          className="text-xs rounded border border-zinc-700 bg-zinc-950 text-zinc-200 px-1.5 py-1 disabled:opacity-50 focus:outline-none focus:border-amber-500/50"
+                          className={cn('text-xs px-1.5 py-1 disabled:opacity-50', INPUT)}
                         >
                           <option value="free">free</option>
                           <option value="plus">plus</option>
                         </select>
                       </td>
-                      <td className="px-3 py-2 text-right tabular-nums text-zinc-400">{u.campaigns}</td>
+                      <td className="px-3 py-2 text-right tabular-nums text-zinc-600 dark:text-zinc-400">{u.campaigns}</td>
                       <td className="px-3 py-2 text-zinc-500 hidden md:table-cell">{fmtDate(u.created_at)}</td>
                       <td className="px-3 py-2 text-zinc-500 hidden lg:table-cell">{fmtDate(u.last_sign_in_at)}</td>
                       <td className="px-3 py-2 text-right">
@@ -440,7 +465,7 @@ export default function AdminConsole() {
                             onClick={() => { setDelTarget(u); setDelConfirm(''); }}
                             disabled={busy === u.id}
                             title="Delete user"
-                            className="text-zinc-600 hover:text-red-400 disabled:opacity-50"
+                            className="text-zinc-400 dark:text-zinc-600 hover:text-red-500 dark:hover:text-red-400 disabled:opacity-50"
                           >
                             {busy === u.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
                           </button>
@@ -460,37 +485,37 @@ export default function AdminConsole() {
             <h2 className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-widest text-zinc-500">
               <Inbox className="w-3.5 h-3.5 text-amber-500" /> Feedback ({feedback.filter((f) => f.status !== 'resolved').length} open)
             </h2>
-            <button onClick={() => setShowResolved((v) => !v)} className="text-xs text-zinc-500 hover:text-zinc-300">
+            <button onClick={() => setShowResolved((v) => !v)} className="text-xs text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300">
               {showResolved ? 'Hide resolved' : 'Show resolved'}
             </button>
           </div>
           <div className="space-y-2">
             {feedback.filter((f) => showResolved || f.status !== 'resolved').length === 0 && (
-              <p className="text-sm text-zinc-600 text-center py-6">No {showResolved ? '' : 'open '}feedback.</p>
+              <p className="text-sm text-zinc-400 dark:text-zinc-600 text-center py-6">No {showResolved ? '' : 'open '}feedback.</p>
             )}
             {feedback.filter((f) => showResolved || f.status !== 'resolved').map((f) => {
               const m = FB_META[f.type] || FB_META.feedback;
               const resolved = f.status === 'resolved';
               return (
-                <div key={f.id} className={cn('rounded-xl border border-zinc-800 bg-zinc-900/40 p-3', resolved && 'opacity-60')}>
+                <div key={f.id} className={cn(CARD, 'p-3', resolved && 'opacity-60')}>
                   <div className="flex items-center gap-2 mb-1.5 flex-wrap">
                     <span className={cn('text-[10px] font-medium px-1.5 py-0.5 rounded-full border inline-flex items-center gap-1', m.color)}>
                       <m.Icon className="w-3 h-3" /> {m.label}
                     </span>
-                    <span className="text-xs text-zinc-400 truncate max-w-[200px]">{f.user_email || 'anonymous'}</span>
-                    <span className="text-[10px] text-zinc-600">{fmtDate(f.created_date)}</span>
+                    <span className="text-xs text-zinc-600 dark:text-zinc-400 truncate max-w-[200px]">{f.user_email || 'anonymous'}</span>
+                    <span className="text-[10px] text-zinc-400 dark:text-zinc-600">{fmtDate(f.created_date)}</span>
                     <div className="ml-auto flex items-center gap-1">
                       <button onClick={() => fbStatus(f, resolved ? 'open' : 'resolved')} title={resolved ? 'Reopen' : 'Mark resolved'}
-                        className={cn('w-6 h-6 flex items-center justify-center rounded', resolved ? 'text-zinc-500 hover:text-zinc-300' : 'text-emerald-500 hover:text-emerald-400')}>
+                        className={cn('w-6 h-6 flex items-center justify-center rounded', resolved ? 'text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300' : 'text-emerald-600 dark:text-emerald-500 hover:text-emerald-500 dark:hover:text-emerald-400')}>
                         {resolved ? <RotateCcw className="w-3.5 h-3.5" /> : <Check className="w-3.5 h-3.5" />}
                       </button>
-                      <button onClick={() => fbDelete(f)} title="Delete" className="w-6 h-6 flex items-center justify-center rounded text-zinc-600 hover:text-red-400">
+                      <button onClick={() => fbDelete(f)} title="Delete" className="w-6 h-6 flex items-center justify-center rounded text-zinc-400 dark:text-zinc-600 hover:text-red-500 dark:hover:text-red-400">
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>
                     </div>
                   </div>
-                  <p className="text-sm text-zinc-300 whitespace-pre-wrap leading-relaxed">{f.message}</p>
-                  {f.page && <p className="text-[10px] text-zinc-600 mt-1.5 font-mono truncate">{f.page}</p>}
+                  <p className="text-sm text-zinc-700 dark:text-zinc-300 whitespace-pre-wrap leading-relaxed">{f.message}</p>
+                  {f.page && <p className="text-[10px] text-zinc-400 dark:text-zinc-600 mt-1.5 font-mono truncate">{f.page}</p>}
                 </div>
               );
             })}
@@ -500,10 +525,10 @@ export default function AdminConsole() {
 
       {/* Delete confirmation */}
       <Dialog open={!!delTarget} onOpenChange={(o) => { if (!o) { setDelTarget(null); setDelConfirm(''); } }}>
-        <DialogContent className="bg-zinc-900 border-zinc-800">
+        <DialogContent className="bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800">
           <DialogHeader>
-            <DialogTitle className="text-zinc-100">Delete user?</DialogTitle>
-            <DialogDescription className="text-zinc-400">
+            <DialogTitle className="text-zinc-900 dark:text-zinc-100">Delete user?</DialogTitle>
+            <DialogDescription className="text-zinc-600 dark:text-zinc-400">
               Permanently erases <span className="font-medium">{delTarget?.email}</span> and all their campaigns and data.
               There is no recovery. Type the email to confirm.
             </DialogDescription>
@@ -512,11 +537,11 @@ export default function AdminConsole() {
             value={delConfirm}
             onChange={(e) => setDelConfirm(e.target.value)}
             placeholder={delTarget?.email}
-            className="rounded-md border border-zinc-800 bg-zinc-950 text-zinc-100 px-3 py-2 text-sm focus:outline-none focus:border-red-500/50"
+            className="rounded-md border border-zinc-300 dark:border-zinc-800 bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 px-3 py-2 text-sm focus:outline-none focus:border-red-500/50"
             autoFocus
           />
           <DialogFooter>
-            <button onClick={() => { setDelTarget(null); setDelConfirm(''); }} className="text-sm text-zinc-400 px-3">Cancel</button>
+            <button onClick={() => { setDelTarget(null); setDelConfirm(''); }} className="text-sm text-zinc-600 dark:text-zinc-400 px-3">Cancel</button>
             <button
               onClick={doDelete}
               disabled={delConfirm !== delTarget?.email || busy === delTarget?.id}
@@ -532,5 +557,5 @@ export default function AdminConsole() {
 }
 
 function Center({ children }) {
-  return <div className="min-h-screen bg-zinc-950 flex items-center justify-center p-4">{children}</div>;
+  return <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 flex items-center justify-center p-4">{children}</div>;
 }
