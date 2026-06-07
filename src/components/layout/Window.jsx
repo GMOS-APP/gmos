@@ -7,6 +7,18 @@ import WindowContent from './WindowContent';
 const MIN_W = 360;
 const MIN_H = 240;
 
+// Edge + corner drag zones. Edges are inset so the corners own the ends.
+const RESIZE_HANDLES = [
+  { dir: 'n', className: 'top-0 left-3 right-3 h-1.5', cursor: 'ns-resize' },
+  { dir: 's', className: 'bottom-0 left-3 right-3 h-1.5', cursor: 'ns-resize' },
+  { dir: 'e', className: 'right-0 top-3 bottom-3 w-1.5', cursor: 'ew-resize' },
+  { dir: 'w', className: 'left-0 top-3 bottom-3 w-1.5', cursor: 'ew-resize' },
+  { dir: 'nw', className: 'top-0 left-0 w-3 h-3', cursor: 'nwse-resize' },
+  { dir: 'se', className: 'bottom-0 right-0 w-3 h-3', cursor: 'nwse-resize' },
+  { dir: 'ne', className: 'top-0 right-0 w-3 h-3', cursor: 'nesw-resize' },
+  { dir: 'sw', className: 'bottom-0 left-0 w-3 h-3', cursor: 'nesw-resize' },
+];
+
 export default function Window({ win, containerRef }) {
   const wm = useWindowManager();
   const dragState = useRef(null);
@@ -26,12 +38,12 @@ export default function Window({ win, containerRef }) {
     dragState.current = { mode: 'move', startX: e.clientX, startY: e.clientY, x: win.x, y: win.y };
     attach();
   };
-  const onResizeStart = (e) => {
+  const onResizeStart = (dir) => (e) => {
     if (maximized) return;
     e.preventDefault();
     e.stopPropagation();
     wm.focusWindow(win.id);
-    dragState.current = { mode: 'resize', startX: e.clientX, startY: e.clientY, w: win.w, h: win.h };
+    dragState.current = { mode: 'resize', dir, startX: e.clientX, startY: e.clientY, x: win.x, y: win.y, w: win.w, h: win.h };
     attach();
   };
 
@@ -44,9 +56,20 @@ export default function Window({ win, containerRef }) {
       const ny = Math.min(Math.max(0, s.y + (e.clientY - s.startY)), Math.max(0, b.h - 40));
       wm.setRect(win.id, { x: nx, y: ny });
     } else {
-      const nw = Math.min(Math.max(MIN_W, s.w + (e.clientX - s.startX)), b.w - win.x);
-      const nh = Math.min(Math.max(MIN_H, s.h + (e.clientY - s.startY)), b.h - win.y);
-      wm.setRect(win.id, { w: nw, h: nh });
+      const dx = e.clientX - s.startX;
+      const dy = e.clientY - s.startY;
+      let { x, y, w, h } = s;
+      if (s.dir.includes('e')) w = s.w + dx;
+      if (s.dir.includes('s')) h = s.h + dy;
+      if (s.dir.includes('w')) { w = s.w - dx; x = s.x + dx; }
+      if (s.dir.includes('n')) { h = s.h - dy; y = s.y + dy; }
+      // Honor minimums (anchor the opposite edge when dragging n/w).
+      if (w < MIN_W) { if (s.dir.includes('w')) x = s.x + (s.w - MIN_W); w = MIN_W; }
+      if (h < MIN_H) { if (s.dir.includes('n')) y = s.y + (s.h - MIN_H); h = MIN_H; }
+      // Keep inside the desktop.
+      x = Math.max(0, x); y = Math.max(0, y);
+      w = Math.min(w, b.w - x); h = Math.min(h, b.h - y);
+      wm.setRect(win.id, { x, y, w, h });
     }
   };
   const onUp = () => { dragState.current = null; detach(); };
@@ -123,15 +146,17 @@ export default function Window({ win, containerRef }) {
         <WindowContent id={win.id} url={win.url} />
       </div>
 
-      {/* Resize handle */}
-      {!maximized && (
+      {/* Resize handles — drag any edge or corner */}
+      {!maximized && RESIZE_HANDLES.map(({ dir, className, cursor }) => (
         <div
-          onPointerDown={onResizeStart}
-          className="absolute bottom-0 right-0 w-4 h-4 cursor-nwse-resize z-10"
-          style={{ touchAction: 'none' }}
-        >
-          <div className="absolute bottom-1 right-1 w-2 h-2 border-r-2 border-b-2 border-zinc-400 dark:border-zinc-600" />
-        </div>
+          key={dir}
+          onPointerDown={onResizeStart(dir)}
+          className={cn('absolute z-20', className)}
+          style={{ cursor, touchAction: 'none' }}
+        />
+      ))}
+      {!maximized && (
+        <div className="absolute bottom-1 right-1 w-2 h-2 border-r-2 border-b-2 border-zinc-400 dark:border-zinc-600 pointer-events-none z-20" />
       )}
     </div>
   );
