@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { usePageParams } from '@/lib/usePageParams';
 import { CampaignProvider } from '@/lib/CampaignContext';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Campaign, WorldEntity, Session } from '@/api/entities';
@@ -79,7 +80,7 @@ function CampaignBrief({ campaign }) {
 }
 
 export default function CampaignDashboard() {
-  const params = new URLSearchParams(window.location.search);
+  const params = usePageParams();
   const campaignId = params.get('id');
   const queryClient = useQueryClient();
   const [togglingShare, setTogglingShare] = useState(false);

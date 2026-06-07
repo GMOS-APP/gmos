@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { CAMPAIGN_NAV_ITEMS, navHref } from '@/lib/navItems';
 import { createPageUrl } from '@/utils';
+import { useWindowManager } from '@/lib/WindowManager';
 import { auth } from '@/api/entities';
 import FeedbackButton from '@/components/layout/FeedbackButton';
 import { PanelLeft, LogOut, UserCog } from 'lucide-react';
@@ -12,6 +13,7 @@ import { cn } from '@/lib/utils';
 // and a sign-out action so it stands in fully for the docked sidebar.
 export default function NavMenu({ open, onClose, campaignId, onDock }) {
   const navigate = useNavigate();
+  const wm = useWindowManager();
   const ref = useRef(null);
   const [user, setUser] = useState(null);
 
@@ -38,6 +40,7 @@ export default function NavMenu({ open, onClose, campaignId, onDock }) {
 
   const itemClass = 'w-full flex items-center gap-2.5 px-2 py-1.5 rounded-md text-sm text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/50';
   const go = (href) => { onClose(); navigate(href); };
+  const openWin = (href) => { onClose(); if (wm) wm.openWindow(href); else navigate(href); };
   const signOut = () => { onClose(); sessionStorage.removeItem('gmos_booted'); auth.logout(); };
 
   return (
@@ -50,7 +53,7 @@ export default function NavMenu({ open, onClose, campaignId, onDock }) {
       </div>
       <div className="p-1.5 max-h-[60vh] overflow-y-auto">
         {CAMPAIGN_NAV_ITEMS.map((it) => (
-          <button key={it.page} onClick={() => go(navHref(it, campaignId))} className={itemClass}>
+          <button key={it.page} onClick={() => openWin(navHref(it, campaignId))} className={itemClass}>
             <it.Icon className="w-4 h-4 text-zinc-400 dark:text-zinc-500 flex-shrink-0" />
             <span>{it.label}</span>
           </button>

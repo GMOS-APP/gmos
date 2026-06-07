@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { LayoutGrid, Search } from 'lucide-react';
 import { Session } from '@/api/entities';
 import { createPageUrl } from '@/utils';
-import Breadcrumbs from '@/components/layout/Breadcrumbs';
+import { useWindowManager, titleOf } from '@/lib/WindowManager';
 import TrayAudioPlayer from '@/components/layout/TrayAudioPlayer';
 import TrayNotifications from '@/components/layout/TrayNotifications';
 import TrayTools from '@/components/layout/TrayTools';
@@ -21,9 +21,10 @@ const MODES = {
 
 // Full-width OS taskbar: Start button, system state, breadcrumbs, and a
 // clustered system tray (search, live activity, theme, clock).
-export default function Taskbar({ campaign, currentPageName, startActive, onStart, onSearch }) {
+export default function Taskbar({ campaign, startActive, onStart, onSearch }) {
   const fetching = useIsFetching();
   const navigate = useNavigate();
+  const wm = useWindowManager();
   const [now, setNow] = useState(() => new Date());
 
   useEffect(() => {
@@ -42,14 +43,17 @@ export default function Taskbar({ campaign, currentPageName, startActive, onStar
   const mode = MODES[campaign?.active_mode] || MODES.prep;
   const time = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
+  // Open windows through the manager when present; fall back to routing.
+  const open = (url) => { if (wm) wm.openWindow(url); else navigate(url); };
+
   // Jump to the live session (or the latest one) when the mode badge is clicked.
   const goToSession = () => {
     if (!campaign?.id) return;
     const target = sessions.find((s) => s.status === 'in_progress') || sessions[0];
     if (target) {
-      navigate(createPageUrl('SessionPage') + `?id=${campaign.id}&session_id=${target.id}`);
+      open(createPageUrl('SessionPage') + `?id=${campaign.id}&session_id=${target.id}`);
     } else {
-      navigate(createPageUrl('SessionBrowser') + `?campaign_id=${campaign.id}`);
+      open(createPageUrl('SessionBrowser') + `?campaign_id=${campaign.id}`);
     }
   };
 
@@ -85,9 +89,7 @@ export default function Taskbar({ campaign, currentPageName, startActive, onStar
         {mode.label}
       </button>
 
-      <div className="hidden md:flex flex-1 min-w-0 items-center pl-1">
-        <Breadcrumbs currentPageName={currentPageName} campaign={campaign} />
-      </div>
+      <WindowStrip wm={wm} />
 
       {/* System tray */}
       <div data-tour="tray" className="ml-auto flex items-center gap-0.5 pl-1 pr-1 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900/60">
@@ -114,5 +116,42 @@ export default function Taskbar({ campaign, currentPageName, startActive, onStar
         <span className="hidden sm:inline px-2 font-mono text-[11px] tabular-nums text-zinc-600 dark:text-zinc-400">{time}</span>
       </div>
     </header>
+  );
+}
+
+// Window buttons living in the top bar: one per open window. Click to
+// focus/restore, click the active one to minimize, × to close.
+function WindowStrip({ wm }) {
+  if (!wm || !wm.windows.length) return <div className="flex-1 min-w-0" />;
+  return (
+    <div className="flex-1 min-w-0 flex items-center gap-1 overflow-x-auto pl-1" style={{ scrollbarWidth: 'none' }}>
+      {wm.windows.map((w) => {
+        const active = wm.focusedId === w.id && !w.minimized;
+        return (
+          <button
+            key={w.id}
+            onClick={() => (active ? wm.minimizeWindow(w.id) : wm.focusWindow(w.id))}
+            title={titleOf(w.url)}
+            className={cn(
+              'group flex items-center gap-1.5 h-9 sm:h-7 px-2 rounded-md text-[11px] font-medium whitespace-nowrap transition-colors max-w-[160px] flex-shrink-0',
+              active
+                ? 'bg-amber-500/15 text-amber-600 dark:text-amber-400'
+                : w.minimized
+                  ? 'text-zinc-400 dark:text-zinc-600 hover:bg-zinc-100 dark:hover:bg-zinc-800/60'
+                  : 'text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800/60'
+            )}
+          >
+            <span className={cn('w-1.5 h-1.5 rounded-full shrink-0', active ? 'bg-amber-500' : 'bg-zinc-400 dark:bg-zinc-600')} />
+            <span className="truncate">{titleOf(w.url)}</span>
+            <span
+              role="button"
+              tabIndex={-1}
+              onClick={(e) => { e.stopPropagation(); wm.closeWindow(w.id); }}
+              className="opacity-0 group-hover:opacity-100 text-zinc-400 hover:text-red-500 ml-0.5 leading-none"
+            >×</span>
+          </button>
+        );
+      })}
+    </div>
   );
 }

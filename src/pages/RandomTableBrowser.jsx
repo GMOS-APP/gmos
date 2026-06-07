@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { usePageParams } from '@/lib/usePageParams';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Campaign, RandomTable } from '@/api/entities';
 import { Plus, Dices } from 'lucide-react';
@@ -17,7 +18,7 @@ const CATEGORIES = [
 ];
 
 export default function RandomTableBrowser() {
-  const params = new URLSearchParams(window.location.search);
+  const params = usePageParams();
   const campaignId = params.get('campaign_id');
   const queryClient = useQueryClient();
 

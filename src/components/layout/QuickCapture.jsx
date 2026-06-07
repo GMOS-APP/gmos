@@ -6,16 +6,21 @@ import { Plus, X } from 'lucide-react';
 import { QuickNote } from '@/api/entities';
 import QuickNoteInput from '@/components/session/QuickNoteInput';
 import { ENTITY_CREATE_TYPES } from '@/lib/entityCreateTypes';
+import { useWindowManager, paramsOf } from '@/lib/WindowManager';
 
 export default function QuickCapture({ campaignId, open, onOpenChange }) {
   const cardRef = useRef(null);
   const navigate = useNavigate();
+  const wm = useWindowManager();
   const queryClient = useQueryClient();
   const [saved, setSaved] = useState(false);
 
-  // Link the note to the current session when we're on a session page;
-  // otherwise it's a campaign-wide note. Read at render so it tracks the page.
-  const sessionId = new URLSearchParams(window.location.search).get('session_id');
+  const go = (href) => { if (wm) wm.openWindow(href); else navigate(href); };
+
+  // Link the note to the focused session window when one is open; otherwise
+  // it's a campaign-wide note.
+  const focused = wm?.windows.find((w) => w.id === wm.focusedId);
+  const sessionId = focused ? paramsOf(focused.url).get('session_id') : null;
 
   useEffect(() => {
     if (!open) return;
@@ -53,7 +58,7 @@ export default function QuickCapture({ campaignId, open, onOpenChange }) {
 
   function handleSelect(type) {
     onOpenChange(false);
-    navigate(createPageUrl('EntityDetail') + `?new=true&type=${type}&campaign_id=${campaignId}`);
+    go(createPageUrl('EntityDetail') + `?new=true&type=${type}&campaign_id=${campaignId}`);
   }
 
   return (
@@ -86,7 +91,7 @@ export default function QuickCapture({ campaignId, open, onOpenChange }) {
             </span>
             {saved && (
               <button
-                onClick={() => { onOpenChange(false); navigate(createPageUrl('CampaignNotes') + `?campaign_id=${campaignId}`); }}
+                onClick={() => { onOpenChange(false); go(createPageUrl('CampaignNotes') + `?campaign_id=${campaignId}`); }}
                 className="text-[10px] font-medium text-emerald-600 dark:text-emerald-400 hover:underline"
               >
                 ✓ Saved — view

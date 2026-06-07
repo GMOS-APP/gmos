@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { usePageParams } from '@/lib/usePageParams';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { WorldEntity, Relationship } from '@/api/entities';
 import { Network, Calendar, Plus, Filter, X } from 'lucide-react';
@@ -42,7 +43,7 @@ function toggleInSet(set, value) {
 }
 
 export default function RelationshipMap() {
-  const params = new URLSearchParams(window.location.search);
+  const params = usePageParams();
   const campaignId = params.get('campaign_id');
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingRel, setEditingRel] = useState(null);
