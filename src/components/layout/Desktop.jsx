@@ -1,9 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useWindowManager } from '@/lib/WindowManager';
+import { UploadFile } from '@/api/entities';
 import Window from './Window';
-import { LayoutGrid, Check } from 'lucide-react';
+import { LayoutGrid, Check, Upload, Loader2 } from 'lucide-react';
 
 const STORAGE = 'gmos_wallpaper';
+const URL_STORAGE = 'gmos_wallpaper_url';
 
 // Each wallpaper is a stack of absolutely-positioned layers, light/dark aware.
 const WALLPAPERS = {
@@ -47,19 +49,49 @@ const WALLPAPER_KEYS = Object.keys(WALLPAPERS);
 export default function Desktop({ dashboardUrl }) {
   const wm = useWindowManager();
   const ref = useRef(null);
+  const fileRef = useRef(null);
   const [wallpaper, setWallpaper] = useState(() => {
     try { return localStorage.getItem(STORAGE) || DEFAULT_WALLPAPER; } catch { return DEFAULT_WALLPAPER; }
   });
+  const [customUrl, setCustomUrl] = useState(() => {
+    try { return localStorage.getItem(URL_STORAGE) || null; } catch { return null; }
+  });
+  const [uploading, setUploading] = useState(false);
   const [menu, setMenu] = useState(null); // { x, y } | null
 
   const visible = wm.windows.filter((w) => !w.minimized);
   const hasWindows = wm.windows.length > 0;
-  const wp = WALLPAPERS[wallpaper] || WALLPAPERS[DEFAULT_WALLPAPER];
+
+  // A custom uploaded image, or one of the built-in presets.
+  const customLayers = [
+    <div key="img" className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url("${customUrl}")` }} />,
+    <div key="ov" className="absolute inset-0 bg-black/10 dark:bg-black/40" />,
+  ];
+  const wp = (wallpaper === 'custom' && customUrl)
+    ? { label: 'Custom', layers: customLayers }
+    : (WALLPAPERS[wallpaper] || WALLPAPERS[DEFAULT_WALLPAPER]);
 
   const pickWallpaper = (key) => {
     setWallpaper(key);
     try { localStorage.setItem(STORAGE, key); } catch { /* ignore */ }
     setMenu(null);
+  };
+
+  const onFileChange = async (e) => {
+    const file = e.target.files?.[0];
+    e.target.value = '';
+    if (!file) return;
+    setUploading(true);
+    try {
+      const { file_url } = await UploadFile({ file });
+      setCustomUrl(file_url);
+      try { localStorage.setItem(URL_STORAGE, file_url); } catch { /* ignore */ }
+      pickWallpaper('custom');
+    } catch (err) {
+      alert(err?.message || 'Upload failed');
+    } finally {
+      setUploading(false);
+    }
   };
 
   // Right-click the empty desktop → wallpaper menu (positioned within bounds).
@@ -130,6 +162,32 @@ export default function Desktop({ dashboardUrl }) {
               {wallpaper === key && <Check className="w-3.5 h-3.5 text-amber-500" />}
             </button>
           ))}
+
+          <div className="my-1 h-px bg-zinc-200 dark:bg-zinc-800" />
+
+          {customUrl && (
+            <button
+              onClick={() => pickWallpaper('custom')}
+              className="w-full flex items-center gap-2.5 px-3 py-1.5 text-sm text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+            >
+              <span className="w-5 h-5 rounded border border-zinc-300 dark:border-zinc-700 bg-cover bg-center flex-shrink-0" style={{ backgroundImage: `url("${customUrl}")` }} />
+              <span className="flex-1 text-left">Custom image</span>
+              {wallpaper === 'custom' && <Check className="w-3.5 h-3.5 text-amber-500" />}
+            </button>
+          )}
+
+          <button
+            onClick={() => fileRef.current?.click()}
+            disabled={uploading}
+            className="w-full flex items-center gap-2.5 px-3 py-1.5 text-sm text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors disabled:opacity-60"
+          >
+            <span className="w-5 h-5 rounded flex items-center justify-center flex-shrink-0 text-zinc-500">
+              {uploading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Upload className="w-3.5 h-3.5" />}
+            </span>
+            <span className="flex-1 text-left">{uploading ? 'Uploading…' : 'Upload image…'}</span>
+          </button>
+
+          <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={onFileChange} />
         </div>
       )}
     </div>
