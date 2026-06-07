@@ -17,7 +17,6 @@ import {
   Church,
   Flame,
   ShoppingBag,
-  LogOut,
   UserCog,
 } from 'lucide-react';
 import { CAMPAIGN_NAV_ITEMS, navHref } from '@/lib/navItems';
@@ -214,23 +213,7 @@ export default function Sidebar({ campaign, collapsed, onToggle, onNavClick }) {
             <div className="flex-1 min-w-0">
               <p className="text-xs font-medium text-zinc-900 dark:text-zinc-200 truncate">{user.full_name || user.email}</p>
             </div>
-            <button
-              onClick={() => { sessionStorage.removeItem('gmos_booted'); auth.logout(); }}
-              title="Sign out"
-              className="p-1 rounded text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 hover:bg-zinc-200 dark:hover:bg-zinc-700"
-            >
-              <LogOut className="w-3.5 h-3.5" />
-            </button>
           </div>
-        )}
-        {user && collapsed && (
-          <button
-            onClick={() => { sessionStorage.removeItem('gmos_booted'); auth.logout(); }}
-            title="Sign out"
-            className="w-full flex items-center justify-center p-2 rounded-lg text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800/50"
-          >
-            <LogOut className="w-4 h-4" />
-          </button>
         )}
       </div>
     </aside>
