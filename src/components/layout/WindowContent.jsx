@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useContext, useMemo } from 'react';
 import {
   UNSAFE_LocationContext as LocationContext,
   UNSAFE_NavigationContext as NavigationContext,
@@ -38,6 +38,7 @@ const toHref = (to) => (typeof to === 'string' ? to : `${to.pathname || ''}${to.
 // in-window navigation back through the WindowManager — no page changes needed.
 export default function WindowContent({ id, url }) {
   const wm = useWindowManager();
+  const parentNav = useContext(NavigationContext); // inherit basename/future from the top router
   const { pathname, search } = splitUrl(url);
 
   const location = useMemo(
@@ -60,7 +61,9 @@ export default function WindowContent({ id, url }) {
     };
   }, [id, wm]);
 
-  const navContext = useMemo(() => ({ basename: '', navigator, static: false }), [navigator]);
+  // Base on the parent router's context so future flags (v7_relativeSplatPath,
+  // etc.) and basename are preserved; only the navigator is swapped per window.
+  const navContext = useMemo(() => ({ ...parentNav, navigator, static: false }), [parentNav, navigator]);
   const locContext = useMemo(() => ({ location, navigationType: 'PUSH' }), [location]);
   const routeContext = useMemo(() => ({ outlet: null, matches: [], isDataRoute: false }), []);
 
