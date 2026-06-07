@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useIsFetching, useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
-import { LayoutGrid, Search } from 'lucide-react';
-import { Session } from '@/api/entities';
+import { LayoutGrid, Search, LogOut } from 'lucide-react';
+import { Session, auth } from '@/api/entities';
 import { createPageUrl } from '@/utils';
 import { useWindowManager, titleOf } from '@/lib/WindowManager';
 import TrayAudioPlayer from '@/components/layout/TrayAudioPlayer';
@@ -45,6 +45,8 @@ export default function Taskbar({ campaign, startActive, onStart, onSearch }) {
 
   // Open windows through the manager when present; fall back to routing.
   const open = (url) => { if (wm) wm.openWindow(url); else navigate(url); };
+
+  const signOut = () => { sessionStorage.removeItem('gmos_booted'); auth.logout(); };
 
   // Jump to the live session (or the latest one) when the mode badge is clicked.
   const goToSession = () => {
@@ -114,6 +116,14 @@ export default function Taskbar({ campaign, startActive, onStart, onSearch }) {
         )}
         <ThemeToggle className="h-10 w-10 sm:h-7 sm:w-7 flex items-center justify-center" />
         <span className="hidden sm:inline px-2 font-mono text-[11px] tabular-nums text-zinc-600 dark:text-zinc-400">{time}</span>
+        <button
+          onClick={signOut}
+          title="Sign out"
+          aria-label="Sign out"
+          className="h-10 w-10 sm:h-7 sm:w-7 flex items-center justify-center rounded-md text-zinc-500 hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-red-500 dark:hover:text-red-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/50"
+        >
+          <LogOut className="w-4 h-4 sm:w-3.5 sm:h-3.5" />
+        </button>
       </div>
     </header>
   );

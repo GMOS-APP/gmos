@@ -5,8 +5,7 @@ import { createPageUrl } from '@/utils';
 import { useWindowManager } from '@/lib/WindowManager';
 import { auth } from '@/api/entities';
 import FeedbackButton from '@/components/layout/FeedbackButton';
-import { PanelLeft, LogOut, UserCog } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { PanelLeft, UserCog } from 'lucide-react';
 
 // Floating navigation dropdown shown when the sidebar is undocked. Includes a
 // "Dock sidebar" action to bring it back to the left, plus the signed-in user
@@ -41,7 +40,6 @@ export default function NavMenu({ open, onClose, campaignId, onDock }) {
   const itemClass = 'w-full flex items-center gap-2.5 px-2 py-1.5 rounded-md text-sm text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/50';
   const go = (href) => { onClose(); navigate(href); };
   const openWin = (href) => { onClose(); if (wm) wm.openWindow(href); else navigate(href); };
-  const signOut = () => { onClose(); sessionStorage.removeItem('gmos_booted'); auth.logout(); };
 
   return (
     <div ref={ref} className="fixed left-2 top-12 sm:top-11 z-50 w-60 max-w-[calc(100vw-1rem)] rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-2xl overflow-hidden">
@@ -75,13 +73,6 @@ export default function NavMenu({ open, onClose, campaignId, onDock }) {
           <span>Account settings</span>
         </button>
         <FeedbackButton onOpen={onClose} className={itemClass} />
-        <button
-          onClick={signOut}
-          className={cn(itemClass, 'text-zinc-600 dark:text-zinc-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-500/10 dark:hover:bg-red-500/10')}
-        >
-          <LogOut className="w-4 h-4 flex-shrink-0" />
-          <span>Sign out</span>
-        </button>
       </div>
     </div>
   );
