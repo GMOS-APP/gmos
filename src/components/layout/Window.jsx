@@ -1,4 +1,5 @@
 import React, { useRef } from 'react';
+import { X, Minus, Square, Copy } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useWindowManager, titleOf } from '@/lib/WindowManager';
 import WindowContent from './WindowContent';
@@ -59,13 +60,20 @@ export default function Window({ win, containerRef }) {
     ? { left: 0, top: 0, right: 0, bottom: 0, zIndex: win.z }
     : { left: win.x, top: win.y, width: win.w, height: win.h, zIndex: win.z };
 
-  const Ctrl = ({ onClick, title, className, children }) => (
+  const Ctrl = ({ onClick, title, icon: Icon, hover }) => (
     <button
       onClick={(e) => { e.stopPropagation(); onClick(); }}
       onPointerDown={(e) => e.stopPropagation()}
       title={title}
-      className={cn('w-3.5 h-3.5 rounded-[3px] flex items-center justify-center transition-colors', className)}
-    >{children}</button>
+      aria-label={title}
+      className={cn(
+        'w-4 h-4 rounded-[4px] flex items-center justify-center transition-colors',
+        'bg-zinc-200/80 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400',
+        hover,
+      )}
+    >
+      <Icon className="w-2.5 h-2.5" strokeWidth={2.75} />
+    </button>
   );
 
   return (
@@ -92,17 +100,16 @@ export default function Window({ win, containerRef }) {
         )}
       >
         <div className="flex items-center gap-1.5">
-          <Ctrl onClick={() => wm.closeWindow(win.id)} title="Close"
-            className="bg-zinc-300 dark:bg-zinc-700 hover:bg-amber-500 text-transparent hover:text-zinc-950">
-            <span className="text-[9px] leading-none font-bold">×</span>
-          </Ctrl>
+          <Ctrl onClick={() => wm.closeWindow(win.id)} title="Close" icon={X}
+            hover="hover:bg-red-500 hover:text-white" />
           {!mobile && (
-            <Ctrl onClick={() => wm.minimizeWindow(win.id)} title="Minimize"
-              className="bg-zinc-300 dark:bg-zinc-700 hover:bg-zinc-400 dark:hover:bg-zinc-600" />
+            <Ctrl onClick={() => wm.minimizeWindow(win.id)} title="Minimize" icon={Minus}
+              hover="hover:bg-amber-500 hover:text-zinc-950" />
           )}
           {!mobile && (
             <Ctrl onClick={() => wm.toggleMaximize(win.id)} title={maximized ? 'Restore' : 'Maximize'}
-              className="bg-zinc-300 dark:bg-zinc-700 hover:bg-zinc-400 dark:hover:bg-zinc-600" />
+              icon={maximized ? Copy : Square}
+              hover="hover:bg-zinc-300 dark:hover:bg-zinc-600 hover:text-zinc-900 dark:hover:text-zinc-100" />
           )}
         </div>
         <span className={cn('text-xs font-semibold uppercase tracking-widest truncate',
