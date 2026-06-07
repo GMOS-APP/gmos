@@ -1,4 +1,5 @@
 import React from 'react';
+import { usePageParams } from '@/lib/usePageParams';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { PartyInventory, PlayerNote, Campaign } from '@/api/entities';
 import PartyInventoryManager from '@/components/party/PartyInventoryManager';
@@ -6,7 +7,7 @@ import PartyNotes from '@/components/party/PartyNotes';
 import { Backpack } from 'lucide-react';
 
 export default function PartyInventoryPage() {
-  const params = new URLSearchParams(window.location.search);
+  const params = usePageParams();
   const campaignId = params.get('campaign_id') || params.get('id');
   const qc = useQueryClient();
 

@@ -12,6 +12,7 @@ import {
 } from '@/components/ui/command';
 import { CalendarDays, Plus, Dices, Compass } from 'lucide-react';
 import { CAMPAIGN_NAV_ITEMS, navHref } from '@/lib/navItems';
+import { useWindowManager } from '@/lib/WindowManager';
 import { useNotifications } from '@/lib/NotificationContext';
 
 // Inline dice: "2d6+3", "d20", "roll 1d8-1".
@@ -33,6 +34,7 @@ function rollDice({ count, sides, mod }) {
 export default function CommandPalette({ open, onOpenChange, campaignId, onStartTour }) {
   const [query, setQuery] = useState('');
   const navigate = useNavigate();
+  const wm = useWindowManager();
   const notifier = useNotifications();
 
   const { data: entities = [] } = useQuery({
@@ -93,7 +95,7 @@ export default function CommandPalette({ open, onOpenChange, campaignId, onStart
   const run = (href) => {
     onOpenChange(false);
     setQuery('');
-    navigate(href);
+    if (wm) wm.openWindow(href); else navigate(href);
   };
 
   const handleOpenChange = (next) => {

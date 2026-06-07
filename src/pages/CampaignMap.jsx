@@ -1,4 +1,5 @@
 import React, { useState, useRef, useCallback } from 'react';
+import { usePageParams } from '@/lib/usePageParams';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { CampaignMap as CampaignMapEntity, WorldEntity, UploadFile } from '@/api/entities';
 import {
@@ -14,7 +15,7 @@ import PinLocationPicker from '@/components/map/PinLocationPicker';
 import DysonLogosImporter from '@/components/map/DysonLogosImporter';
 
 export default function CampaignMap() {
-  const params = new URLSearchParams(window.location.search);
+  const params = usePageParams();
   const campaignId = params.get('campaign_id') || params.get('id');
   const queryClient = useQueryClient();
 

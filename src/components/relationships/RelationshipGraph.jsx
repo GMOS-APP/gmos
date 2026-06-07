@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { createPageUrl } from '@/utils';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 
 const ENTITY_ICONS = {
   npc: '👤',
@@ -18,6 +18,7 @@ const ENTITY_ICONS = {
 
 export default function RelationshipGraph({ entities, relationships, onEditRelationship }) {
   const canvasRef = useRef(null);
+  const campaignId = new URLSearchParams(useLocation().search).get('campaign_id');
   const [nodes, setNodes] = useState([]);
   const [selectedNode, setSelectedNode] = useState(null);
   const [hoveredNode, setHoveredNode] = useState(null);
@@ -253,7 +254,7 @@ export default function RelationshipGraph({ entities, relationships, onEditRelat
               </Badge>
             </div>
             <Link
-              to={createPageUrl('EntityDetail') + `?id=${selectedNode.id}&campaign_id=${new URLSearchParams(window.location.search).get('campaign_id')}`}
+              to={createPageUrl('EntityDetail') + `?id=${selectedNode.id}&campaign_id=${campaignId}`}
               className="text-xs text-amber-500 hover:text-amber-400"
             >
               View Details →

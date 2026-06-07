@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { usePageParams } from '@/lib/usePageParams';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Campaign, Session, WorldEntity, QuickNote } from '@/api/entities';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -108,7 +109,7 @@ function exportSessionAsMarkdown(session, formData) {
 }
 
 export default function SessionPage() {
-  const params = new URLSearchParams(window.location.search);
+  const params = usePageParams();
   const campaignId = params.get('id') || params.get('campaign_id');
   const sessionId = params.get('session_id');
   const isNewSession = params.get('new') === 'true';

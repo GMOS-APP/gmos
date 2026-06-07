@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { usePageParams } from '@/lib/usePageParams';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Campaign, functions } from '@/api/entities';
 import { useNavigate } from 'react-router-dom';
@@ -22,7 +23,7 @@ const STATUS_OPTIONS = [
 ];
 
 export default function CampaignSettings() {
-  const params = new URLSearchParams(window.location.search);
+  const params = usePageParams();
   const campaignId = params.get('campaign_id') || params.get('id');
   const queryClient = useQueryClient();
   const navigate = useNavigate();

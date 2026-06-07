@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { usePageParams } from '@/lib/usePageParams';
 import { useQuery } from '@tanstack/react-query';
 import { Campaign, WorldEntity, Session } from '@/api/entities';
 import PlayerEntityModal from '@/components/common/PlayerEntityModal';
@@ -20,7 +21,7 @@ const VISIBILITY_LABELS = {
 };
 
 export default function PlayerView() {
-  const params = new URLSearchParams(window.location.search);
+  const params = usePageParams();
   const campaignId = params.get('campaign_id');
   const [activeType, setActiveType] = useState('all');
   const [selected, setSelected] = useState(null);

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { usePageParams } from '@/lib/usePageParams';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { QuickNote, Session, WorldEntity } from '@/api/entities';
 import { Link } from 'react-router-dom';
@@ -139,7 +140,7 @@ function NoteColumns({ children }) {
 }
 
 export default function CampaignNotes() {
-  const params = new URLSearchParams(window.location.search);
+  const params = usePageParams();
   const campaignId = params.get('campaign_id') || params.get('id');
   const queryClient = useQueryClient();
 

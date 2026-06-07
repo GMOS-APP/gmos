@@ -22,6 +22,7 @@ import {
 } from 'lucide-react';
 import { CAMPAIGN_NAV_ITEMS, navHref } from '@/lib/navItems';
 import FeedbackButton from '@/components/layout/FeedbackButton';
+import { useWindowManager, pageKeyOf, paramsOf } from '@/lib/WindowManager';
 import { cn } from '@/lib/utils';
 
 const entityGroups = [
@@ -61,11 +62,25 @@ const entityGroups = [
 
 export default function Sidebar({ campaign, collapsed, onToggle, onNavClick }) {
   const location = useLocation();
+  const wm = useWindowManager();
   const [user, setUser] = useState(null);
 
   useEffect(() => {
     auth.me().then(setUser).catch(() => {});
   }, []);
+
+  // Active state follows the focused window (the manager's source of truth),
+  // not the top-level route which only reflects the entry page.
+  const focused = wm?.windows.find((w) => w.id === wm.focusedId);
+  const activeUrl = focused?.url || (location.pathname + location.search);
+  const activePage = pageKeyOf(activeUrl);
+  const activeType = paramsOf(activeUrl).get('type');
+
+  // Open campaign pages as windows; let other links route normally.
+  const openInWindow = (e, href) => {
+    if (wm) { e.preventDefault(); wm.openWindow(href); }
+    onNavClick?.();
+  };
 
   if (!campaign) return null;
 
@@ -105,13 +120,13 @@ export default function Sidebar({ campaign, collapsed, onToggle, onNavClick }) {
       {/* Navigation */}
       <nav data-tour="nav" className="flex-1 overflow-y-auto p-2 space-y-1">
         {CAMPAIGN_NAV_ITEMS.map(({ page, label, Icon, param }) => {
-          const isActive = location.pathname === createPageUrl(page);
+          const isActive = activePage === page;
           const href = navHref({ page, param }, campaign.id);
           return (
             <Link
               key={page}
               data-tour={`nav-${page}`}
-              onClick={onNavClick}
+              onClick={(e) => openInWindow(e, href)}
               to={href}
               className={cn(
                 "relative overflow-hidden flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/50",
@@ -142,12 +157,13 @@ export default function Sidebar({ campaign, collapsed, onToggle, onNavClick }) {
             )}
             {group.items.map((item) => {
               const Icon = item.icon;
-              const isActive = location.search.includes(`type=${item.type}`);
+              const isActive = activePage === 'EntityBrowser' && activeType === item.type;
+              const href = createPageUrl('EntityBrowser') + `?campaign_id=${campaign.id}&type=${item.type}`;
               return (
                 <Link
                   key={item.type}
-                  onClick={onNavClick}
-                  to={createPageUrl('EntityBrowser') + `?campaign_id=${campaign.id}&type=${item.type}`}
+                  onClick={(e) => openInWindow(e, href)}
+                  to={href}
                   className={cn(
                     "relative overflow-hidden flex items-center gap-3 px-3 py-1.5 rounded-lg text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/50",
                     isActive

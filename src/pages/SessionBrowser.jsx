@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { usePageParams } from '@/lib/usePageParams';
 import { useQuery } from '@tanstack/react-query';
 import { Campaign, Session } from '@/api/entities';
 import { Link } from 'react-router-dom';
@@ -63,7 +64,7 @@ function SessionRow({ s, campaignId }) {
 }
 
 export default function SessionBrowser() {
-  const params = new URLSearchParams(window.location.search);
+  const params = usePageParams();
   const campaignId = params.get('campaign_id') || params.get('id');
   const [showNewDialog, setShowNewDialog] = useState(false);
   const [view, setView] = useState('list');
