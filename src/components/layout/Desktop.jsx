@@ -114,7 +114,7 @@ export default function Desktop({ dashboardUrl }) {
   }, [menu]);
 
   return (
-    <div ref={ref} onContextMenu={onContextMenu} className="relative flex-1 min-h-0 overflow-hidden">
+    <div ref={ref} onContextMenu={onContextMenu} className="relative isolate flex-1 min-h-0 overflow-hidden">
       {/* Wallpaper layers (transparent to right-click via data attr) */}
       <div data-wallpaper-layer className="absolute inset-0 pointer-events-none">{wp.layers}</div>
 
@@ -143,7 +143,7 @@ export default function Desktop({ dashboardUrl }) {
       {/* Wallpaper context menu */}
       {menu && (
         <div
-          className="absolute z-[60] w-44 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-2xl py-1"
+          className="absolute z-[9999] w-44 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-2xl py-1"
           style={{ left: menu.x, top: menu.y }}
           onPointerDown={(e) => e.stopPropagation()}
           onContextMenu={(e) => e.preventDefault()}
