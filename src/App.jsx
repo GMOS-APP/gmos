@@ -13,6 +13,7 @@ import Terms from '@/pages/Terms';
 import AdminConsole from '@/pages/AdminConsole';
 import AccentSync from '@/lib/AccentSync';
 import ChangelogDialog from '@/components/layout/ChangelogDialog';
+import EasterEggHost from '@/components/easter/EasterEggHost';
 import BootSequence from '@/components/layout/BootSequence';
 import { AudioPlayerProvider } from '@/lib/AudioPlayerContext';
 import { NotificationProvider } from '@/lib/NotificationContext';
@@ -44,6 +45,7 @@ const AuthenticatedApp = () => {
     <>
     <BootSequence />
     <ChangelogDialog />
+    <EasterEggHost />
     <Routes>
       <Route path="/" element={
         <LayoutWrapper currentPageName={mainPageKey}>

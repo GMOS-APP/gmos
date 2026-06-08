@@ -190,6 +190,22 @@ export default function CommandPalette({ open, onOpenChange, campaignId, onStart
           </CommandGroup>
         )}
 
+        {(q === 'xyzzy' || q === 'plugh') && (
+          <CommandGroup heading="???">
+            <CommandItem
+              value="deep-delve"
+              onSelect={() => {
+                onOpenChange(false);
+                setQuery('');
+                window.dispatchEvent(new CustomEvent('gmos:easter-egg', { detail: 'delve' }));
+              }}
+            >
+              <Compass className="text-amber-500" />
+              <span>A hollow voice says &ldquo;Deep Delve&rdquo;…</span>
+            </CommandItem>
+          </CommandGroup>
+        )}
+
         {onStartTour && (matches('take the tour') || matches('tour') || matches('help') || matches('walkthrough')) && (
           <CommandGroup heading="Help">
             <CommandItem
