@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { cn } from '@/lib/utils';
 
 // Reusable token layer: a map image with draggable tokens positioned in
@@ -13,18 +13,36 @@ export default function TokenLayer({
 }) {
   const wrapRef = useRef(null);
   const drag = useRef(null); // { id, lastSent }
+  const [size, setSize] = useState({ w: 0, h: 0 });
 
-  const snap = (v) => {
+  // Track the rendered size so the grid can use SQUARE pixel cells (a %-based
+  // grid is rectangular on a non-square image).
+  useEffect(() => {
+    const el = wrapRef.current;
+    if (!el) return undefined;
+    const update = () => setSize({ w: el.clientWidth, h: el.clientHeight });
+    update();
+    const ro = new ResizeObserver(update);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+
+  const cellPx = gridCols > 0 && size.w ? size.w / gridCols : 0;
+  const cellPctX = gridCols > 0 ? 100 / gridCols : 0;
+  const cellPctY = cellPx && size.h ? (cellPx / size.h) * 100 : cellPctX; // square cell as % of height
+
+  const snap = (v, axis) => {
     if (!gridCols) return Math.max(0, Math.min(100, v));
-    const cell = 100 / gridCols;
+    const cell = axis === 'y' ? cellPctY : cellPctX;
+    if (!cell) return Math.max(0, Math.min(100, v));
     return Math.max(0, Math.min(100, (Math.floor(v / cell) + 0.5) * cell));
   };
 
   const pointToPct = (e) => {
     const r = wrapRef.current.getBoundingClientRect();
     return {
-      x: snap(((e.clientX - r.left) / r.width) * 100),
-      y: snap(((e.clientY - r.top) / r.height) * 100),
+      x: snap(((e.clientX - r.left) / r.width) * 100, 'x'),
+      y: snap(((e.clientY - r.top) / r.height) * 100, 'y'),
     };
   };
 
@@ -56,9 +74,9 @@ export default function TokenLayer({
 
   const gridStyle = gridCols > 0 ? {
     backgroundImage:
-      'linear-gradient(to right, rgba(255,255,255,0.12) 1px, transparent 1px),' +
-      'linear-gradient(to bottom, rgba(255,255,255,0.12) 1px, transparent 1px)',
-    backgroundSize: `${100 / gridCols}% ${100 / gridCols}%`,
+      'linear-gradient(to right, rgba(0,0,0,0.45) 1px, transparent 1px),' +
+      'linear-gradient(to bottom, rgba(0,0,0,0.45) 1px, transparent 1px)',
+    backgroundSize: cellPx ? `${cellPx}px ${cellPx}px` : `${100 / gridCols}% ${100 / gridCols}%`,
   } : null;
 
   return (
