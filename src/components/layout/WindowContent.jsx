@@ -62,9 +62,13 @@ export default function WindowContent({ id, url }) {
     };
   }, [id, wm]);
 
-  // Base on the parent router's context so future flags (v7_relativeSplatPath,
-  // etc.) and basename are preserved; only the navigator is swapped per window.
-  const navContext = useMemo(() => ({ ...parentNav, navigator, static: false }), [parentNav, navigator]);
+  // Inherit the parent's future flags (v7_relativeSplatPath, etc.) but force an
+  // EMPTY basename: useNavigate/<Link> otherwise prepend the app basename
+  // (/GM-OS/ in production) before calling our navigator, so navTo would see
+  // "/GM-OS/EntityDetail", mis-route it (pageKeyOf → "GM-OS/…"), escape to the
+  // top router, and double the basename → 404. With basename '' the navigator
+  // receives clean paths like "/EntityDetail".
+  const navContext = useMemo(() => ({ ...parentNav, navigator, static: false, basename: '' }), [parentNav, navigator]);
   const locContext = useMemo(() => ({ location, navigationType: 'PUSH' }), [location]);
   const routeContext = useMemo(() => ({ outlet: null, matches: [], isDataRoute: false }), []);
 
