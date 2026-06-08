@@ -24,6 +24,7 @@ export default function BattleMap() {
   const fileRef = useRef(null);
   const tokensRef = useRef(tokens);
   tokensRef.current = tokens;
+  const draggingRef = useRef(null);
 
   const { data: maps = [] } = useQuery({
     queryKey: ['battle-maps', campaignId],
@@ -49,6 +50,14 @@ export default function BattleMap() {
   const channel = useBattleMapChannel(mapId, (msg) => {
     if (msg.type === 'move') {
       setTokens((prev) => prev.map((t) => (t.id === msg.tokenId ? { ...t, x: msg.x, y: msg.y } : t)));
+    } else if (msg.type === 'db') {
+      if (!Array.isArray(msg.tokens)) return;
+      setTokens((prev) => {
+        const id = draggingRef.current;
+        if (!id) return msg.tokens;
+        const cur = prev.find((t) => t.id === id);
+        return msg.tokens.map((t) => (t.id === id && cur ? { ...t, x: cur.x, y: cur.y } : t));
+      });
     } else if (msg.type === 'sync') {
       qc.invalidateQueries({ queryKey: ['battle-maps', campaignId] });
     }
@@ -64,10 +73,12 @@ export default function BattleMap() {
 
   // ── Token movement ─────────────────────────────────────────────────────────
   const onMoveLive = (id, x, y) => {
+    draggingRef.current = id;
     setTokens((prev) => prev.map((t) => (t.id === id ? { ...t, x, y } : t)));
     channel.sendMove(id, x, y);
   };
   const onMoveEnd = (id, x, y) => {
+    draggingRef.current = null;
     const next = tokensRef.current.map((t) => (t.id === id ? { ...t, x, y } : t));
     setTokens(next);
     channel.sendMove(id, x, y);

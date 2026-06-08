@@ -13,6 +13,7 @@ export default function PlayerBattleMap({ token }) {
   const [tokens, setTokens] = useState([]);
   const tokensRef = useRef([]);
   tokensRef.current = tokens;
+  const draggingRef = useRef(null);
 
   const load = async () => {
     try {
@@ -23,14 +24,28 @@ export default function PlayerBattleMap({ token }) {
   useEffect(() => { if (token) load(); }, [token]); // eslint-disable-line
 
   const channel = useBattleMapChannel(map?.id, (msg) => {
-    if (msg.type === 'move') setTokens((p) => p.map((t) => (t.id === msg.tokenId ? { ...t, x: msg.x, y: msg.y } : t)));
-    else if (msg.type === 'sync') load();
+    if (msg.type === 'move') {
+      setTokens((p) => p.map((t) => (t.id === msg.tokenId ? { ...t, x: msg.x, y: msg.y } : t)));
+    } else if (msg.type === 'db') {
+      if (Array.isArray(msg.tokens)) {
+        setTokens((prev) => {
+          const id = draggingRef.current;
+          if (!id) return msg.tokens;
+          const cur = prev.find((t) => t.id === id);
+          return msg.tokens.map((t) => (t.id === id && cur ? { ...t, x: cur.x, y: cur.y } : t));
+        });
+      }
+      setMap((m) => (m ? { ...m, locked: msg.locked, grid_cols: msg.grid_cols, image_url: msg.image_url } : m));
+    } else if (msg.type === 'sync') {
+      load();
+    }
   });
 
   if (!map) return null;
 
-  const onMoveLive = (id, x, y) => { setTokens((p) => p.map((t) => (t.id === id ? { ...t, x, y } : t))); channel.sendMove(id, x, y); };
+  const onMoveLive = (id, x, y) => { draggingRef.current = id; setTokens((p) => p.map((t) => (t.id === id ? { ...t, x, y } : t))); channel.sendMove(id, x, y); };
   const onMoveEnd = (id, x, y) => {
+    draggingRef.current = null;
     const next = tokensRef.current.map((t) => (t.id === id ? { ...t, x, y } : t));
     setTokens(next);
     channel.sendMove(id, x, y);
