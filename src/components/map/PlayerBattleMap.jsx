@@ -8,7 +8,7 @@ import { useBattleMapChannel } from '@/lib/useBattleMapChannel';
 // the token-gated `battle-map` edge function, shows live token movement over a
 // Realtime broadcast channel, and lets players drag tokens (unless locked),
 // persisting drops through the same function.
-export default function PlayerBattleMap({ token }) {
+export default function PlayerBattleMap({ token, onHasMap }) {
   const [map, setMap] = useState(null);
   const [tokens, setTokens] = useState([]);
   const tokensRef = useRef([]);
@@ -18,7 +18,7 @@ export default function PlayerBattleMap({ token }) {
   const load = async () => {
     try {
       const { data } = await supabase.functions.invoke('battle-map', { body: { token, action: 'get' } });
-      if (data && !data.error) { setMap(data.map || null); setTokens(data.map?.tokens || []); }
+      if (data && !data.error) { setMap(data.map || null); setTokens(data.map?.tokens || []); onHasMap?.(!!data.map); }
     } catch { /* non-fatal */ }
   };
   useEffect(() => { if (token) load(); }, [token]); // eslint-disable-line
@@ -53,7 +53,7 @@ export default function PlayerBattleMap({ token }) {
   };
 
   return (
-    <div className="mt-12">
+    <div>
       <div className="flex items-center gap-2 mb-3">
         <Swords className="w-4 h-4 text-amber-400" />
         <h2 className="text-xs font-semibold uppercase tracking-widest text-zinc-500">

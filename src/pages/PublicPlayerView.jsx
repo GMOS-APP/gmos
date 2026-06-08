@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/api/supabaseClient';
 import { Eye, EyeOff, Loader2, Backpack, MessageSquare } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -35,6 +35,7 @@ export default function PublicPlayerView() {
   const [inv, setInv] = useState([]);
   const [currency, setCurrency] = useState({});
   const [pnotes, setPnotes] = useState([]);
+  const [hasMap, setHasMap] = useState(false);
 
   // The public share view is dark-only; ensure the `dark` class is set so
   // themed components (the entity modal) render consistently.
@@ -71,6 +72,30 @@ export default function PublicPlayerView() {
     }
     load();
   }, [token]);
+
+  // Re-pull the player-safe projection (entities + sessions) when the GM changes
+  // something — triggered by the campaign's realtime signal below.
+  const refreshView = useCallback(async () => {
+    if (!token) return;
+    try {
+      const { data } = await supabase.functions.invoke('player-view', { body: { token } });
+      if (data && !data.error) { setEntities(data.entities || []); setSessions(data.sessions || []); }
+    } catch { /* non-fatal */ }
+  }, [token]);
+
+  // Live entity reveals: a DB trigger bumps `campaign_pulse` on any world-entity
+  // change; we subscribe to that secrets-free row via postgres_changes and
+  // debounce-refetch through the edge function, so reveals appear without a
+  // refresh. (No entity data is ever exposed to the anon client directly.)
+  useEffect(() => {
+    if (!campaign?.id) return undefined;
+    let t;
+    const ch = supabase.channel(`pulse:${campaign.id}`)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'campaign_pulse', filter: `campaign_id=eq.${campaign.id}` },
+        () => { clearTimeout(t); t = setTimeout(refreshView, 400); })
+      .subscribe();
+    return () => { clearTimeout(t); supabase.removeChannel(ch); };
+  }, [campaign?.id, refreshView]);
 
   const visible = entities.filter(e => TYPE_META[e.entity_type]);
   const types = [...new Set(visible.map(e => e.entity_type))];
@@ -124,140 +149,116 @@ export default function PublicPlayerView() {
     );
   }
 
+  const frame = 'rounded-xl border border-zinc-800 bg-zinc-900/40 p-4';
+  const frameHeading = 'flex items-center gap-2 mb-3 text-xs font-semibold uppercase tracking-widest text-zinc-500';
+
   return (
     <div className="min-h-screen bg-zinc-950 text-zinc-100">
-      <div className="max-w-4xl mx-auto p-4 sm:p-6 lg:p-8">
-
-        {/* Header */}
-        <div className="mb-8">
-          <div className="flex items-center gap-2 mb-1">
+      {/* Header bar (full width) */}
+      <div className="border-b border-zinc-800/70">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4">
+          <div className="flex items-center gap-2 mb-0.5">
             <Eye className="w-4 h-4 text-amber-400" />
             <span className="text-xs font-semibold uppercase tracking-widest text-zinc-500">Player View</span>
           </div>
-          <h1 className="text-3xl font-bold text-zinc-100">{campaign?.name || 'Campaign'}</h1>
-          {campaign?.setting && (
-            <p className="text-sm text-zinc-500 mt-1">{campaign.setting}</p>
+          <h1 className="text-2xl sm:text-3xl font-bold text-zinc-100">{campaign?.name || 'Campaign'}</h1>
+          {campaign?.setting && <p className="text-sm text-zinc-500 mt-0.5">{campaign.setting}</p>}
+        </div>
+      </div>
+
+      {/* Map on the left, everything else in frames on the right */}
+      <div className={cn('max-w-7xl mx-auto p-4 sm:p-6', hasMap && 'lg:grid lg:grid-cols-[1.5fr_1fr] lg:gap-6 lg:items-start')}>
+        {/* LEFT — battle map (kept mounted so it can detect when a map goes live) */}
+        <div className={cn('mb-6 lg:mb-0 lg:sticky lg:top-4', !hasMap && 'hidden')}>
+          <PlayerBattleMap token={token} onHasMap={setHasMap} />
+        </div>
+
+        {/* RIGHT — stacked frames */}
+        <div className="space-y-6 min-w-0">
+          {/* Previously… */}
+          {lastDebriefed?.previous_session_recap && (
+            <div className="rounded-xl border border-amber-500/20 bg-amber-500/5 p-4">
+              <p className="text-xs font-semibold uppercase tracking-wider text-amber-500 mb-2">Previously…</p>
+              <p className="text-sm text-zinc-300 leading-relaxed italic">{lastDebriefed.previous_session_recap}</p>
+            </div>
           )}
-        </div>
 
-        {/* Last session recap */}
-        {lastDebriefed?.previous_session_recap && (
-          <div className="mb-8 rounded-xl border border-amber-500/20 bg-amber-500/5 p-4">
-            <p className="text-xs font-semibold uppercase tracking-wider text-amber-500 mb-2">Previously…</p>
-            <p className="text-sm text-zinc-300 leading-relaxed italic">{lastDebriefed.previous_session_recap}</p>
-          </div>
-        )}
-
-        {/* Type filter */}
-        {types.length > 1 && (
-          <div className="flex gap-2 flex-wrap mb-6">
-            <button
-              onClick={() => setActiveType('all')}
-              className={cn('px-3 py-1 rounded-full text-xs font-medium transition-colors',
-                activeType === 'all'
-                  ? 'bg-amber-500 text-zinc-950'
-                  : 'bg-zinc-800 text-zinc-400 hover:bg-zinc-700'
-              )}
-            >
-              All ({visible.length})
-            </button>
-            {types.map(type => {
-              const meta = TYPE_META[type];
-              if (!meta) return null;
-              const count = visible.filter(e => e.entity_type === type).length;
-              return (
-                <button
-                  key={type}
-                  onClick={() => setActiveType(type)}
-                  className={cn('px-3 py-1 rounded-full text-xs font-medium transition-colors',
-                    activeType === type
-                      ? 'bg-amber-500 text-zinc-950'
-                      : 'bg-zinc-800 text-zinc-400 hover:bg-zinc-700'
-                  )}
-                >
-                  {meta.label} ({count})
+          {/* Revealed entities */}
+          <div className={frame}>
+            <div className={frameHeading}><Eye className="w-4 h-4 text-amber-400" /> Revealed</div>
+            {types.length > 1 && (
+              <div className="flex gap-2 flex-wrap mb-3">
+                <button onClick={() => setActiveType('all')}
+                  className={cn('px-3 py-1 rounded-full text-xs font-medium transition-colors', activeType === 'all' ? 'bg-amber-500 text-zinc-950' : 'bg-zinc-800 text-zinc-400 hover:bg-zinc-700')}>
+                  All ({visible.length})
                 </button>
-              );
-            })}
+                {types.map((type) => {
+                  const meta = TYPE_META[type];
+                  if (!meta) return null;
+                  const count = visible.filter((e) => e.entity_type === type).length;
+                  return (
+                    <button key={type} onClick={() => setActiveType(type)}
+                      className={cn('px-3 py-1 rounded-full text-xs font-medium transition-colors', activeType === type ? 'bg-amber-500 text-zinc-950' : 'bg-zinc-800 text-zinc-400 hover:bg-zinc-700')}>
+                      {meta.label} ({count})
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+            {filtered.length === 0 ? (
+              <div className="text-center py-10">
+                <Eye className="w-10 h-10 text-zinc-700 mx-auto mb-3" />
+                <p className="text-zinc-400 text-sm font-medium mb-1">Nothing revealed yet</p>
+                <p className="text-xs text-zinc-600">Entries appear here when the GM marks them “Players Know” or “Suspect”.</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 gap-2">
+                {filtered.map((entity) => {
+                  const meta = TYPE_META[entity.entity_type] || {};
+                  const Icon = meta.icon || Eye;
+                  const vis = VISIBILITY_LABELS[entity.visibility];
+                  const VisIcon = vis?.icon;
+                  return (
+                    <button key={entity.id} onClick={() => setSelected(entity)}
+                      className="text-left flex gap-3 p-2.5 rounded-lg border border-zinc-800 bg-zinc-900/40 hover:border-amber-500/40 hover:bg-zinc-900 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/50">
+                      <div className={cn('w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5', meta.bg)}>
+                        <Icon className={cn('w-4 h-4', meta.accent)} />
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-2 mb-0.5">
+                          <p className="text-sm font-semibold text-zinc-200 truncate">{entity.name}</p>
+                          {vis && VisIcon && (
+                            <span className={cn('flex items-center gap-0.5 text-[10px] font-medium flex-shrink-0', vis.color)}>
+                              <VisIcon className="w-2.5 h-2.5" /> {vis.label}
+                            </span>
+                          )}
+                        </div>
+                        {entity.summary && <p className="text-xs text-zinc-500 line-clamp-2 leading-snug">{entity.summary}</p>}
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            )}
           </div>
-        )}
 
-        {/* Entity grid */}
-        {filtered.length === 0 ? (
-          <div className="text-center py-20">
-            <Eye className="w-12 h-12 text-zinc-700 mx-auto mb-4" />
-            <p className="text-zinc-400 font-medium mb-1">Nothing revealed yet</p>
-            <p className="text-sm text-zinc-600">Entities become visible here when marked as "Players Know" or "Players Suspect".</p>
+          {/* Party Inventory */}
+          <div className={frame}>
+            <div className={frameHeading}><Backpack className="w-4 h-4 text-amber-400" /> Party Inventory</div>
+            <PartyInventoryManager items={inv} currency={currency} onAdd={addItem} onUpdate={updItem} onDelete={delItem} onCurrency={setCur} />
           </div>
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            {filtered.map(entity => {
-              const meta = TYPE_META[entity.entity_type] || {};
-              const Icon = meta.icon || Eye;
-              const vis = VISIBILITY_LABELS[entity.visibility];
-              const VisIcon = vis?.icon;
-              return (
-                <button
-                  key={entity.id}
-                  onClick={() => setSelected(entity)}
-                  className="text-left flex gap-3 p-3 rounded-xl border border-zinc-800 bg-zinc-900/40 hover:border-amber-500/40 hover:bg-zinc-900 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/50"
-                >
-                  <div className={cn('w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5', meta.bg)}>
-                    <Icon className={cn('w-4 h-4', meta.accent)} />
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-2 mb-0.5">
-                      <p className="text-sm font-semibold text-zinc-200 truncate">{entity.name}</p>
-                      {vis && VisIcon && (
-                        <span className={cn('flex items-center gap-0.5 text-[10px] font-medium flex-shrink-0', vis.color)}>
-                          <VisIcon className="w-2.5 h-2.5" />
-                          {vis.label}
-                        </span>
-                      )}
-                    </div>
-                    {entity.summary && (
-                      <p className="text-xs text-zinc-500 line-clamp-2 leading-snug">{entity.summary}</p>
-                    )}
-                  </div>
-                </button>
-              );
-            })}
+
+          {/* Party Notes */}
+          <div className={frame}>
+            <div className={frameHeading}><MessageSquare className="w-4 h-4 text-amber-400" /> Party Notes</div>
+            <PartyNotes notes={pnotes} onAdd={addNote} onDelete={delNote} />
           </div>
-        )}
 
-        {/* Battle Map — shared live token board */}
-        <PlayerBattleMap token={token} />
-
-        {/* Party Inventory — players manage this together */}
-        <div className="mt-12">
-          <div className="flex items-center gap-2 mb-3">
-            <Backpack className="w-4 h-4 text-amber-400" />
-            <h2 className="text-xs font-semibold uppercase tracking-widest text-zinc-500">Party Inventory</h2>
+          <div className="pt-2 text-center">
+            <p className="text-xs text-zinc-600">
+              {sessions.length} session{sessions.length !== 1 ? 's' : ''} played · {visible.length} revealed {visible.length !== 1 ? 'entries' : 'entry'}
+            </p>
           </div>
-          <PartyInventoryManager
-            items={inv}
-            currency={currency}
-            onAdd={addItem}
-            onUpdate={updItem}
-            onDelete={delItem}
-            onCurrency={setCur}
-          />
-        </div>
-
-        {/* Party Notes — players keep track together */}
-        <div className="mt-10">
-          <div className="flex items-center gap-2 mb-3">
-            <MessageSquare className="w-4 h-4 text-amber-400" />
-            <h2 className="text-xs font-semibold uppercase tracking-widest text-zinc-500">Party Notes</h2>
-          </div>
-          <PartyNotes notes={pnotes} onAdd={addNote} onDelete={delNote} />
-        </div>
-
-        {/* Footer */}
-        <div className="mt-12 pt-6 border-t border-zinc-800 text-center">
-          <p className="text-xs text-zinc-600">
-            {sessions.length} session{sessions.length !== 1 ? 's' : ''} played · {visible.length} revealed {visible.length !== 1 ? 'entries' : 'entry'}
-          </p>
         </div>
       </div>
 

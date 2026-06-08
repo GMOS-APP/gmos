@@ -71,7 +71,7 @@ Deno.serve(async (req) => {
 
     return Response.json(
       {
-        campaign: { name: campaign.name, setting: campaign.setting },
+        campaign: { id: campaign.id, name: campaign.name, setting: campaign.setting },
         entities: entities || [],
         sessions: sessions || [],
       },
