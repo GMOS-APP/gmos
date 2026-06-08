@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { supabase } from '@/api/supabaseClient';
 import { Swords } from 'lucide-react';
 import TokenLayer from './TokenLayer';
+import ZoomPan from './ZoomPan';
 import { useBattleMapChannel } from '@/lib/useBattleMapChannel';
 
 // Player-facing battle map for the public share link. Loads the active map via
@@ -60,17 +61,20 @@ export default function PlayerBattleMap({ token, onHasMap }) {
           Battle Map {map.locked && <span className="text-zinc-600 normal-case tracking-normal">· locked by GM</span>}
         </h2>
       </div>
-      <TokenLayer
-        imageUrl={map.image_url}
-        gridCols={map.grid_cols || 0}
-        tokens={tokens}
-        canMove={!map.locked}
-        locked={map.locked}
-        onMoveLive={onMoveLive}
-        onMoveEnd={onMoveEnd}
-        className="rounded-lg border border-zinc-800 overflow-hidden"
-      />
-      {!map.locked && <p className="mt-2 text-[11px] text-zinc-600">Drag tokens to move them — everyone sees it live.</p>}
+      <ZoomPan className="border border-zinc-800 bg-black">
+        <TokenLayer
+          imageUrl={map.image_url}
+          gridCols={map.grid_cols || 0}
+          tokens={tokens}
+          canMove={!map.locked}
+          locked={map.locked}
+          onMoveLive={onMoveLive}
+          onMoveEnd={onMoveEnd}
+        />
+      </ZoomPan>
+      <p className="mt-2 text-[11px] text-zinc-600">
+        Scroll / pinch to zoom · drag the map to pan{!map.locked && ' · drag tokens to move them — everyone sees it live'}.
+      </p>
     </div>
   );
 }

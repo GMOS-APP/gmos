@@ -156,7 +156,7 @@ export default function PublicPlayerView() {
     <div className="min-h-screen bg-zinc-950 text-zinc-100">
       {/* Header bar (full width) */}
       <div className="border-b border-zinc-800/70">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4">
+        <div className="max-w-[1700px] mx-auto px-4 sm:px-6 py-4">
           <div className="flex items-center gap-2 mb-0.5">
             <Eye className="w-4 h-4 text-amber-400" />
             <span className="text-xs font-semibold uppercase tracking-widest text-zinc-500">Player View</span>
@@ -166,8 +166,8 @@ export default function PublicPlayerView() {
         </div>
       </div>
 
-      {/* Map on the left, everything else in frames on the right */}
-      <div className={cn('max-w-7xl mx-auto p-4 sm:p-6', hasMap && 'lg:grid lg:grid-cols-[1.5fr_1fr] lg:gap-6 lg:items-start')}>
+      {/* Map on the left (takes the space), everything else framed on the right */}
+      <div className={cn('max-w-[1700px] mx-auto p-4 sm:p-6', hasMap && 'lg:grid lg:grid-cols-[minmax(0,1fr)_360px] lg:gap-6 lg:items-start')}>
         {/* LEFT — battle map (kept mounted so it can detect when a map goes live) */}
         <div className={cn('mb-6 lg:mb-0 lg:sticky lg:top-4', !hasMap && 'hidden')}>
           <PlayerBattleMap token={token} onHasMap={setHasMap} />
