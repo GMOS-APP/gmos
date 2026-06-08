@@ -79,6 +79,7 @@ export const Feedback = createEntityAPI('feedback');
 export const Announcement = createEntityAPI('announcements');
 export const Changelog = createEntityAPI('changelog');
 export const Setting = createEntityAPI('app_settings');
+export const BattleMap = createEntityAPI('battle_maps');
 
 export async function UploadFile({ file }) {
   const ext = file.name.split('.').pop();
@@ -98,6 +99,7 @@ export const functions = {
       exportAccount: 'export-account',
       deleteAccount: 'delete-account',
       partyInventory: 'party-inventory',
+      battleMap: 'battle-map',
     };
     const fnName = FUNCTION_MAP[name] || name;
     const { data, error } = await supabase.functions.invoke(fnName, { body: payload });

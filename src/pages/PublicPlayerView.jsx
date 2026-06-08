@@ -6,6 +6,7 @@ import { ENTITY_TYPE_META } from '@/lib/entityColors';
 import PlayerEntityModal from '@/components/common/PlayerEntityModal';
 import PartyInventoryManager from '@/components/party/PartyInventoryManager';
 import PartyNotes from '@/components/party/PartyNotes';
+import PlayerBattleMap from '@/components/map/PlayerBattleMap';
 
 // Player-facing types, derived from the single source.
 const TYPE_META = Object.fromEntries(
@@ -223,6 +224,9 @@ export default function PublicPlayerView() {
             })}
           </div>
         )}
+
+        {/* Battle Map — shared live token board */}
+        <PlayerBattleMap token={token} />
 
         {/* Party Inventory — players manage this together */}
         <div className="mt-12">

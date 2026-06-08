@@ -1,6 +1,6 @@
 import {
   LayoutDashboard, Search, Network, Map, CalendarDays,
-  StickyNote, Dices, History, Eye, Settings, Backpack,
+  StickyNote, Dices, History, Eye, Settings, Backpack, Swords,
 } from 'lucide-react';
 import { createPageUrl } from '@/utils';
 
@@ -12,6 +12,7 @@ export const CAMPAIGN_NAV_ITEMS = [
   { page: 'EntityBrowser', label: 'All Entities', Icon: Search, param: 'campaign_id' },
   { page: 'RelationshipMap', label: 'Relationship Map', Icon: Network, param: 'campaign_id' },
   { page: 'CampaignMap', label: 'Campaign Map', Icon: Map, param: 'campaign_id' },
+  { page: 'BattleMap', label: 'Battle Map', Icon: Swords, param: 'campaign_id' },
   { page: 'SessionBrowser', label: 'Sessions', Icon: CalendarDays, param: 'campaign_id' },
   { page: 'PartyInventory', label: 'Party Inventory', Icon: Backpack, param: 'campaign_id' },
   { page: 'CampaignNotes', label: 'Notes', Icon: StickyNote, param: 'campaign_id' },

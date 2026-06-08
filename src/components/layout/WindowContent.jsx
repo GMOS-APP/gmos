@@ -11,6 +11,7 @@ import EntityBrowser from '@/pages/EntityBrowser';
 import EntityDetail from '@/pages/EntityDetail';
 import RelationshipMap from '@/pages/RelationshipMap';
 import CampaignMap from '@/pages/CampaignMap';
+import BattleMap from '@/pages/BattleMap';
 import SessionBrowser from '@/pages/SessionBrowser';
 import SessionPage from '@/pages/SessionPage';
 import RandomTableBrowser from '@/pages/RandomTableBrowser';
@@ -21,7 +22,7 @@ import PartyInventory from '@/pages/PartyInventory';
 import PlayerView from '@/pages/PlayerView';
 
 const PAGES = {
-  CampaignDashboard, EntityBrowser, EntityDetail, RelationshipMap, CampaignMap,
+  CampaignDashboard, EntityBrowser, EntityDetail, RelationshipMap, CampaignMap, BattleMap,
   SessionBrowser, SessionPage, RandomTableBrowser, CampaignTimeline,
   CampaignNotes, CampaignSettings, PartyInventory, PlayerView,
 };

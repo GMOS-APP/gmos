@@ -20,7 +20,7 @@ import { useHotkeysEnabled } from '@/lib/useHotkeysEnabled';
 import { useMediaQuery } from '@/lib/useMediaQuery';
 import { cn } from '@/lib/utils';
 import { Loader2 } from 'lucide-react';
-const CAMPAIGN_PAGES = ['CampaignDashboard', 'EntityDetail', 'EntityBrowser', 'RelationshipMap', 'CampaignMap', 'SessionPage', 'SessionBrowser', 'RandomTableBrowser', 'CampaignTimeline', 'PlayerView', 'CampaignNotes', 'CampaignSettings', 'PartyInventory'];
+const CAMPAIGN_PAGES = ['CampaignDashboard', 'EntityDetail', 'EntityBrowser', 'RelationshipMap', 'CampaignMap', 'BattleMap', 'SessionPage', 'SessionBrowser', 'RandomTableBrowser', 'CampaignTimeline', 'PlayerView', 'CampaignNotes', 'CampaignSettings', 'PartyInventory'];
 
 export default function Layout({ children, currentPageName }) {
   // Desktop sidebar can be 'docked' (left) or 'floating' (Start dropdown). Persisted.
