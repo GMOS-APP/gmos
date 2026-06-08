@@ -1,25 +1,29 @@
-import React, { useContext, useMemo } from 'react';
+import React, { useContext, useMemo, Suspense, lazy } from 'react';
 import {
   UNSAFE_LocationContext as LocationContext,
   UNSAFE_NavigationContext as NavigationContext,
   UNSAFE_RouteContext as RouteContext,
 } from 'react-router-dom';
 import { useWindowManager, WINDOW_PAGES, pageKeyOf } from '@/lib/WindowManager';
+import ErrorBoundary from '@/components/common/ErrorBoundary';
+import PageLoader from '@/components/common/PageLoader';
 
-import CampaignDashboard from '@/pages/CampaignDashboard';
-import EntityBrowser from '@/pages/EntityBrowser';
-import EntityDetail from '@/pages/EntityDetail';
-import RelationshipMap from '@/pages/RelationshipMap';
-import CampaignMap from '@/pages/CampaignMap';
-import BattleMap from '@/pages/BattleMap';
-import SessionBrowser from '@/pages/SessionBrowser';
-import SessionPage from '@/pages/SessionPage';
-import RandomTableBrowser from '@/pages/RandomTableBrowser';
-import CampaignTimeline from '@/pages/CampaignTimeline';
-import CampaignNotes from '@/pages/CampaignNotes';
-import CampaignSettings from '@/pages/CampaignSettings';
-import PartyInventory from '@/pages/PartyInventory';
-import PlayerView from '@/pages/PlayerView';
+// Lazy so each window page is its own chunk (loaded when first opened). These
+// dynamic imports resolve to the same chunks as pages.config.js — Rollup dedupes.
+const CampaignDashboard = lazy(() => import('@/pages/CampaignDashboard'));
+const EntityBrowser = lazy(() => import('@/pages/EntityBrowser'));
+const EntityDetail = lazy(() => import('@/pages/EntityDetail'));
+const RelationshipMap = lazy(() => import('@/pages/RelationshipMap'));
+const CampaignMap = lazy(() => import('@/pages/CampaignMap'));
+const BattleMap = lazy(() => import('@/pages/BattleMap'));
+const SessionBrowser = lazy(() => import('@/pages/SessionBrowser'));
+const SessionPage = lazy(() => import('@/pages/SessionPage'));
+const RandomTableBrowser = lazy(() => import('@/pages/RandomTableBrowser'));
+const CampaignTimeline = lazy(() => import('@/pages/CampaignTimeline'));
+const CampaignNotes = lazy(() => import('@/pages/CampaignNotes'));
+const CampaignSettings = lazy(() => import('@/pages/CampaignSettings'));
+const PartyInventory = lazy(() => import('@/pages/PartyInventory'));
+const PlayerView = lazy(() => import('@/pages/PlayerView'));
 
 const PAGES = {
   CampaignDashboard, EntityBrowser, EntityDetail, RelationshipMap, CampaignMap, BattleMap,
@@ -78,7 +82,11 @@ export default function WindowContent({ id, url }) {
     <NavigationContext.Provider value={navContext}>
       <LocationContext.Provider value={locContext}>
         <RouteContext.Provider value={routeContext}>
-          {Page ? <Page /> : <div className="p-6 text-sm text-zinc-500">Unknown page.</div>}
+          <ErrorBoundary scope="window" resetKey={url}>
+            <Suspense fallback={<PageLoader />}>
+              {Page ? <Page /> : <div className="p-6 text-sm text-zinc-500">Unknown page.</div>}
+            </Suspense>
+          </ErrorBoundary>
         </RouteContext.Provider>
       </LocationContext.Provider>
     </NavigationContext.Provider>

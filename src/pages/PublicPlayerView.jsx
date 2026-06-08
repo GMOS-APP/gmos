@@ -7,6 +7,7 @@ import PlayerEntityModal from '@/components/common/PlayerEntityModal';
 import PartyInventoryManager from '@/components/party/PartyInventoryManager';
 import PartyNotes from '@/components/party/PartyNotes';
 import PlayerBattleMap from '@/components/map/PlayerBattleMap';
+import useDocumentTitle from '@/lib/useDocumentTitle';
 
 // Player-facing types, derived from the single source.
 const TYPE_META = Object.fromEntries(
@@ -36,6 +37,7 @@ export default function PublicPlayerView() {
   const [currency, setCurrency] = useState({});
   const [pnotes, setPnotes] = useState([]);
   const [hasMap, setHasMap] = useState(false);
+  useDocumentTitle(campaign?.name ? `${campaign.name} — Player View` : 'Player View');
 
   // The public share view is dark-only; ensure the `dark` class is set so
   // themed components (the entity modal) render consistently.
