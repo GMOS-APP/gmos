@@ -10,6 +10,7 @@ import {
   BookOpen, Map, Sparkles, ChevronDown,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import QueryError from '@/components/common/QueryError';
 import { cn } from '@/lib/utils';
 import { ENTITY_TYPE_META } from '@/lib/entityColors';
 import PassiveStatsHub from '@/components/dashboard/PassiveStatsHub';
@@ -86,7 +87,7 @@ export default function CampaignDashboard() {
   const [togglingShare, setTogglingShare] = useState(false);
   const [copied, setCopied] = useState(false);
 
-  const { data: campaign } = useQuery({
+  const { data: campaign, isLoading: campaignLoading, isError: campaignError, error: campaignErr, refetch: refetchCampaign } = useQuery({
     queryKey: ['campaign', campaignId],
     queryFn: () => Campaign.filter({ id: campaignId }),
     enabled: !!campaignId,
@@ -146,6 +147,13 @@ export default function CampaignDashboard() {
     navigator.clipboard.writeText(url);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
+  }
+
+  if (campaignError) {
+    return <QueryError error={campaignErr} onRetry={refetchCampaign} title="Couldn't load this campaign" />;
+  }
+  if (!campaign && !campaignLoading) {
+    return <QueryError title="Campaign not found" error={{ message: 'It may have been deleted or you may not have access.' }} />;
   }
 
   return (

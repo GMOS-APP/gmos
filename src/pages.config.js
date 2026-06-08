@@ -47,24 +47,29 @@
  *
  * The mainPage value must match a key in the PAGES object exactly.
  */
-import CampaignDashboard from './pages/CampaignDashboard';
-import CampaignList from './pages/CampaignList';
-import CampaignNotes from './pages/CampaignNotes';
-import CampaignMap from './pages/CampaignMap';
-import EntityBrowser from './pages/EntityBrowser';
-import EntityDetail from './pages/EntityDetail';
-import RelationshipMap from './pages/RelationshipMap';
-import SessionBrowser from './pages/SessionBrowser';
-import SessionPage from './pages/SessionPage';
-import RandomTableBrowser from './pages/RandomTableBrowser';
-import CampaignTimeline from './pages/CampaignTimeline';
-import PlayerView from './pages/PlayerView';
-import CampaignSettings from './pages/CampaignSettings';
-import About from './pages/About';
-import AccountSettings from './pages/AccountSettings';
-import PartyInventory from './pages/PartyInventory';
-import BattleMap from './pages/BattleMap';
+import { lazy } from 'react';
 import __Layout from './Layout.jsx';
+
+// Pages are code-split: each becomes its own chunk loaded on demand (behind a
+// <Suspense> in App.jsx and WindowContent.jsx), so the initial bundle is just
+// the shell + whatever page the user lands on.
+const CampaignDashboard = lazy(() => import('./pages/CampaignDashboard'));
+const CampaignList = lazy(() => import('./pages/CampaignList'));
+const CampaignNotes = lazy(() => import('./pages/CampaignNotes'));
+const CampaignMap = lazy(() => import('./pages/CampaignMap'));
+const EntityBrowser = lazy(() => import('./pages/EntityBrowser'));
+const EntityDetail = lazy(() => import('./pages/EntityDetail'));
+const RelationshipMap = lazy(() => import('./pages/RelationshipMap'));
+const SessionBrowser = lazy(() => import('./pages/SessionBrowser'));
+const SessionPage = lazy(() => import('./pages/SessionPage'));
+const RandomTableBrowser = lazy(() => import('./pages/RandomTableBrowser'));
+const CampaignTimeline = lazy(() => import('./pages/CampaignTimeline'));
+const PlayerView = lazy(() => import('./pages/PlayerView'));
+const CampaignSettings = lazy(() => import('./pages/CampaignSettings'));
+const About = lazy(() => import('./pages/About'));
+const AccountSettings = lazy(() => import('./pages/AccountSettings'));
+const PartyInventory = lazy(() => import('./pages/PartyInventory'));
+const BattleMap = lazy(() => import('./pages/BattleMap'));
 
 
 export const PAGES = {

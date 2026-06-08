@@ -7,6 +7,7 @@ import { Search, Plus } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import EntityCard from '@/components/entity/EntityCard';
+import QueryError from '@/components/common/QueryError';
 import { cn } from '@/lib/utils';
 
 const entityTypes = [
@@ -39,7 +40,7 @@ export default function EntityBrowser() {
   const query = { campaign_id: campaignId };
   if (typeFilter) query.entity_type = typeFilter;
 
-  const { data: entities = [], isLoading } = useQuery({
+  const { data: entities = [], isLoading, isError, error, refetch } = useQuery({
     queryKey: ['entities', campaignId, typeFilter],
     queryFn: () => WorldEntity.filter(query, '-updated_date', 100),
     enabled: !!campaignId,
@@ -96,7 +97,9 @@ export default function EntityBrowser() {
       </div>
 
       {/* Grid */}
-      {isLoading ? (
+      {isError ? (
+        <QueryError error={error} onRetry={refetch} title="Couldn't load entities" />
+      ) : isLoading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
           {[1, 2, 3, 4, 5, 6].map((i) => (
             <div key={i} className="h-28 rounded-xl bg-zinc-900 animate-pulse" />

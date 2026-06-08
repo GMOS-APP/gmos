@@ -4,13 +4,15 @@ import { queryClientInstance } from '@/lib/query-client'
 import NavigationTracker from '@/lib/NavigationTracker'
 import { pagesConfig } from './pages.config'
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { Suspense, lazy } from 'react';
 import PageNotFound from './lib/PageNotFound';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import LandingPage from '@/components/layout/LandingPage';
-import PublicPlayerView from '@/pages/PublicPlayerView';
-import PrivacyPolicy from '@/pages/PrivacyPolicy';
-import Terms from '@/pages/Terms';
-import AdminConsole from '@/pages/AdminConsole';
+import PageLoader from '@/components/common/PageLoader';
+const PublicPlayerView = lazy(() => import('@/pages/PublicPlayerView'));
+const PrivacyPolicy = lazy(() => import('@/pages/PrivacyPolicy'));
+const Terms = lazy(() => import('@/pages/Terms'));
+const AdminConsole = lazy(() => import('@/pages/AdminConsole'));
 import AccentSync from '@/lib/AccentSync';
 import ChangelogDialog from '@/components/layout/ChangelogDialog';
 import EasterEggHost from '@/components/easter/EasterEggHost';
@@ -46,6 +48,7 @@ const AuthenticatedApp = () => {
     <BootSequence />
     <ChangelogDialog />
     <EasterEggHost />
+    <Suspense fallback={<PageLoader />}>
     <Routes>
       <Route path="/" element={
         <LayoutWrapper currentPageName={mainPageKey}>
@@ -65,6 +68,7 @@ const AuthenticatedApp = () => {
       ))}
       <Route path="*" element={<PageNotFound />} />
     </Routes>
+    </Suspense>
     </>
   );
 };
@@ -78,6 +82,7 @@ function App() {
             <AccentSync />
             <Router basename={import.meta.env.BASE_URL}>
               <NavigationTracker />
+              <Suspense fallback={<PageLoader />}>
               <Routes>
                 <Route path="/player-view/public" element={<PublicPlayerView />} />
                 <Route path="/PrivacyPolicy" element={<PrivacyPolicy />} />
@@ -85,6 +90,7 @@ function App() {
                 <Route path="/admin" element={<AdminConsole />} />
                 <Route path="/*" element={<AuthenticatedApp />} />
               </Routes>
+              </Suspense>
             </Router>
             <Toaster />
           </NotificationProvider>

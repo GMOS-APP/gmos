@@ -13,7 +13,8 @@ import Tour from '@/components/layout/Tour';
 import AnnouncementBanner from '@/components/layout/AnnouncementBanner';
 import Footer from '@/components/layout/Footer';
 import Desktop from '@/components/layout/Desktop';
-import { WindowManagerProvider } from '@/lib/WindowManager';
+import { WindowManagerProvider, useWindowManager, titleOf } from '@/lib/WindowManager';
+import useDocumentTitle, { pageLabel } from '@/lib/useDocumentTitle';
 import { createPageUrl } from '@/utils';
 import { useHotkeys } from '@/lib/useHotkeys';
 import { useHotkeysEnabled } from '@/lib/useHotkeysEnabled';
@@ -21,6 +22,17 @@ import { useMediaQuery } from '@/lib/useMediaQuery';
 import { cn } from '@/lib/utils';
 import { Loader2 } from 'lucide-react';
 const CAMPAIGN_PAGES = ['CampaignDashboard', 'EntityDetail', 'EntityBrowser', 'RelationshipMap', 'CampaignMap', 'BattleMap', 'SessionPage', 'SessionBrowser', 'RandomTableBrowser', 'CampaignTimeline', 'PlayerView', 'CampaignNotes', 'CampaignSettings', 'PartyInventory'];
+
+// On the desktop, multiple page windows are mounted at once, so each setting
+// document.title would race. Instead one component derives the title from the
+// focused window (Layout opts out by passing `undefined` to useDocumentTitle).
+function DesktopTitle({ campaign }) {
+  const wm = useWindowManager();
+  const focused = wm?.windows.find((w) => w.id === wm.focusedId);
+  const name = campaign?.name || 'Campaign';
+  useDocumentTitle(focused ? `${titleOf(focused.url)} · ${name}` : name);
+  return null;
+}
 
 export default function Layout({ children, currentPageName }) {
   // Desktop sidebar can be 'docked' (left) or 'floating' (Start dropdown). Persisted.
@@ -45,6 +57,13 @@ export default function Layout({ children, currentPageName }) {
     enabled: !!campaignId && isCampaignPage && !isLoadingAuth,
     select: (data) => data?.[0],
   });
+
+  // Document title. The desktop derives its own title from the focused window
+  // (DesktopTitle), so Layout opts out there; everywhere else it owns it.
+  const desktopCampaign = wide && isCampaignPage && !!campaignId;
+  const baseLabel = isCampaignPage ? titleOf('/' + currentPageName) : pageLabel(currentPageName);
+  const baseTitle = isCampaignPage && campaign?.name ? `${baseLabel} · ${campaign.name}` : baseLabel;
+  useDocumentTitle(desktopCampaign ? undefined : baseTitle);
 
   const [paletteOpen, setPaletteOpen] = useState(false);
   const [helpOpen, setHelpOpen] = useState(false);
@@ -175,6 +194,7 @@ export default function Layout({ children, currentPageName }) {
   // Desktop: floating-window OS.
   return (
     <WindowManagerProvider campaignId={campaignId} seedUrl={seedUrl} navigate={navigate} isMobile={false}>
+      <DesktopTitle campaign={campaign} />
       {shell(<Desktop dashboardUrl={createPageUrl('CampaignDashboard') + `?id=${campaignId}`} />)}
     </WindowManagerProvider>
   );

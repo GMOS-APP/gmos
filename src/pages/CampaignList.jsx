@@ -18,6 +18,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
+import QueryError from '@/components/common/QueryError';
 import { DEFAULT_SYSTEM_ID } from '@/lib/systems';
 
 export default function CampaignList() {
@@ -73,7 +74,7 @@ export default function CampaignList() {
     }
   };
 
-  const { data: campaigns = [], isLoading } = useQuery({
+  const { data: campaigns = [], isLoading, isError, error, refetch } = useQuery({
     queryKey: ['campaigns'],
     queryFn: () => Campaign.list('-created_date'),
   });
@@ -175,7 +176,10 @@ export default function CampaignList() {
         </div>
 
         {/* Campaign list */}
-        {isLoading ? (
+        {isError ? (
+          <QueryError error={error} onRetry={refetch} title="Couldn't load your campaigns"
+            className="border border-dashed border-zinc-300 dark:border-zinc-800 rounded-xl" />
+        ) : isLoading ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {[1, 2].map((i) => (
               <div key={i} className="h-36 rounded-xl bg-zinc-200 dark:bg-zinc-900 animate-pulse" />

@@ -56,6 +56,7 @@ export default function CampaignSettings() {
 
   const saveMutation = useMutation({
     mutationFn: (data) => Campaign.update(campaignId, data),
+    meta: { silent: true }, // handles its own error toast below
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['campaign', campaignId] });
       queryClient.invalidateQueries({ queryKey: ['campaigns'] });
@@ -66,6 +67,7 @@ export default function CampaignSettings() {
 
   const deleteMutation = useMutation({
     mutationFn: () => Campaign.delete(campaignId),
+    meta: { silent: true }, // handles its own error toast below
     onSuccess: () => navigate(createPageUrl('CampaignList')),
     onError: () => toast({ title: 'Error', description: 'Failed to delete campaign.', variant: 'destructive' }),
   });
