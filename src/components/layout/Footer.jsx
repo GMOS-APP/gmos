@@ -11,6 +11,7 @@ export default function Footer() {
         <span>Built on the Lazy GM method · SRD 5.1 &amp; Open5e under open licenses</span>
       </div>
       <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 mt-1.5">
+        <Link to={createPageUrl('Help')} className="underline underline-offset-2 hover:text-zinc-600 dark:hover:text-zinc-400 transition-colors">Manual</Link>
         <Link to={createPageUrl('About')} className="underline underline-offset-2 hover:text-zinc-600 dark:hover:text-zinc-400 transition-colors">Attributions</Link>
         <Link to={createPageUrl('PrivacyPolicy')} className="underline underline-offset-2 hover:text-zinc-600 dark:hover:text-zinc-400 transition-colors">Privacy</Link>
         <Link to={createPageUrl('Terms')} className="underline underline-offset-2 hover:text-zinc-600 dark:hover:text-zinc-400 transition-colors">Terms</Link>

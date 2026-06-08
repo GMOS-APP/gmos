@@ -12,6 +12,7 @@ import PageLoader from '@/components/common/PageLoader';
 const PublicPlayerView = lazy(() => import('@/pages/PublicPlayerView'));
 const PrivacyPolicy = lazy(() => import('@/pages/PrivacyPolicy'));
 const Terms = lazy(() => import('@/pages/Terms'));
+const Help = lazy(() => import('@/pages/Help'));
 const AdminConsole = lazy(() => import('@/pages/AdminConsole'));
 import AccentSync from '@/lib/AccentSync';
 import ChangelogDialog from '@/components/layout/ChangelogDialog';
@@ -87,6 +88,7 @@ function App() {
                 <Route path="/player-view/public" element={<PublicPlayerView />} />
                 <Route path="/PrivacyPolicy" element={<PrivacyPolicy />} />
                 <Route path="/Terms" element={<Terms />} />
+                <Route path="/Help" element={<Help />} />
                 <Route path="/admin" element={<AdminConsole />} />
                 <Route path="/*" element={<AuthenticatedApp />} />
               </Routes>
