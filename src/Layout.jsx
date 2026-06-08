@@ -11,6 +11,7 @@ import Taskbar from '@/components/layout/Taskbar';
 import NavMenu from '@/components/layout/NavMenu';
 import Tour from '@/components/layout/Tour';
 import AnnouncementBanner from '@/components/layout/AnnouncementBanner';
+import Footer from '@/components/layout/Footer';
 import Desktop from '@/components/layout/Desktop';
 import { WindowManagerProvider } from '@/lib/WindowManager';
 import { createPageUrl } from '@/utils';
@@ -102,61 +103,79 @@ export default function Layout({ children, currentPageName }) {
     );
   }
 
-  return (
-    <WindowManagerProvider campaignId={campaignId} seedUrl={seedUrl} navigate={navigate} isMobile={!wide}>
-      <div className="flex flex-col h-screen overflow-hidden max-w-[1920px] mx-auto">
-        <style>{`body { overflow: hidden; }`}</style>
+  // Shared chrome (taskbar, drawer/sidebar, menus) wrapping a main content slot.
+  // Desktop fills it with the window-manager Desktop; mobile fills it with the
+  // routed page rendered full-screen.
+  const shell = (content) => (
+    <div className="flex flex-col h-screen overflow-hidden max-w-[1920px] mx-auto">
+      <style>{`body { overflow: hidden; }`}</style>
 
-        <Taskbar
-          campaign={campaign}
-          startActive={wide ? floatingMenuOpen : mobileNavOpen}
-          onStart={onStart}
-          onSearch={() => setPaletteOpen(true)}
-        />
+      <Taskbar
+        campaign={campaign}
+        currentPageName={currentPageName}
+        startActive={wide ? floatingMenuOpen : mobileNavOpen}
+        onStart={onStart}
+        onSearch={() => setPaletteOpen(true)}
+      />
 
-        <AnnouncementBanner />
+      <AnnouncementBanner />
 
-        <div className="flex flex-1 overflow-hidden min-h-0">
-          {/* Mobile drawer backdrop */}
-          {mobileNavOpen && (
-            <div
-              className="fixed left-0 right-0 bottom-0 top-12 z-30 bg-black/60 md:hidden"
-              onClick={() => setMobileNavOpen(false)}
-            />
-          )}
+      <div className="flex flex-1 overflow-hidden min-h-0">
+        {/* Mobile drawer backdrop */}
+        {mobileNavOpen && (
+          <div
+            className="fixed left-0 right-0 bottom-0 top-12 z-30 bg-black/60 md:hidden"
+            onClick={() => setMobileNavOpen(false)}
+          />
+        )}
 
-          {/* Sidebar — mobile drawer always; desktop in-flow only when docked */}
-          <div className={cn(
-            'z-40 transition-transform duration-300',
-            'fixed top-12 bottom-0 left-0 md:static md:top-auto md:bottom-auto md:z-auto',
-            mobileNavOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0',
-            navMode === 'docked' ? 'md:flex md:flex-col md:flex-shrink-0' : 'md:hidden'
-          )}>
-            <Sidebar
-              campaign={campaign}
-              collapsed={false}
-              onToggle={onSidebarToggle}
-              onNavClick={() => setMobileNavOpen(false)}
-            />
-          </div>
-
-          {/* Desktop — pages render as floating windows here */}
-          <main className="flex-1 h-full overflow-hidden flex flex-col min-w-0">
-            <Desktop dashboardUrl={createPageUrl('CampaignDashboard') + `?id=${campaignId}`} />
-          </main>
+        {/* Sidebar — mobile drawer always; desktop in-flow only when docked */}
+        <div className={cn(
+          'z-40 transition-transform duration-300',
+          'fixed top-12 bottom-0 left-0 md:static md:top-auto md:bottom-auto md:z-auto',
+          mobileNavOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0',
+          navMode === 'docked' ? 'md:flex md:flex-col md:flex-shrink-0' : 'md:hidden'
+        )}>
+          <Sidebar
+            campaign={campaign}
+            collapsed={false}
+            onToggle={onSidebarToggle}
+            onNavClick={() => setMobileNavOpen(false)}
+          />
         </div>
 
-        <NavMenu
-          open={wide && navMode === 'floating' && floatingMenuOpen}
-          onClose={() => setFloatingMenuOpen(false)}
-          campaignId={campaignId}
-          onDock={() => setMode('docked')}
-        />
-        <QuickCapture campaignId={campaignId} open={createOpen} onOpenChange={setCreateOpen} />
-        <CommandPalette open={paletteOpen} onOpenChange={setPaletteOpen} campaignId={campaignId} onStartTour={startTour} />
-        <ShortcutsHelp open={helpOpen} onOpenChange={setHelpOpen} onStartTour={startTour} />
-        <Tour open={tourOpen} onOpenChange={setTourOpen} campaignId={campaignId} />
+        <main className="flex-1 h-full overflow-hidden flex flex-col min-w-0">{content}</main>
       </div>
+
+      <NavMenu
+        open={wide && navMode === 'floating' && floatingMenuOpen}
+        onClose={() => setFloatingMenuOpen(false)}
+        campaignId={campaignId}
+        onDock={() => setMode('docked')}
+      />
+      <QuickCapture campaignId={campaignId} open={createOpen} onOpenChange={setCreateOpen} />
+      <CommandPalette open={paletteOpen} onOpenChange={setPaletteOpen} campaignId={campaignId} onStartTour={startTour} />
+      <ShortcutsHelp open={helpOpen} onOpenChange={setHelpOpen} onStartTour={startTour} />
+      <Tour open={tourOpen} onOpenChange={setTourOpen} campaignId={campaignId} />
+    </div>
+  );
+
+  // Mobile: no window manager — the routed page renders full-screen, scrollable.
+  if (!wide) {
+    return shell(
+      <div className="h-full overflow-y-auto">
+        <div className="min-h-full flex flex-col">
+          <div className="flex-1 min-w-0">{children}</div>
+          <Footer />
+        </div>
+      </div>
+    );
+  }
+
+  // Desktop: floating-window OS.
+  return (
+    <WindowManagerProvider campaignId={campaignId} seedUrl={seedUrl} navigate={navigate} isMobile={false}>
+      {shell(<Desktop dashboardUrl={createPageUrl('CampaignDashboard') + `?id=${campaignId}`} />)}
     </WindowManagerProvider>
   );
 }

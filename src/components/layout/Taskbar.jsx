@@ -21,7 +21,7 @@ const MODES = {
 
 // Full-width OS taskbar: Start button, system state, breadcrumbs, and a
 // clustered system tray (search, live activity, theme, clock).
-export default function Taskbar({ campaign, startActive, onStart, onSearch }) {
+export default function Taskbar({ campaign, currentPageName, startActive, onStart, onSearch }) {
   const fetching = useIsFetching();
   const navigate = useNavigate();
   const wm = useWindowManager();
@@ -91,7 +91,9 @@ export default function Taskbar({ campaign, startActive, onStart, onSearch }) {
         {mode.label}
       </button>
 
-      <WindowStrip wm={wm} />
+      {wm
+        ? <WindowStrip wm={wm} />
+        : <span className="flex-1 min-w-0 px-1 text-sm font-semibold text-zinc-700 dark:text-zinc-300 truncate">{titleOf(`/${currentPageName}`)}</span>}
 
       {/* System tray */}
       <div data-tour="tray" className="ml-auto flex items-center gap-0.5 pl-1 pr-1 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900/60">
