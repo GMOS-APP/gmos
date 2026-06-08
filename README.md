@@ -2,7 +2,7 @@
 
 A Dungeon Master operating system for tabletop RPG campaigns. Track your world, prep smarter, and run sessions without juggling a dozen browser tabs — all wrapped in a desktop-OS-style interface.
 
-**Live app:** https://trisdenc.github.io/GM-OS/ &nbsp;·&nbsp; **[User Tutorial](TUTORIAL.md)**
+**Live app:** https://trisdenc.github.io/GM-OS/ &nbsp;·&nbsp; **[User Tutorial](TUTORIAL.md)** &nbsp;·&nbsp; **[Developer Guide / Architecture](ARCHITECTURE.md)**
 
 ---
 
