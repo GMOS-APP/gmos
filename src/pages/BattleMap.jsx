@@ -1,9 +1,10 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { usePageParams } from '@/lib/usePageParams';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { BattleMap as BattleMapEntity, WorldEntity, UploadFile, Campaign } from '@/api/entities';
-import { Plus, Upload, Grid3x3, Lock, Unlock, Eye, Trash2, Users, Loader2, Swords, Link2, Check, Share2 } from 'lucide-react';
+import { BattleMap as BattleMapEntity, WorldEntity, Campaign } from '@/api/entities';
+import { Plus, Image as ImageIcon, Grid3x3, Lock, Unlock, Eye, Trash2, Users, Swords, Link2, Check, Share2 } from 'lucide-react';
 import TokenLayer from '@/components/map/TokenLayer';
+import BackgroundPicker from '@/components/map/BackgroundPicker';
 import { useBattleMapChannel } from '@/lib/useBattleMapChannel';
 import { getEntityColors } from '@/lib/entityColors';
 
@@ -19,10 +20,9 @@ export default function BattleMap() {
   const [mapId, setMapId] = useState(null);
   const [tokens, setTokens] = useState([]);
   const [selectedToken, setSelectedToken] = useState(null);
-  const [uploading, setUploading] = useState(false);
+  const [bgOpen, setBgOpen] = useState(false);
   const [showAdd, setShowAdd] = useState(false);
   const [copied, setCopied] = useState(false);
-  const fileRef = useRef(null);
   const tokensRef = useRef(tokens);
   tokensRef.current = tokens;
   const draggingRef = useRef(null);
@@ -138,13 +138,6 @@ export default function BattleMap() {
     qc.invalidateQueries({ queryKey: ['battle-maps', campaignId] });
     setMapId(created.id);
   };
-  const onUpload = async (e) => {
-    const file = e.target.files?.[0]; e.target.value = '';
-    if (!file || !mapId) return;
-    setUploading(true);
-    try { const { file_url } = await UploadFile({ file }); await patchMap({ image_url: file_url }); }
-    catch (err) { alert(err?.message || 'Upload failed'); } finally { setUploading(false); }
-  };
   const setActive = async () => {
     await Promise.all(maps.filter((m) => m.active && m.id !== mapId).map((m) => BattleMapEntity.update(m.id, { active: false })));
     await patchMap({ active: true });
@@ -179,11 +172,10 @@ export default function BattleMap() {
         <>
           {/* Toolbar */}
           <div className="flex flex-wrap items-center gap-2 mb-3">
-            <button onClick={() => fileRef.current?.click()} disabled={uploading}
-              className="inline-flex items-center gap-1.5 text-sm px-2.5 py-1.5 rounded-md border border-zinc-300 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800 disabled:opacity-50">
-              {uploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />} Background
+            <button onClick={() => setBgOpen(true)}
+              className="inline-flex items-center gap-1.5 text-sm px-2.5 py-1.5 rounded-md border border-zinc-300 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800">
+              <ImageIcon className="w-4 h-4" /> Background
             </button>
-            <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={onUpload} />
 
             <button
               onClick={() => patchMap({ grid_cols: map.grid_cols > 0 ? 0 : (lastCols.current || 12) })}
@@ -267,6 +259,8 @@ export default function BattleMap() {
           <button onClick={createMap} className="px-3 py-1.5 rounded-md bg-amber-500 hover:bg-amber-400 text-zinc-950 text-sm font-medium">Create your first map</button>
         </div>
       )}
+
+      <BackgroundPicker open={bgOpen} onOpenChange={setBgOpen} onSelect={(url) => patchMap({ image_url: url })} />
     </div>
   );
 }
