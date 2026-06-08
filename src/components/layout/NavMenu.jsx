@@ -5,7 +5,7 @@ import { createPageUrl } from '@/utils';
 import { useWindowManager } from '@/lib/WindowManager';
 import { auth } from '@/api/entities';
 import FeedbackButton from '@/components/layout/FeedbackButton';
-import { PanelLeft, UserCog } from 'lucide-react';
+import { PanelLeft, UserCog, LayoutGrid } from 'lucide-react';
 
 // Floating navigation dropdown shown when the sidebar is undocked. Includes a
 // "Dock sidebar" action to bring it back to the left, plus the signed-in user
@@ -44,6 +44,10 @@ export default function NavMenu({ open, onClose, campaignId, onDock }) {
   return (
     <div ref={ref} className="fixed left-2 top-12 sm:top-11 z-50 w-60 max-w-[calc(100vw-1rem)] rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-2xl overflow-hidden">
       <div className="p-1.5 border-b border-zinc-100 dark:border-zinc-800">
+        <button onClick={() => go(createPageUrl('CampaignList'))} className={itemClass} title="Back to all campaigns">
+          <LayoutGrid className="w-4 h-4 text-amber-500 flex-shrink-0" />
+          <span>All campaigns</span>
+        </button>
         <button onClick={() => { onClose(); onDock(); }} className={itemClass} title="Dock to the left">
           <PanelLeft className="w-4 h-4 text-amber-500 flex-shrink-0" />
           <span>Dock sidebar</span>
