@@ -1,8 +1,8 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { usePageParams } from '@/lib/usePageParams';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { BattleMap as BattleMapEntity, WorldEntity, UploadFile } from '@/api/entities';
-import { Plus, Upload, Grid3x3, Lock, Unlock, Eye, Trash2, Users, Loader2, Swords } from 'lucide-react';
+import { BattleMap as BattleMapEntity, WorldEntity, UploadFile, Campaign } from '@/api/entities';
+import { Plus, Upload, Grid3x3, Lock, Unlock, Eye, Trash2, Users, Loader2, Swords, Link2, Check, Share2 } from 'lucide-react';
 import TokenLayer from '@/components/map/TokenLayer';
 import { useBattleMapChannel } from '@/lib/useBattleMapChannel';
 import { getEntityColors } from '@/lib/entityColors';
@@ -21,10 +21,31 @@ export default function BattleMap() {
   const [selectedToken, setSelectedToken] = useState(null);
   const [uploading, setUploading] = useState(false);
   const [showAdd, setShowAdd] = useState(false);
+  const [copied, setCopied] = useState(false);
   const fileRef = useRef(null);
   const tokensRef = useRef(tokens);
   tokensRef.current = tokens;
   const draggingRef = useRef(null);
+  const lastCols = useRef(12); // remembered grid size for the on/off toggle
+
+  const { data: campaign } = useQuery({
+    queryKey: ['campaign', campaignId],
+    queryFn: () => Campaign.filter({ id: campaignId }),
+    enabled: !!campaignId,
+    select: (d) => d?.[0],
+  });
+  const shareUrl = campaign?.player_share_token
+    ? `${window.location.origin}${import.meta.env.BASE_URL}player-view/public?token=${campaign.player_share_token}`
+    : null;
+  const copyLink = async () => {
+    if (!shareUrl) return;
+    try { await navigator.clipboard.writeText(shareUrl); setCopied(true); setTimeout(() => setCopied(false), 1800); }
+    catch { /* clipboard blocked */ }
+  };
+  const enableShare = async () => {
+    await Campaign.update(campaignId, { is_shared: true });
+    qc.invalidateQueries({ queryKey: ['campaign', campaignId] });
+  };
 
   const { data: maps = [] } = useQuery({
     queryKey: ['battle-maps', campaignId],
@@ -164,12 +185,17 @@ export default function BattleMap() {
             </button>
             <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={onUpload} />
 
-            <label className="inline-flex items-center gap-1.5 text-sm px-2.5 py-1.5 rounded-md border border-zinc-300 dark:border-zinc-700">
-              <Grid3x3 className="w-4 h-4" /> Grid
-              <input type="number" min={0} max={40} value={map.grid_cols || 0}
-                onChange={(e) => patchMap({ grid_cols: Math.max(0, Math.min(40, parseInt(e.target.value, 10) || 0)) })}
-                className="w-12 text-center rounded border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-950 px-1 py-0.5" />
-            </label>
+            <button
+              onClick={() => patchMap({ grid_cols: map.grid_cols > 0 ? 0 : (lastCols.current || 12) })}
+              className={`inline-flex items-center gap-1.5 text-sm px-2.5 py-1.5 rounded-md border ${map.grid_cols > 0 ? 'border-amber-500/50 text-amber-600 dark:text-amber-400' : 'border-zinc-300 dark:border-zinc-700'} hover:bg-zinc-100 dark:hover:bg-zinc-800`}>
+              <Grid3x3 className="w-4 h-4" /> Grid {map.grid_cols > 0 ? 'on' : 'off'}
+            </button>
+            {map.grid_cols > 0 && (
+              <input type="number" min={2} max={40} value={map.grid_cols}
+                title="Grid columns"
+                onChange={(e) => { const n = Math.max(2, Math.min(40, parseInt(e.target.value, 10) || 12)); lastCols.current = n; patchMap({ grid_cols: n }); }}
+                className="w-14 text-center text-sm rounded-md border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-950 px-1 py-1.5" />
+            )}
 
             <button onClick={() => patchMap({ locked: !map.locked })}
               className={`inline-flex items-center gap-1.5 text-sm px-2.5 py-1.5 rounded-md border ${map.locked ? 'border-amber-500/50 text-amber-600 dark:text-amber-400' : 'border-zinc-300 dark:border-zinc-700'} hover:bg-zinc-100 dark:hover:bg-zinc-800`}>
@@ -180,6 +206,18 @@ export default function BattleMap() {
               className={`inline-flex items-center gap-1.5 text-sm px-2.5 py-1.5 rounded-md ${map.active ? 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400' : 'bg-amber-500 hover:bg-amber-400 text-zinc-950'} disabled:cursor-default`}>
               <Eye className="w-4 h-4" /> {map.active ? 'Live to players' : 'Show to players'}
             </button>
+
+            {campaign && (campaign.is_shared && shareUrl ? (
+              <button onClick={copyLink}
+                className="inline-flex items-center gap-1.5 text-sm px-2.5 py-1.5 rounded-md border border-zinc-300 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800">
+                {copied ? <Check className="w-4 h-4 text-emerald-500" /> : <Link2 className="w-4 h-4" />} {copied ? 'Copied!' : 'Copy player link'}
+              </button>
+            ) : (
+              <button onClick={enableShare}
+                className="inline-flex items-center gap-1.5 text-sm px-2.5 py-1.5 rounded-md border border-zinc-300 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800">
+                <Share2 className="w-4 h-4" /> Share with players
+              </button>
+            ))}
           </div>
 
           {/* Token palette */}
