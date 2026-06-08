@@ -5,7 +5,7 @@ import { CAMPAIGN_NAV_ITEMS } from '@/lib/navItems';
 // (CampaignList, AccountSettings, About) escapes the window manager and
 // navigates the top-level router.
 export const WINDOW_PAGES = [
-  'CampaignDashboard', 'EntityBrowser', 'EntityDetail', 'RelationshipMap', 'CampaignMap',
+  'CampaignDashboard', 'EntityBrowser', 'EntityDetail', 'RelationshipMap', 'CampaignMap', 'BattleMap',
   'SessionBrowser', 'SessionPage', 'RandomTableBrowser', 'CampaignTimeline',
   'CampaignNotes', 'CampaignSettings', 'PartyInventory', 'PlayerView',
 ];

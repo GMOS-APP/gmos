@@ -63,6 +63,7 @@ import CampaignSettings from './pages/CampaignSettings';
 import About from './pages/About';
 import AccountSettings from './pages/AccountSettings';
 import PartyInventory from './pages/PartyInventory';
+import BattleMap from './pages/BattleMap';
 import __Layout from './Layout.jsx';
 
 
@@ -83,6 +84,7 @@ export const PAGES = {
     "About": About,
     "AccountSettings": AccountSettings,
     "PartyInventory": PartyInventory,
+    "BattleMap": BattleMap,
 }
 
 export const pagesConfig = {
