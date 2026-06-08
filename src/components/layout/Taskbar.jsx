@@ -106,25 +106,27 @@ export default function Taskbar({ campaign, currentPageName, startActive, onStar
         >
           <Search className="w-4 h-4 sm:w-3.5 sm:h-3.5" />
         </button>
-        <TrayTools campaignId={campaign?.id} />
+        {/* Tools/audio/theme/clock/sign-out are desktop-only; on mobile they
+            live in the drawer to keep the tray uncluttered. */}
+        <span className="hidden md:flex items-center"><TrayTools campaignId={campaign?.id} /></span>
         <span className="hidden md:block w-px h-4 bg-zinc-200 dark:bg-zinc-800 mx-0.5" />
-        <TrayAudioPlayer />
+        <span className="hidden md:flex items-center"><TrayAudioPlayer /></span>
         <TrayNotifications />
         {fetching > 0 && (
-          <span className="hidden sm:flex items-center gap-1 px-1.5 text-[10px] font-mono text-zinc-400 dark:text-zinc-600">
+          <span className="hidden md:flex items-center gap-1 px-1.5 text-[10px] font-mono text-zinc-400 dark:text-zinc-600">
             <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
             sync
           </span>
         )}
-        <ThemeToggle className="h-10 w-10 sm:h-7 sm:w-7 flex items-center justify-center" />
-        <span className="hidden sm:inline px-2 font-mono text-[11px] tabular-nums text-zinc-600 dark:text-zinc-400">{time}</span>
+        <ThemeToggle className="hidden md:flex h-7 w-7 items-center justify-center" />
+        <span className="hidden md:inline px-2 font-mono text-[11px] tabular-nums text-zinc-600 dark:text-zinc-400">{time}</span>
         <button
           onClick={signOut}
           title="Sign out"
           aria-label="Sign out"
-          className="h-10 w-10 sm:h-7 sm:w-7 flex items-center justify-center rounded-md text-zinc-500 hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-red-500 dark:hover:text-red-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/50"
+          className="hidden md:flex h-7 w-7 items-center justify-center rounded-md text-zinc-500 hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-red-500 dark:hover:text-red-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/50"
         >
-          <LogOut className="w-4 h-4 sm:w-3.5 sm:h-3.5" />
+          <LogOut className="w-3.5 h-3.5" />
         </button>
       </div>
     </header>

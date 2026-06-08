@@ -18,6 +18,7 @@ import {
   Flame,
   ShoppingBag,
   UserCog,
+  LogOut,
 } from 'lucide-react';
 import { CAMPAIGN_NAV_ITEMS, navHref } from '@/lib/navItems';
 import FeedbackButton from '@/components/layout/FeedbackButton';
@@ -203,6 +204,14 @@ export default function Sidebar({ campaign, collapsed, onToggle, onNavClick }) {
           <ThemeToggle />
           {!collapsed && <span className="text-sm text-zinc-600 dark:text-zinc-400">Theme</span>}
         </div>
+        {/* Sign out — mobile drawer only (desktop has it in the system tray). */}
+        <button
+          onClick={() => { sessionStorage.removeItem('gmos_booted'); auth.logout(); }}
+          className="md:hidden w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-zinc-600 dark:text-zinc-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-500/10 transition-colors"
+        >
+          <LogOut className="w-4 h-4 flex-shrink-0" />
+          <span>Sign out</span>
+        </button>
         {user && !collapsed && (
           <div className="flex items-center gap-2 px-2 py-1.5 rounded-lg bg-zinc-100 dark:bg-zinc-800/50">
             <div className="w-6 h-6 rounded-full bg-amber-500/20 flex items-center justify-center flex-shrink-0">
