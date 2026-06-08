@@ -19,6 +19,7 @@ import {
   ShoppingBag,
   UserCog,
   LogOut,
+  LayoutGrid,
 } from 'lucide-react';
 import { CAMPAIGN_NAV_ITEMS, navHref } from '@/lib/navItems';
 import FeedbackButton from '@/components/layout/FeedbackButton';
@@ -119,6 +120,15 @@ export default function Sidebar({ campaign, collapsed, onToggle, onNavClick }) {
 
       {/* Navigation */}
       <nav data-tour="nav" className="flex-1 overflow-y-auto p-2 space-y-1">
+        <Link
+          to={createPageUrl('CampaignList')}
+          onClick={onNavClick}
+          title="Back to all campaigns"
+          className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800/50 transition-colors mb-1 border-b border-zinc-200/60 dark:border-zinc-800/60 rounded-b-none pb-2.5"
+        >
+          <LayoutGrid className="w-4 h-4 flex-shrink-0" />
+          {!collapsed && <span>All campaigns</span>}
+        </Link>
         {CAMPAIGN_NAV_ITEMS.map(({ page, label, Icon, param }) => {
           const isActive = activePage === page;
           const href = navHref({ page, param }, campaign.id);

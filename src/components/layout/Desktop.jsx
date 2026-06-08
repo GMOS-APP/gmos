@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useWindowManager } from '@/lib/WindowManager';
 import { UploadFile } from '@/api/entities';
 import Window from './Window';
-import { LayoutGrid, Check, Upload, Loader2 } from 'lucide-react';
+import { LayoutGrid, Check, Upload, Loader2, Link2 } from 'lucide-react';
 
 const STORAGE = 'gmos_wallpaper';
 const URL_STORAGE = 'gmos_wallpaper_url';
@@ -58,6 +58,8 @@ export default function Desktop({ dashboardUrl }) {
   });
   const [uploading, setUploading] = useState(false);
   const [menu, setMenu] = useState(null); // { x, y } | null
+  const [linkMode, setLinkMode] = useState(false);
+  const [linkVal, setLinkVal] = useState('');
 
   const visible = wm.windows.filter((w) => !w.minimized);
   const hasWindows = wm.windows.length > 0;
@@ -94,14 +96,23 @@ export default function Desktop({ dashboardUrl }) {
     }
   };
 
+  const applyLink = () => {
+    const u = linkVal.trim();
+    if (!/^https?:\/\//i.test(u)) { alert('Enter a valid image URL (starts with http).'); return; }
+    setCustomUrl(u);
+    try { localStorage.setItem(URL_STORAGE, u); } catch { /* ignore */ }
+    pickWallpaper('custom');
+  };
+
   // Right-click the empty desktop → wallpaper menu (positioned within bounds).
   const onContextMenu = (e) => {
     if (e.target !== e.currentTarget && !e.target.dataset?.wallpaperLayer) return;
     e.preventDefault();
+    setLinkMode(false); setLinkVal('');
     const rect = ref.current?.getBoundingClientRect();
     const x = rect ? e.clientX - rect.left : e.clientX;
     const y = rect ? e.clientY - rect.top : e.clientY;
-    setMenu({ x: Math.min(x, (rect?.width || 9999) - 180), y: Math.min(y, (rect?.height || 9999) - 220) });
+    setMenu({ x: Math.min(x, (rect?.width || 9999) - 240), y: Math.min(y, (rect?.height || 9999) - 280) });
   };
 
   useEffect(() => {
@@ -143,7 +154,7 @@ export default function Desktop({ dashboardUrl }) {
       {/* Wallpaper context menu */}
       {menu && (
         <div
-          className="absolute z-[9999] w-44 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-2xl py-1"
+          className="absolute z-[9999] w-56 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-2xl py-1"
           style={{ left: menu.x, top: menu.y }}
           onPointerDown={(e) => e.stopPropagation()}
           onContextMenu={(e) => e.preventDefault()}
@@ -186,6 +197,28 @@ export default function Desktop({ dashboardUrl }) {
             </span>
             <span className="flex-1 text-left">{uploading ? 'Uploading…' : 'Upload image…'}</span>
           </button>
+
+          {!linkMode ? (
+            <button
+              onClick={() => setLinkMode(true)}
+              className="w-full flex items-center gap-2.5 px-3 py-1.5 text-sm text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+            >
+              <span className="w-5 h-5 rounded flex items-center justify-center flex-shrink-0 text-zinc-500"><Link2 className="w-3.5 h-3.5" /></span>
+              <span className="flex-1 text-left">Link to image…</span>
+            </button>
+          ) : (
+            <div className="px-2 py-1.5 flex gap-1">
+              <input
+                autoFocus
+                value={linkVal}
+                onChange={(e) => setLinkVal(e.target.value)}
+                onKeyDown={(e) => { if (e.key === 'Enter') applyLink(); }}
+                placeholder="Paste image URL…"
+                className="flex-1 min-w-0 text-xs rounded border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 px-2 py-1 focus:outline-none focus:border-amber-500/50"
+              />
+              <button onClick={applyLink} className="px-2 py-1 rounded bg-amber-500 hover:bg-amber-400 text-zinc-950 text-xs font-medium">Set</button>
+            </div>
+          )}
 
           <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={onFileChange} />
         </div>
