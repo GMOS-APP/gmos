@@ -3,7 +3,9 @@ import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription,
 } from '@/components/ui/dialog';
 import { Switch } from '@/components/ui/switch';
-import { Compass } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { createPageUrl } from '@/utils';
+import { Compass, BookOpen } from 'lucide-react';
 import { MOD_LABEL, ALT_LABEL } from '@/lib/useHotkeys';
 import { useHotkeysEnabled, setHotkeysEnabled } from '@/lib/useHotkeysEnabled';
 
@@ -62,6 +64,14 @@ export default function ShortcutsHelp({ open, onOpenChange, onStartTour }) {
             Take the interactive tour
           </button>
         )}
+        <Link
+          to={createPageUrl('Help')}
+          onClick={() => onOpenChange(false)}
+          className="flex items-center justify-center gap-2 h-9 rounded-lg border border-zinc-200 dark:border-zinc-800 text-sm font-medium text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800/60 transition-colors"
+        >
+          <BookOpen className="w-4 h-4" />
+          Open the full user manual
+        </Link>
       </DialogContent>
     </Dialog>
   );

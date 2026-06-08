@@ -158,6 +158,8 @@ export default function LandingPage() {
           the D&D SRD 5.1 (CC BY 4.0, Wizards of the Coast), and Open5e content.
         </p>
         <p className="text-[11px] text-zinc-400 dark:text-zinc-600 text-center mt-2">
+          <Link to={createPageUrl('Help')} className="hover:text-zinc-600 dark:hover:text-zinc-400 hover:underline">User Manual</Link>
+          <span className="mx-2" aria-hidden>·</span>
           <Link to={createPageUrl('PrivacyPolicy')} className="hover:text-zinc-600 dark:hover:text-zinc-400 hover:underline">Privacy Policy</Link>
           <span className="mx-2" aria-hidden>·</span>
           <Link to={createPageUrl('Terms')} className="hover:text-zinc-600 dark:hover:text-zinc-400 hover:underline">Terms of Service</Link>
