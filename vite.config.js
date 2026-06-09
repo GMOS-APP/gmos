@@ -12,4 +12,15 @@ export default defineConfig({
       '@': fileURLToPath(new URL('./src', import.meta.url)),
     },
   },
+  // react-draggable (via react-grid-layout) reads process.env.DRAGGABLE_DEBUG in
+  // its drag handlers; `process` is undefined in the browser, so without this it
+  // throws on drag-start and the dashboard widgets won't move. Define it away.
+  define: {
+    'process.env.DRAGGABLE_DEBUG': 'false',
+  },
+  optimizeDeps: {
+    esbuildOptions: {
+      define: { 'process.env.DRAGGABLE_DEBUG': 'false' },
+    },
+  },
 })
