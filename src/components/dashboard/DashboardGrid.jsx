@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import GridLayout, { WidthProvider } from 'react-grid-layout';
 import 'react-grid-layout/css/styles.css';
 import 'react-resizable/css/styles.css';
@@ -8,14 +8,22 @@ import { useMediaQuery } from '@/lib/useMediaQuery';
 
 const Grid = WidthProvider(GridLayout);
 const COLS = 12;
-const ROW_H = 64;
-const MARGIN = 14;
+// Small row height so a widget's height can fit its content closely (no scroll).
+// Each widget's row-span is measured from its rendered height, never fixed.
+const ROW_H = 8;
+const MARGIN = 12;
+const VERSION = 2; // bump when the layout math changes, to invalidate old saves
 const KEY = (cid) => `gmos_dash_${cid}`;
+// px → row-span that fully contains it (ceil so content is never clipped/scrolled).
+const rowsFor = (px) => Math.max(2, Math.ceil((px + MARGIN) / (ROW_H + MARGIN)));
+// Rough initial span before the first measurement, derived from the registry's
+// (64px-based) default h, so first paint is in the right ballpark.
+const initRows = (h) => Math.max(4, Math.round((h * 64) / (ROW_H + MARGIN)));
 
 function load(cid) {
   try {
     const raw = localStorage.getItem(KEY(cid));
-    if (raw) return JSON.parse(raw);
+    if (raw) { const s = JSON.parse(raw); if (s && s.v === VERSION) return s; }
   } catch { /* ignore */ }
   return null;
 }
@@ -29,14 +37,14 @@ function buildDefault(widgets) {
   const active = widgets.filter((w) => w.defaultActive && w.available !== false).map((w) => w.id);
   const layout = widgets
     .filter((w) => active.includes(w.id))
-    .map((w) => ({ i: w.id, x: w.x, y: w.y, w: w.w, h: w.h, minW: w.minW || 2, minH: w.minH || 2 }));
-  return { active, layout };
+    .map((w) => ({ i: w.id, x: w.x, y: w.y * 4, w: w.w, h: initRows(w.h), minW: w.minW || 2, minH: 2 }));
+  return { v: VERSION, active, layout };
 }
 
 // Drop a newly-added widget at the bottom of the current layout.
 function placeAtBottom(layout, w) {
   const maxY = layout.reduce((m, l) => Math.max(m, l.y + l.h), 0);
-  return { i: w.id, x: 0, y: maxY, w: w.w, h: w.h, minW: w.minW || 2, minH: w.minH || 2 };
+  return { i: w.id, x: 0, y: maxY, w: w.w, h: initRows(w.h), minW: w.minW || 2, minH: 2 };
 }
 
 function AddMenu({ widgets, active, onAdd }) {
@@ -84,68 +92,91 @@ function AddRow({ w, onAdd }) {
   );
 }
 
+// One grid cell. Measures its own natural content height and reports the needed
+// row-span up, so the grid grows the cell to fit — widgets never scroll.
+function WidgetItem({ w, editing, onRemove, onMeasure }) {
+  const ref = useRef(null);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el || typeof ResizeObserver === 'undefined') return undefined;
+    const report = () => onMeasure(w.id, rowsFor(el.offsetHeight));
+    report();
+    const ro = new ResizeObserver(report);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [w.id, editing, onMeasure]);
+
+  return (
+    <div className="h-full overflow-hidden">
+      {/* This inner element is NOT height-constrained, so its offsetHeight is the
+          true content height we measure. */}
+      <div ref={ref}>
+        {editing ? (
+          <div className="rounded-xl ring-2 ring-amber-400/60 dark:ring-amber-500/40 bg-white dark:bg-zinc-900/40 overflow-hidden">
+            <div className="flex items-center justify-between px-2 py-1 bg-amber-50 dark:bg-amber-500/10 cursor-move">
+              <span className="flex items-center gap-1 text-[11px] font-medium text-amber-700 dark:text-amber-300 truncate">
+                <GripVertical className="w-3.5 h-3.5 flex-shrink-0" /> {w.title}
+              </span>
+              {w.removable !== false && (
+                <button onClick={() => onRemove(w.id)}
+                  className="dash-no-drag flex-shrink-0 p-0.5 rounded text-amber-700/70 dark:text-amber-300/70 hover:text-red-500 hover:bg-red-500/10"
+                  title={`Remove ${w.title}`} aria-label={`Remove ${w.title}`}>
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              )}
+            </div>
+            <div className="p-3 pointer-events-none select-none">{w.node}</div>
+          </div>
+        ) : w.node}
+      </div>
+    </div>
+  );
+}
+
 export default function DashboardGrid({ campaignId, widgets }) {
   const wide = useMediaQuery('(min-width: 768px)');
   const byId = useMemo(() => Object.fromEntries(widgets.map((w) => [w.id, w])), [widgets]);
 
   const [state, setState] = useState(() => load(campaignId) || buildDefault(widgets));
   const [editing, setEditing] = useState(false);
+  const [measured, setMeasured] = useState({}); // id -> row-span from content
 
-  // Persist on every change.
   useEffect(() => { save(campaignId, state); }, [campaignId, state]);
 
-  // Reconcile: drop active ids that no longer exist as widgets (e.g. a widget
-  // became unavailable), and ensure every active widget has a layout entry.
+  const onMeasure = useCallback((id, rows) => {
+    setMeasured((m) => (m[id] === rows ? m : { ...m, [id]: rows }));
+  }, []);
+
   const active = useMemo(
     () => state.active.filter((id) => byId[id] && byId[id].available !== false),
     [state.active, byId],
   );
+
+  // Effective layout: positions/width from saved state, height from measurement.
   const layout = useMemo(() => {
     const existing = new Map(state.layout.map((l) => [l.i, l]));
-    return active.map((id) => existing.get(id) || placeAtBottom(state.layout, byId[id]));
-  }, [active, state.layout, byId]);
+    return active.map((id) => {
+      const base = existing.get(id) || placeAtBottom(state.layout, byId[id]);
+      return { i: id, x: base.x, y: base.y, w: base.w, h: measured[id] ?? base.h, minW: byId[id].minW || 2, minH: 2 };
+    });
+  }, [active, state.layout, measured, byId]);
 
   const onLayoutChange = (next) => {
     if (!editing) return;
-    setState((s) => ({ ...s, layout: next.map(({ i, x, y, w, h, minW, minH }) => ({ i, x, y, w, h, minW, minH })) }));
+    setState((s) => {
+      const merged = next.map(({ i, x, y, w, h, minW }) => ({ i, x, y, w, h, minW, minH: 2 }));
+      if (JSON.stringify(merged) === JSON.stringify(s.layout)) return s; // avoid loops
+      return { ...s, layout: merged };
+    });
   };
   const addWidget = (id) => setState((s) => ({
-    active: [...s.active, id],
-    layout: [...s.layout, placeAtBottom(s.layout, byId[id])],
+    ...s, active: [...s.active, id], layout: [...s.layout, placeAtBottom(s.layout, byId[id])],
   }));
   const removeWidget = (id) => setState((s) => ({
-    active: s.active.filter((x) => x !== id),
-    layout: s.layout.filter((l) => l.i !== id),
+    ...s, active: s.active.filter((x) => x !== id), layout: s.layout.filter((l) => l.i !== id),
   }));
-  const reset = () => setState(buildDefault(widgets));
+  const reset = () => { setMeasured({}); setState(buildDefault(widgets)); };
 
-  // View mode renders each widget exactly as it looks elsewhere (the node brings
-  // its own framing). Edit mode wraps it in a grab-able amber chrome and blocks
-  // inner clicks so dragging/resizing doesn't trip links.
-  const Card = ({ w }) => {
-    if (!editing) return <div className="h-full overflow-auto">{w.node}</div>;
-    return (
-      <div className="h-full flex flex-col overflow-hidden rounded-xl ring-2 ring-amber-400/60 dark:ring-amber-500/40 bg-white dark:bg-zinc-900/40">
-        <div className="flex items-center justify-between px-2 py-1 bg-amber-50 dark:bg-amber-500/10 cursor-move flex-shrink-0">
-          <span className="flex items-center gap-1 text-[11px] font-medium text-amber-700 dark:text-amber-300 truncate">
-            <GripVertical className="w-3.5 h-3.5 flex-shrink-0" /> {w.title}
-          </span>
-          {w.removable !== false && (
-            <button onClick={() => removeWidget(w.id)}
-              className="dash-no-drag flex-shrink-0 p-0.5 rounded text-amber-700/70 dark:text-amber-300/70 hover:text-red-500 hover:bg-red-500/10"
-              title={`Remove ${w.title}`} aria-label={`Remove ${w.title}`}>
-              <X className="w-3.5 h-3.5" />
-            </button>
-          )}
-        </div>
-        <div className="flex-1 min-h-0 overflow-auto p-3 pointer-events-none select-none">
-          {w.node}
-        </div>
-      </div>
-    );
-  };
-
-  // Toolbar shared by both layouts.
   const toolbar = (
     <div className="flex items-center justify-end gap-2 mb-3">
       {editing && <AddMenu widgets={widgets} active={active} onAdd={addWidget} />}
@@ -164,8 +195,8 @@ export default function DashboardGrid({ campaignId, widgets }) {
     </div>
   );
 
-  // Mobile: no grid — stack active widgets in layout order (top-to-bottom,
-  // left-to-right). Editing the grid is a desktop affair.
+  // Mobile: no grid — stack active widgets in layout order. No scroll concerns
+  // since each widget renders at its natural height.
   if (!wide) {
     const ordered = [...active].sort((a, b) => {
       const la = layout.find((l) => l.i === a) || {}; const lb = layout.find((l) => l.i === b) || {};
@@ -183,7 +214,7 @@ export default function DashboardGrid({ campaignId, widgets }) {
       {toolbar}
       {editing && (
         <p className="text-[11px] text-zinc-500 dark:text-zinc-500 mb-2 text-right">
-          Drag the title bar to move · drag a corner to resize · saved on this device.
+          Drag the title bar to move · drag the right edge to set width · height fits the content · saved on this device.
         </p>
       )}
       <Grid
@@ -195,12 +226,14 @@ export default function DashboardGrid({ campaignId, widgets }) {
         isDraggable={editing}
         isResizable={editing}
         draggableCancel=".dash-no-drag"
-        resizeHandles={['se']}
+        resizeHandles={['e']}
         compactType="vertical"
         onLayoutChange={onLayoutChange}
       >
         {active.map((id) => (
-          <div key={id}><Card w={byId[id]} /></div>
+          <div key={id}>
+            <WidgetItem w={byId[id]} editing={editing} onRemove={removeWidget} onMeasure={onMeasure} />
+          </div>
         ))}
       </Grid>
     </div>
