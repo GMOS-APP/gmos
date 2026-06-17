@@ -4,14 +4,25 @@ const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!;
 const SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
 const ANON_KEY = Deno.env.get('SUPABASE_ANON_KEY')!;
 
-const CORS_HEADERS = {
-  'Access-Control-Allow-Origin': '*',
+const ALLOWED_ORIGINS = ['https://trisdenc.github.io'];
+const isAllowedOrigin = (o: string | null): o is string =>
+  !!o && (ALLOWED_ORIGINS.includes(o) ||
+    /^http:\/\/localhost:\d+$/.test(o) ||
+    /^https:\/\/[a-z0-9-]+\.vercel\.app$/.test(o));
+const cors = (origin: string | null) => ({
+  'Access-Control-Allow-Origin': isAllowedOrigin(origin) ? origin : ALLOWED_ORIGINS[0],
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+  'Access-Control-Allow-Methods': 'POST, GET, OPTIONS',
+  'Vary': 'Origin',
+});
+
+// Cap import size to stop a crafted backup from creating unbounded rows.
+const MAX_RECORDS = 10000;
 
 const strip = ({ id, created_date, updated_date, created_by, ...rest }: Record<string, unknown>) => rest;
 
 Deno.serve(async (req) => {
+  const CORS_HEADERS = cors(req.headers.get('Origin'));
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: CORS_HEADERS });
   }
@@ -44,6 +55,18 @@ Deno.serve(async (req) => {
 
     if (!campaign) {
       return Response.json({ error: 'Invalid backup file: missing campaign data' }, { status: 400, headers: CORS_HEADERS });
+    }
+
+    // Reject malformed or oversized payloads before doing any privileged writes.
+    const arrays = { world_entities, sessions, relationships, campaign_maps, quick_notes, random_tables };
+    for (const [name, arr] of Object.entries(arrays)) {
+      if (!Array.isArray(arr)) {
+        return Response.json({ error: `Invalid backup file: ${name} must be an array` }, { status: 400, headers: CORS_HEADERS });
+      }
+    }
+    const totalRecords = Object.values(arrays).reduce((sum, arr) => sum + arr.length, 0);
+    if (totalRecords > MAX_RECORDS) {
+      return Response.json({ error: `Import too large: ${totalRecords} records exceeds the ${MAX_RECORDS} limit` }, { status: 413, headers: CORS_HEADERS });
     }
 
     const admin = createClient(SUPABASE_URL, SERVICE_ROLE_KEY);

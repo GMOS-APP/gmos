@@ -3,12 +3,20 @@ import { createClient } from 'npm:@supabase/supabase-js@2';
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!;
 const SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
 
+const ALLOWED_ORIGINS = ['https://trisdenc.github.io'];
+const isAllowedOrigin = (o: string | null): o is string =>
+  !!o && (ALLOWED_ORIGINS.includes(o) ||
+    /^http:\/\/localhost:\d+$/.test(o) ||
+    /^https:\/\/[a-z0-9-]+\.vercel\.app$/.test(o));
+const cors = (origin: string | null) => ({
+  'Access-Control-Allow-Origin': isAllowedOrigin(origin) ? origin : ALLOWED_ORIGINS[0],
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Methods': 'POST, GET, OPTIONS',
+  'Vary': 'Origin',
+});
+
 Deno.serve(async (req) => {
-  // CORS headers for browser access
-  const corsHeaders = {
-    'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-  };
+  const corsHeaders = cors(req.headers.get('Origin'));
 
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders });

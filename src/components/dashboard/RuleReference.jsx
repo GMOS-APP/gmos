@@ -123,9 +123,9 @@ export default function RuleReference() {
       </div>
 
       <p className="text-[10px] text-zinc-600 mt-2 flex-shrink-0">
-        <a href="https://dnd.wizards.com/resources/systems-reference-document" target="_blank" rel="noreferrer" className="hover:text-zinc-400 underline underline-offset-2">D&amp;D SRD 5.1</a>
+        <a href="https://dnd.wizards.com/resources/systems-reference-document" target="_blank" rel="noopener noreferrer" className="hover:text-zinc-400 underline underline-offset-2">D&amp;D SRD 5.1</a>
         {' · © Wizards of the Coast LLC · '}
-        <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noreferrer" className="hover:text-zinc-400 underline underline-offset-2">CC BY 4.0</a>
+        <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener noreferrer" className="hover:text-zinc-400 underline underline-offset-2">CC BY 4.0</a>
       </p>
     </div>
   );

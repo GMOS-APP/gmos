@@ -241,7 +241,7 @@ export default function Open5eImport({ entityType, onImport, onCancel }) {
       <a
         href="https://open5e.com"
         target="_blank"
-        rel="noreferrer"
+        rel="noopener noreferrer"
         className="text-xs dark:text-zinc-600 text-zinc-500 hover:text-amber-500 inline-flex items-center gap-1 mb-6"
       >
         <ExternalLink className="w-3 h-3" /> open5e.com

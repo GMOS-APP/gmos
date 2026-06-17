@@ -1,10 +1,17 @@
-const CORS_HEADERS = {
-  'Access-Control-Allow-Origin': '*',
+const ALLOWED_ORIGINS = ['https://trisdenc.github.io'];
+const isAllowedOrigin = (o: string | null): o is string =>
+  !!o && (ALLOWED_ORIGINS.includes(o) ||
+    /^http:\/\/localhost:\d+$/.test(o) ||
+    /^https:\/\/[a-z0-9-]+\.vercel\.app$/.test(o));
+const cors = (origin: string | null) => ({
+  'Access-Control-Allow-Origin': isAllowedOrigin(origin) ? origin : ALLOWED_ORIGINS[0],
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-  'Access-Control-Allow-Methods': 'POST, OPTIONS',
-};
+  'Access-Control-Allow-Methods': 'POST, GET, OPTIONS',
+  'Vary': 'Origin',
+});
 
 Deno.serve(async (req) => {
+  const CORS_HEADERS = cors(req.headers.get('Origin'));
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: CORS_HEADERS });
   }
@@ -20,12 +27,20 @@ Deno.serve(async (req) => {
     }
 
     const url = `https://character-service.dndbeyond.com/character/v5/character/${encodeURIComponent(String(characterId))}`;
+    // SSRF defence-in-depth: never follow redirects (a 3xx could point at an
+    // internal host), and time out so a hung upstream can't pin the function.
     const response = await fetch(url, {
+      redirect: 'manual',
+      signal: AbortSignal.timeout(10000),
       headers: {
         'Accept': 'application/json',
         'User-Agent': 'Mozilla/5.0 (compatible; DnDCampaignManager/1.0)',
       },
     });
+
+    if (response.status >= 300 && response.status < 400) {
+      return Response.json({ error: 'Unexpected redirect from D&D Beyond.' }, { status: 502, headers: CORS_HEADERS });
+    }
 
     if (response.status === 401 || response.status === 403) {
       return Response.json({
