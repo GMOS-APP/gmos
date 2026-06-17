@@ -20,11 +20,26 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import QueryError from '@/components/common/QueryError';
 import { DEFAULT_SYSTEM_ID } from '@/lib/systems';
+import UpgradeModal from '@/components/billing/UpgradeModal';
+import { FREE_CAMPAIGN_LIMIT, isCampaignLimitError } from '@/lib/plans';
+
+// True when a thrown error — from a direct insert or from a functions.invoke
+// (FunctionsHttpError carries the body in .context) — is the campaign-limit signal.
+async function isLimitError(err) {
+  if (isCampaignLimitError(err)) return true;
+  try {
+    const body = await err?.context?.json?.();
+    return isCampaignLimitError(body);
+  } catch {
+    return false;
+  }
+}
 
 export default function CampaignList() {
   const queryClient = useQueryClient();
   const { user, isPlus, logout } = useAuth();
   const [showCreate, setShowCreate] = useState(false);
+  const [showUpgrade, setShowUpgrade] = useState(false);
   const [form, setForm] = useState({ name: '', background: '', setting: '', hook: '', system: DEFAULT_SYSTEM_ID });
   const [exportingId, setExportingId] = useState(null);
   const [importing, setImporting] = useState(false);
@@ -34,12 +49,18 @@ export default function CampaignList() {
     const file = e.target.files?.[0];
     if (!file) return;
     setImporting(true);
-    const text = await file.text();
-    const data = JSON.parse(text);
-    await functions.invoke('importCampaign', data);
-    queryClient.invalidateQueries({ queryKey: ['campaigns'] });
-    setImporting(false);
-    e.target.value = '';
+    try {
+      const text = await file.text();
+      const data = JSON.parse(text);
+      await functions.invoke('importCampaign', data);
+      queryClient.invalidateQueries({ queryKey: ['campaigns'] });
+    } catch (err) {
+      if (await isLimitError(err)) setShowUpgrade(true);
+      else console.error('Import failed:', err);
+    } finally {
+      setImporting(false);
+      e.target.value = '';
+    }
   };
 
   const handleExport = async (e, campaign) => {
@@ -68,7 +89,8 @@ export default function CampaignList() {
       if (error) throw error;
       await queryClient.invalidateQueries({ queryKey: ['campaigns'] });
     } catch (err) {
-      console.error('Failed to load demo campaign:', err);
+      if (await isLimitError(err)) setShowUpgrade(true);
+      else console.error('Failed to load demo campaign:', err);
     } finally {
       setLoadingDemo(false);
     }
@@ -79,12 +101,22 @@ export default function CampaignList() {
     queryFn: () => Campaign.list('-created_date'),
   });
 
+  // Free plan is capped at FREE_CAMPAIGN_LIMIT campaigns; the server enforces it too.
+  const atFreeLimit = !isPlus && campaigns.length >= FREE_CAMPAIGN_LIMIT;
+  const handleNewCampaign = () => (atFreeLimit ? setShowUpgrade(true) : setShowCreate(true));
+
   const createMutation = useMutation({
     mutationFn: (data) => Campaign.create(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['campaigns'] });
       setShowCreate(false);
       setForm({ name: '', background: '', setting: '', hook: '', system: DEFAULT_SYSTEM_ID });
+    },
+    onError: async (err) => {
+      if (await isLimitError(err)) {
+        setShowCreate(false);
+        setShowUpgrade(true);
+      }
     },
   });
 
@@ -148,14 +180,14 @@ export default function CampaignList() {
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800">
                 <DropdownMenuItem
-                  onClick={() => fileInputRef.current?.click()}
+                  onClick={() => (atFreeLimit ? setShowUpgrade(true) : fileInputRef.current?.click())}
                   className="text-zinc-700 dark:text-zinc-300 focus:text-zinc-900 dark:focus:text-zinc-100"
                 >
                   <FileText className="w-3.5 h-3.5 mr-2" />
                   From File
                 </DropdownMenuItem>
                 <DropdownMenuItem
-                  onClick={handleLoadDemo}
+                  onClick={() => (atFreeLimit ? setShowUpgrade(true) : handleLoadDemo())}
                   disabled={loadingDemo}
                   className="text-zinc-700 dark:text-zinc-300 focus:text-zinc-900 dark:focus:text-zinc-100"
                 >
@@ -165,7 +197,7 @@ export default function CampaignList() {
               </DropdownMenuContent>
             </DropdownMenu>
             <Button
-              onClick={() => setShowCreate(true)}
+              onClick={handleNewCampaign}
               size="sm"
               className="bg-amber-500 hover:bg-amber-400 text-zinc-950 font-semibold h-9"
             >
@@ -314,6 +346,8 @@ export default function CampaignList() {
           About GM/OS &amp; Legal Attributions
         </Link>
       </div>
+
+      <UpgradeModal open={showUpgrade} onOpenChange={setShowUpgrade} />
 
       {/* Create Dialog */}
       <Dialog open={showCreate} onOpenChange={setShowCreate}>

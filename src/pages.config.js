@@ -68,6 +68,7 @@ const PlayerView = lazy(() => import('./pages/PlayerView'));
 const CampaignSettings = lazy(() => import('./pages/CampaignSettings'));
 const About = lazy(() => import('./pages/About'));
 const AccountSettings = lazy(() => import('./pages/AccountSettings'));
+const Upgrade = lazy(() => import('./pages/Upgrade'));
 const PartyInventory = lazy(() => import('./pages/PartyInventory'));
 const BattleMap = lazy(() => import('./pages/BattleMap'));
 
@@ -88,6 +89,7 @@ export const PAGES = {
     "CampaignSettings": CampaignSettings,
     "About": About,
     "AccountSettings": AccountSettings,
+    "Upgrade": Upgrade,
     "PartyInventory": PartyInventory,
     "BattleMap": BattleMap,
 }

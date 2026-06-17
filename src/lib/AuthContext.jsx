@@ -4,21 +4,21 @@ import { queryClientInstance } from '@/lib/query-client';
 
 const AuthContext = createContext();
 
-async function fetchOrCreateProfile(userId, setPlan) {
+async function fetchOrCreateProfile(userId, setProfile) {
   if (!userId) {
-    setPlan('free');
+    setProfile({ plan: 'free', planExpiresAt: null });
     return;
   }
   const { data } = await supabase
     .from('user_profiles')
-    .select('plan')
+    .select('plan, plan_expires_at')
     .eq('id', userId)
     .maybeSingle();
   if (data) {
-    setPlan(data.plan);
+    setProfile({ plan: data.plan, planExpiresAt: data.plan_expires_at });
     return;
   }
-  setPlan('free');
+  setProfile({ plan: 'free', planExpiresAt: null });
   // Insert idempotently; only the call that actually creates the row seeds the
   // demo, so concurrent init paths can't double-seed.
   const { data: inserted } = await supabase
@@ -35,12 +35,22 @@ export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoadingAuth, setIsLoadingAuth] = useState(true);
   const [plan, setPlan] = useState('free');
+  const [planExpiresAt, setPlanExpiresAt] = useState(null);
+
+  const setProfile = ({ plan: p, planExpiresAt: exp }) => {
+    setPlan(p ?? 'free');
+    setPlanExpiresAt(exp ?? null);
+  };
+
+  // Re-pull the plan from the DB. Used after returning from Stripe checkout,
+  // where the webhook may land a beat after the redirect.
+  const refreshProfile = () => fetchOrCreateProfile(user?.id ?? null, setProfile);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null);
       setIsAuthenticated(!!session);
-      fetchOrCreateProfile(session?.user?.id ?? null, setPlan).finally(() => {
+      fetchOrCreateProfile(session?.user?.id ?? null, setProfile).finally(() => {
         setIsLoadingAuth(false);
       });
     }).catch(() => setIsLoadingAuth(false));
@@ -48,7 +58,7 @@ export const AuthProvider = ({ children }) => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
       setIsAuthenticated(!!session);
-      fetchOrCreateProfile(session?.user?.id ?? null, setPlan);
+      fetchOrCreateProfile(session?.user?.id ?? null, setProfile);
     });
 
     return () => subscription.unsubscribe();
@@ -66,7 +76,9 @@ export const AuthProvider = ({ children }) => {
       isAuthenticated,
       isLoadingAuth,
       plan,
-      isPlus: plan === 'plus',
+      planExpiresAt,
+      isPlus: plan !== 'free',
+      refreshProfile,
       // Kept for backward compatibility with any consuming components
       isLoadingPublicSettings: false,
       authError: null,

@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import AuthPanel from '@/components/layout/AuthPanel';
 import ThemeToggle from '@/components/ui/ThemeToggle';
+import PricingTiers from '@/components/billing/PricingTiers';
 import {
   BookOpen, Globe, Swords, Network, Map, Eye, Command, Check,
 } from 'lucide-react';
@@ -81,6 +82,9 @@ export default function LandingPage() {
           GM<span className="text-amber-500">/OS</span>
         </span>
         <div className="ml-auto flex items-center gap-3">
+          <a href="#pricing" className="hidden sm:inline text-sm font-medium text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors">
+            Pricing
+          </a>
           <ThemeToggle />
           <a href="#signin" className="text-sm font-medium px-3 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-zinc-950 transition-colors">
             Sign in
@@ -138,6 +142,15 @@ export default function LandingPage() {
             <Command className="w-4 h-4 text-amber-500" />
             <span>It's keyboard-driven too: a command palette (⌘K), shortcuts, and inline dice.</span>
           </div>
+        </div>
+      </section>
+
+      {/* Pricing */}
+      <section id="pricing" className="px-4 sm:px-6 py-16 border-t border-zinc-200/70 dark:border-zinc-800/60">
+        <div className="max-w-4xl mx-auto">
+          <h2 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100 text-center mb-2">Simple pricing</h2>
+          <p className="text-sm text-zinc-500 dark:text-zinc-500 text-center mb-10">Start free with one campaign. Upgrade any time for unlimited.</p>
+          <PricingTiers onSelect={() => { window.location.hash = 'signin'; }} ctaLabel="Get started" />
         </div>
       </section>
 

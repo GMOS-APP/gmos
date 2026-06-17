@@ -453,7 +453,10 @@ export default function AdminConsole() {
                           className={cn('text-xs px-1.5 py-1 disabled:opacity-50', INPUT)}
                         >
                           <option value="free">free</option>
-                          <option value="plus">plus</option>
+                          <option value="monthly">monthly</option>
+                          <option value="yearly">yearly</option>
+                          <option value="lifetime">lifetime</option>
+                          {u.plan === 'plus' && <option value="plus">plus (legacy)</option>}
                         </select>
                       </td>
                       <td className="px-3 py-2 text-right tabular-nums text-zinc-600 dark:text-zinc-400">{u.campaigns}</td>

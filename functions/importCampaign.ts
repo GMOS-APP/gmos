@@ -185,6 +185,12 @@ Deno.serve(async (req) => {
         await cleanup.from('campaigns').delete().eq('id', createdCampaignId);
       } catch { /* best-effort cleanup */ }
     }
-    return Response.json({ error: error.message }, { status: 500, headers: CORS_HEADERS });
+    // Free-tier campaign limit (from the enforce_free_campaign_limit trigger) →
+    // surface a recognizable code so the client can show the upgrade prompt.
+    const err = error as { message?: string; hint?: string };
+    if (err?.hint === 'CAMPAIGN_LIMIT_REACHED' || /Free plan is limited to 1 campaign/.test(err?.message || '')) {
+      return Response.json({ error: 'CAMPAIGN_LIMIT_REACHED' }, { status: 403, headers: CORS_HEADERS });
+    }
+    return Response.json({ error: err?.message }, { status: 500, headers: CORS_HEADERS });
   }
 });

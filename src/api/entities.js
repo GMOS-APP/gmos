@@ -100,6 +100,8 @@ export const functions = {
       deleteAccount: 'delete-account',
       partyInventory: 'party-inventory',
       battleMap: 'battle-map',
+      createCheckout: 'create-checkout',
+      createBillingPortal: 'create-billing-portal',
     };
     const fnName = FUNCTION_MAP[name] || name;
     const { data, error } = await supabase.functions.invoke(fnName, { body: payload });

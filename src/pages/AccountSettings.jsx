@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useSearchParams, Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { supabase } from '@/api/supabaseClient';
 import { functions } from '@/api/entities';
 import { useAuth } from '@/lib/AuthContext';
+import { PLAN_LABELS } from '@/lib/plans';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/use-toast';
@@ -33,9 +34,37 @@ function Section({ icon: Icon, title, description, children }) {
 }
 
 export default function AccountSettings() {
-  const { user, plan, logout } = useAuth();
+  const { user, plan, planExpiresAt, isPlus, refreshProfile, logout } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
+  const [params] = useSearchParams();
+  const [billingLoading, setBillingLoading] = useState(false);
+
+  // Returning from a successful Stripe checkout: the webhook may land a beat
+  // after the redirect, so re-pull the plan a few times.
+  useEffect(() => {
+    if (params.get('checkout') !== 'success') return;
+    toast({ title: 'Thanks for upgrading!', description: 'Activating your plan…' });
+    let tries = 0;
+    const tick = async () => {
+      await refreshProfile();
+      if (++tries < 5) setTimeout(tick, 1500);
+    };
+    tick();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const openBillingPortal = async () => {
+    setBillingLoading(true);
+    try {
+      const { data } = await functions.invoke('createBillingPortal', {});
+      if (data?.url) { window.location.href = data.url; return; }
+      throw new Error('No portal URL returned');
+    } catch (e) {
+      setBillingLoading(false);
+      toast({ title: 'Could not open billing', description: e.message || 'Please try again.', variant: 'destructive' });
+    }
+  };
 
   const provider = user?.app_metadata?.provider || 'email';
   const isPasswordUser = provider === 'email';
@@ -161,9 +190,39 @@ export default function AccountSettings() {
 
         {/* Plan */}
         <Section icon={Crown} title="Plan">
-          <div className="flex items-center justify-between">
-            <span className="text-sm text-zinc-800 dark:text-zinc-200 capitalize">{plan === 'plus' ? 'Plus' : 'Free'}</span>
-            {plan !== 'plus' && <span className="text-xs text-zinc-500 dark:text-zinc-500">Free plan</span>}
+          <div className="flex items-center justify-between gap-3">
+            <div>
+              <span className="text-sm font-medium text-zinc-800 dark:text-zinc-200">{PLAN_LABELS[plan] || 'Free'}</span>
+              {(plan === 'monthly' || plan === 'yearly') ? (
+                planExpiresAt && (
+                  <p className="text-xs text-zinc-500 dark:text-zinc-500 mt-0.5">
+                    Renews {new Date(planExpiresAt).toLocaleDateString()}
+                  </p>
+                )
+              ) : plan === 'lifetime' ? (
+                <p className="text-xs text-zinc-500 dark:text-zinc-500 mt-0.5">Lifetime access — thank you.</p>
+              ) : (
+                <p className="text-xs text-zinc-500 dark:text-zinc-500 mt-0.5">1 campaign, fully featured.</p>
+              )}
+            </div>
+            {!isPlus ? (
+              <Button
+                onClick={() => navigate(createPageUrl('Upgrade'))}
+                className="bg-amber-500 hover:bg-amber-400 text-zinc-950 font-semibold flex-shrink-0"
+              >
+                Upgrade
+              </Button>
+            ) : (plan === 'monthly' || plan === 'yearly' || plan === 'plus') ? (
+              <Button
+                onClick={openBillingPortal}
+                disabled={billingLoading}
+                variant="outline"
+                className="dark:bg-zinc-950 dark:border-zinc-700 flex-shrink-0"
+              >
+                {billingLoading ? <Loader2 className="w-4 h-4 mr-1.5 animate-spin" /> : null}
+                Manage subscription
+              </Button>
+            ) : null}
           </div>
         </Section>
 

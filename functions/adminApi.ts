@@ -46,7 +46,7 @@ Deno.serve(async (req) => {
         counts('user_profiles'), counts('campaigns'), counts('sessions'), counts('world_entities'),
       ]);
       const { data: plans } = await admin.from('user_profiles').select('plan');
-      const plus = (plans || []).filter((p) => p.plan === 'plus').length;
+      const plus = (plans || []).filter((p) => p.plan && p.plan !== 'free').length;
       return json({ stats: { users, campaigns, sessions, entities, plus } });
     }
 
@@ -77,9 +77,13 @@ Deno.serve(async (req) => {
 
     if (action === 'set-plan') {
       const { userId, plan, expires } = body;
-      if (!userId || !['free', 'plus'].includes(plan)) return json({ error: 'Invalid plan' }, 400);
+      if (!userId || !['free', 'plus', 'monthly', 'yearly', 'lifetime'].includes(plan)) {
+        return json({ error: 'Invalid plan' }, 400);
+      }
+      // Lifetime never expires; free has no expiry either.
+      const planExpires = (plan === 'lifetime' || plan === 'free') ? null : (expires || null);
       await admin.from('user_profiles').update({
-        plan, plan_expires_at: expires || null, updated_at: new Date().toISOString(),
+        plan, plan_expires_at: planExpires, updated_at: new Date().toISOString(),
       }).eq('id', userId);
       return json({ ok: true });
     }
