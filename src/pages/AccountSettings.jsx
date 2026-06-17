@@ -212,7 +212,7 @@ export default function AccountSettings() {
               >
                 Upgrade
               </Button>
-            ) : (plan === 'monthly' || plan === 'yearly' || plan === 'plus') ? (
+            ) : (
               <Button
                 onClick={openBillingPortal}
                 disabled={billingLoading}
@@ -220,9 +220,9 @@ export default function AccountSettings() {
                 className="dark:bg-zinc-950 dark:border-zinc-700 flex-shrink-0"
               >
                 {billingLoading ? <Loader2 className="w-4 h-4 mr-1.5 animate-spin" /> : null}
-                Manage subscription
+                {plan === 'lifetime' ? 'Billing & receipts' : 'Manage subscription'}
               </Button>
-            ) : null}
+            )}
           </div>
         </Section>
 

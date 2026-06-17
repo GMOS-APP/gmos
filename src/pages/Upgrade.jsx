@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Loader2, CreditCard } from 'lucide-react';
 import { functions } from '@/api/entities';
 import { useAuth } from '@/lib/AuthContext';
 import { useToast } from '@/components/ui/use-toast';
+import { Button } from '@/components/ui/button';
 import PricingTiers from '@/components/billing/PricingTiers';
 import { PLAN_LABELS } from '@/lib/plans';
 
@@ -14,6 +15,7 @@ export default function Upgrade() {
   const { toast } = useToast();
   const [params] = useSearchParams();
   const [loadingTier, setLoadingTier] = useState(null);
+  const [billingLoading, setBillingLoading] = useState(false);
 
   const canceled = params.get('checkout') === 'cancel';
 
@@ -29,6 +31,18 @@ export default function Upgrade() {
     } catch (e) {
       setLoadingTier(null);
       toast({ title: 'Could not start checkout', description: e.message || 'Please try again.', variant: 'destructive' });
+    }
+  };
+
+  const openBillingPortal = async () => {
+    setBillingLoading(true);
+    try {
+      const { data } = await functions.invoke('createBillingPortal', {});
+      if (data?.url) { window.location.href = data.url; return; }
+      throw new Error('No portal URL returned');
+    } catch (e) {
+      setBillingLoading(false);
+      toast({ title: 'Could not open billing', description: e.message || 'Please try again.', variant: 'destructive' });
     }
   };
 
@@ -53,6 +67,25 @@ export default function Upgrade() {
       {canceled && (
         <div className="mb-6 text-xs text-zinc-600 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-800 rounded-lg px-3 py-2">
           Checkout canceled — no charge was made.
+        </div>
+      )}
+
+      {isPlus && (
+        <div className="mb-6 flex items-center justify-between gap-3 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/40 px-4 py-3">
+          <p className="text-xs text-zinc-600 dark:text-zinc-400">
+            {plan === 'lifetime'
+              ? 'View your receipts and payment history.'
+              : 'Update your card, switch plan, or cancel anytime.'}
+          </p>
+          <Button
+            onClick={openBillingPortal}
+            disabled={billingLoading}
+            variant="outline"
+            className="dark:bg-zinc-950 dark:border-zinc-700 flex-shrink-0"
+          >
+            {billingLoading ? <Loader2 className="w-4 h-4 mr-1.5 animate-spin" /> : <CreditCard className="w-4 h-4 mr-1.5" />}
+            {plan === 'lifetime' ? 'Billing & receipts' : 'Manage subscription'}
+          </Button>
         </div>
       )}
 
