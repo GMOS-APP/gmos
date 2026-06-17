@@ -6,9 +6,11 @@ import ThemeToggle from '@/components/ui/ThemeToggle';
 import PricingTiers from '@/components/billing/PricingTiers';
 import {
   BookOpen, Globe, Swords, Network, Map, Eye, Command, Check,
+  LayoutGrid, Search, X, Minus, Square,
 } from 'lucide-react';
 
 const FEATURES = [
+  { Icon: LayoutGrid, title: 'A desktop-style workspace', body: 'Open your pages as floating windows you can drag, resize, and snap. Switch between Prep, Session, and Debrief modes from the taskbar, and jump anywhere with the ⌘K command palette.' },
   { Icon: Globe, title: 'Your world, in one place', body: 'Keep NPCs, locations, factions, items, deities, and lore together — linked, tagged, and searchable.' },
   { Icon: BookOpen, title: 'Session prep', body: "A guided structure for prepping a session, based on the Lazy GM method: strong start, scenes, secrets, NPCs, monsters, and rewards." },
   { Icon: Swords, title: 'Tools for the table', body: 'Notes, an initiative tracker, dice, and a fullscreen screen for while you run the game.' },
@@ -17,55 +19,111 @@ const FEATURES = [
   { Icon: Eye, title: 'Player view', body: 'A separate page you can share with players, showing only what you choose.' },
 ];
 
-// A code-rendered preview of the GM/OS UI (not a screenshot) for the hero.
+// A code-rendered preview of the GM/OS desktop (not a screenshot) for the hero —
+// mirrors the real OS chrome: taskbar (Start, mode badge, window strip, tray)
+// with draggable floating windows on the desktop.
+
+// Three mock window controls, matching Window.jsx (left-aligned, not mac dots).
+function WinControls() {
+  return (
+    <div className="flex items-center gap-1">
+      {[X, Minus, Square].map((Icon, i) => (
+        <span key={i} className="w-3 h-3 rounded-[3px] bg-zinc-200/80 dark:bg-zinc-800 flex items-center justify-center text-zinc-400 dark:text-zinc-500">
+          <Icon className="w-2 h-2" strokeWidth={2.75} />
+        </span>
+      ))}
+    </div>
+  );
+}
+
 function ProductPreview() {
   return (
     <div className="w-full rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 shadow-2xl overflow-hidden select-none">
       {/* Taskbar */}
-      <div className="flex items-center gap-2 h-9 px-3 border-b border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900/60">
-        <span className="flex items-center gap-1.5">
-          <span className="w-2.5 h-2.5 rounded-full bg-red-400/70" />
-          <span className="w-2.5 h-2.5 rounded-full bg-amber-400/70" />
-          <span className="w-2.5 h-2.5 rounded-full bg-emerald-400/70" />
+      <div className="flex items-center gap-1.5 h-8 px-2 border-b border-zinc-200 dark:border-zinc-800/70 bg-white dark:bg-zinc-950">
+        {/* Start button */}
+        <span className="flex items-center gap-1 px-1.5 h-6 rounded-md text-[11px] font-bold text-zinc-800 dark:text-zinc-200">
+          <LayoutGrid className="w-3.5 h-3.5 text-amber-500" />
+          GM<span className="text-amber-500">/OS</span>
         </span>
-        <span className="text-[11px] font-bold text-zinc-700 dark:text-zinc-200">GM<span className="text-amber-500">/OS</span></span>
-        <span className="flex items-center gap-1 font-mono text-[10px] text-emerald-600 dark:text-emerald-400">
-          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" /> RUN 00:42
+        {/* Active mode badge */}
+        <span className="flex items-center gap-1 px-1.5 h-6 rounded-md font-mono text-[10px] text-emerald-600 dark:text-emerald-400">
+          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" /> RUN
         </span>
-        <span className="ml-auto font-mono text-[10px] text-zinc-400 dark:text-zinc-600">⌘K · 21:14</span>
-      </div>
-
-      <div className="flex h-56">
-        {/* Sidebar */}
-        <div className="hidden sm:block w-32 flex-shrink-0 border-r border-zinc-200 dark:border-zinc-800/60 p-2 space-y-1">
-          {['Dashboard', 'Entities', 'Sessions', 'Map', 'Timeline'].map((n, i) => (
-            <div key={n} className={`flex items-center gap-2 px-2 py-1.5 rounded-lg text-[11px] ${i === 0 ? 'bg-amber-500/15 text-amber-600 dark:text-amber-400 font-medium' : 'text-zinc-500 dark:text-zinc-500'}`}>
-              <span className={`w-1.5 h-1.5 rounded-full ${i === 0 ? 'bg-amber-500' : 'bg-zinc-300 dark:bg-zinc-700'}`} />
-              {n}
-            </div>
+        {/* Open-window strip */}
+        <div className="hidden sm:flex items-center gap-1 min-w-0">
+          {[['Dashboard', true], ['The Sunken Crypt', false], ['Kael', false]].map(([label, active]) => (
+            <span key={label} className={`flex items-center gap-1 h-6 px-1.5 rounded-md text-[10px] font-medium whitespace-nowrap ${active ? 'bg-amber-500/15 text-amber-600 dark:text-amber-400' : 'text-zinc-500 dark:text-zinc-500'}`}>
+              <span className={`w-1.5 h-1.5 rounded-full ${active ? 'bg-amber-500' : 'bg-zinc-300 dark:bg-zinc-700'}`} />
+              {label}
+            </span>
           ))}
         </div>
+        {/* System tray */}
+        <div className="ml-auto flex items-center gap-1 pl-1 pr-1.5 h-6 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900/60">
+          <Search className="w-3 h-3 text-zinc-400 dark:text-zinc-500" />
+          <span className="w-px h-3 bg-zinc-200 dark:bg-zinc-800" />
+          <span className="font-mono text-[10px] tabular-nums text-zinc-500 dark:text-zinc-400">21:14</span>
+        </div>
+      </div>
 
-        {/* Main */}
-        <div className="flex-1 p-3 space-y-2.5 overflow-hidden">
-          <div className="rounded-lg border border-emerald-300/60 dark:border-emerald-500/20 bg-emerald-50 dark:bg-emerald-500/5 px-3 py-2">
-            <p className="text-[11px] font-semibold text-emerald-700 dark:text-emerald-300">🎲 Session in progress</p>
-            <p className="text-[10px] text-zinc-600 dark:text-zinc-400 mt-0.5">Session #12 — The Sunken Crypt</p>
+      {/* Desktop with floating windows */}
+      <div
+        className="relative h-60 sm:h-64 overflow-hidden bg-zinc-100/60 dark:bg-zinc-900/40"
+        style={{
+          backgroundImage: 'radial-gradient(currentColor 0.5px, transparent 0.5px)',
+          backgroundSize: '14px 14px',
+          color: 'rgb(161 161 170 / 0.25)',
+        }}
+      >
+        {/* Back window — an entity (unfocused) */}
+        <div className="absolute left-[3%] top-[7%] w-[55%] h-[60%] flex flex-col rounded-lg border border-zinc-300 dark:border-zinc-800 bg-white dark:bg-zinc-950 shadow-lg shadow-black/10 overflow-hidden">
+          <div className="flex items-center gap-2 h-7 px-2 border-b border-zinc-200 dark:border-zinc-800/60 bg-zinc-50 dark:bg-zinc-900/60">
+            <WinControls />
+            <span className="text-[10px] font-semibold uppercase tracking-widest text-zinc-400 dark:text-zinc-600 truncate">Entity</span>
           </div>
-          <div className="grid grid-cols-3 gap-2">
-            {[['NPCs', '24'], ['Locations', '11'], ['Threads', '6']].map(([label, n]) => (
-              <div key={label} className="rounded-lg border border-zinc-200 dark:border-zinc-800/60 bg-zinc-50 dark:bg-zinc-900/40 p-2">
-                <p className="text-base font-bold text-zinc-900 dark:text-zinc-100 leading-none">{n}</p>
-                <p className="text-[9px] uppercase tracking-wider text-zinc-400 dark:text-zinc-600 mt-1">{label}</p>
+          <div className="flex-1 p-2.5 min-h-0">
+            <div className="flex items-center gap-2 mb-2">
+              <span className="w-6 h-6 rounded-md bg-rose-500/15 text-rose-500 flex items-center justify-center text-[11px] font-bold">K</span>
+              <div className="min-w-0">
+                <p className="text-[11px] font-semibold text-zinc-800 dark:text-zinc-200 leading-none">Kael Voss</p>
+                <p className="text-[9px] text-zinc-400 dark:text-zinc-600 mt-0.5">NPC · Antagonist</p>
               </div>
-            ))}
+            </div>
+            <div className="flex flex-wrap gap-1">
+              {['Spy', 'Duke’s court', 'Hidden'].map((t) => (
+                <span key={t} className="text-[8px] px-1.5 py-0.5 rounded-full bg-zinc-100 dark:bg-zinc-800/70 text-zinc-500 dark:text-zinc-400">{t}</span>
+              ))}
+            </div>
           </div>
-          <div className="space-y-1.5">
-            {['Kael betrayed the Duke', 'The crypt seal is weakening', 'Mara seeks the lost relic'].map((t) => (
-              <div key={t} className="flex items-center gap-2 text-[10px] text-zinc-600 dark:text-zinc-400">
-                <span className="w-1 h-1 rounded-full bg-amber-500 flex-shrink-0" /> {t}
-              </div>
-            ))}
+        </div>
+
+        {/* Front window — the dashboard (focused: amber border) */}
+        <div className="absolute right-[3%] bottom-[7%] w-[64%] h-[80%] flex flex-col rounded-lg border border-amber-500/60 dark:border-amber-500/50 bg-white dark:bg-zinc-950 shadow-xl shadow-black/20 overflow-hidden">
+          <div className="flex items-center gap-2 h-7 px-2 border-b border-zinc-200 dark:border-zinc-800 bg-zinc-100 dark:bg-zinc-900">
+            <WinControls />
+            <span className="text-[10px] font-semibold uppercase tracking-widest text-zinc-700 dark:text-zinc-300 truncate">Dashboard</span>
+          </div>
+          <div className="flex-1 p-2.5 space-y-2 min-h-0 overflow-hidden">
+            <div className="rounded-md border border-emerald-300/60 dark:border-emerald-500/20 bg-emerald-50 dark:bg-emerald-500/5 px-2.5 py-1.5">
+              <p className="text-[10px] font-semibold text-emerald-700 dark:text-emerald-300">🎲 Session in progress</p>
+              <p className="text-[9px] text-zinc-600 dark:text-zinc-400 mt-0.5">Session #12 — The Sunken Crypt</p>
+            </div>
+            <div className="grid grid-cols-3 gap-1.5">
+              {[['NPCs', '24'], ['Locations', '11'], ['Threads', '6']].map(([label, n]) => (
+                <div key={label} className="rounded-md border border-zinc-200 dark:border-zinc-800/60 bg-zinc-50 dark:bg-zinc-900/40 p-1.5">
+                  <p className="text-sm font-bold text-zinc-900 dark:text-zinc-100 leading-none">{n}</p>
+                  <p className="text-[8px] uppercase tracking-wider text-zinc-400 dark:text-zinc-600 mt-1">{label}</p>
+                </div>
+              ))}
+            </div>
+            <div className="space-y-1">
+              {['Kael betrayed the Duke', 'The crypt seal is weakening'].map((t) => (
+                <div key={t} className="flex items-center gap-2 text-[9px] text-zinc-600 dark:text-zinc-400">
+                  <span className="w-1 h-1 rounded-full bg-amber-500 flex-shrink-0" /> {t}
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </div>
