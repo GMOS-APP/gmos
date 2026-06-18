@@ -4,7 +4,7 @@ const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!;
 const SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
 const ANON_KEY = Deno.env.get('SUPABASE_ANON_KEY')!;
 
-const ALLOWED_ORIGINS = ['https://trisdenc.github.io'];
+const ALLOWED_ORIGINS = ['https://gmos.app', 'https://gm-os.app', 'https://gamemasteros.com', 'https://trisdenc.github.io'];
 const isAllowedOrigin = (o: string | null): o is string =>
   !!o && (ALLOWED_ORIGINS.includes(o) ||
     /^http:\/\/localhost:\d+$/.test(o) ||

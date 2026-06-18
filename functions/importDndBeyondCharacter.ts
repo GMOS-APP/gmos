@@ -1,4 +1,4 @@
-const ALLOWED_ORIGINS = ['https://trisdenc.github.io'];
+const ALLOWED_ORIGINS = ['https://gmos.app', 'https://gm-os.app', 'https://gamemasteros.com', 'https://trisdenc.github.io'];
 const isAllowedOrigin = (o: string | null): o is string =>
   !!o && (ALLOWED_ORIGINS.includes(o) ||
     /^http:\/\/localhost:\d+$/.test(o) ||

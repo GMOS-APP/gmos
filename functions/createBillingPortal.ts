@@ -4,7 +4,7 @@
 import { createClient } from 'npm:@supabase/supabase-js@2';
 import Stripe from 'npm:stripe@^17';
 
-const ALLOWED_ORIGINS = ['https://trisdenc.github.io'];
+const ALLOWED_ORIGINS = ['https://gmos.app', 'https://gm-os.app', 'https://gamemasteros.com', 'https://trisdenc.github.io'];
 const isAllowedOrigin = (o: string | null): o is string =>
   !!o && (ALLOWED_ORIGINS.includes(o) ||
     /^http:\/\/localhost:\d+$/.test(o) ||
@@ -20,7 +20,7 @@ const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!;
 const SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
 const ANON_KEY = Deno.env.get('SUPABASE_ANON_KEY')!;
 const STRIPE_SECRET_KEY = Deno.env.get('STRIPE_SECRET_KEY')!;
-const APP_URL = Deno.env.get('APP_URL') || 'https://trisdenc.github.io/GM-OS';
+const APP_URL = Deno.env.get('APP_URL') || 'https://gmos.app';
 
 const stripe = new Stripe(STRIPE_SECRET_KEY, {
   apiVersion: '2024-12-18.acacia',
