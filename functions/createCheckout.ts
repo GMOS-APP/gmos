@@ -23,10 +23,12 @@ const ANON_KEY = Deno.env.get('SUPABASE_ANON_KEY')!;
 const STRIPE_SECRET_KEY = Deno.env.get('STRIPE_SECRET_KEY')!;
 const APP_URL = Deno.env.get('APP_URL') || 'https://trisdenc.github.io/GM-OS';
 
+// Price IDs aren't secret, so they default to the (sandbox) Prices created for
+// GM/OS; set the STRIPE_PRICE_* secrets to override (e.g. with live-mode IDs).
 const PRICE_BY_TIER: Record<string, string | undefined> = {
-  monthly: Deno.env.get('STRIPE_PRICE_MONTHLY'),
-  yearly: Deno.env.get('STRIPE_PRICE_YEARLY'),
-  lifetime: Deno.env.get('STRIPE_PRICE_LIFETIME'),
+  monthly: Deno.env.get('STRIPE_PRICE_MONTHLY') || 'price_1TjUjMGuBN0ONk5zc5QSf2DL',
+  yearly: Deno.env.get('STRIPE_PRICE_YEARLY') || 'price_1TjUjNGuBN0ONk5zyhRnk4a7',
+  lifetime: Deno.env.get('STRIPE_PRICE_LIFETIME') || 'price_1TjUjOGuBN0ONk5zbkrDfsB8',
 };
 
 const stripe = new Stripe(STRIPE_SECRET_KEY, {

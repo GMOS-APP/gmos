@@ -10,8 +10,9 @@ const SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
 const STRIPE_SECRET_KEY = Deno.env.get('STRIPE_SECRET_KEY')!;
 const WEBHOOK_SECRET = Deno.env.get('STRIPE_WEBHOOK_SECRET')!;
 
-const PRICE_MONTHLY = Deno.env.get('STRIPE_PRICE_MONTHLY');
-const PRICE_YEARLY = Deno.env.get('STRIPE_PRICE_YEARLY');
+// Defaults to the sandbox Prices; override via secrets for live mode.
+const PRICE_MONTHLY = Deno.env.get('STRIPE_PRICE_MONTHLY') || 'price_1TjUjMGuBN0ONk5zc5QSf2DL';
+const PRICE_YEARLY = Deno.env.get('STRIPE_PRICE_YEARLY') || 'price_1TjUjNGuBN0ONk5zyhRnk4a7';
 
 const stripe = new Stripe(STRIPE_SECRET_KEY, {
   apiVersion: '2024-12-18.acacia',
