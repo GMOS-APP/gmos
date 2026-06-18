@@ -21,6 +21,7 @@ import { cn } from '@/lib/utils';
 import QueryError from '@/components/common/QueryError';
 import { DEFAULT_SYSTEM_ID } from '@/lib/systems';
 import UpgradeModal from '@/components/billing/UpgradeModal';
+import BetaBadge from '@/components/common/BetaBadge';
 import { FREE_CAMPAIGN_LIMIT, isCampaignLimitError } from '@/lib/plans';
 
 // True when a thrown error — from a direct insert or from a functions.invoke
@@ -152,6 +153,7 @@ export default function CampaignList() {
       <div className="text-center mb-10 sm:mb-16 max-w-lg">
         <h1 className="text-4xl sm:text-5xl font-semibold tracking-widest text-zinc-900 dark:text-zinc-100 mb-3 select-none">
           GM<span className="text-amber-600 dark:text-amber-400">/OS{isPlus ? '+' : ''}</span>
+          <BetaBadge className="ml-2 align-top" />
         </h1>
         <p className="text-zinc-500 dark:text-zinc-500 text-sm tracking-wide">
           The operating system for Game Masters.

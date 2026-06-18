@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import BetaBadge from '@/components/common/BetaBadge';
 
 const STEPS = [
   'initializing kernel',
@@ -46,7 +47,7 @@ export default function BootSequence() {
   return (
     <div className={`fixed inset-0 z-[100] flex items-center justify-center bg-white dark:bg-zinc-950 transition-opacity duration-300 ${closing ? 'opacity-0' : 'opacity-100'}`}>
       <div className="font-mono text-sm w-72">
-        <div className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100">GM<span className="text-amber-500">/OS</span></div>
+        <div className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100">GM<span className="text-amber-500">/OS</span><BetaBadge className="ml-2 align-middle" /></div>
         <div className="text-[11px] text-zinc-400 dark:text-zinc-600 mb-5">v2026.05</div>
         <div className="space-y-1.5">
           {STEPS.map((line, i) => (

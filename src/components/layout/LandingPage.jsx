@@ -4,6 +4,7 @@ import { createPageUrl } from '@/utils';
 import AuthPanel from '@/components/layout/AuthPanel';
 import ThemeToggle from '@/components/ui/ThemeToggle';
 import PricingTiers from '@/components/billing/PricingTiers';
+import BetaBadge from '@/components/common/BetaBadge';
 import { RISK_REVERSAL } from '@/lib/plans';
 import { track } from '@/lib/analytics';
 import {
@@ -187,8 +188,11 @@ export default function LandingPage() {
     <div className="min-h-screen flex flex-col">
       {/* Nav */}
       <header className="sticky top-0 z-20 flex items-center gap-3 px-4 sm:px-6 h-14 border-b border-zinc-200/70 dark:border-zinc-800/60 bg-white/80 dark:bg-zinc-950/80 backdrop-blur">
-        <span className="text-lg font-bold tracking-wide text-zinc-900 dark:text-zinc-100">
-          GM<span className="text-amber-500">/OS</span>
+        <span className="flex items-center gap-2">
+          <span className="text-lg font-bold tracking-wide text-zinc-900 dark:text-zinc-100">
+            GM<span className="text-amber-500">/OS</span>
+          </span>
+          <BetaBadge />
         </span>
         <div className="ml-auto flex items-center gap-3">
           <a href="#pricing" className="hidden sm:inline text-sm font-medium text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors">

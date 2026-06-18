@@ -9,6 +9,7 @@ import TrayAudioPlayer from '@/components/layout/TrayAudioPlayer';
 import TrayNotifications from '@/components/layout/TrayNotifications';
 import TrayTools from '@/components/layout/TrayTools';
 import ThemeToggle from '@/components/ui/ThemeToggle';
+import BetaBadge from '@/components/common/BetaBadge';
 import { MOD_LABEL } from '@/lib/useHotkeys';
 import { cn } from '@/lib/utils';
 
@@ -77,6 +78,7 @@ export default function Taskbar({ campaign, currentPageName, startActive, onStar
         <LayoutGrid className="w-4 h-4 text-amber-500" />
         <span>GM<span className="text-amber-500">/OS</span></span>
       </button>
+      <BetaBadge className="hidden sm:inline-flex flex-shrink-0" />
 
       <button
         data-tour="mode"
