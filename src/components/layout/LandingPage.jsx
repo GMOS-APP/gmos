@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import AuthPanel from '@/components/layout/AuthPanel';
@@ -8,19 +8,19 @@ import { RISK_REVERSAL } from '@/lib/plans';
 import { track } from '@/lib/analytics';
 import {
   BookOpen, Globe, Swords, Network, Map, Eye, Command, Check,
-  LayoutGrid, Search, X, Minus, Square, Grid2x2, Archive,
+  LayoutGrid, Search, X, Minus, Square, Grid2x2, Archive, RotateCw, RotateCcw,
 } from 'lucide-react';
 
 const FEATURES = [
-  { Icon: LayoutGrid, title: 'A desktop-style workspace', body: 'Open your pages as floating windows you can drag, resize, and snap. Switch between Prep, Session, and Debrief modes from the taskbar, and jump anywhere with the ⌘K command palette.' },
-  { Icon: Globe, title: 'Your world, in one place', body: 'Keep NPCs, locations, factions, items, deities, and lore together — linked, tagged, and searchable.' },
-  { Icon: BookOpen, title: 'Session prep', body: "A guided structure for prepping a session, based on the Lazy GM method: strong start, scenes, secrets, NPCs, monsters, and rewards." },
-  { Icon: Swords, title: 'Tools for the table', body: 'Notes, an initiative tracker, dice, and a fullscreen screen for while you run the game.' },
-  { Icon: Network, title: 'Relationship map', body: 'A visual map of how characters, factions, and threads connect.' },
-  { Icon: Map, title: 'Maps & tables', body: 'Interactive maps for your locations, and your own random tables to roll on.' },
-  { Icon: Eye, title: 'Player view', body: 'A separate page you can share with players, showing only what you choose.' },
-  { Icon: Grid2x2, title: 'Live battle map', body: 'A shared, real-time grid — drop and move tokens, and your players see it update live as you run combat.' },
-  { Icon: Archive, title: 'Own your data', body: 'Export a full backup of any campaign to a file, and import it back anytime. Your world is yours to keep.' },
+  { Icon: LayoutGrid, title: 'A desktop-style workspace', body: 'Open your pages as floating windows you can drag, resize, and snap. Switch between Prep, Session, and Debrief modes from the taskbar, and jump anywhere with the ⌘K command palette.', detail: 'Tile two windows side by side, pop the battle map out fullscreen, and the taskbar tracks everything you have open. Prep, Session, and Debrief modes reshape the app for what you’re doing right now.' },
+  { Icon: Globe, title: 'Your world, in one place', body: 'Keep NPCs, locations, factions, items, deities, and lore together — linked, tagged, and searchable.', detail: 'Twelve entity types — NPCs, PCs, creatures, locations, factions, deities, items, shops, events, lore, encounters, and threads — each with its own fields and tags. Mention one anywhere and it auto-links.' },
+  { Icon: BookOpen, title: 'Session prep', body: "A guided structure for prepping a session, based on the Lazy GM method: strong start, scenes, secrets, NPCs, monsters, and rewards.", detail: 'Walk the eight steps of the Lazy GM — review characters, strong start, potential scenes, secrets & clues, fantastic locations, key NPCs, relevant monsters, and rewards — all saved to the session and ready at the table.' },
+  { Icon: Swords, title: 'Tools for the table', body: 'Notes, an initiative tracker, dice, and a fullscreen screen for while you run the game.', detail: 'Roll dice inline or from ⌘K, run initiative with friend/foe tinting and live HP, jot notes that link to your world, and flip to a distraction-free GM screen mid-combat.' },
+  { Icon: Network, title: 'Relationship map', body: 'A visual map of how characters, factions, and threads connect.', detail: 'An interactive force-directed graph of every connection — allies, rivals, faction ties, and the threads that bind them. Click any node to jump straight to that entity.' },
+  { Icon: Map, title: 'Maps & tables', body: 'Interactive maps for your locations, and your own random tables to roll on.', detail: 'Drop pins on location maps and link them to entities, import maps from Dyson Logos, and build your own random tables for names, loot, and encounters — then roll on them in a click.' },
+  { Icon: Eye, title: 'Player view', body: 'A separate page you can share with players, showing only what you choose.', detail: 'Share a private link that shows players only what you’ve marked visible — never GM secrets or prep. Flip entities between “players know” and “players suspect” as the story unfolds.' },
+  { Icon: Grid2x2, title: 'Live battle map', body: 'A shared, real-time grid — drop and move tokens, and your players see it update live as you run combat.', detail: 'A grid synced in real time over the web. Place and move tokens and your players see every move instantly from their own browser — no install and no account required.' },
+  { Icon: Archive, title: 'Own your data', body: 'Export a full backup of any campaign to a file, and import it back anytime. Your world is yours to keep.', detail: 'Export any campaign — entities, sessions, maps, notes, tables — to a single file and re-import it whenever. Full account export and one-click deletion too. Nothing is locked in.' },
 ];
 
 const FAQ = [
@@ -31,6 +31,44 @@ const FAQ = [
   { q: 'Is my data mine to keep?', a: 'Always. You can export a complete backup of any campaign to a file at any time, and import it back whenever you like.' },
   { q: "What's the difference between the plans?", a: 'Every plan has all the features. Free covers one campaign; any paid plan removes the campaign limit. Lifetime is a one-time payment for unlimited campaigns forever.' },
 ];
+
+// A "What's inside" card that flips on click to reveal more detail on the back.
+function FlipCard({ Icon, title, body, detail }) {
+  const [flipped, setFlipped] = useState(false);
+  return (
+    <button
+      type="button"
+      onClick={() => setFlipped((v) => !v)}
+      aria-pressed={flipped}
+      aria-label={`${title} — ${flipped ? 'show summary' : 'show more'}`}
+      className="group relative h-60 w-full text-left [perspective:1200px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/40 rounded-xl"
+    >
+      <div
+        className={`relative h-full w-full transition-transform duration-500 [transform-style:preserve-3d] ${flipped ? '[transform:rotateY(180deg)]' : ''}`}
+      >
+        {/* Front */}
+        <div className="absolute inset-0 flex flex-col rounded-xl border border-zinc-200 dark:border-zinc-800/60 bg-white dark:bg-zinc-900/40 p-5 [backface-visibility:hidden] [-webkit-backface-visibility:hidden] group-hover:border-amber-500/40 transition-colors">
+          <div className="w-9 h-9 rounded-lg bg-amber-500/10 flex items-center justify-center mb-3">
+            <Icon className="w-5 h-5 text-amber-500" />
+          </div>
+          <h3 className="font-semibold text-zinc-900 dark:text-zinc-100 text-sm mb-1.5">{title}</h3>
+          <p className="text-xs text-zinc-500 dark:text-zinc-500 leading-relaxed">{body}</p>
+          <span className="mt-auto pt-3 inline-flex items-center gap-1 text-[10px] font-medium text-amber-600/80 dark:text-amber-400/80">
+            <RotateCw className="w-3 h-3" /> More
+          </span>
+        </div>
+        {/* Back */}
+        <div className="absolute inset-0 flex flex-col rounded-xl border border-amber-500/40 dark:border-amber-500/30 bg-amber-50/50 dark:bg-amber-500/[0.06] p-5 [backface-visibility:hidden] [-webkit-backface-visibility:hidden] [transform:rotateY(180deg)]">
+          <h3 className="font-semibold text-zinc-900 dark:text-zinc-100 text-sm mb-2">{title}</h3>
+          <p className="text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed overflow-y-auto">{detail}</p>
+          <span className="mt-auto pt-2 inline-flex items-center gap-1 text-[10px] font-medium text-zinc-400 dark:text-zinc-500">
+            <RotateCcw className="w-3 h-3" /> Back
+          </span>
+        </div>
+      </div>
+    </button>
+  );
+}
 
 // A code-rendered preview of the GM/OS desktop (not a screenshot) for the hero —
 // mirrors the real OS chrome: taskbar (Start, mode badge, window strip, tray)
@@ -210,16 +248,11 @@ export default function LandingPage() {
           <h2 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100 text-center mb-2">What's inside</h2>
           <p className="text-sm text-zinc-500 dark:text-zinc-500 text-center mb-10">For prepping, running, and looking back on your sessions.</p>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {FEATURES.map(({ Icon, title, body }) => (
-              <div key={title} className="rounded-xl border border-zinc-200 dark:border-zinc-800/60 bg-white dark:bg-zinc-900/40 p-5">
-                <div className="w-9 h-9 rounded-lg bg-amber-500/10 flex items-center justify-center mb-3">
-                  <Icon className="w-5 h-5 text-amber-500" />
-                </div>
-                <h3 className="font-semibold text-zinc-900 dark:text-zinc-100 text-sm mb-1.5">{title}</h3>
-                <p className="text-xs text-zinc-500 dark:text-zinc-500 leading-relaxed">{body}</p>
-              </div>
+            {FEATURES.map((f) => (
+              <FlipCard key={f.title} {...f} />
             ))}
           </div>
+          <p className="mt-4 text-center text-[11px] text-zinc-400 dark:text-zinc-600">Tip: click any card to flip it for more.</p>
           <div className="mt-10 flex items-center justify-center gap-2 text-sm text-zinc-500 dark:text-zinc-500">
             <Command className="w-4 h-4 text-amber-500" />
             <span>It's keyboard-driven too: a command palette (⌘K), shortcuts, and inline dice.</span>
