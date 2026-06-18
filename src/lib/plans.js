@@ -39,10 +39,13 @@ export const PAID_TIERS = [
     name: 'Lifetime',
     price: '$49.99',
     cadence: 'once',
-    blurb: 'Launch pricing for early supporters — locked in forever.',
-    badge: "Founder's deal",
+    blurb: 'Pay once, yours forever. Only offered during beta.',
+    badge: 'Beta exclusive',
   },
 ];
+
+// Founding-member framing shown above the pricing grid during beta.
+export const BETA_PRICING_NOTE = 'Lock in your rate before it rises at launch — it never goes up while you stay subscribed.';
 
 // Human label for a stored plan value.
 export const PLAN_LABELS = {

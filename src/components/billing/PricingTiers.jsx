@@ -1,8 +1,8 @@
 import React from 'react';
-import { Check, Loader2 } from 'lucide-react';
+import { Check, Loader2, Lock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import { PAID_TIERS, FREE_TIER, PLUS_BENEFITS } from '@/lib/plans';
+import { PAID_TIERS, FREE_TIER, PLUS_BENEFITS, BETA_PRICING_NOTE } from '@/lib/plans';
 
 /**
  * Pricing cards. By default monthly / yearly / lifetime; pass showFree to
@@ -13,7 +13,16 @@ import { PAID_TIERS, FREE_TIER, PLUS_BENEFITS } from '@/lib/plans';
 export default function PricingTiers({ onSelect, currentPlan, loadingTier, ctaLabel = 'Choose', showFree = false }) {
   const tiers = showFree ? [FREE_TIER, ...PAID_TIERS] : PAID_TIERS;
   return (
-    <div className={cn('grid grid-cols-1 gap-4', showFree ? 'sm:grid-cols-2 lg:grid-cols-4' : 'sm:grid-cols-3')}>
+    <div className="space-y-5">
+      {/* Founding-member / beta lock-in banner */}
+      <div className="mx-auto max-w-2xl flex items-center justify-center gap-2.5 rounded-xl border border-amber-500/40 bg-amber-500/10 px-4 py-2.5">
+        <Lock className="w-4 h-4 text-amber-500 flex-shrink-0" />
+        <p className="text-xs text-amber-700 dark:text-amber-300 text-center">
+          <span className="font-semibold">Founding-member beta pricing.</span> {BETA_PRICING_NOTE}
+        </p>
+      </div>
+
+      <div className={cn('grid grid-cols-1 gap-4', showFree ? 'sm:grid-cols-2 lg:grid-cols-4' : 'sm:grid-cols-3')}>
       {tiers.map((tier) => {
         const isCurrent = currentPlan === tier.id;
         const isLoading = loadingTier === tier.id;
@@ -60,6 +69,7 @@ export default function PricingTiers({ onSelect, currentPlan, loadingTier, ctaLa
           </li>
         ))}
       </ul>
+      </div>
     </div>
   );
 }

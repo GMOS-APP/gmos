@@ -267,8 +267,8 @@ export default function LandingPage() {
       {/* Pricing */}
       <section id="pricing" className="px-4 sm:px-6 py-16 border-t border-zinc-200/70 dark:border-zinc-800/60">
         <div className="max-w-5xl mx-auto">
-          <h2 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100 text-center mb-2">Simple pricing</h2>
-          <p className="text-sm text-zinc-500 dark:text-zinc-500 text-center mb-10">Start free with one campaign. Upgrade any time for unlimited.</p>
+          <h2 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100 text-center mb-2">Founding-member pricing</h2>
+          <p className="text-sm text-zinc-500 dark:text-zinc-500 text-center mb-10">Join the beta and lock these rates in for good. Free to start — upgrade any time for unlimited.</p>
           <PricingTiers
             showFree
             onSelect={(tier) => { track('pricing_cta_clicked', { tier }); window.location.hash = 'signin'; }}
