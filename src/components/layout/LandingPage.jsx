@@ -6,7 +6,7 @@ import ThemeToggle from '@/components/ui/ThemeToggle';
 import PricingTiers from '@/components/billing/PricingTiers';
 import {
   BookOpen, Globe, Swords, Network, Map, Eye, Command, Check,
-  LayoutGrid, Search, X, Minus, Square,
+  LayoutGrid, Search, X, Minus, Square, Grid2x2, Archive,
 } from 'lucide-react';
 
 const FEATURES = [
@@ -17,6 +17,8 @@ const FEATURES = [
   { Icon: Network, title: 'Relationship map', body: 'A visual map of how characters, factions, and threads connect.' },
   { Icon: Map, title: 'Maps & tables', body: 'Interactive maps for your locations, and your own random tables to roll on.' },
   { Icon: Eye, title: 'Player view', body: 'A separate page you can share with players, showing only what you choose.' },
+  { Icon: Grid2x2, title: 'Live battle map', body: 'A shared, real-time grid — drop and move tokens, and your players see it update live as you run combat.' },
+  { Icon: Archive, title: 'Own your data', body: 'Export a full backup of any campaign to a file, and import it back anytime. Your world is yours to keep.' },
 ];
 
 // A code-rendered preview of the GM/OS desktop (not a screenshot) for the hero —
