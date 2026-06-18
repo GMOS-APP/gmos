@@ -8,6 +8,7 @@ import { useToast } from '@/components/ui/use-toast';
 import { Button } from '@/components/ui/button';
 import PricingTiers from '@/components/billing/PricingTiers';
 import { PLAN_LABELS } from '@/lib/plans';
+import { track } from '@/lib/analytics';
 
 export default function Upgrade() {
   const navigate = useNavigate();
@@ -21,6 +22,7 @@ export default function Upgrade() {
 
   const handleSelect = async (tier) => {
     setLoadingTier(tier);
+    track('checkout_started', { tier });
     try {
       const { data } = await functions.invoke('createCheckout', { tier });
       if (data?.url) {

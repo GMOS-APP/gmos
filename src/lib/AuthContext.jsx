@@ -1,6 +1,7 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import { supabase } from '@/api/supabaseClient';
 import { queryClientInstance } from '@/lib/query-client';
+import { track } from '@/lib/analytics';
 
 const AuthContext = createContext();
 
@@ -58,6 +59,7 @@ export const AuthProvider = ({ children }) => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
       setIsAuthenticated(!!session);
+      if (_event === 'SIGNED_IN') track('signed_in', { provider: session?.user?.app_metadata?.provider || 'email' });
       fetchOrCreateProfile(session?.user?.id ?? null, setProfile);
     });
 

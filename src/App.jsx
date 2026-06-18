@@ -20,6 +20,7 @@ import EasterEggHost from '@/components/easter/EasterEggHost';
 import BootSequence from '@/components/layout/BootSequence';
 import { AudioPlayerProvider } from '@/lib/AudioPlayerContext';
 import { NotificationProvider } from '@/lib/NotificationContext';
+import { Analytics } from '@vercel/analytics/react';
 
 const { Pages, Layout, mainPage } = pagesConfig;
 const mainPageKey = mainPage ?? Object.keys(Pages)[0];
@@ -95,6 +96,7 @@ function App() {
               </Suspense>
             </Router>
             <Toaster />
+            <Analytics />
           </NotificationProvider>
         </AudioPlayerProvider>
       </QueryClientProvider>

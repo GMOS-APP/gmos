@@ -4,6 +4,18 @@
 
 export const FREE_CAMPAIGN_LIMIT = 1;
 
+// The free entry point — shown as the first pricing column on the landing page.
+export const FREE_TIER = {
+  id: 'free',
+  name: 'Free',
+  price: '$0',
+  cadence: 'forever',
+  blurb: 'One fully-featured campaign. No card required.',
+};
+
+// Reassurance shown beneath the pricing grid.
+export const RISK_REVERSAL = 'No credit card to start · cancel anytime · export your data whenever.';
+
 // Paid tiers offered at checkout. `id` is passed to the create-checkout function.
 export const PAID_TIERS = [
   {
@@ -27,7 +39,8 @@ export const PAID_TIERS = [
     name: 'Lifetime',
     price: '$49.99',
     cadence: 'once',
-    blurb: 'Pay once. Yours forever.',
+    blurb: 'Launch pricing for early supporters — locked in forever.',
+    badge: "Founder's deal",
   },
 ];
 

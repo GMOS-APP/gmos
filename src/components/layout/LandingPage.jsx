@@ -4,6 +4,8 @@ import { createPageUrl } from '@/utils';
 import AuthPanel from '@/components/layout/AuthPanel';
 import ThemeToggle from '@/components/ui/ThemeToggle';
 import PricingTiers from '@/components/billing/PricingTiers';
+import { RISK_REVERSAL } from '@/lib/plans';
+import { track } from '@/lib/analytics';
 import {
   BookOpen, Globe, Swords, Network, Map, Eye, Command, Check,
   LayoutGrid, Search, X, Minus, Square, Grid2x2, Archive,
@@ -19,6 +21,15 @@ const FEATURES = [
   { Icon: Eye, title: 'Player view', body: 'A separate page you can share with players, showing only what you choose.' },
   { Icon: Grid2x2, title: 'Live battle map', body: 'A shared, real-time grid — drop and move tokens, and your players see it update live as you run combat.' },
   { Icon: Archive, title: 'Own your data', body: 'Export a full backup of any campaign to a file, and import it back anytime. Your world is yours to keep.' },
+];
+
+const FAQ = [
+  { q: 'Is the free plan really free?', a: 'Yes. Free gives you one fully-featured campaign — every feature, no limits within it, and no credit card to start.' },
+  { q: 'Which game systems does it support?', a: "It's built around D&D 5e and the Lazy GM prep method, but the world, notes, maps, and player-view tools are system-agnostic — they work for most tabletop RPGs." },
+  { q: 'Do my players need an account?', a: 'No. The Player View is a private share link — your players just open it in a browser. Only you (the GM) need an account.' },
+  { q: 'Can I cancel anytime?', a: 'Yes. Manage or cancel your plan from your account in a click. Monthly and yearly plans stay active until the end of the period you paid for.' },
+  { q: 'Is my data mine to keep?', a: 'Always. You can export a complete backup of any campaign to a file at any time, and import it back whenever you like.' },
+  { q: "What's the difference between the plans?", a: 'Every plan has all the features. Free covers one campaign; any paid plan removes the campaign limit. Lifetime is a one-time payment for unlimited campaigns forever.' },
 ];
 
 // A code-rendered preview of the GM/OS desktop (not a screenshot) for the hero —
@@ -156,12 +167,12 @@ export default function LandingPage() {
       <section className="px-4 sm:px-6 pt-16 pb-20 sm:pt-20">
         <div className="max-w-6xl mx-auto grid lg:grid-cols-2 gap-10 lg:gap-12 items-center">
           <div>
-            <p className="text-xs font-mono uppercase tracking-[0.2em] text-amber-600 dark:text-amber-400 mb-4">For Game Masters</p>
+            <p className="text-xs font-mono uppercase tracking-[0.2em] text-amber-600 dark:text-amber-400 mb-4">The Game Master's operating system</p>
             <h1 className="text-4xl sm:text-5xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100 leading-[1.1]">
-              A dedicated space for Game Masters.
+              Prep less.<br />Run better.
             </h1>
             <p className="mt-5 text-lg text-zinc-600 dark:text-zinc-400 max-w-lg">
-              GM/OS keeps your whole campaign in one place — your NPCs and locations, your session prep, and the tools you reach for while running the game.
+              GM/OS holds your whole campaign in one place — and unlike a wiki or a stack of docs, it's built for the table: guided prep, a live battle map, initiative, and a player view you control.
             </p>
             <ul className="mt-6 space-y-2">
               {['Your world: NPCs, locations, factions, lore', 'Guided session prep', 'Notes, initiative, and dice at the table', 'A player-facing view you control'].map((t) => (
@@ -171,10 +182,21 @@ export default function LandingPage() {
               ))}
             </ul>
             <div className="mt-8 flex items-center gap-3">
-              <a href="#signin" className="inline-flex items-center px-5 py-2.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-zinc-950 font-semibold transition-colors">
-                Get started
+              <a
+                href="#signin"
+                onClick={() => track('get_started_clicked', { location: 'hero' })}
+                className="inline-flex items-center px-5 py-2.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-zinc-950 font-semibold transition-colors"
+              >
+                Get started free
+              </a>
+              <a
+                href="#pricing"
+                className="inline-flex items-center px-5 py-2.5 rounded-lg border border-zinc-300 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 font-medium hover:bg-zinc-100 dark:hover:bg-zinc-800/60 transition-colors"
+              >
+                See pricing
               </a>
             </div>
+            <p className="mt-3 text-xs text-zinc-500 dark:text-zinc-500">Free to start · no credit card required.</p>
           </div>
           <div className="w-full">
             <ProductPreview />
@@ -207,10 +229,33 @@ export default function LandingPage() {
 
       {/* Pricing */}
       <section id="pricing" className="px-4 sm:px-6 py-16 border-t border-zinc-200/70 dark:border-zinc-800/60">
-        <div className="max-w-4xl mx-auto">
+        <div className="max-w-5xl mx-auto">
           <h2 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100 text-center mb-2">Simple pricing</h2>
           <p className="text-sm text-zinc-500 dark:text-zinc-500 text-center mb-10">Start free with one campaign. Upgrade any time for unlimited.</p>
-          <PricingTiers onSelect={() => { window.location.hash = 'signin'; }} ctaLabel="Get started" />
+          <PricingTiers
+            showFree
+            onSelect={(tier) => { track('pricing_cta_clicked', { tier }); window.location.hash = 'signin'; }}
+            ctaLabel="Get started"
+          />
+          <p className="mt-8 text-center text-xs text-zinc-500 dark:text-zinc-500">{RISK_REVERSAL}</p>
+        </div>
+      </section>
+
+      {/* FAQ */}
+      <section className="px-4 sm:px-6 py-16 border-t border-zinc-200/70 dark:border-zinc-800/60">
+        <div className="max-w-2xl mx-auto">
+          <h2 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100 text-center mb-8">Questions</h2>
+          <div className="space-y-2">
+            {FAQ.map(({ q, a }) => (
+              <details key={q} className="group rounded-lg border border-zinc-200 dark:border-zinc-800/60 bg-white dark:bg-zinc-900/40 px-4 py-3">
+                <summary className="flex items-center justify-between cursor-pointer list-none text-sm font-medium text-zinc-800 dark:text-zinc-200">
+                  {q}
+                  <span className="ml-3 text-zinc-400 transition-transform group-open:rotate-45">+</span>
+                </summary>
+                <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed">{a}</p>
+              </details>
+            ))}
+          </div>
         </div>
       </section>
 

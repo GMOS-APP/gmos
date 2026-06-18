@@ -2,17 +2,19 @@ import React from 'react';
 import { Check, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import { PAID_TIERS, PLUS_BENEFITS } from '@/lib/plans';
+import { PAID_TIERS, FREE_TIER, PLUS_BENEFITS } from '@/lib/plans';
 
 /**
- * Three pricing cards (monthly / yearly / lifetime).
+ * Pricing cards. By default monthly / yearly / lifetime; pass showFree to
+ * prepend the Free column (used on the marketing landing page).
  * @param {{ onSelect?: (tierId: string) => void, currentPlan?: string,
- *           loadingTier?: string|null, ctaLabel?: string }} props
+ *           loadingTier?: string|null, ctaLabel?: string, showFree?: boolean }} props
  */
-export default function PricingTiers({ onSelect, currentPlan, loadingTier, ctaLabel = 'Choose' }) {
+export default function PricingTiers({ onSelect, currentPlan, loadingTier, ctaLabel = 'Choose', showFree = false }) {
+  const tiers = showFree ? [FREE_TIER, ...PAID_TIERS] : PAID_TIERS;
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-      {PAID_TIERS.map((tier) => {
+    <div className={cn('grid grid-cols-1 gap-4', showFree ? 'sm:grid-cols-2 lg:grid-cols-4' : 'sm:grid-cols-3')}>
+      {tiers.map((tier) => {
         const isCurrent = currentPlan === tier.id;
         const isLoading = loadingTier === tier.id;
         return (
@@ -51,7 +53,7 @@ export default function PricingTiers({ onSelect, currentPlan, loadingTier, ctaLa
           </div>
         );
       })}
-      <ul className="sm:col-span-3 mt-2 grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-1.5">
+      <ul className="col-span-full mt-2 grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-1.5">
         {PLUS_BENEFITS.map((b) => (
           <li key={b} className="flex items-center gap-2 text-xs text-zinc-600 dark:text-zinc-400">
             <Check className="w-3.5 h-3.5 text-amber-500 flex-shrink-0" /> {b}
