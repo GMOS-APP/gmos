@@ -25,6 +25,12 @@ const admin = createClient(SUPABASE_URL, SERVICE_ROLE_KEY);
 const toISO = (unixSeconds?: number | null) =>
   unixSeconds ? new Date(unixSeconds * 1000).toISOString() : null;
 
+// current_period_end lives on the subscription in older API versions but moved
+// to the line items in newer ones — read whichever is present.
+// deno-lint-ignore no-explicit-any
+const periodEnd = (sub: any) =>
+  toISO(sub?.current_period_end ?? sub?.items?.data?.[0]?.current_period_end);
+
 // Map an active subscription price back to our tier name.
 function tierFromPriceId(priceId?: string | null): 'monthly' | 'yearly' | null {
   if (priceId && priceId === PRICE_MONTHLY) return 'monthly';
@@ -93,7 +99,7 @@ Deno.serve(async (req) => {
           const tier = tierFromPriceId(sub.items.data[0]?.price?.id) || obj.metadata?.tier || 'monthly';
           await updateProfile(userId, {
             plan: tier,
-            plan_expires_at: toISO(sub.current_period_end),
+            plan_expires_at: periodEnd(sub),
             stripe_subscription_id: sub.id,
           });
         }
@@ -110,7 +116,7 @@ Deno.serve(async (req) => {
           const tier = tierFromPriceId(obj.items?.data?.[0]?.price?.id) || 'monthly';
           await updateProfile(userId, {
             plan: tier,
-            plan_expires_at: toISO(obj.current_period_end),
+            plan_expires_at: periodEnd(obj),
             stripe_subscription_id: obj.id,
           });
         }
@@ -133,7 +139,7 @@ Deno.serve(async (req) => {
         const tier = tierFromPriceId(sub.items.data[0]?.price?.id) || 'monthly';
         await updateProfile(userId, {
           plan: tier,
-          plan_expires_at: toISO(sub.current_period_end),
+          plan_expires_at: periodEnd(sub),
           stripe_subscription_id: sub.id,
         });
         break;
