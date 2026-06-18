@@ -13,7 +13,7 @@ import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter,
 } from '@/components/ui/dialog';
 import {
-  User, Mail, Shield, Crown, Palette, Download, FileText, Trash2, Loader2, ArrowLeft,
+  User, Mail, Crown, Palette, Download, FileText, Trash2, Loader2, ArrowLeft,
 } from 'lucide-react';
 
 function Section({ icon: Icon, title, description, children }) {
@@ -67,13 +67,9 @@ export default function AccountSettings() {
   };
 
   const provider = user?.app_metadata?.provider || 'email';
-  const isPasswordUser = provider === 'email';
 
   const [name, setName] = useState(user?.user_metadata?.full_name || user?.user_metadata?.name || '');
   const [savingName, setSavingName] = useState(false);
-  const [pw, setPw] = useState('');
-  const [pw2, setPw2] = useState('');
-  const [savingPw, setSavingPw] = useState(false);
   const [exporting, setExporting] = useState(false);
   const [delOpen, setDelOpen] = useState(false);
   const [delConfirm, setDelConfirm] = useState('');
@@ -87,17 +83,6 @@ export default function AccountSettings() {
     setSavingName(false);
     if (error) return toast({ title: 'Error', description: error.message, variant: 'destructive' });
     toast({ title: 'Saved', description: 'Display name updated.' });
-  };
-
-  const savePassword = async () => {
-    if (pw.length < 8) return toast({ title: 'Too short', description: 'Use at least 8 characters.', variant: 'destructive' });
-    if (pw !== pw2) return toast({ title: 'Mismatch', description: 'Passwords do not match.', variant: 'destructive' });
-    setSavingPw(true);
-    const { error } = await supabase.auth.updateUser({ password: pw });
-    setSavingPw(false);
-    if (error) return toast({ title: 'Error', description: error.message, variant: 'destructive' });
-    setPw(''); setPw2('');
-    toast({ title: 'Password changed', description: 'Your password has been updated.' });
   };
 
   const exportData = async () => {
@@ -171,22 +156,6 @@ export default function AccountSettings() {
             </p>
           )}
         </Section>
-
-        {/* Security */}
-        {isPasswordUser && (
-          <Section icon={Shield} title="Password" description="Change your password.">
-            <div className="space-y-2">
-              <Input type="password" value={pw} onChange={(e) => setPw(e.target.value)}
-                placeholder="New password (min 8 characters)" className="dark:bg-zinc-950 dark:border-zinc-800" />
-              <Input type="password" value={pw2} onChange={(e) => setPw2(e.target.value)}
-                placeholder="Confirm new password" className="dark:bg-zinc-950 dark:border-zinc-800" />
-              <Button onClick={savePassword} disabled={savingPw || !pw || !pw2}
-                className="bg-amber-500 hover:bg-amber-400 text-zinc-950 font-semibold">
-                {savingPw ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Change password'}
-              </Button>
-            </div>
-          </Section>
-        )}
 
         {/* Plan */}
         <Section icon={Crown} title="Plan">
