@@ -42,8 +42,8 @@ export const PAID_TIERS = [
     price: '$49.99',
     regularPrice: '$99.99',
     cadence: 'once',
-    blurb: 'Pay once, yours forever. Only offered during beta.',
-    badge: 'Beta exclusive',
+    blurb: 'Pay once, keep it forever. Half price during beta.',
+    badge: 'Save $50',
   },
 ];
 
