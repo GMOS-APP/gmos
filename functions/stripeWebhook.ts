@@ -12,7 +12,7 @@ const WEBHOOK_SECRET = Deno.env.get('STRIPE_WEBHOOK_SECRET')!;
 
 // Defaults to the sandbox Prices; override via secrets for live mode.
 const PRICE_MONTHLY = Deno.env.get('STRIPE_PRICE_MONTHLY') || 'price_1TjUjMGuBN0ONk5zc5QSf2DL';
-const PRICE_YEARLY = Deno.env.get('STRIPE_PRICE_YEARLY') || 'price_1TjUjNGuBN0ONk5zyhRnk4a7';
+const PRICE_YEARLY = Deno.env.get('STRIPE_PRICE_YEARLY') || 'price_1TjqScGuBN0ONk5zZdZnU0Im';
 
 const stripe = new Stripe(STRIPE_SECRET_KEY, {
   apiVersion: '2024-12-18.acacia',

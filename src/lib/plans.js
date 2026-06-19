@@ -28,10 +28,10 @@ export const PAID_TIERS = [
   {
     id: 'yearly',
     name: 'Yearly',
-    price: '$29.99',
+    price: '$37.99',
     cadence: '/yr',
-    blurb: 'Best value — save 37% vs monthly.',
-    badge: 'Save 37%',
+    blurb: 'Best value — save 20% vs monthly.',
+    badge: 'Save 20%',
     highlight: true,
   },
   {

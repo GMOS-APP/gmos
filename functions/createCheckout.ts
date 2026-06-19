@@ -27,7 +27,7 @@ const APP_URL = Deno.env.get('APP_URL') || 'https://gmos.app';
 // GM/OS; set the STRIPE_PRICE_* secrets to override (e.g. with live-mode IDs).
 const PRICE_BY_TIER: Record<string, string | undefined> = {
   monthly: Deno.env.get('STRIPE_PRICE_MONTHLY') || 'price_1TjUjMGuBN0ONk5zc5QSf2DL',
-  yearly: Deno.env.get('STRIPE_PRICE_YEARLY') || 'price_1TjUjNGuBN0ONk5zyhRnk4a7',
+  yearly: Deno.env.get('STRIPE_PRICE_YEARLY') || 'price_1TjqScGuBN0ONk5zZdZnU0Im',
   lifetime: Deno.env.get('STRIPE_PRICE_LIFETIME') || 'price_1TjUjOGuBN0ONk5zbkrDfsB8',
 };
 
