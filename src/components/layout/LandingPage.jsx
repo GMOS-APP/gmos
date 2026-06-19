@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
-import AuthPanel from '@/components/layout/AuthPanel';
 import ThemeToggle from '@/components/ui/ThemeToggle';
 import PricingTiers from '@/components/billing/PricingTiers';
 import BetaBadge from '@/components/common/BetaBadge';
@@ -184,6 +183,7 @@ function ProductPreview() {
 }
 
 export default function LandingPage() {
+  const navigate = useNavigate();
   return (
     <div className="min-h-screen flex flex-col">
       {/* Nav */}
@@ -195,13 +195,16 @@ export default function LandingPage() {
           <BetaBadge />
         </span>
         <div className="ml-auto flex items-center gap-3">
+          <Link to="/blog" className="hidden sm:inline text-sm font-medium text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors">
+            Blog
+          </Link>
           <a href="#pricing" className="hidden sm:inline text-sm font-medium text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors">
             Pricing
           </a>
           <ThemeToggle />
-          <a href="#signin" className="text-sm font-medium px-3 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-zinc-950 transition-colors">
+          <Link to="/login" className="text-sm font-medium px-3 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-zinc-950 transition-colors">
             Sign in
-          </a>
+          </Link>
         </div>
       </header>
 
@@ -224,13 +227,13 @@ export default function LandingPage() {
               ))}
             </ul>
             <div className="mt-8 flex items-center gap-3">
-              <a
-                href="#signin"
+              <Link
+                to="/login"
                 onClick={() => track('get_started_clicked', { location: 'hero' })}
                 className="inline-flex items-center px-5 py-2.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-zinc-950 font-semibold transition-colors"
               >
                 Get started free
-              </a>
+              </Link>
               <a
                 href="#pricing"
                 className="inline-flex items-center px-5 py-2.5 rounded-lg border border-zinc-300 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 font-medium hover:bg-zinc-100 dark:hover:bg-zinc-800/60 transition-colors"
@@ -271,7 +274,7 @@ export default function LandingPage() {
           <p className="text-sm text-zinc-500 dark:text-zinc-500 text-center mb-10">Join the beta and lock these rates in for good. Free to start — upgrade any time for unlimited.</p>
           <PricingTiers
             showFree
-            onSelect={(tier) => { track('pricing_cta_clicked', { tier }); window.location.hash = 'signin'; }}
+            onSelect={(tier) => { track('pricing_cta_clicked', { tier }); navigate('/login'); }}
             ctaLabel="Get started"
           />
           <p className="mt-8 text-center text-xs text-zinc-500 dark:text-zinc-500">{RISK_REVERSAL}</p>
@@ -296,14 +299,18 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Sign-in */}
-      <section id="signin" className="px-4 sm:px-6 py-16 border-t border-zinc-200/70 dark:border-zinc-800/60">
+      {/* Final CTA */}
+      <section className="px-4 sm:px-6 py-20 border-t border-zinc-200/70 dark:border-zinc-800/60">
         <div className="max-w-md mx-auto text-center">
-          <h2 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100 mb-1">Get started</h2>
-          <p className="text-sm text-zinc-500 dark:text-zinc-500 mb-6">Create an account or sign in. It's free to start.</p>
-          <div className="flex justify-center">
-            <AuthPanel />
-          </div>
+          <h2 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100 mb-2">Ready to run your best sessions?</h2>
+          <p className="text-sm text-zinc-500 dark:text-zinc-500 mb-6">Start free — one campaign, every feature, no credit card.</p>
+          <Link
+            to="/login"
+            onClick={() => track('get_started_clicked', { location: 'footer_cta' })}
+            className="inline-flex items-center px-6 py-2.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-zinc-950 font-semibold transition-colors"
+          >
+            Get started free
+          </Link>
         </div>
       </section>
 
@@ -313,6 +320,8 @@ export default function LandingPage() {
           the D&D SRD 5.1 (CC BY 4.0, Wizards of the Coast), and Open5e content.
         </p>
         <p className="text-[11px] text-zinc-400 dark:text-zinc-600 text-center mt-2">
+          <Link to="/blog" className="hover:text-zinc-600 dark:hover:text-zinc-400 hover:underline">Blog</Link>
+          <span className="mx-2" aria-hidden>·</span>
           <Link to={createPageUrl('Help')} className="hover:text-zinc-600 dark:hover:text-zinc-400 hover:underline">User Manual</Link>
           <span className="mx-2" aria-hidden>·</span>
           <Link to={createPageUrl('PrivacyPolicy')} className="hover:text-zinc-600 dark:hover:text-zinc-400 hover:underline">Privacy Policy</Link>

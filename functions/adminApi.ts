@@ -198,6 +198,48 @@ Deno.serve(async (req) => {
       return json({ ok: true, accent: accent || null });
     }
 
+    if (action === 'blog-list') {
+      const { data } = await admin.from('blog_posts').select('*')
+        .order('published_at', { ascending: false, nullsFirst: false })
+        .order('created_at', { ascending: false }).limit(200);
+      return json({ posts: data || [] });
+    }
+
+    if (action === 'blog-save') {
+      const p = body.post || {};
+      const title = (p.title || '').trim();
+      if (!title) return json({ error: 'title is required' }, 400);
+      const slug = ((p.slug || title).toLowerCase().trim()
+        .replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '')).slice(0, 80);
+      if (!slug) return json({ error: 'invalid slug' }, 400);
+      const row = {
+        slug,
+        title: title.slice(0, 200),
+        excerpt: (p.excerpt || '').slice(0, 500) || null,
+        body: p.body || null,
+        cover_image: (p.cover_image || '').slice(0, 500) || null,
+        category: (p.category || 'GM Tips').slice(0, 60),
+        author: (p.author || 'GM/OS').slice(0, 80),
+        published: !!p.published,
+        published_at: p.published ? (p.published_at || new Date().toISOString()) : null,
+        updated_at: new Date().toISOString(),
+      };
+      if (p.id) {
+        const { data, error } = await admin.from('blog_posts').update(row).eq('id', p.id).select().single();
+        if (error) return json({ error: error.message }, 400);
+        return json({ post: data });
+      }
+      const { data, error } = await admin.from('blog_posts').insert({ ...row, created_by: me.id }).select().single();
+      if (error) return json({ error: error.message }, 400);
+      return json({ post: data });
+    }
+
+    if (action === 'blog-delete') {
+      if (!body.id) return json({ error: 'id is required' }, 400);
+      await admin.from('blog_posts').delete().eq('id', body.id);
+      return json({ ok: true });
+    }
+
     return json({ error: 'Unknown action' }, 400);
   } catch (e) {
     if (e instanceof Response) return e;

@@ -49,6 +49,8 @@ export default function AuthPanel({ id }) {
       </Button>
 
       {error && <p className="mt-4 text-sm text-red-500 bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2">{error}</p>}
+
+      <p className="mt-4 text-center text-[11px] text-zinc-400 dark:text-zinc-600">More sign-in options coming soon.</p>
     </div>
   );
 }

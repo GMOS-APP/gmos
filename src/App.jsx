@@ -14,6 +14,9 @@ const PrivacyPolicy = lazy(() => import('@/pages/PrivacyPolicy'));
 const Terms = lazy(() => import('@/pages/Terms'));
 const Help = lazy(() => import('@/pages/Help'));
 const AdminConsole = lazy(() => import('@/pages/AdminConsole'));
+const Blog = lazy(() => import('@/pages/Blog'));
+const BlogPost = lazy(() => import('@/pages/BlogPost'));
+const Login = lazy(() => import('@/pages/Login'));
 import AccentSync from '@/lib/AccentSync';
 import ChangelogDialog from '@/components/layout/ChangelogDialog';
 import EasterEggHost from '@/components/easter/EasterEggHost';
@@ -90,6 +93,9 @@ function App() {
                 <Route path="/PrivacyPolicy" element={<PrivacyPolicy />} />
                 <Route path="/Terms" element={<Terms />} />
                 <Route path="/Help" element={<Help />} />
+                <Route path="/blog" element={<Blog />} />
+                <Route path="/blog/:slug" element={<BlogPost />} />
+                <Route path="/login" element={<Login />} />
                 <Route path="/admin" element={<AdminConsole />} />
                 <Route path="/*" element={<AuthenticatedApp />} />
               </Routes>

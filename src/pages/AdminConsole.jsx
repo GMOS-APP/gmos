@@ -5,7 +5,7 @@ import AuthPanel from '@/components/layout/AuthPanel';
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter,
 } from '@/components/ui/dialog';
-import { Loader2, ShieldAlert, Users, Crown, BookOpen, Layers, Boxes, Trash2, RefreshCw, Bug, Lightbulb, LifeBuoy, Check, Inbox, RotateCcw, Megaphone, Pencil, ScrollText, Palette, Sun, Moon } from 'lucide-react';
+import { Loader2, ShieldAlert, Users, Crown, BookOpen, Layers, Boxes, Trash2, RefreshCw, Bug, Lightbulb, LifeBuoy, Check, Inbox, RotateCcw, Megaphone, Pencil, ScrollText, Palette, Sun, Moon, Newspaper, ExternalLink } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Setting } from '@/api/entities';
 import { applyAccent, clearAccent, setAccentCached, DEFAULT_ACCENT } from '@/lib/theme';
@@ -69,6 +69,9 @@ export default function AdminConsole() {
   const [annDraft, setAnnDraft] = useState({ title: '', body: '', level: 'info', published: false });
   const [changelog, setChangelog] = useState([]);
   const [clDraft, setClDraft] = useState({ version: '', date: '', entriesText: '', published: true });
+  const [posts, setPosts] = useState([]);
+  const emptyPost = { title: '', slug: '', category: 'GM Tips', excerpt: '', body: '', published: false };
+  const [postDraft, setPostDraft] = useState(emptyPost);
   const [busy, setBusy] = useState(null);
   const [accent, setAccent] = useState(DEFAULT_ACCENT);  // current picker value (live preview)
   const [savedAccent, setSavedAccent] = useState(null);  // persisted value, null = default
@@ -99,16 +102,17 @@ export default function AdminConsole() {
   }, []);
 
   const load = useCallback(async () => {
-    const [s, u, f, a, c] = await Promise.all([
+    const [s, u, f, a, c, b] = await Promise.all([
       callAdmin({ action: 'stats' }), callAdmin({ action: 'users' }),
       callAdmin({ action: 'feedback-list' }), callAdmin({ action: 'announcement-list' }),
-      callAdmin({ action: 'changelog-list' }),
+      callAdmin({ action: 'changelog-list' }), callAdmin({ action: 'blog-list' }),
     ]);
     setStats(s.stats);
     setUsers(u.users);
     setFeedback(f.feedback);
     setAnnouncements(a.announcements);
     setChangelog(c.changelog);
+    setPosts(b.posts);
     // Brand accent (public read on app_settings); null/absent → default.
     try {
       const rows = await Setting.filter({ id: 'global' });
@@ -179,6 +183,28 @@ export default function AdminConsole() {
   const delAnn = async (a) => {
     setAnnouncements((prev) => prev.filter((x) => x.id !== a.id));
     await callAdmin({ action: 'announcement-delete', id: a.id });
+  };
+
+  const savePost = async () => {
+    if (!postDraft.title.trim()) return;
+    const { post } = await callAdmin({ action: 'blog-save', post: postDraft });
+    setPosts((prev) => (prev.some((x) => x.id === post.id)
+      ? prev.map((x) => (x.id === post.id ? post : x))
+      : [post, ...prev]));
+    setPostDraft(emptyPost);
+  };
+  const editPost = (p) => setPostDraft({
+    id: p.id, title: p.title, slug: p.slug, category: p.category || 'GM Tips',
+    excerpt: p.excerpt || '', body: p.body || '', published: p.published, published_at: p.published_at,
+  });
+  const togglePubPost = async (p) => {
+    const { post } = await callAdmin({ action: 'blog-save', post: { ...p, published: !p.published } });
+    setPosts((prev) => prev.map((x) => (x.id === post.id ? post : x)));
+  };
+  const delPost = async (p) => {
+    if (!window.confirm(`Delete "${p.title}"? This can't be undone.`)) return;
+    setPosts((prev) => prev.filter((x) => x.id !== p.id));
+    await callAdmin({ action: 'blog-delete', id: p.id });
   };
 
   const fbStatus = async (f, status) => {
@@ -414,6 +440,52 @@ export default function AdminConsole() {
                 <button onClick={() => togglePubCl(c)} className="text-xs text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200">{c.published ? 'Unpublish' : 'Publish'}</button>
                 <button onClick={() => setClDraft({ id: c.id, version: c.version, date: c.date || '', entriesText: entriesToText(c.entries), published: c.published })} className="text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300"><Pencil className="w-3.5 h-3.5" /></button>
                 <button onClick={() => delCl(c)} className="text-zinc-400 dark:text-zinc-600 hover:text-red-500 dark:hover:text-red-400"><Trash2 className="w-3.5 h-3.5" /></button>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* Blog */}
+        <section>
+          <h2 className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-widest text-zinc-500 mb-3">
+            <Newspaper className="w-3.5 h-3.5 text-amber-500" /> Blog
+          </h2>
+          <div className={cn(CARD, 'p-3 space-y-2 mb-3')}>
+            <input value={postDraft.title} onChange={(e) => setPostDraft({ ...postDraft, title: e.target.value })}
+              placeholder="Post title" className={cn('w-full text-sm px-2.5 py-1.5', INPUT)} />
+            <div className="flex gap-2">
+              <input value={postDraft.slug} onChange={(e) => setPostDraft({ ...postDraft, slug: e.target.value })}
+                placeholder="slug (auto from title if blank)" className={cn('flex-1 text-sm px-2.5 py-1.5 font-mono', INPUT)} />
+              <input value={postDraft.category} onChange={(e) => setPostDraft({ ...postDraft, category: e.target.value })}
+                placeholder="Category" className={cn('w-44 text-sm px-2.5 py-1.5', INPUT)} />
+            </div>
+            <textarea value={postDraft.excerpt} onChange={(e) => setPostDraft({ ...postDraft, excerpt: e.target.value })}
+              placeholder="Excerpt — shown on the blog index" rows={2} className={cn('w-full text-sm px-2.5 py-1.5 resize-none', INPUT)} />
+            <textarea value={postDraft.body} onChange={(e) => setPostDraft({ ...postDraft, body: e.target.value })}
+              placeholder={'Body — Markdown supported:\n## Heading\n**bold**, *italic*\n- bullet\n[link](https://…)'}
+              rows={10} className={cn('w-full text-sm px-2.5 py-1.5 resize-y font-mono', INPUT)} />
+            <div className="flex items-center gap-2">
+              <label className="flex items-center gap-1.5 text-xs text-zinc-600 dark:text-zinc-400">
+                <input type="checkbox" checked={postDraft.published} onChange={(e) => setPostDraft({ ...postDraft, published: e.target.checked })} /> Published
+              </label>
+              {postDraft.id && <button onClick={() => setPostDraft(emptyPost)} className="text-xs text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300">Cancel</button>}
+              <button onClick={savePost} disabled={!postDraft.title.trim()}
+                className="ml-auto px-3 py-1.5 rounded-md bg-amber-500 hover:bg-amber-400 disabled:opacity-40 text-zinc-950 text-sm font-medium">
+                {postDraft.id ? 'Update' : 'Create'}
+              </button>
+            </div>
+          </div>
+          <div className="space-y-1.5">
+            {posts.length === 0 && <p className="text-sm text-zinc-400 dark:text-zinc-600 text-center py-3">No posts yet.</p>}
+            {posts.map((p) => (
+              <div key={p.id} className={cn('flex items-center gap-2 px-3 py-2', ROW)}>
+                <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full border border-amber-500/30 text-amber-600 dark:text-amber-400 shrink-0">{p.category}</span>
+                <span className="text-sm text-zinc-800 dark:text-zinc-200 truncate flex-1">{p.title}</span>
+                <span className={cn('text-[10px] font-medium shrink-0', p.published ? 'text-emerald-600 dark:text-emerald-400' : 'text-zinc-500')}>{p.published ? 'Published' : 'Draft'}</span>
+                {p.published && <a href={`${import.meta.env.BASE_URL}blog/${p.slug}`} target="_blank" rel="noopener noreferrer" title="View post" className="text-zinc-400 dark:text-zinc-600 hover:text-zinc-700 dark:hover:text-zinc-300"><ExternalLink className="w-3.5 h-3.5" /></a>}
+                <button onClick={() => togglePubPost(p)} className="text-xs text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200">{p.published ? 'Unpublish' : 'Publish'}</button>
+                <button onClick={() => editPost(p)} className="text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300"><Pencil className="w-3.5 h-3.5" /></button>
+                <button onClick={() => delPost(p)} className="text-zinc-400 dark:text-zinc-600 hover:text-red-500 dark:hover:text-red-400"><Trash2 className="w-3.5 h-3.5" /></button>
               </div>
             ))}
           </div>
