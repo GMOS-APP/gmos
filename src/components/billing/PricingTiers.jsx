@@ -46,6 +46,11 @@ export default function PricingTiers({ onSelect, currentPlan, loadingTier, ctaLa
               <span className="text-3xl font-bold text-zinc-900 dark:text-zinc-100">{tier.price}</span>
               <span className="text-xs text-zinc-500 dark:text-zinc-500">{tier.cadence}</span>
             </div>
+            {tier.regularPrice && (
+              <p className="mt-1 text-[11px] text-zinc-400 dark:text-zinc-600">
+                <span className="line-through">{tier.regularPrice}{tier.id === 'lifetime' ? '' : tier.cadence}</span> after beta
+              </p>
+            )}
             <p className="mt-1.5 text-xs text-zinc-500 dark:text-zinc-500 min-h-[2rem]">{tier.blurb}</p>
             <Button
               onClick={() => onSelect?.(tier.id)}
