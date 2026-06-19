@@ -7,19 +7,19 @@ const AuthContext = createContext();
 
 async function fetchOrCreateProfile(userId, setProfile) {
   if (!userId) {
-    setProfile({ plan: 'free', planExpiresAt: null });
+    setProfile({ plan: 'free', planExpiresAt: null, isAdmin: false });
     return;
   }
   const { data } = await supabase
     .from('user_profiles')
-    .select('plan, plan_expires_at')
+    .select('plan, plan_expires_at, is_admin')
     .eq('id', userId)
     .maybeSingle();
   if (data) {
-    setProfile({ plan: data.plan, planExpiresAt: data.plan_expires_at });
+    setProfile({ plan: data.plan, planExpiresAt: data.plan_expires_at, isAdmin: !!data.is_admin });
     return;
   }
-  setProfile({ plan: 'free', planExpiresAt: null });
+  setProfile({ plan: 'free', planExpiresAt: null, isAdmin: false });
   // Insert idempotently; only the call that actually creates the row seeds the
   // demo, so concurrent init paths can't double-seed.
   const { data: inserted } = await supabase
@@ -37,10 +37,12 @@ export const AuthProvider = ({ children }) => {
   const [isLoadingAuth, setIsLoadingAuth] = useState(true);
   const [plan, setPlan] = useState('free');
   const [planExpiresAt, setPlanExpiresAt] = useState(null);
+  const [isAdmin, setIsAdmin] = useState(false);
 
-  const setProfile = ({ plan: p, planExpiresAt: exp }) => {
+  const setProfile = ({ plan: p, planExpiresAt: exp, isAdmin: adm }) => {
     setPlan(p ?? 'free');
     setPlanExpiresAt(exp ?? null);
+    setIsAdmin(!!adm);
   };
 
   // Re-pull the plan from the DB. Used after returning from Stripe checkout,
@@ -79,6 +81,7 @@ export const AuthProvider = ({ children }) => {
       isLoadingAuth,
       plan,
       planExpiresAt,
+      isAdmin,
       isPlus: plan !== 'free',
       refreshProfile,
       // Kept for backward compatibility with any consuming components
