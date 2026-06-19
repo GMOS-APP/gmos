@@ -6,6 +6,7 @@ import PricingTiers from '@/components/billing/PricingTiers';
 import BetaBadge from '@/components/common/BetaBadge';
 import { RISK_REVERSAL } from '@/lib/plans';
 import { track } from '@/lib/analytics';
+import { useSeo } from '@/lib/useSeo';
 import {
   BookOpen, Globe, Swords, Network, Map, Eye, Command, Check,
   LayoutGrid, Search, X, Minus, Square, Grid2x2, Archive, RotateCw, RotateCcw,
@@ -184,6 +185,11 @@ function ProductPreview() {
 
 export default function LandingPage() {
   const navigate = useNavigate();
+  useSeo({
+    title: 'GM/OS — Prep less. Run better. | The Game Master’s operating system',
+    description: 'GM/OS keeps your whole tabletop campaign in one place — worldbuilding, guided session prep, a live battle map, initiative, dice, and a player view you control. Free to start.',
+    path: '/',
+  });
   return (
     <div className="min-h-screen flex flex-col">
       {/* Nav */}

@@ -3,6 +3,7 @@ import { Link, useParams } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
 import { supabase } from '@/api/supabaseClient';
 import MarketingShell from '@/components/layout/MarketingShell';
+import { useSeo } from '@/lib/useSeo';
 import { Loader2, ArrowLeft } from 'lucide-react';
 
 const fmtDate = (d) => d ? new Date(d).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' }) : '';
@@ -10,20 +11,38 @@ const fmtDate = (d) => d ? new Date(d).toLocaleDateString(undefined, { year: 'nu
 export default function BlogPost() {
   const { slug } = useParams();
   const [state, setState] = useState({ loading: true, post: null });
+  const post = state.post;
+
+  useSeo(post ? {
+    title: `${post.title} — GM/OS`,
+    description: post.excerpt || undefined,
+    path: `/blog/${post.slug}`,
+    type: 'article',
+    image: post.cover_image || undefined,
+    jsonLd: {
+      '@context': 'https://schema.org',
+      '@type': 'Article',
+      headline: post.title,
+      description: post.excerpt || undefined,
+      datePublished: post.published_at,
+      author: { '@type': 'Organization', name: post.author || 'GM/OS' },
+      publisher: { '@type': 'Organization', name: 'GM/OS' },
+      mainEntityOfPage: `https://gmos.app/blog/${post.slug}`,
+    },
+  } : { title: 'GM/OS Blog', path: `/blog/${slug}` });
 
   useEffect(() => {
     let active = true;
     setState({ loading: true, post: null });
     supabase
       .from('blog_posts')
-      .select('slug, title, excerpt, body, category, author, published_at')
+      .select('slug, title, excerpt, body, cover_image, category, author, published_at')
       .eq('slug', slug)
       .eq('published', true)
       .maybeSingle()
       .then(({ data }) => {
         if (!active) return;
         setState({ loading: false, post: data || null });
-        document.title = data ? `${data.title} — GM/OS` : 'Not found — GM/OS';
       });
     return () => { active = false; };
   }, [slug]);

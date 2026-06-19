@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { supabase } from '@/api/supabaseClient';
 import MarketingShell from '@/components/layout/MarketingShell';
+import { useSeo } from '@/lib/useSeo';
 import { Loader2 } from 'lucide-react';
 
 const fmtDate = (d) => d ? new Date(d).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' }) : '';
@@ -9,8 +10,13 @@ const fmtDate = (d) => d ? new Date(d).toLocaleDateString(undefined, { year: 'nu
 export default function Blog() {
   const [posts, setPosts] = useState(null);
 
+  useSeo({
+    title: 'Blog — GM tips & deep dives | GM/OS',
+    description: 'GM tips, prep methods, and feature deep-dives for running better tabletop RPG sessions, from the team behind GM/OS.',
+    path: '/blog',
+  });
+
   useEffect(() => {
-    document.title = 'Blog — GM/OS';
     supabase
       .from('blog_posts')
       .select('slug, title, excerpt, category, author, published_at')
