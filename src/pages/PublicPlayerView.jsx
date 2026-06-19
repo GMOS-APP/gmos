@@ -85,15 +85,16 @@ export default function PublicPlayerView() {
     } catch { /* non-fatal */ }
   }, [token]);
 
-  // Live entity reveals: a DB trigger bumps `campaign_pulse` on any world-entity
-  // change; we subscribe to that secrets-free row via postgres_changes and
-  // debounce-refetch through the edge function, so reveals appear without a
-  // refresh. (No entity data is ever exposed to the anon client directly.)
+  // Live entity reveals: a DB trigger broadcasts a secrets-free "bump" on any
+  // world-entity change; we listen on the public `pulse:<id>` broadcast channel
+  // and debounce-refetch through the token-gated edge function, so reveals appear
+  // without a refresh. (No table is read with just the campaign UUID — the anon
+  // SELECT on campaign_pulse was dropped; this is broadcast-only now.)
   useEffect(() => {
     if (!campaign?.id) return undefined;
     let t;
     const ch = supabase.channel(`pulse:${campaign.id}`)
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'campaign_pulse', filter: `campaign_id=eq.${campaign.id}` },
+      .on('broadcast', { event: 'bump' },
         () => { clearTimeout(t); t = setTimeout(refreshView, 400); })
       .subscribe();
     return () => { clearTimeout(t); supabase.removeChannel(ch); };
