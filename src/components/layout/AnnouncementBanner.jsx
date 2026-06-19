@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Announcement } from '@/api/entities';
+import { supabase } from '@/api/supabaseClient';
 import { Megaphone, AlertTriangle, CheckCircle2, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -20,7 +20,17 @@ export default function AnnouncementBanner() {
 
   const { data: list = [] } = useQuery({
     queryKey: ['announcements'],
-    queryFn: () => Announcement.filter({ published: true }, '-created_date', 5),
+    // Explicit columns only — never request created_by (an admin user id), which
+    // anon is also revoked from reading at the DB level.
+    queryFn: async () => {
+      const { data } = await supabase
+        .from('announcements')
+        .select('id,title,body,level,created_date')
+        .eq('published', true)
+        .order('created_date', { ascending: false })
+        .limit(5);
+      return data || [];
+    },
     staleTime: 60000,
   });
 
