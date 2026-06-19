@@ -28,3 +28,5 @@ dist-ssr
 *.sw?
 
 .env
+# local security notes (not for the repo)
+securitychecklist.md

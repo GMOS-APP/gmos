@@ -1,3 +1,8 @@
+import { createClient } from 'npm:@supabase/supabase-js@2';
+
+const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!;
+const ANON_KEY = Deno.env.get('SUPABASE_ANON_KEY')!;
+
 const ALLOWED_ORIGINS = ['https://gmos.app', 'https://gm-os.app', 'https://gamemasteros.com', 'https://trisdenc.github.io'];
 const isAllowedOrigin = (o: string | null): o is string =>
   !!o && (ALLOWED_ORIGINS.includes(o) ||
@@ -17,6 +22,13 @@ Deno.serve(async (req) => {
   }
 
   try {
+    // Require a real signed-in user (platform verify_jwt also accepts the public
+    // anon key, so check for an actual user to stop anonymous proxy abuse).
+    const authHeader = req.headers.get('Authorization');
+    const userClient = createClient(SUPABASE_URL, ANON_KEY, { global: { headers: { Authorization: authHeader || '' } } });
+    const { data: { user } } = await userClient.auth.getUser();
+    if (!user) return Response.json({ error: 'Unauthorized' }, { status: 401, headers: CORS_HEADERS });
+
     const { characterId } = await req.json();
     if (!characterId) {
       return Response.json({ error: 'characterId is required' }, { status: 400, headers: CORS_HEADERS });
