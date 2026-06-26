@@ -194,6 +194,18 @@ export default function Sidebar({ campaign, collapsed, onToggle, onNavClick }) {
       {/* Footer */}
       <div className="p-3 border-t border-zinc-200 dark:border-zinc-800/60 space-y-2">
         <Link
+          to={createPageUrl('Help')}
+          onClick={onNavClick}
+          title="Manual"
+          className={cn(
+            'flex items-center gap-3 rounded-lg text-sm text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800/50 transition-colors',
+            collapsed ? 'justify-center p-2' : 'px-3 py-2'
+          )}
+        >
+          <BookOpen className="w-4 h-4 flex-shrink-0" />
+          {!collapsed && <span>Manual</span>}
+        </Link>
+        <Link
           to={createPageUrl('AccountSettings')}
           onClick={onNavClick}
           className={cn(

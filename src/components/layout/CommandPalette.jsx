@@ -10,7 +10,7 @@ import {
   CommandDialog, CommandInput, CommandList, CommandEmpty,
   CommandGroup, CommandItem,
 } from '@/components/ui/command';
-import { CalendarDays, Plus, Dices, Compass } from 'lucide-react';
+import { CalendarDays, Plus, Dices, Compass, BookOpen } from 'lucide-react';
 import { CAMPAIGN_NAV_ITEMS, navHref } from '@/lib/navItems';
 import { useWindowManager } from '@/lib/WindowManager';
 import { useNotifications } from '@/lib/NotificationContext';
@@ -206,15 +206,27 @@ export default function CommandPalette({ open, onOpenChange, campaignId, onStart
           </CommandGroup>
         )}
 
-        {onStartTour && (matches('take the tour') || matches('tour') || matches('help') || matches('walkthrough')) && (
+        {(matches('manual') || matches('help') || matches('docs') || matches('guide') ||
+          (onStartTour && (matches('take the tour') || matches('tour') || matches('walkthrough')))) && (
           <CommandGroup heading="Help">
-            <CommandItem
-              value="start-tour"
-              onSelect={() => { onOpenChange(false); setQuery(''); onStartTour(); }}
-            >
-              <Compass className="text-amber-500" />
-              <span>Take the interactive tour</span>
-            </CommandItem>
+            {(matches('manual') || matches('help') || matches('docs') || matches('guide')) && (
+              <CommandItem
+                value="open-manual"
+                onSelect={() => run(createPageUrl('Help'))}
+              >
+                <BookOpen className="text-amber-500" />
+                <span>Open the manual</span>
+              </CommandItem>
+            )}
+            {onStartTour && (matches('take the tour') || matches('tour') || matches('help') || matches('walkthrough')) && (
+              <CommandItem
+                value="start-tour"
+                onSelect={() => { onOpenChange(false); setQuery(''); onStartTour(); }}
+              >
+                <Compass className="text-amber-500" />
+                <span>Take the interactive tour</span>
+              </CommandItem>
+            )}
           </CommandGroup>
         )}
       </CommandList>
