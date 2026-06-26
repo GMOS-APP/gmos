@@ -4,6 +4,7 @@ import { Swords } from 'lucide-react';
 import TokenLayer from './TokenLayer';
 import ZoomPan from './ZoomPan';
 import { useBattleMapChannel } from '@/lib/useBattleMapChannel';
+import AlphaBadge from '@/components/common/AlphaBadge';
 
 // Player-facing battle map for the public share link. Loads the active map via
 // the token-gated `battle-map` edge function, shows live token movement over a
@@ -57,8 +58,8 @@ export default function PlayerBattleMap({ token, onHasMap }) {
     <div>
       <div className="flex items-center gap-2 mb-3">
         <Swords className="w-4 h-4 text-amber-400" />
-        <h2 className="text-xs font-semibold uppercase tracking-widest text-zinc-500">
-          Battle Map {map.locked && <span className="text-zinc-600 normal-case tracking-normal">· locked by GM</span>}
+        <h2 className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-widest text-zinc-500">
+          Battle Map <AlphaBadge />{map.locked && <span className="text-zinc-600 normal-case tracking-normal">· locked by GM</span>}
         </h2>
       </div>
       <ZoomPan className="border border-zinc-800 bg-black">
