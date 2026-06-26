@@ -194,25 +194,6 @@ export default function About() {
           </div>
         </section>
 
-        {/* Source */}
-        <section>
-          <h2 className="text-[11px] dark:text-zinc-600 text-zinc-500 uppercase tracking-widest font-semibold mb-4">
-            Source Code
-          </h2>
-          <p className="text-sm dark:text-zinc-400 text-zinc-600 leading-relaxed">
-            GM/OS is open source. View the code, report issues, or contribute on{' '}
-            <a
-              href="https://github.com/trisdenc/GM-OS"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="dark:text-zinc-200 text-zinc-800 underline underline-offset-2 hover:dark:text-amber-400 hover:text-amber-600 transition-colors"
-            >
-              GitHub
-            </a>
-            .
-          </p>
-        </section>
-
         {/* Footer nav */}
         <div className="border-t dark:border-zinc-800 border-zinc-200 pt-8 text-center">
           <Link
