@@ -8,6 +8,16 @@ import { Loader2, ArrowLeft } from 'lucide-react';
 
 const fmtDate = (d) => d ? new Date(d).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' }) : '';
 
+// Render in-app links (e.g. the series nav, /blog/...) as client-side Router
+// navigations instead of full page reloads; external links open in a new tab.
+const markdownComponents = {
+  a: ({ href = '', children, ...props }) => (
+    href.startsWith('/')
+      ? <Link to={href} {...props}>{children}</Link>
+      : <a href={href} target="_blank" rel="noopener noreferrer" {...props}>{children}</a>
+  ),
+};
+
 export default function BlogPost() {
   const { slug } = useParams();
   const [state, setState] = useState({ loading: true, post: null });
@@ -75,7 +85,7 @@ export default function BlogPost() {
             [&_h3]:text-base [&_h3]:font-semibold [&_h3]:text-zinc-900 dark:[&_h3]:text-zinc-100 [&_h3]:mt-6 [&_h3]:mb-2
             [&_p]:mb-4 [&_ul]:list-disc [&_ul]:pl-5 [&_ul]:space-y-1.5 [&_ul]:mb-4 [&_ol]:list-decimal [&_ol]:pl-5 [&_ol]:space-y-1.5 [&_ol]:mb-4
             [&_a]:text-amber-600 dark:[&_a]:text-amber-400 [&_a]:underline [&_strong]:text-zinc-900 dark:[&_strong]:text-zinc-100 [&_strong]:font-semibold">
-            <ReactMarkdown>{state.post.body || ''}</ReactMarkdown>
+            <ReactMarkdown components={markdownComponents}>{state.post.body || ''}</ReactMarkdown>
           </div>
 
           <div className="mt-12 pt-6 border-t border-zinc-200 dark:border-zinc-800/60 flex items-center justify-between">
