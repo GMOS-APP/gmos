@@ -18,6 +18,7 @@ import useDocumentTitle, { pageLabel } from '@/lib/useDocumentTitle';
 import { createPageUrl } from '@/utils';
 import { useHotkeys } from '@/lib/useHotkeys';
 import { useHotkeysEnabled } from '@/lib/useHotkeysEnabled';
+import { useWindowMode } from '@/lib/useWindowMode';
 import { useMediaQuery } from '@/lib/useMediaQuery';
 import { cn } from '@/lib/utils';
 import { Loader2 } from 'lucide-react';
@@ -44,6 +45,10 @@ export default function Layout({ children, currentPageName }) {
   const { isLoadingAuth } = useAuth();
   const navigate = useNavigate();
   const wide = useMediaQuery('(min-width: 768px)');
+  const windowModeOn = useWindowMode();
+  // The floating-window OS only runs on desktop widths and when the user hasn't
+  // turned it off. Otherwise pages render full-screen with plain navigation.
+  const windowed = wide && windowModeOn;
 
   const params = new URLSearchParams(window.location.search);
   const campaignId = params.get('campaign_id') || (CAMPAIGN_PAGES.includes(currentPageName) && !params.get('campaign_id') ? params.get('id') : null);
@@ -60,7 +65,7 @@ export default function Layout({ children, currentPageName }) {
 
   // Document title. The desktop derives its own title from the focused window
   // (DesktopTitle), so Layout opts out there; everywhere else it owns it.
-  const desktopCampaign = wide && isCampaignPage && !!campaignId;
+  const desktopCampaign = windowed && isCampaignPage && !!campaignId;
   const baseLabel = isCampaignPage ? titleOf('/' + currentPageName) : pageLabel(currentPageName);
   const baseTitle = isCampaignPage && campaign?.name ? `${baseLabel} · ${campaign.name}` : baseLabel;
   useDocumentTitle(desktopCampaign ? undefined : baseTitle);
@@ -179,8 +184,9 @@ export default function Layout({ children, currentPageName }) {
     </div>
   );
 
-  // Mobile: no window manager — the routed page renders full-screen, scrollable.
-  if (!wide) {
+  // No window manager — the routed page renders full-screen, scrollable. Used on
+  // mobile, and on desktop when the user has turned OS/window mode off.
+  if (!windowed) {
     return shell(
       <div className="h-full overflow-y-auto">
         <div className="min-h-full flex flex-col">

@@ -121,6 +121,7 @@ const SECTIONS = [
             'Click a window-strip button in the taskbar to bring a window forward, or click it again to minimise.',
             'Your open windows and their positions are saved per campaign and restored when you return.',
           ] },
+          { type: 'tip', text: 'Prefer plain pages? Turn off "Desktop window mode" in Settings → Preferences and pages open full-screen, one at a time, with normal navigation. It applies to this device.' },
         ],
       },
       {
