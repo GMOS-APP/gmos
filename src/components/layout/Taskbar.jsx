@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useIsFetching, useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
-import { LayoutGrid, Search, LogOut, HelpCircle } from 'lucide-react';
+import { LayoutGrid, Search, LogOut, HelpCircle, AppWindow } from 'lucide-react';
 import { Session, auth } from '@/api/entities';
 import { createPageUrl } from '@/utils';
 import { useWindowManager, titleOf } from '@/lib/WindowManager';
+import { useWindowMode, setWindowModeEnabled } from '@/lib/useWindowMode';
 import TrayAudioPlayer from '@/components/layout/TrayAudioPlayer';
 import TrayNotifications from '@/components/layout/TrayNotifications';
 import TrayTools from '@/components/layout/TrayTools';
@@ -26,6 +27,7 @@ export default function Taskbar({ campaign, currentPageName, startActive, onStar
   const fetching = useIsFetching();
   const navigate = useNavigate();
   const wm = useWindowManager();
+  const windowModeOn = useWindowMode();
   const [now, setNow] = useState(() => new Date());
 
   useEffect(() => {
@@ -115,6 +117,20 @@ export default function Taskbar({ campaign, currentPageName, startActive, onStar
           className="h-10 w-10 sm:h-7 sm:w-7 flex items-center justify-center rounded-md text-zinc-500 hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-zinc-700 dark:hover:text-zinc-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/50"
         >
           <HelpCircle className="w-4 h-4 sm:w-3.5 sm:h-3.5" />
+        </button>
+        <button
+          onClick={() => setWindowModeEnabled(!windowModeOn)}
+          title={windowModeOn ? 'Window mode: on (click for full-screen pages)' : 'Window mode: off (click for floating windows)'}
+          aria-label="Toggle desktop window mode"
+          aria-pressed={windowModeOn}
+          className={cn(
+            'hidden md:flex h-7 w-7 items-center justify-center rounded-md transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/50',
+            windowModeOn
+              ? 'bg-amber-500/15 text-amber-600 dark:text-amber-400'
+              : 'text-zinc-500 hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-zinc-700 dark:hover:text-zinc-300'
+          )}
+        >
+          <AppWindow className="w-3.5 h-3.5" />
         </button>
         {/* Tools/audio/theme/clock/sign-out are desktop-only; on mobile they
             live in the drawer to keep the tray uncluttered. */}
