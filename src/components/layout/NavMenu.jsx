@@ -5,7 +5,7 @@ import { createPageUrl } from '@/utils';
 import { useWindowManager } from '@/lib/WindowManager';
 import { auth } from '@/api/entities';
 import FeedbackButton from '@/components/layout/FeedbackButton';
-import { PanelLeft, UserCog, LayoutGrid, BookOpen } from 'lucide-react';
+import { PanelLeft, UserCog, LayoutGrid, HelpCircle } from 'lucide-react';
 
 // Floating navigation dropdown shown when the sidebar is undocked. Includes a
 // "Dock sidebar" action to bring it back to the left, plus the signed-in user
@@ -73,7 +73,7 @@ export default function NavMenu({ open, onClose, campaignId, onDock }) {
           </div>
         )}
         <button onClick={() => openWin(createPageUrl('Help'))} className={itemClass}>
-          <BookOpen className="w-4 h-4 text-zinc-400 dark:text-zinc-500 flex-shrink-0" />
+          <HelpCircle className="w-4 h-4 text-zinc-400 dark:text-zinc-500 flex-shrink-0" />
           <span>Manual</span>
         </button>
         <button onClick={() => go(createPageUrl('AccountSettings'))} className={itemClass}>

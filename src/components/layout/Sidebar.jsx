@@ -13,6 +13,7 @@ import {
   Sparkles,
   ChevronLeft,
   BookOpen,
+  HelpCircle,
   Swords,
   Church,
   Flame,
@@ -205,7 +206,7 @@ export default function Sidebar({ campaign, collapsed, onToggle, onNavClick }) {
             aria-label="Manual"
             className={iconBtn}
           >
-            <BookOpen className="w-4 h-4" />
+            <HelpCircle className="w-4 h-4" />
           </Link>
           <Link
             to={createPageUrl('AccountSettings')}
