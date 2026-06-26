@@ -12,6 +12,7 @@ export default function Footer() {
       </div>
       <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 mt-1.5">
         <Link to={createPageUrl('Help')} className="underline underline-offset-2 hover:text-zinc-600 dark:hover:text-zinc-400 transition-colors">Manual</Link>
+        <Link to="/blog" className="underline underline-offset-2 hover:text-zinc-600 dark:hover:text-zinc-400 transition-colors">Blog</Link>
         <Link to={createPageUrl('About')} className="underline underline-offset-2 hover:text-zinc-600 dark:hover:text-zinc-400 transition-colors">Attributions</Link>
         <Link to={createPageUrl('PrivacyPolicy')} className="underline underline-offset-2 hover:text-zinc-600 dark:hover:text-zinc-400 transition-colors">Privacy</Link>
         <Link to={createPageUrl('Terms')} className="underline underline-offset-2 hover:text-zinc-600 dark:hover:text-zinc-400 transition-colors">Terms</Link>

@@ -349,7 +349,14 @@ export default function CampaignList() {
 
 
       {/* Footer */}
-      <div className="mt-16 pb-6 text-center">
+      <div className="mt-16 pb-6 flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-center">
+        <Link
+          to="/blog"
+          className="text-xs text-zinc-400 dark:text-zinc-700 hover:text-zinc-600 dark:hover:text-zinc-500 transition-colors"
+        >
+          Blog — GM tips &amp; guides
+        </Link>
+        <span aria-hidden className="text-xs text-zinc-300 dark:text-zinc-800">·</span>
         <Link
           to={createPageUrl('About')}
           className="text-xs text-zinc-400 dark:text-zinc-700 hover:text-zinc-600 dark:hover:text-zinc-500 transition-colors"
