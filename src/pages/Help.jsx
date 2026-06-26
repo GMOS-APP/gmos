@@ -279,6 +279,7 @@ const SECTIONS = [
             'Drag tokens to move them; toggle the grid; zoom and pan.',
             'When the campaign is shared, players see the map and token movements update live.',
           ] },
+          { type: 'tip', text: 'The Battle Map is in alpha — it’s brand new and still rough in places. Expect changes and the occasional quirk, and tell us what breaks via Send feedback.' },
         ],
       },
     ],

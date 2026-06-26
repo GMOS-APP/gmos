@@ -4,6 +4,7 @@ import { createPageUrl } from '@/utils';
 import ThemeToggle from '@/components/ui/ThemeToggle';
 import PricingTiers from '@/components/billing/PricingTiers';
 import BetaBadge from '@/components/common/BetaBadge';
+import AlphaBadge from '@/components/common/AlphaBadge';
 import { RISK_REVERSAL } from '@/lib/plans';
 import { track } from '@/lib/analytics';
 import { useSeo } from '@/lib/useSeo';
@@ -20,7 +21,7 @@ const FEATURES = [
   { Icon: Network, title: 'Relationship map', body: 'A visual map of how characters, factions, and threads connect.', detail: 'An interactive force-directed graph of every connection — allies, rivals, faction ties, and the threads that bind them. Click any node to jump straight to that entity.' },
   { Icon: Map, title: 'Maps & tables', body: 'Interactive maps for your locations, and your own random tables to roll on.', detail: 'Drop pins on location maps and link them to entities, import maps from Dyson Logos, and build your own random tables for names, loot, and encounters — then roll on them in a click.' },
   { Icon: Eye, title: 'Player view', body: 'A separate page you can share with players, showing only what you choose.', detail: 'Share a private link that shows players only what you’ve marked visible — never GM secrets or prep. Flip entities between “players know” and “players suspect” as the story unfolds.' },
-  { Icon: Grid2x2, title: 'Live battle map', body: 'A shared, real-time grid — drop and move tokens, and your players see it update live as you run combat.', detail: 'A grid synced in real time over the web. Place and move tokens and your players see every move instantly from their own browser — no install and no account required.' },
+  { Icon: Grid2x2, title: 'Live battle map', alpha: true, body: 'A shared, real-time grid — drop and move tokens, and your players see it update live as you run combat.', detail: 'A grid synced in real time over the web. Place and move tokens and your players see every move instantly from their own browser — no install and no account required. This one is brand new — expect rough edges while it’s in alpha.' },
   { Icon: Archive, title: 'Own your data', body: 'Export a full backup of any campaign to a file, and import it back anytime. Your world is yours to keep.', detail: 'Export any campaign — entities, sessions, maps, notes, tables — to a single file and re-import it whenever. Full account export and one-click deletion too. Nothing is locked in.' },
 ];
 
@@ -34,7 +35,7 @@ const FAQ = [
 ];
 
 // A "What's inside" card that flips on click to reveal more detail on the back.
-function FlipCard({ Icon, title, body, detail }) {
+function FlipCard({ Icon, title, body, detail, alpha }) {
   const [flipped, setFlipped] = useState(false);
   return (
     <button
@@ -52,7 +53,9 @@ function FlipCard({ Icon, title, body, detail }) {
           <div className="w-9 h-9 rounded-lg bg-amber-500/10 flex items-center justify-center mb-3">
             <Icon className="w-5 h-5 text-amber-500" />
           </div>
-          <h3 className="font-semibold text-zinc-900 dark:text-zinc-100 text-sm mb-1.5">{title}</h3>
+          <h3 className="flex items-center gap-1.5 font-semibold text-zinc-900 dark:text-zinc-100 text-sm mb-1.5">
+            {title}{alpha && <AlphaBadge />}
+          </h3>
           <p className="text-xs text-zinc-500 dark:text-zinc-500 leading-relaxed">{body}</p>
           <span className="mt-auto pt-3 inline-flex items-center gap-1 text-[10px] font-medium text-amber-600/80 dark:text-amber-400/80">
             <RotateCw className="w-3 h-3" /> More
@@ -60,7 +63,9 @@ function FlipCard({ Icon, title, body, detail }) {
         </div>
         {/* Back */}
         <div className="absolute inset-0 flex flex-col rounded-xl border border-amber-500/40 dark:border-amber-500/30 bg-amber-50/50 dark:bg-amber-500/[0.06] p-5 [backface-visibility:hidden] [-webkit-backface-visibility:hidden] [transform:rotateY(180deg)]">
-          <h3 className="font-semibold text-zinc-900 dark:text-zinc-100 text-sm mb-2">{title}</h3>
+          <h3 className="flex items-center gap-1.5 font-semibold text-zinc-900 dark:text-zinc-100 text-sm mb-2">
+            {title}{alpha && <AlphaBadge />}
+          </h3>
           <p className="text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed overflow-y-auto">{detail}</p>
           <span className="mt-auto pt-2 inline-flex items-center gap-1 text-[10px] font-medium text-zinc-400 dark:text-zinc-500">
             <RotateCcw className="w-3 h-3" /> Back

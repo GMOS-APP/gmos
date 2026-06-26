@@ -7,6 +7,7 @@ import TokenLayer from '@/components/map/TokenLayer';
 import BackgroundPicker from '@/components/map/BackgroundPicker';
 import { useBattleMapChannel } from '@/lib/useBattleMapChannel';
 import { getEntityColors } from '@/lib/entityColors';
+import AlphaBadge from '@/components/common/AlphaBadge';
 
 const TYPE_HEX = { player_character: '#22d3ee', npc: '#a78bfa', creature: '#f87171' };
 const KIND_OF = { player_character: 'pc', npc: 'npc', creature: 'monster' };
@@ -150,6 +151,7 @@ export default function BattleMap() {
       <div className="flex items-center gap-2 mb-4">
         <Swords className="w-5 h-5 text-amber-500" />
         <h1 className="text-xl font-bold text-zinc-900 dark:text-zinc-100">Battle Map</h1>
+        <AlphaBadge />
         <span className="text-xs text-zinc-500 hidden sm:inline">live shared board</span>
       </div>
 

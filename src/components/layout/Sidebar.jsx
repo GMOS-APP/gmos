@@ -24,6 +24,7 @@ import {
 } from 'lucide-react';
 import { CAMPAIGN_NAV_ITEMS, navHref } from '@/lib/navItems';
 import FeedbackButton from '@/components/layout/FeedbackButton';
+import AlphaBadge from '@/components/common/AlphaBadge';
 import { useWindowManager, pageKeyOf, paramsOf } from '@/lib/WindowManager';
 import { cn } from '@/lib/utils';
 
@@ -133,7 +134,7 @@ export default function Sidebar({ campaign, collapsed, onToggle, onNavClick }) {
           <LayoutGrid className="w-4 h-4 flex-shrink-0" />
           {!collapsed && <span>All campaigns</span>}
         </Link>
-        {CAMPAIGN_NAV_ITEMS.map(({ page, label, Icon, param }) => {
+        {CAMPAIGN_NAV_ITEMS.map(({ page, label, Icon, param, alpha }) => {
           const isActive = activePage === page;
           const href = navHref({ page, param }, campaign.id);
           return (
@@ -151,6 +152,7 @@ export default function Sidebar({ campaign, collapsed, onToggle, onNavClick }) {
             >
               <Icon className="w-4 h-4 flex-shrink-0" />
               {!collapsed && <span>{label}</span>}
+              {!collapsed && alpha && <AlphaBadge className="ml-auto" />}
             </Link>
           );
         })}
