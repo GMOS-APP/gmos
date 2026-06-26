@@ -6,6 +6,9 @@ import { Session, auth } from '@/api/entities';
 import { createPageUrl } from '@/utils';
 import { useWindowManager, titleOf } from '@/lib/WindowManager';
 import { useWindowMode, setWindowModeEnabled } from '@/lib/useWindowMode';
+import {
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription,
+} from '@/components/ui/dialog';
 import TrayAudioPlayer from '@/components/layout/TrayAudioPlayer';
 import TrayNotifications from '@/components/layout/TrayNotifications';
 import TrayTools from '@/components/layout/TrayTools';
@@ -29,6 +32,19 @@ export default function Taskbar({ campaign, currentPageName, startActive, onStar
   const wm = useWindowManager();
   const windowModeOn = useWindowMode();
   const [now, setNow] = useState(() => new Date());
+  const [explainerOpen, setExplainerOpen] = useState(false);
+
+  // Toggle window mode; the very first time, pop a one-off explainer so people
+  // know what just changed.
+  const toggleWindowMode = () => {
+    setWindowModeEnabled(!windowModeOn);
+    try {
+      if (localStorage.getItem('gmos_window_mode_explained') !== 'true') {
+        localStorage.setItem('gmos_window_mode_explained', 'true');
+        setExplainerOpen(true);
+      }
+    } catch { /* ignore */ }
+  };
 
   useEffect(() => {
     const id = setInterval(() => setNow(new Date()), 30_000);
@@ -119,7 +135,7 @@ export default function Taskbar({ campaign, currentPageName, startActive, onStar
           <HelpCircle className="w-4 h-4 sm:w-3.5 sm:h-3.5" />
         </button>
         <button
-          onClick={() => setWindowModeEnabled(!windowModeOn)}
+          onClick={toggleWindowMode}
           title={windowModeOn ? 'Window mode: on (click for full-screen pages)' : 'Window mode: off (click for floating windows)'}
           aria-label="Toggle desktop window mode"
           aria-pressed={windowModeOn}
@@ -155,6 +171,34 @@ export default function Taskbar({ campaign, currentPageName, startActive, onStar
           <LogOut className="w-3.5 h-3.5" />
         </button>
       </div>
+
+      <Dialog open={explainerOpen} onOpenChange={setExplainerOpen}>
+        <DialogContent className="sm:max-w-md dark:bg-zinc-900 dark:border-zinc-800">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-zinc-900 dark:text-zinc-100">
+              <AppWindow className="w-5 h-5 text-amber-500" />
+              {windowModeOn ? 'Window mode is on' : 'Window mode is off'}
+            </DialogTitle>
+            <DialogDescription className="text-zinc-500 dark:text-zinc-400">
+              GM/OS works like a desktop operating system.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-3 text-sm text-zinc-600 dark:text-zinc-300">
+            <p>
+              <span className="font-medium text-zinc-900 dark:text-zinc-100">Window mode on</span> — each
+              page opens as a draggable, resizable window you can tile and stack, with your layout remembered per campaign.
+            </p>
+            <p>
+              <span className="font-medium text-zinc-900 dark:text-zinc-100">Window mode off</span> — pages
+              open full-screen, one at a time, with plain back-and-forth navigation.
+            </p>
+            <p className="text-xs text-zinc-500 dark:text-zinc-500">
+              Toggle it any time from this <AppWindow className="inline w-3.5 h-3.5 align-text-bottom" /> tray
+              button or from Settings → Preferences. The choice is remembered on this device.
+            </p>
+          </div>
+        </DialogContent>
+      </Dialog>
     </header>
   );
 }
