@@ -17,7 +17,7 @@ const TYPES = [
  * A self-contained "Send feedback" menu item + dialog. Lets any signed-in user
  * file a bug, idea, or help request (lands in the admin inbox).
  */
-export default function FeedbackButton({ className, onOpen }) {
+export default function FeedbackButton({ className, onOpen, iconOnly = false }) {
   const { user } = useAuth();
   const [open, setOpen] = useState(false);
   const [type, setType] = useState('bug');
@@ -48,9 +48,11 @@ export default function FeedbackButton({ className, onOpen }) {
       <button
         onClick={() => { onOpen?.(); setOpen(true); setSent(false); }}
         className={className}
+        title={iconOnly ? 'Send feedback' : undefined}
+        aria-label={iconOnly ? 'Send feedback' : undefined}
       >
         <MessageSquarePlus className="w-4 h-4 flex-shrink-0" />
-        <span>Send feedback</span>
+        {!iconOnly && <span>Send feedback</span>}
       </button>
 
       <Dialog open={open} onOpenChange={setOpen}>

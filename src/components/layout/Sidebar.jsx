@@ -61,6 +61,9 @@ const entityGroups = [
   },
 ];
 
+// Shared style for the compact footer utility icons (matches ThemeToggle).
+const iconBtn = 'p-1.5 rounded-md text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/50';
+
 export default function Sidebar({ campaign, collapsed, onToggle, onNavClick }) {
   const location = useLocation();
   const wm = useWindowManager();
@@ -193,38 +196,28 @@ export default function Sidebar({ campaign, collapsed, onToggle, onNavClick }) {
 
       {/* Footer */}
       <div className="p-3 border-t border-zinc-200 dark:border-zinc-800/60 space-y-2">
-        <Link
-          to={createPageUrl('Help')}
-          onClick={onNavClick}
-          title="Manual"
-          className={cn(
-            'flex items-center gap-3 rounded-lg text-sm text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800/50 transition-colors',
-            collapsed ? 'justify-center p-2' : 'px-3 py-2'
-          )}
-        >
-          <BookOpen className="w-4 h-4 flex-shrink-0" />
-          {!collapsed && <span>Manual</span>}
-        </Link>
-        <Link
-          to={createPageUrl('AccountSettings')}
-          onClick={onNavClick}
-          className={cn(
-            'flex items-center gap-3 rounded-lg text-sm text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800/50 transition-colors',
-            collapsed ? 'justify-center p-2' : 'px-3 py-2'
-          )}
-        >
-          <UserCog className="w-4 h-4 flex-shrink-0" />
-          {!collapsed && <span>Account settings</span>}
-        </Link>
-        {!collapsed && (
-          <FeedbackButton
-            onOpen={onNavClick}
-            className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800/50 transition-colors"
-          />
-        )}
-        <div className={collapsed ? "flex justify-center" : "flex items-center gap-2 px-1"}>
+        {/* Utility actions, reduced to icons to save space (labels on hover). */}
+        <div className={cn('flex', collapsed ? 'flex-col items-center gap-1' : 'items-center justify-between')}>
+          <Link
+            to={createPageUrl('Help')}
+            onClick={onNavClick}
+            title="Manual"
+            aria-label="Manual"
+            className={iconBtn}
+          >
+            <BookOpen className="w-4 h-4" />
+          </Link>
+          <Link
+            to={createPageUrl('AccountSettings')}
+            onClick={onNavClick}
+            title="Account settings"
+            aria-label="Account settings"
+            className={iconBtn}
+          >
+            <UserCog className="w-4 h-4" />
+          </Link>
+          <FeedbackButton onOpen={onNavClick} iconOnly className={iconBtn} />
           <ThemeToggle />
-          {!collapsed && <span className="text-sm text-zinc-600 dark:text-zinc-400">Theme</span>}
         </div>
         {/* Sign out — mobile drawer only (desktop has it in the system tray). */}
         <button
