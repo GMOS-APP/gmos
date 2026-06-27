@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/lib/AuthContext';
 import AuthPanel from '@/components/layout/AuthPanel';
 import BlogAdmin from '@/components/admin/BlogAdmin';
+import NewsletterAdmin from '@/components/admin/NewsletterAdmin';
 import { callAdmin, INPUT, CARD, ROW } from '@/lib/adminApi';
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter,
@@ -409,6 +410,9 @@ export default function AdminConsole() {
 
         {/* Blog */}
         <BlogAdmin />
+
+        {/* Newsletter */}
+        <NewsletterAdmin />
 
         {/* Users */}
         <section>

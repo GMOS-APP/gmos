@@ -124,6 +124,18 @@ Deno.serve(async (req) => {
       return json({ ok: true });
     }
 
+    if (action === 'newsletter-list') {
+      const { data } = await admin.from('newsletter_subscribers')
+        .select('id, email, source, created_at').order('created_at', { ascending: false }).limit(5000);
+      return json({ subscribers: data || [] });
+    }
+
+    if (action === 'newsletter-delete') {
+      if (!body.id) return json({ error: 'id is required' }, 400);
+      await admin.from('newsletter_subscribers').delete().eq('id', body.id);
+      return json({ ok: true });
+    }
+
     if (action === 'announcement-list') {
       const { data } = await admin.from('announcements').select('*').order('created_date', { ascending: false }).limit(200);
       return json({ announcements: data || [] });
