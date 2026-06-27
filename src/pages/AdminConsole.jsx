@@ -3,11 +3,14 @@ import { useAuth } from '@/lib/AuthContext';
 import AuthPanel from '@/components/layout/AuthPanel';
 import BlogAdmin from '@/components/admin/BlogAdmin';
 import NewsletterAdmin from '@/components/admin/NewsletterAdmin';
-import { callAdmin, INPUT, CARD, ROW } from '@/lib/adminApi';
+import AnnouncementsAdmin from '@/components/admin/AnnouncementsAdmin';
+import ChangelogAdmin from '@/components/admin/ChangelogAdmin';
+import FeedbackAdmin from '@/components/admin/FeedbackAdmin';
+import { callAdmin, INPUT, CARD } from '@/lib/adminApi';
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter,
 } from '@/components/ui/dialog';
-import { Loader2, ShieldAlert, Users, Crown, BookOpen, Layers, Boxes, Trash2, RefreshCw, Bug, Lightbulb, LifeBuoy, Check, Inbox, RotateCcw, Megaphone, Pencil, ScrollText, Palette, Sun, Moon } from 'lucide-react';
+import { Loader2, ShieldAlert, Users, Crown, BookOpen, Layers, Boxes, Trash2, RefreshCw, Check, Palette, Sun, Moon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Setting } from '@/api/entities';
 import { applyAccent, clearAccent, setAccentCached, DEFAULT_ACCENT } from '@/lib/theme';
@@ -22,18 +25,6 @@ const ACCENT_PRESETS = [
   { name: 'Magenta', hex: '#db2777' },
   { name: 'Slate', hex: '#64748b' },
 ];
-
-const FB_META = {
-  bug: { label: 'Bug', Icon: Bug, color: 'text-red-600 dark:text-red-400 bg-red-500/10 border-red-500/30' },
-  feedback: { label: 'Idea', Icon: Lightbulb, color: 'text-amber-600 dark:text-amber-400 bg-amber-500/10 border-amber-500/30' },
-  help: { label: 'Help', Icon: LifeBuoy, color: 'text-sky-600 dark:text-sky-400 bg-sky-500/10 border-sky-500/30' },
-};
-
-const parseEntries = (text) => (text || '').split('\n').map((l) => l.trim()).filter(Boolean).map((l) => {
-  const m = l.match(/^(new|improved|fixed):\s*(.*)$/i);
-  return m ? { type: m[1].toLowerCase(), text: m[2] } : { type: 'new', text: l };
-});
-const entriesToText = (entries) => (entries || []).map((e) => `${e.type}: ${e.text}`).join('\n');
 
 const fmtDate = (s) => (s ? new Date(s).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '—');
 
@@ -53,12 +44,9 @@ export default function AdminConsole() {
   const [phase, setPhase] = useState('checking'); // checking | signin | denied | ok
   const [stats, setStats] = useState(null);
   const [users, setUsers] = useState([]);
-  const [feedback, setFeedback] = useState([]);
-  const [announcements, setAnnouncements] = useState([]);
-  const [annDraft, setAnnDraft] = useState({ title: '', body: '', level: 'info', published: false });
-  const [changelog, setChangelog] = useState([]);
-  const [clDraft, setClDraft] = useState({ version: '', date: '', entriesText: '', published: true });
   const [busy, setBusy] = useState(null);
+  // Bumped by the global Refresh button to remount the self-loading sections.
+  const [refreshKey, setRefreshKey] = useState(0);
   const [accent, setAccent] = useState(DEFAULT_ACCENT);  // current picker value (live preview)
   const [savedAccent, setSavedAccent] = useState(null);  // persisted value, null = default
   const [accentBusy, setAccentBusy] = useState(false);
@@ -88,16 +76,11 @@ export default function AdminConsole() {
   }, []);
 
   const load = useCallback(async () => {
-    const [s, u, f, a, c] = await Promise.all([
+    const [s, u] = await Promise.all([
       callAdmin({ action: 'stats' }), callAdmin({ action: 'users' }),
-      callAdmin({ action: 'feedback-list' }), callAdmin({ action: 'announcement-list' }),
-      callAdmin({ action: 'changelog-list' }),
     ]);
     setStats(s.stats);
     setUsers(u.users);
-    setFeedback(f.feedback);
-    setAnnouncements(a.announcements);
-    setChangelog(c.changelog);
     // Brand accent (public read on app_settings); null/absent → default.
     try {
       const rows = await Setting.filter({ id: 'global' });
@@ -131,53 +114,8 @@ export default function AdminConsole() {
   };
   const accentDirty = (savedAccent || DEFAULT_ACCENT).toLowerCase() !== accent.toLowerCase();
 
-  const saveCl = async () => {
-    if (!clDraft.version.trim()) return;
-    const { entry } = await callAdmin({ action: 'changelog-save', entry: {
-      id: clDraft.id, version: clDraft.version.trim(), date: clDraft.date,
-      entries: parseEntries(clDraft.entriesText), published: clDraft.published,
-    } });
-    setChangelog((prev) => (prev.some((x) => x.id === entry.id)
-      ? prev.map((x) => (x.id === entry.id ? entry : x))
-      : [entry, ...prev]).sort((a, b) => (b.version || '').localeCompare(a.version || '')));
-    setClDraft({ version: '', date: '', entriesText: '', published: true });
-  };
-  const togglePubCl = async (c) => {
-    const published = !c.published;
-    setChangelog((prev) => prev.map((x) => (x.id === c.id ? { ...x, published } : x)));
-    await callAdmin({ action: 'changelog-save', entry: { ...c, entries: c.entries, published } });
-  };
-  const delCl = async (c) => {
-    setChangelog((prev) => prev.filter((x) => x.id !== c.id));
-    await callAdmin({ action: 'changelog-delete', id: c.id });
-  };
-
-  const saveAnn = async () => {
-    if (!annDraft.title.trim()) return;
-    const { announcement } = await callAdmin({ action: 'announcement-save', announcement: annDraft });
-    setAnnouncements((prev) => (prev.some((x) => x.id === announcement.id)
-      ? prev.map((x) => (x.id === announcement.id ? announcement : x))
-      : [announcement, ...prev]));
-    setAnnDraft({ title: '', body: '', level: 'info', published: false });
-  };
-  const togglePub = async (a) => {
-    const published = !a.published;
-    setAnnouncements((prev) => prev.map((x) => (x.id === a.id ? { ...x, published } : x)));
-    await callAdmin({ action: 'announcement-save', announcement: { ...a, published } });
-  };
-  const delAnn = async (a) => {
-    setAnnouncements((prev) => prev.filter((x) => x.id !== a.id));
-    await callAdmin({ action: 'announcement-delete', id: a.id });
-  };
-
-  const fbStatus = async (f, status) => {
-    setFeedback((prev) => prev.map((x) => (x.id === f.id ? { ...x, status } : x)));
-    await callAdmin({ action: 'feedback-status', id: f.id, status });
-  };
-  const fbDelete = async (f) => {
-    setFeedback((prev) => prev.filter((x) => x.id !== f.id));
-    await callAdmin({ action: 'feedback-delete', id: f.id });
-  };
+  // Refresh the inline data (stats/users) and remount the self-loading sections.
+  const refreshAll = () => { setRefreshKey((k) => k + 1); load(); };
 
   useEffect(() => {
     if (isLoadingAuth) return;
@@ -256,7 +194,7 @@ export default function AdminConsole() {
       <header className="border-b border-zinc-200 dark:border-zinc-800 sticky top-0 z-10 bg-zinc-50/90 dark:bg-zinc-950/90 backdrop-blur">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 h-14 flex items-center gap-3">
           <span className="font-bold tracking-tight">GM<span className="text-amber-500">/OS</span> <span className="text-zinc-500 font-normal">Admin</span></span>
-          <button onClick={load} title="Refresh" className="text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300"><RefreshCw className="w-4 h-4" /></button>
+          <button onClick={refreshAll} title="Refresh" className="text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300"><RefreshCw className="w-4 h-4" /></button>
           <div className="ml-auto flex items-center gap-3 text-xs text-zinc-500">
             <span className="hidden sm:inline">{user?.email}</span>
             {ThemeButton}
@@ -326,93 +264,16 @@ export default function AdminConsole() {
         </section>
 
         {/* Announcements */}
-        <section>
-          <h2 className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-widest text-zinc-500 mb-3">
-            <Megaphone className="w-3.5 h-3.5 text-amber-500" /> Announcements
-          </h2>
-          <div className={cn(CARD, 'p-3 space-y-2 mb-3')}>
-            <input value={annDraft.title} onChange={(e) => setAnnDraft({ ...annDraft, title: e.target.value })}
-              placeholder="Title" className={cn('w-full text-sm px-2.5 py-1.5', INPUT)} />
-            <textarea value={annDraft.body} onChange={(e) => setAnnDraft({ ...annDraft, body: e.target.value })}
-              placeholder="Body (optional)" rows={2} className={cn('w-full text-sm px-2.5 py-1.5 resize-none', INPUT)} />
-            <div className="flex items-center gap-2">
-              <select value={annDraft.level} onChange={(e) => setAnnDraft({ ...annDraft, level: e.target.value })}
-                className={cn('text-xs px-1.5 py-1', INPUT)}>
-                <option value="info">info</option><option value="warning">warning</option><option value="success">success</option>
-              </select>
-              <label className="flex items-center gap-1.5 text-xs text-zinc-600 dark:text-zinc-400">
-                <input type="checkbox" checked={annDraft.published} onChange={(e) => setAnnDraft({ ...annDraft, published: e.target.checked })} /> Published
-              </label>
-              {annDraft.id && (
-                <button onClick={() => setAnnDraft({ title: '', body: '', level: 'info', published: false })} className="text-xs text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300">Cancel</button>
-              )}
-              <button onClick={saveAnn} disabled={!annDraft.title.trim()}
-                className="ml-auto px-3 py-1.5 rounded-md bg-amber-500 hover:bg-amber-400 disabled:opacity-40 text-zinc-950 text-sm font-medium">
-                {annDraft.id ? 'Update' : 'Create'}
-              </button>
-            </div>
-          </div>
-          <div className="space-y-1.5">
-            {announcements.length === 0 && <p className="text-sm text-zinc-400 dark:text-zinc-600 text-center py-3">No announcements yet.</p>}
-            {announcements.map((a) => (
-              <div key={a.id} className={cn('flex items-center gap-2 px-3 py-2', ROW)}>
-                <span className={cn('text-[10px] font-medium px-1.5 py-0.5 rounded-full border',
-                  a.level === 'warning' ? 'text-red-600 dark:text-red-400 border-red-500/30' : a.level === 'success' ? 'text-emerald-600 dark:text-emerald-400 border-emerald-500/30' : 'text-amber-600 dark:text-amber-400 border-amber-500/30')}>{a.level}</span>
-                <span className="text-sm text-zinc-800 dark:text-zinc-200 truncate flex-1">{a.title}</span>
-                <span className={cn('text-[10px] font-medium', a.published ? 'text-emerald-600 dark:text-emerald-400' : 'text-zinc-500')}>{a.published ? 'Published' : 'Draft'}</span>
-                <button onClick={() => togglePub(a)} className="text-xs text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200">{a.published ? 'Unpublish' : 'Publish'}</button>
-                <button onClick={() => setAnnDraft({ id: a.id, title: a.title, body: a.body || '', level: a.level, published: a.published })} className="text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300"><Pencil className="w-3.5 h-3.5" /></button>
-                <button onClick={() => delAnn(a)} className="text-zinc-400 dark:text-zinc-600 hover:text-red-500 dark:hover:text-red-400"><Trash2 className="w-3.5 h-3.5" /></button>
-              </div>
-            ))}
-          </div>
-        </section>
+        <AnnouncementsAdmin key={`ann-${refreshKey}`} />
 
         {/* Changelog */}
-        <section>
-          <h2 className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-widest text-zinc-500 mb-3">
-            <ScrollText className="w-3.5 h-3.5 text-amber-500" /> Changelog
-          </h2>
-          <div className={cn(CARD, 'p-3 space-y-2 mb-3')}>
-            <div className="flex gap-2">
-              <input value={clDraft.version} onChange={(e) => setClDraft({ ...clDraft, version: e.target.value })}
-                placeholder="Version (e.g. 2026-06-04)" className={cn('flex-1 text-sm px-2.5 py-1.5 font-mono', INPUT)} />
-              <input value={clDraft.date} onChange={(e) => setClDraft({ ...clDraft, date: e.target.value })}
-                placeholder="Date label (Jun 4, 2026)" className={cn('flex-1 text-sm px-2.5 py-1.5', INPUT)} />
-            </div>
-            <textarea value={clDraft.entriesText} onChange={(e) => setClDraft({ ...clDraft, entriesText: e.target.value })}
-              placeholder={'One change per line. Prefix with new: / improved: / fixed:\nnew: Added a thing\nfixed: Squashed a bug'}
-              rows={4} className={cn('w-full text-sm px-2.5 py-1.5 resize-none font-mono', INPUT)} />
-            <div className="flex items-center gap-2">
-              <label className="flex items-center gap-1.5 text-xs text-zinc-600 dark:text-zinc-400">
-                <input type="checkbox" checked={clDraft.published} onChange={(e) => setClDraft({ ...clDraft, published: e.target.checked })} /> Published
-              </label>
-              {clDraft.id && <button onClick={() => setClDraft({ version: '', date: '', entriesText: '', published: true })} className="text-xs text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300">Cancel</button>}
-              <button onClick={saveCl} disabled={!clDraft.version.trim()}
-                className="ml-auto px-3 py-1.5 rounded-md bg-amber-500 hover:bg-amber-400 disabled:opacity-40 text-zinc-950 text-sm font-medium">
-                {clDraft.id ? 'Update' : 'Add release'}
-              </button>
-            </div>
-          </div>
-          <div className="space-y-1.5">
-            {changelog.map((c) => (
-              <div key={c.id} className={cn('flex items-center gap-2 px-3 py-2', ROW)}>
-                <span className="text-xs font-mono text-zinc-600 dark:text-zinc-400">{c.version}</span>
-                <span className="text-[11px] text-zinc-400 dark:text-zinc-600 truncate flex-1">{(c.entries || []).length} change{(c.entries || []).length !== 1 ? 's' : ''}{c.date ? ` · ${c.date}` : ''}</span>
-                <span className={cn('text-[10px] font-medium', c.published ? 'text-emerald-600 dark:text-emerald-400' : 'text-zinc-500')}>{c.published ? 'Published' : 'Draft'}</span>
-                <button onClick={() => togglePubCl(c)} className="text-xs text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200">{c.published ? 'Unpublish' : 'Publish'}</button>
-                <button onClick={() => setClDraft({ id: c.id, version: c.version, date: c.date || '', entriesText: entriesToText(c.entries), published: c.published })} className="text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300"><Pencil className="w-3.5 h-3.5" /></button>
-                <button onClick={() => delCl(c)} className="text-zinc-400 dark:text-zinc-600 hover:text-red-500 dark:hover:text-red-400"><Trash2 className="w-3.5 h-3.5" /></button>
-              </div>
-            ))}
-          </div>
-        </section>
+        <ChangelogAdmin key={`cl-${refreshKey}`} />
 
         {/* Blog */}
-        <BlogAdmin />
+        <BlogAdmin key={`blog-${refreshKey}`} />
 
         {/* Newsletter */}
-        <NewsletterAdmin />
+        <NewsletterAdmin key={`nl-${refreshKey}`} />
 
         {/* Users */}
         <section>
@@ -478,47 +339,7 @@ export default function AdminConsole() {
         </section>
 
         {/* Feedback inbox */}
-        <section>
-          <div className="flex items-center justify-between mb-3">
-            <h2 className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-widest text-zinc-500">
-              <Inbox className="w-3.5 h-3.5 text-amber-500" /> Feedback ({feedback.filter((f) => f.status !== 'resolved').length} open)
-            </h2>
-            <button onClick={() => setShowResolved((v) => !v)} className="text-xs text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300">
-              {showResolved ? 'Hide resolved' : 'Show resolved'}
-            </button>
-          </div>
-          <div className="space-y-2">
-            {feedback.filter((f) => showResolved || f.status !== 'resolved').length === 0 && (
-              <p className="text-sm text-zinc-400 dark:text-zinc-600 text-center py-6">No {showResolved ? '' : 'open '}feedback.</p>
-            )}
-            {feedback.filter((f) => showResolved || f.status !== 'resolved').map((f) => {
-              const m = FB_META[f.type] || FB_META.feedback;
-              const resolved = f.status === 'resolved';
-              return (
-                <div key={f.id} className={cn(CARD, 'p-3', resolved && 'opacity-60')}>
-                  <div className="flex items-center gap-2 mb-1.5 flex-wrap">
-                    <span className={cn('text-[10px] font-medium px-1.5 py-0.5 rounded-full border inline-flex items-center gap-1', m.color)}>
-                      <m.Icon className="w-3 h-3" /> {m.label}
-                    </span>
-                    <span className="text-xs text-zinc-600 dark:text-zinc-400 truncate max-w-[200px]">{f.user_email || 'anonymous'}</span>
-                    <span className="text-[10px] text-zinc-400 dark:text-zinc-600">{fmtDate(f.created_date)}</span>
-                    <div className="ml-auto flex items-center gap-1">
-                      <button onClick={() => fbStatus(f, resolved ? 'open' : 'resolved')} title={resolved ? 'Reopen' : 'Mark resolved'}
-                        className={cn('w-6 h-6 flex items-center justify-center rounded', resolved ? 'text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300' : 'text-emerald-600 dark:text-emerald-500 hover:text-emerald-500 dark:hover:text-emerald-400')}>
-                        {resolved ? <RotateCcw className="w-3.5 h-3.5" /> : <Check className="w-3.5 h-3.5" />}
-                      </button>
-                      <button onClick={() => fbDelete(f)} title="Delete" className="w-6 h-6 flex items-center justify-center rounded text-zinc-400 dark:text-zinc-600 hover:text-red-500 dark:hover:text-red-400">
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
-                  </div>
-                  <p className="text-sm text-zinc-700 dark:text-zinc-300 whitespace-pre-wrap leading-relaxed">{f.message}</p>
-                  {f.page && <p className="text-[10px] text-zinc-400 dark:text-zinc-600 mt-1.5 font-mono truncate">{f.page}</p>}
-                </div>
-              );
-            })}
-          </div>
-        </section>
+        <FeedbackAdmin key={`fb-${refreshKey}`} />
       </main>
 
       {/* Delete confirmation */}
