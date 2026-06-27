@@ -70,7 +70,7 @@ export default function AdminConsole() {
   const [changelog, setChangelog] = useState([]);
   const [clDraft, setClDraft] = useState({ version: '', date: '', entriesText: '', published: true });
   const [posts, setPosts] = useState([]);
-  const emptyPost = { title: '', slug: '', category: 'GM Tips', excerpt: '', body: '', published: false };
+  const emptyPost = { title: '', slug: '', category: 'GM Tips', author: 'GM/OS', cover_image: '', excerpt: '', body: '', published: false };
   const [postDraft, setPostDraft] = useState(emptyPost);
   const [busy, setBusy] = useState(null);
   const [accent, setAccent] = useState(DEFAULT_ACCENT);  // current picker value (live preview)
@@ -195,6 +195,7 @@ export default function AdminConsole() {
   };
   const editPost = (p) => setPostDraft({
     id: p.id, title: p.title, slug: p.slug, category: p.category || 'GM Tips',
+    author: p.author || 'GM/OS', cover_image: p.cover_image || '',
     excerpt: p.excerpt || '', body: p.body || '', published: p.published, published_at: p.published_at,
   });
   const togglePubPost = async (p) => {
@@ -458,6 +459,12 @@ export default function AdminConsole() {
                 placeholder="slug (auto from title if blank)" className={cn('flex-1 text-sm px-2.5 py-1.5 font-mono', INPUT)} />
               <input value={postDraft.category} onChange={(e) => setPostDraft({ ...postDraft, category: e.target.value })}
                 placeholder="Category" className={cn('w-44 text-sm px-2.5 py-1.5', INPUT)} />
+            </div>
+            <div className="flex gap-2">
+              <input value={postDraft.cover_image} onChange={(e) => setPostDraft({ ...postDraft, cover_image: e.target.value })}
+                placeholder="Cover image URL (optional — drives social preview)" className={cn('flex-1 text-sm px-2.5 py-1.5', INPUT)} />
+              <input value={postDraft.author} onChange={(e) => setPostDraft({ ...postDraft, author: e.target.value })}
+                placeholder="Author" className={cn('w-44 text-sm px-2.5 py-1.5', INPUT)} />
             </div>
             <textarea value={postDraft.excerpt} onChange={(e) => setPostDraft({ ...postDraft, excerpt: e.target.value })}
               placeholder="Excerpt — shown on the blog index" rows={2} className={cn('w-full text-sm px-2.5 py-1.5 resize-none', INPUT)} />

@@ -8,6 +8,7 @@ import CoverArt from '@/components/blog/CoverArt';
 import ShareRow from '@/components/blog/ShareRow';
 import ReadingProgress from '@/components/blog/ReadingProgress';
 import PostCard from '@/components/blog/PostCard';
+import NewsletterSignup from '@/components/blog/NewsletterSignup';
 import { useSeo } from '@/lib/useSeo';
 import { fmtDate, readingLabel, categoryAccent } from '@/lib/blog';
 import { cn } from '@/lib/utils';
@@ -141,6 +142,8 @@ export default function BlogPost() {
               </div>
             </section>
           )}
+
+          <NewsletterSignup source={`post:${post.slug}`} />
 
           <div className="mt-12 text-center">
             <Link to="/blog" className="text-sm text-amber-600 dark:text-amber-400 hover:underline">← More GM tips</Link>

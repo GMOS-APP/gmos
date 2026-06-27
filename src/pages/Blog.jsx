@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { supabase } from '@/api/supabaseClient';
 import MarketingShell from '@/components/layout/MarketingShell';
 import PostCard from '@/components/blog/PostCard';
+import NewsletterSignup from '@/components/blog/NewsletterSignup';
 import { useSeo } from '@/lib/useSeo';
 import { cn } from '@/lib/utils';
 import { Loader2, Search as SearchIcon } from 'lucide-react';
@@ -104,6 +105,8 @@ export default function Blog() {
               {filtered.map((p) => <PostCard key={p.slug} post={p} />)}
             </div>
           )}
+
+          <NewsletterSignup source="blog-index" />
         </>
       )}
     </MarketingShell>

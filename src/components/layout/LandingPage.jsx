@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
+import { supabase } from '@/api/supabaseClient';
 import ThemeToggle from '@/components/ui/ThemeToggle';
+import PostCard from '@/components/blog/PostCard';
 import PricingTiers from '@/components/billing/PricingTiers';
 import BetaBadge from '@/components/common/BetaBadge';
 import AlphaBadge from '@/components/common/AlphaBadge';
@@ -190,6 +192,16 @@ function ProductPreview() {
 
 export default function LandingPage() {
   const navigate = useNavigate();
+  const [latestPosts, setLatestPosts] = useState([]);
+  useEffect(() => {
+    supabase
+      .from('blog_posts')
+      .select('slug, title, excerpt, body, category, author, cover_image, published_at')
+      .eq('published', true)
+      .order('published_at', { ascending: false })
+      .limit(3)
+      .then(({ data }) => setLatestPosts(data || []));
+  }, []);
   useSeo({
     title: 'GM/OS — Prep less. Run better. | The Game Master’s operating system',
     description: 'GM/OS keeps your whole tabletop campaign in one place — worldbuilding, guided session prep, a live battle map, initiative, dice, and a player view you control. Free to start.',
@@ -309,6 +321,29 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
+
+      {/* From the blog */}
+      {latestPosts.length > 0 && (
+        <section className="px-4 sm:px-6 py-16 border-t border-zinc-200/70 dark:border-zinc-800/60">
+          <div className="max-w-6xl mx-auto">
+            <div className="flex items-end justify-between mb-8">
+              <div>
+                <h2 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100">From the blog</h2>
+                <p className="mt-1.5 text-sm text-zinc-500 dark:text-zinc-500">GM tips, prep methods, and deep dives.</p>
+              </div>
+              <Link to="/blog" className="hidden sm:inline text-sm font-medium text-amber-600 dark:text-amber-400 hover:underline shrink-0">
+                All posts →
+              </Link>
+            </div>
+            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {latestPosts.map((p) => <PostCard key={p.slug} post={p} />)}
+            </div>
+            <div className="mt-6 text-center sm:hidden">
+              <Link to="/blog" className="text-sm font-medium text-amber-600 dark:text-amber-400 hover:underline">All posts →</Link>
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* Final CTA */}
       <section className="px-4 sm:px-6 py-20 border-t border-zinc-200/70 dark:border-zinc-800/60">
