@@ -38,17 +38,36 @@ export default function BlogPost() {
     path: `/blog/${post.slug}`,
     type: 'article',
     image: post.cover_image || undefined,
-    jsonLd: {
-      '@context': 'https://schema.org',
-      '@type': 'Article',
-      headline: post.title,
-      description: post.excerpt || undefined,
-      image: post.cover_image || undefined,
-      datePublished: post.published_at,
-      author: { '@type': 'Organization', name: post.author || 'GM/OS' },
-      publisher: { '@type': 'Organization', name: 'GM/OS' },
-      mainEntityOfPage: `https://gmos.app/blog/${post.slug}`,
-    },
+    imageAlt: post.title,
+    publishedTime: post.published_at,
+    author: post.author || 'GM/OS',
+    jsonLd: [
+      {
+        '@context': 'https://schema.org',
+        '@type': 'Article',
+        headline: post.title,
+        description: post.excerpt || undefined,
+        image: post.cover_image ? [post.cover_image] : undefined,
+        datePublished: post.published_at,
+        dateModified: post.published_at,
+        author: { '@type': 'Organization', name: post.author || 'GM/OS', url: 'https://gmos.app' },
+        publisher: {
+          '@type': 'Organization',
+          name: 'GM/OS',
+          logo: { '@type': 'ImageObject', url: 'https://gmos.app/og.png' },
+        },
+        articleSection: post.category || undefined,
+        mainEntityOfPage: { '@type': 'WebPage', '@id': `https://gmos.app/blog/${post.slug}` },
+      },
+      {
+        '@context': 'https://schema.org',
+        '@type': 'BreadcrumbList',
+        itemListElement: [
+          { '@type': 'ListItem', position: 1, name: 'Blog', item: 'https://gmos.app/blog' },
+          { '@type': 'ListItem', position: 2, name: post.title, item: `https://gmos.app/blog/${post.slug}` },
+        ],
+      },
+    ],
   } : { title: 'GM/OS Blog', path: `/blog/${slug}` });
 
   useEffect(() => {

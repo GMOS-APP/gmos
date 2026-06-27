@@ -29,7 +29,7 @@ function link(rel, href) {
  * JSON-LD. Google renders client JS so it picks these up; non-JS social scrapers
  * fall back to the defaults baked into index.html.
  */
-export function useSeo({ title, description, path, image, type = 'website', jsonLd } = {}) {
+export function useSeo({ title, description, path, image, imageAlt, type = 'website', jsonLd, publishedTime, author } = {}) {
   const ld = jsonLd ? JSON.stringify(jsonLd) : '';
   useEffect(() => {
     const url = SITE + (path ?? window.location.pathname);
@@ -37,11 +37,16 @@ export function useSeo({ title, description, path, image, type = 'website', json
     if (title) document.title = title;
     meta('name', 'description', description);
     link('canonical', url);
+    meta('property', 'og:site_name', 'GM/OS');
     meta('property', 'og:title', title);
     meta('property', 'og:description', description);
     meta('property', 'og:url', url);
     meta('property', 'og:type', type);
     meta('property', 'og:image', img);
+    meta('property', 'og:image:alt', imageAlt || title);
+    // Article-specific Open Graph (only meaningful for type=article).
+    meta('property', 'article:published_time', type === 'article' ? publishedTime : null);
+    meta('property', 'article:author', type === 'article' ? author : null);
     meta('name', 'twitter:card', 'summary_large_image');
     meta('name', 'twitter:title', title);
     meta('name', 'twitter:description', description);

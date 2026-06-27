@@ -16,6 +16,14 @@ export default function Blog() {
     title: 'Blog — GM tips & deep dives | GM/OS',
     description: 'GM tips, prep methods, and feature deep-dives for running better tabletop RPG sessions, from the team behind GM/OS.',
     path: '/blog',
+    jsonLd: {
+      '@context': 'https://schema.org',
+      '@type': 'Blog',
+      name: 'The GM/OS Blog',
+      description: 'GM tips, prep methods, and feature deep-dives for running better tabletop RPG sessions.',
+      url: 'https://gmos.app/blog',
+      publisher: { '@type': 'Organization', name: 'GM/OS', url: 'https://gmos.app' },
+    },
   });
 
   useEffect(() => {
