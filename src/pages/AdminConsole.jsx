@@ -5,9 +5,9 @@ import AuthPanel from '@/components/layout/AuthPanel';
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter,
 } from '@/components/ui/dialog';
-import { Loader2, ShieldAlert, Users, Crown, BookOpen, Layers, Boxes, Trash2, RefreshCw, Bug, Lightbulb, LifeBuoy, Check, Inbox, RotateCcw, Megaphone, Pencil, ScrollText, Palette, Sun, Moon, Newspaper, ExternalLink } from 'lucide-react';
+import { Loader2, ShieldAlert, Users, Crown, BookOpen, Layers, Boxes, Trash2, RefreshCw, Bug, Lightbulb, LifeBuoy, Check, Inbox, RotateCcw, Megaphone, Pencil, ScrollText, Palette, Sun, Moon, Newspaper, ExternalLink, ImagePlus } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { Setting } from '@/api/entities';
+import { Setting, UploadFile } from '@/api/entities';
 import { applyAccent, clearAccent, setAccentCached, DEFAULT_ACCENT } from '@/lib/theme';
 
 const ACCENT_PRESETS = [
@@ -192,6 +192,19 @@ export default function AdminConsole() {
       ? prev.map((x) => (x.id === post.id ? post : x))
       : [post, ...prev]));
     setPostDraft(emptyPost);
+  };
+  const [coverUploading, setCoverUploading] = useState(false);
+  const uploadCover = async (file) => {
+    if (!file) return;
+    setCoverUploading(true);
+    try {
+      const { file_url } = await UploadFile({ file });
+      setPostDraft((d) => ({ ...d, cover_image: file_url }));
+    } catch (e) {
+      window.alert(`Upload failed: ${e.message || e}`);
+    } finally {
+      setCoverUploading(false);
+    }
   };
   const editPost = (p) => setPostDraft({
     id: p.id, title: p.title, slug: p.slug, category: p.category || 'GM Tips',
@@ -463,9 +476,20 @@ export default function AdminConsole() {
             <div className="flex gap-2">
               <input value={postDraft.cover_image} onChange={(e) => setPostDraft({ ...postDraft, cover_image: e.target.value })}
                 placeholder="Cover image URL (optional — drives social preview)" className={cn('flex-1 text-sm px-2.5 py-1.5', INPUT)} />
+              <label className={cn('flex items-center gap-1.5 text-sm px-2.5 py-1.5 rounded-md border border-zinc-300 dark:border-zinc-700 cursor-pointer hover:bg-zinc-100 dark:hover:bg-zinc-800 shrink-0', coverUploading && 'opacity-60 pointer-events-none')}>
+                {coverUploading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <ImagePlus className="w-3.5 h-3.5" />}
+                Upload
+                <input type="file" accept="image/*" className="hidden" onChange={(e) => { uploadCover(e.target.files?.[0]); e.target.value = ''; }} />
+              </label>
               <input value={postDraft.author} onChange={(e) => setPostDraft({ ...postDraft, author: e.target.value })}
                 placeholder="Author" className={cn('w-44 text-sm px-2.5 py-1.5', INPUT)} />
             </div>
+            {postDraft.cover_image && (
+              <div className="flex items-center gap-2">
+                <img src={postDraft.cover_image} alt="Cover preview" className="h-16 w-28 object-cover rounded-md border border-zinc-200 dark:border-zinc-800" />
+                <button onClick={() => setPostDraft({ ...postDraft, cover_image: '' })} className="text-xs text-zinc-500 hover:text-red-500 dark:hover:text-red-400">Remove cover</button>
+              </div>
+            )}
             <textarea value={postDraft.excerpt} onChange={(e) => setPostDraft({ ...postDraft, excerpt: e.target.value })}
               placeholder="Excerpt — shown on the blog index" rows={2} className={cn('w-full text-sm px-2.5 py-1.5 resize-none', INPUT)} />
             <textarea value={postDraft.body} onChange={(e) => setPostDraft({ ...postDraft, body: e.target.value })}
