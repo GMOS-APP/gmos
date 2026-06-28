@@ -113,3 +113,10 @@ ESLint flat config (`eslint.config.js`), scoped to `src/components`, `src/pages`
 
 ## Deployment
 Pushes to `main` auto-deploy to GitHub Pages via `.github/workflows/deploy.yml` (Node 22; runs lint + build with `VITE_SUPABASE_URL`/`VITE_SUPABASE_ANON_KEY` secrets). Base path is `/GM-OS/`. Internal navigation must use `useNavigate()` rather than `window.location.href` (the base path otherwise breaks links).
+
+## Changelog (keep it current)
+Whenever you ship an **end-user / customer-impacting** change, add a curated entry to the `changelog` table — it powers the in-app "What's new" dialog (`ChangelogDialog.jsx`). Treat this as part of shipping, not an afterthought.
+- **Skip purely internal changes** (refactors, admin-only tooling, infra, tests) — they don't get an entry.
+- **One release per ship-day**: `version` = ISO date `YYYY-MM-DD` (sorts the dialog); `date` = friendly label like `Jun 27, 2026`. If a row already exists for today, append to its `entries` instead of creating a second.
+- `entries` is `[{type, text}]` where `type` is `new` | `improved` | `fixed`. Write **for users**: plain language, benefit-first, no jargon or internal names.
+- Author it directly (SQL/MCP on the `changelog` table, or Admin → Changelog at `/admin/changelog`). Keep it easy to read and digest.
