@@ -96,7 +96,7 @@ function App() {
                 <Route path="/blog" element={<Blog />} />
                 <Route path="/blog/:slug" element={<BlogPost />} />
                 <Route path="/login" element={<Login />} />
-                <Route path="/admin" element={<AdminConsole />} />
+                <Route path="/admin/*" element={<AdminConsole />} />
                 <Route path="/*" element={<AuthenticatedApp />} />
               </Routes>
               </Suspense>
