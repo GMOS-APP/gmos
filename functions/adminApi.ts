@@ -51,12 +51,21 @@ Deno.serve(async (req) => {
     }
 
     if (action === 'users') {
-      const { data: list } = await admin.auth.admin.listUsers({ page: 1, perPage: 200 });
+      const perPage = 200;
+      const page = Math.max(1, Number(body.page) || 1);
+      const { data: list } = await admin.auth.admin.listUsers({ page, perPage });
       const { data: profiles } = await admin.from('user_profiles').select('id, plan, is_admin, plan_expires_at');
-      const { data: camps } = await admin.from('campaigns').select('created_by');
+      // Per-account usage counts (numbers only — never any content).
+      const tally = async (table: string) => {
+        const { data } = await admin.from(table).select('created_by');
+        const m = new Map<string, number>();
+        (data || []).forEach((r) => m.set(r.created_by, (m.get(r.created_by) || 0) + 1));
+        return m;
+      };
+      const [campCount, entCount, sessCount] = await Promise.all([
+        tally('campaigns'), tally('world_entities'), tally('sessions'),
+      ]);
       const profMap = new Map((profiles || []).map((p) => [p.id, p]));
-      const campCount = new Map<string, number>();
-      (camps || []).forEach((c) => campCount.set(c.created_by, (campCount.get(c.created_by) || 0) + 1));
       const users = (list?.users || []).map((u) => {
         const p = profMap.get(u.id) || {};
         return {
@@ -70,9 +79,33 @@ Deno.serve(async (req) => {
           is_admin: !!p.is_admin,
           plan_expires_at: p.plan_expires_at || null,
           campaigns: campCount.get(u.id) || 0,
+          entities: entCount.get(u.id) || 0,
+          sessions: sessCount.get(u.id) || 0,
         };
       }).sort((a, b) => (b.created_at || '').localeCompare(a.created_at || ''));
-      return json({ users });
+      return json({ users, page, hasMore: (list?.users?.length || 0) === perPage });
+    }
+
+    if (action === 'user-detail') {
+      const { userId } = body;
+      if (!userId) return json({ error: 'userId is required' }, 400);
+      // Counts only — the admin console never reads a user's actual content.
+      const tables = ['campaigns', 'world_entities', 'sessions', 'relationships', 'campaign_maps', 'quick_notes', 'random_tables'];
+      const counts: Record<string, number> = {};
+      await Promise.all(tables.map(async (t) => {
+        const { count } = await admin.from(t).select('*', { count: 'exact', head: true }).eq('created_by', userId);
+        counts[t] = count || 0;
+      }));
+      return json({ counts });
+    }
+
+    if (action === 'set-admin') {
+      const { userId, isAdmin } = body;
+      if (!userId) return json({ error: 'userId is required' }, 400);
+      if (userId === me.id) return json({ error: 'You cannot change your own admin status.' }, 400);
+      await admin.from('user_profiles')
+        .update({ is_admin: !!isAdmin, updated_at: new Date().toISOString() }).eq('id', userId);
+      return json({ ok: true });
     }
 
     if (action === 'set-plan') {
