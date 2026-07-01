@@ -8,6 +8,7 @@ import QuickCapture from '@/components/layout/QuickCapture';
 import CommandPalette from '@/components/layout/CommandPalette';
 import ShortcutsHelp from '@/components/layout/ShortcutsHelp';
 import Taskbar from '@/components/layout/Taskbar';
+import AccountTopBar from '@/components/layout/AccountTopBar';
 import NavMenu from '@/components/layout/NavMenu';
 import Tour from '@/components/layout/Tour';
 import AnnouncementBanner from '@/components/layout/AnnouncementBanner';
@@ -117,11 +118,14 @@ export default function Layout({ children, currentPageName }) {
     );
   }
 
-  // Full-bleed layout
+  // Full-bleed layout (account-level / non-campaign pages). These have no
+  // campaign sidebar/taskbar, so give them a global top nav to move around —
+  // except CampaignList, which is the home and has its own header.
   if (!isCampaignPage || !campaignId) {
     return (
       <div className="min-h-screen">
         <AnnouncementBanner />
+        {currentPageName !== 'CampaignList' && <AccountTopBar currentPageName={currentPageName} />}
         {children}
       </div>
     );
