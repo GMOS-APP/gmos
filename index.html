@@ -3,13 +3,15 @@
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="%BASE_URL%favicon.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <!-- PWA / installable app -->
     <meta name="theme-color" content="#0a0a0a" />
     <link rel="apple-touch-icon" href="%BASE_URL%apple-touch-icon.png" />
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <!-- "black" (not "black-translucent") so iOS keeps the app below the status
+         bar / Dynamic Island instead of drawing behind it. -->
+    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
     <meta name="apple-mobile-web-app-title" content="GM/OS" />
     <title>GM/OS — The operating system for Game Masters</title>
     <meta name="description" content="GM/OS is a dedicated space for Game Masters to keep a campaign in one place and run their sessions — NPCs, locations, prep, notes, initiative, and dice." />
