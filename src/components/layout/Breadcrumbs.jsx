@@ -4,15 +4,11 @@ import { useQuery } from '@tanstack/react-query';
 import { WorldEntity, Session } from '@/api/entities';
 import { createPageUrl } from '@/utils';
 import { ChevronRight } from 'lucide-react';
-
-const TYPE_LABELS = {
-  npc: 'NPCs', creature: 'Creatures', location: 'Locations', faction: 'Factions',
-  thread: 'Threads', item: 'Items', player_character: 'PCs', event: 'Events',
-  lore: 'Lore', deity: 'Deities', encounter: 'Encounters', shop: 'Shops',
-};
+import { useEntityTypes } from '@/lib/entityTypes';
 
 export default function Breadcrumbs({ currentPageName, campaign }) {
   const params = new URLSearchParams(window.location.search);
+  const { byKey } = useEntityTypes(campaign);
   // campaign_id is explicit on most pages; 'id' is used by Dashboard & SessionPage for campaign
   const campaignId = campaign?.id;
   const entityId = currentPageName === 'EntityDetail' ? params.get('id') : null;
@@ -50,7 +46,7 @@ export default function Breadcrumbs({ currentPageName, campaign }) {
       const typeFilter = params.get('type');
       crumbs.push({ label: 'Entities', href: typeFilter ? createPageUrl('EntityBrowser') + `?campaign_id=${campaignId}` : null });
       if (typeFilter) {
-        crumbs.push({ label: TYPE_LABELS[typeFilter] || typeFilter, href: null });
+        crumbs.push({ label: byKey[typeFilter]?.label || typeFilter, href: null });
       }
       break;
     }

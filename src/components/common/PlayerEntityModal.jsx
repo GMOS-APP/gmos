@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
-import { ENTITY_TYPE_META } from '@/lib/entityColors';
+import { getEntityColors } from '@/lib/entityColors';
 import { Eye, EyeOff, Backpack, Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -15,10 +15,12 @@ const typeLabel = (t) => (t === 'npc' ? 'NPC' : (t || '').replace(/_/g, ' '));
  * Read-only entity detail for the player views (in-app preview + public share).
  * Shows only player-safe fields: portrait, name, type, visibility, and summary.
  */
-export default function PlayerEntityModal({ entity, open, onOpenChange, onAddToInventory }) {
+export default function PlayerEntityModal({ entity, open, onOpenChange, onAddToInventory, meta: metaProp }) {
   const [added, setAdded] = useState(false);
   if (!entity) return null;
-  const meta = ENTITY_TYPE_META[entity.entity_type] || ENTITY_TYPE_META.npc;
+  // Prefer meta passed by the caller (the public share view has no type registry
+  // to resolve custom types); otherwise resolve via getEntityColors.
+  const meta = metaProp || getEntityColors(entity.entity_type);
   const Icon = meta.Icon;
   const vis = VIS[entity.visibility];
   const canAdd = onAddToInventory && entity.entity_type === 'item';

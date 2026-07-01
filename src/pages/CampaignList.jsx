@@ -20,6 +20,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import QueryError from '@/components/common/QueryError';
 import { DEFAULT_SYSTEM_ID, SYSTEMS } from '@/lib/systems';
+import { useEntityTypes } from '@/lib/entityTypes';
 import UpgradeModal from '@/components/billing/UpgradeModal';
 import BetaBadge from '@/components/common/BetaBadge';
 import { FREE_CAMPAIGN_LIMIT, isCampaignLimitError } from '@/lib/plans';
@@ -42,6 +43,7 @@ export default function CampaignList() {
   const [showCreate, setShowCreate] = useState(false);
   const [showUpgrade, setShowUpgrade] = useState(false);
   const [form, setForm] = useState({ name: '', background: '', setting: '', hook: '', system: DEFAULT_SYSTEM_ID });
+  const { customTypes } = useEntityTypes();
   const [exportingId, setExportingId] = useState(null);
   const [importing, setImporting] = useState(false);
   const fileInputRef = useRef(null);
@@ -108,9 +110,11 @@ export default function CampaignList() {
 
   const createMutation = useMutation({
     mutationFn: (data) => {
-      // Seed the campaign's enabled entity types from the chosen system preset.
+      // Seed enabled types from the system preset + every existing custom type,
+      // so custom types show in new campaigns without extra setup.
       const sys = SYSTEMS[data.system] || SYSTEMS[DEFAULT_SYSTEM_ID];
-      return Campaign.create({ ...data, enabled_entity_types: sys.defaultEntityTypes });
+      const enabled_entity_types = [...sys.defaultEntityTypes, ...customTypes.map((t) => t.key)];
+      return Campaign.create({ ...data, enabled_entity_types });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['campaigns'] });

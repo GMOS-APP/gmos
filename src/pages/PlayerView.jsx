@@ -39,7 +39,7 @@ export default function PlayerView() {
 
   // Player-facing types (built-in player types + player-visible custom types).
   // Mirrors the public player-view edge function so the GM preview matches.
-  const { allTypes } = useEntityTypes(campaign);
+  const { allTypes, byKey } = useEntityTypes(campaign);
   const TYPE_META = Object.fromEntries(
     allTypes.filter((t) => t.playerVisible).map((t) => [t.key, { label: t.label, icon: t.Icon, accent: t.text, bg: t.bg }])
   );
@@ -164,7 +164,7 @@ export default function PlayerView() {
         </p>
       </div>
 
-      <PlayerEntityModal entity={selected} open={!!selected} onOpenChange={(o) => !o && setSelected(null)} />
+      <PlayerEntityModal entity={selected} meta={selected ? byKey[selected.entity_type] : undefined} open={!!selected} onOpenChange={(o) => !o && setSelected(null)} />
     </div>
   );
 }

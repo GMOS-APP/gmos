@@ -3,7 +3,7 @@ import { supabase } from '@/api/supabaseClient';
 import { Eye, EyeOff, Loader2, Backpack, MessageSquare } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ENTITY_TYPE_META } from '@/lib/entityColors';
-import { COLOR_PRESETS, resolveIcon } from '@/lib/entityTypes';
+import { COLOR_PRESETS, resolveIcon, buildCustomMeta } from '@/lib/entityTypes';
 import PlayerEntityModal from '@/components/common/PlayerEntityModal';
 import PartyInventoryManager from '@/components/party/PartyInventoryManager';
 import PartyNotes from '@/components/party/PartyNotes';
@@ -46,6 +46,14 @@ export default function PublicPlayerView() {
   const [customTypeDefs, setCustomTypeDefs] = useState([]);
   const [activeType, setActiveType] = useState('all');
   const typeMeta = useMemo(() => buildTypeMeta(customTypeDefs), [customTypeDefs]);
+  // Full getEntityColors-shaped meta for the detail modal (needs tag/text/Icon).
+  // The public page has no type registry, so custom types are resolved here.
+  const metaForModal = (t) => {
+    if (!t) return null;
+    if (ENTITY_TYPE_META[t]) return ENTITY_TYPE_META[t];
+    const d = customTypeDefs.find((x) => x.key === t);
+    return d ? buildCustomMeta(d) : ENTITY_TYPE_META.npc;
+  };
   const [selected, setSelected] = useState(null);
   const [inv, setInv] = useState([]);
   const [currency, setCurrency] = useState({});
@@ -282,6 +290,7 @@ export default function PublicPlayerView() {
 
       <PlayerEntityModal
         entity={selected}
+        meta={metaForModal(selected?.entity_type)}
         open={!!selected}
         onOpenChange={(o) => !o && setSelected(null)}
         onAddToInventory={(e) => addItem({ name: e.name, quantity: 1 })}

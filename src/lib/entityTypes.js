@@ -125,9 +125,12 @@ export function useEntityTypes(campaign) {
     setCustomTypeRegistry(map);
   }, [customTypes]);
 
+  // Explicit list when set; otherwise (legacy/unconfigured campaigns) default to
+  // all built-ins PLUS every custom type, so a newly created custom type shows up
+  // everywhere without per-campaign setup. Campaigns narrow this via Settings.
   const enabledKeys = Array.isArray(campaign?.enabled_entity_types)
     ? campaign.enabled_entity_types
-    : BUILTIN_TYPE_KEYS;
+    : [...BUILTIN_TYPE_KEYS, ...customTypes.map((t) => t.key)];
 
   return useMemo(() => {
     const allTypes = [...BUILTIN_TYPES, ...customTypes];
