@@ -70,6 +70,9 @@ export default function Breadcrumbs({ currentPageName, campaign }) {
     case 'RelationshipMap':
       crumbs.push({ label: 'Relationship Map', href: null });
       break;
+    case 'EntityTypes':
+      crumbs.push({ label: 'Entity Types', href: null });
+      break;
     case 'CampaignMap':
       crumbs.push({ label: 'Campaign Map', href: null });
       break;

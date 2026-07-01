@@ -197,7 +197,7 @@ export default function CampaignSettings() {
         <div className="flex items-center justify-between">
           <h2 className="text-xs font-semibold uppercase tracking-widest text-zinc-500 dark:text-zinc-500">Entity Types</h2>
           <button
-            onClick={() => navigate(createPageUrl('EntityTypes'))}
+            onClick={() => navigate(createPageUrl('EntityTypes') + `?campaign_id=${campaignId}`)}
             className="text-xs text-amber-600 dark:text-amber-400 hover:underline"
           >
             Manage custom types →

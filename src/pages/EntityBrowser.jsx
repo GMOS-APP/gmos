@@ -52,7 +52,7 @@ export default function EntityBrowser() {
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-xl font-bold dark:text-zinc-100 text-zinc-900">World Entities</h1>
         <div className="flex items-center gap-2">
-          <Link to={createPageUrl('EntityTypes')}>
+          <Link to={createPageUrl('EntityTypes') + `?campaign_id=${campaignId}`}>
             <Button size="sm" variant="ghost" className="text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200">
               <Shapes className="w-4 h-4 mr-1.5" />
               Manage types

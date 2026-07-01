@@ -171,17 +171,28 @@ export default function Sidebar({ campaign, collapsed, onToggle, onNavClick }) {
             })}
           </div>
         ))}
-        {/* Account-level: build/enable custom entity types. Routes normally
-            (not a campaign window) since it isn't campaign-scoped. */}
-        <Link
-          to={createPageUrl('EntityTypes')}
-          onClick={onNavClick}
-          title="Manage entity types"
-          className="flex items-center gap-3 px-3 py-1.5 mt-1 rounded-lg text-xs text-zinc-500 dark:text-zinc-500 hover:text-amber-600 dark:hover:text-amber-400 hover:bg-zinc-100 dark:hover:bg-zinc-800/50 transition-colors"
-        >
-          <Shapes className="w-3.5 h-3.5 flex-shrink-0" />
-          {!collapsed && <span>Manage types</span>}
-        </Link>
+        {/* Build/enable custom entity types — opens in the campaign frame/window
+            like the other entity pages. */}
+        {(() => {
+          const href = createPageUrl('EntityTypes') + `?campaign_id=${campaign.id}`;
+          const isActive = activePage === 'EntityTypes';
+          return (
+            <Link
+              to={href}
+              onClick={(e) => openInWindow(e, href)}
+              title="Manage entity types"
+              className={cn(
+                'flex items-center gap-3 px-3 py-1.5 mt-1 rounded-lg text-xs transition-colors',
+                isActive
+                  ? 'bg-amber-500/15 dark:bg-amber-500/10 text-amber-700 dark:text-amber-400 font-medium'
+                  : 'text-zinc-500 dark:text-zinc-500 hover:text-amber-600 dark:hover:text-amber-400 hover:bg-zinc-100 dark:hover:bg-zinc-800/50'
+              )}
+            >
+              <Shapes className="w-3.5 h-3.5 flex-shrink-0" />
+              {!collapsed && <span>Manage types</span>}
+            </Link>
+          );
+        })()}
         </div>
       </nav>
 

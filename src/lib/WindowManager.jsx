@@ -7,11 +7,11 @@ import { CAMPAIGN_NAV_ITEMS } from '@/lib/navItems';
 export const WINDOW_PAGES = [
   'CampaignDashboard', 'EntityBrowser', 'EntityDetail', 'RelationshipMap', 'CampaignMap', 'BattleMap',
   'SessionBrowser', 'SessionPage', 'RandomTableBrowser', 'CampaignTimeline',
-  'CampaignNotes', 'CampaignSettings', 'PartyInventory', 'PlayerView',
+  'CampaignNotes', 'CampaignSettings', 'PartyInventory', 'PlayerView', 'EntityTypes',
 ];
 
 const LABELS = Object.fromEntries(CAMPAIGN_NAV_ITEMS.map((i) => [i.page, i.label]));
-const EXTRA_LABELS = { EntityDetail: 'Entity', SessionPage: 'Session' };
+const EXTRA_LABELS = { EntityDetail: 'Entity', SessionPage: 'Session', EntityTypes: 'Entity Types' };
 
 export function pageKeyOf(url) {
   return (url || '').replace(/^\//, '').split('?')[0] || 'CampaignDashboard';

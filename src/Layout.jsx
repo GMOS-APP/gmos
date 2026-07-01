@@ -23,7 +23,7 @@ import { useWindowMode } from '@/lib/useWindowMode';
 import { useMediaQuery } from '@/lib/useMediaQuery';
 import { cn } from '@/lib/utils';
 import { Loader2 } from 'lucide-react';
-const CAMPAIGN_PAGES = ['CampaignDashboard', 'EntityDetail', 'EntityBrowser', 'RelationshipMap', 'CampaignMap', 'BattleMap', 'SessionPage', 'SessionBrowser', 'RandomTableBrowser', 'CampaignTimeline', 'PlayerView', 'CampaignNotes', 'CampaignSettings', 'PartyInventory'];
+const CAMPAIGN_PAGES = ['CampaignDashboard', 'EntityDetail', 'EntityBrowser', 'RelationshipMap', 'CampaignMap', 'BattleMap', 'SessionPage', 'SessionBrowser', 'RandomTableBrowser', 'CampaignTimeline', 'PlayerView', 'CampaignNotes', 'CampaignSettings', 'PartyInventory', 'EntityTypes'];
 
 // On the desktop, multiple page windows are mounted at once, so each setting
 // document.title would race. Instead one component derives the title from the

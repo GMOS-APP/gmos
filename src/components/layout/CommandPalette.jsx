@@ -197,7 +197,7 @@ export default function CommandPalette({ open, onOpenChange, campaignId, onStart
           <CommandGroup heading="Entity types">
             <CommandItem
               value="manage-entity-types"
-              onSelect={() => run(createPageUrl('EntityTypes'))}
+              onSelect={() => run(createPageUrl('EntityTypes') + `?campaign_id=${campaignId}`)}
             >
               <Shapes className="text-amber-500" />
               <span>Manage entity types</span>

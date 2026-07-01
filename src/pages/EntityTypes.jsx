@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { EntityType } from '@/api/entities';
 import { createPageUrl } from '@/utils';
@@ -271,8 +271,12 @@ export default function EntityTypes() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [editing, setEditing] = useState(null); // null | typeRow | blank
 
+  // In-frame (opened from a campaign) the sidebar/taskbar handle navigation, so
+  // the standalone Back button is only shown in the account-level full-bleed view.
+  const inFrame = !!searchParams.get('campaign_id');
   const goBack = () => (window.history.length > 1 ? navigate(-1) : navigate(createPageUrl('CampaignList')));
 
   const { data: types = [], isLoading } = useQuery({
@@ -291,12 +295,14 @@ export default function EntityTypes() {
 
   return (
     <div className="p-4 sm:p-6 lg:p-8 max-w-3xl mx-auto space-y-6">
-      <button
-        onClick={goBack}
-        className="inline-flex items-center gap-1.5 text-xs text-zinc-500 dark:text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-300"
-      >
-        <ArrowLeft className="w-3.5 h-3.5" /> Back
-      </button>
+      {!inFrame && (
+        <button
+          onClick={goBack}
+          className="inline-flex items-center gap-1.5 text-xs text-zinc-500 dark:text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-300"
+        >
+          <ArrowLeft className="w-3.5 h-3.5" /> Back
+        </button>
+      )}
       <div>
         <h1 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100">Entity Types</h1>
         <p className="text-sm text-zinc-500 dark:text-zinc-500 mt-1">
