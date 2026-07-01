@@ -5,12 +5,13 @@ import { WorldEntity, Session } from '@/api/entities';
 import { createPageUrl } from '@/utils';
 import { getEntityColors } from '@/lib/entityColors';
 import { useCampaignEntityTypes } from '@/lib/entityTypes';
+import { useAuth } from '@/lib/AuthContext';
 import EntityAvatar from '@/components/entity/EntityAvatar';
 import {
   CommandDialog, CommandInput, CommandList, CommandEmpty,
   CommandGroup, CommandItem,
 } from '@/components/ui/command';
-import { CalendarDays, Plus, Dices, Compass, HelpCircle, Shapes } from 'lucide-react';
+import { CalendarDays, Plus, Dices, Compass, HelpCircle, Shapes, ShieldCheck } from 'lucide-react';
 import { CAMPAIGN_NAV_ITEMS, navHref } from '@/lib/navItems';
 import { useWindowManager } from '@/lib/WindowManager';
 import { useNotifications } from '@/lib/NotificationContext';
@@ -89,6 +90,7 @@ export default function CommandPalette({ open, onOpenChange, campaignId, onStart
   }, [q, entities, sessions, campaignId]);
 
   const { types: enabledTypes } = useCampaignEntityTypes(campaignId);
+  const { isAdmin } = useAuth();
   const matches = (label) => !q || label.toLowerCase().includes(q);
   const createItems = enabledTypes
     .map((t) => ({ type: t.key, label: t.labelSingular, Icon: t.Icon }))
@@ -175,6 +177,18 @@ export default function CommandPalette({ open, onOpenChange, campaignId, onStart
                 <span>New {label}</span>
               </CommandItem>
             ))}
+          </CommandGroup>
+        )}
+
+        {isAdmin && (matches('admin') || matches('admin console') || matches('console')) && (
+          <CommandGroup heading="Admin">
+            <CommandItem
+              value="admin-console"
+              onSelect={() => { onOpenChange(false); setQuery(''); navigate('/admin'); }}
+            >
+              <ShieldCheck className="text-amber-500" />
+              <span>Open admin console</span>
+            </CommandItem>
           </CommandGroup>
         )}
 

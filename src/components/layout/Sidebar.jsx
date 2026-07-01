@@ -10,7 +10,9 @@ import {
   LogOut,
   LayoutGrid,
   Shapes,
+  ShieldCheck,
 } from 'lucide-react';
+import { useAuth } from '@/lib/AuthContext';
 import { CAMPAIGN_NAV_ITEMS, navHref } from '@/lib/navItems';
 import { useEntityTypes } from '@/lib/entityTypes';
 import FeedbackButton from '@/components/layout/FeedbackButton';
@@ -44,6 +46,7 @@ export default function Sidebar({ campaign, collapsed, onToggle, onNavClick }) {
   const [user, setUser] = useState(null);
   const { types } = useEntityTypes(campaign);
   const entityGroups = buildEntityGroups(types);
+  const { isAdmin } = useAuth();
 
   useEffect(() => {
     auth.me().then(setUser).catch(() => {});
@@ -195,6 +198,17 @@ export default function Sidebar({ campaign, collapsed, onToggle, onNavClick }) {
           >
             <HelpCircle className="w-4 h-4" />
           </Link>
+          {isAdmin && (
+            <Link
+              to="/admin"
+              onClick={onNavClick}
+              title="Admin console"
+              aria-label="Admin console"
+              className={iconBtn}
+            >
+              <ShieldCheck className="w-4 h-4" />
+            </Link>
+          )}
           <Link
             to={createPageUrl('AccountSettings')}
             onClick={onNavClick}

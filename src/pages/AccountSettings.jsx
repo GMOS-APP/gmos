@@ -13,7 +13,7 @@ import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter,
 } from '@/components/ui/dialog';
 import {
-  User, Mail, Crown, Palette, Download, FileText, Trash2, Loader2, ArrowLeft, Shapes, ChevronRight,
+  User, Mail, Crown, Palette, Download, FileText, Trash2, Loader2, ArrowLeft, Shapes, ChevronRight, ShieldCheck,
 } from 'lucide-react';
 
 function Section({ icon: Icon, title, description, children }) {
@@ -34,7 +34,7 @@ function Section({ icon: Icon, title, description, children }) {
 }
 
 export default function AccountSettings() {
-  const { user, plan, planExpiresAt, isPlus, refreshProfile, logout } = useAuth();
+  const { user, plan, planExpiresAt, isPlus, isAdmin, refreshProfile, logout } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
   const [params] = useSearchParams();
@@ -141,6 +141,19 @@ export default function AccountSettings() {
             </Button>
           </div>
         </Section>
+
+        {/* Admin — only for admins */}
+        {isAdmin && (
+          <Section icon={ShieldCheck} title="Admin" description="Site administration console.">
+            <button
+              onClick={() => navigate('/admin')}
+              className="w-full flex items-center justify-between gap-3 text-left group"
+            >
+              <span className="text-sm text-zinc-700 dark:text-zinc-300">Open admin console</span>
+              <ChevronRight className="w-4 h-4 text-zinc-400 group-hover:text-amber-500 transition-colors flex-shrink-0" />
+            </button>
+          </Section>
+        )}
 
         {/* Entity Types */}
         <Section icon={Shapes} title="Entity Types" description="Create custom entity types with your own fields — for any game system.">
