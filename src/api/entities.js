@@ -80,6 +80,7 @@ export const Announcement = createEntityAPI('announcements');
 export const Changelog = createEntityAPI('changelog');
 export const Setting = createEntityAPI('app_settings');
 export const BattleMap = createEntityAPI('battle_maps');
+export const EntityType = createEntityAPI('entity_types');
 
 export async function UploadFile({ file }) {
   const ext = file.name.split('.').pop();

@@ -213,8 +213,22 @@ function ProseSection({ section, value, accent, campaignEntities, campaignId }) 
  * (location, faction, item, shop, thread, deity, event, lore, note).
  * Replaces the old generic humanized key/value grid.
  */
-export default function EntityTypeView({ entityType, extraData, campaignEntities = [], campaignId }) {
-  const config = PRESENTATION[entityType];
+// Synthesize a PRESENTATION-shaped config from a custom type's field schema.
+function configFromFields(fields) {
+  if (!Array.isArray(fields) || fields.length === 0) return null;
+  return {
+    specs: fields
+      .filter((f) => f.placement === 'spec')
+      .map((f) => ({ key: f.key, label: f.label, chips: f.kind === 'chips' })),
+    sections: fields
+      .filter((f) => f.placement !== 'spec')
+      .map((f) => ({ key: f.key, label: f.label, gmOnly: !!f.gmOnly })),
+  };
+}
+
+export default function EntityTypeView({ entityType, extraData, campaignEntities = [], campaignId, fields }) {
+  // Custom types render from their schema; built-ins from the static PRESENTATION.
+  const config = fields ? configFromFields(fields) : PRESENTATION[entityType];
   const extra = extraData || {};
   const meta = getEntityColors(entityType);
   const accent = meta.text;

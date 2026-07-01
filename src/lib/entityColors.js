@@ -95,4 +95,17 @@ export const ENTITY_TYPE_META = {
 // Back-compat alias (older imports use ENTITY_TYPE_COLORS).
 export const ENTITY_TYPE_COLORS = ENTITY_TYPE_META;
 
-export const getEntityColors = (type) => ENTITY_TYPE_META[type] ?? ENTITY_TYPE_META.npc;
+// Registry of user-defined custom entity types, keyed by type key. Populated by
+// the useEntityTypes() hook (src/lib/entityTypes.js) at app load. Stored as
+// fully-built meta objects (same shape as ENTITY_TYPE_META entries) so the many
+// synchronous getEntityColors() call sites resolve custom types without each one
+// needing the registry/React context. entityTypes.js owns building these — this
+// module just holds & serves them, which keeps the import graph acyclic.
+let CUSTOM_TYPE_REGISTRY = {};
+
+export function setCustomTypeRegistry(map) {
+  CUSTOM_TYPE_REGISTRY = map || {};
+}
+
+export const getEntityColors = (type) =>
+  ENTITY_TYPE_META[type] ?? CUSTOM_TYPE_REGISTRY[type] ?? ENTITY_TYPE_META.npc;

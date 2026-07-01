@@ -19,7 +19,7 @@ import {
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import QueryError from '@/components/common/QueryError';
-import { DEFAULT_SYSTEM_ID } from '@/lib/systems';
+import { DEFAULT_SYSTEM_ID, SYSTEMS } from '@/lib/systems';
 import UpgradeModal from '@/components/billing/UpgradeModal';
 import BetaBadge from '@/components/common/BetaBadge';
 import { FREE_CAMPAIGN_LIMIT, isCampaignLimitError } from '@/lib/plans';
@@ -107,7 +107,11 @@ export default function CampaignList() {
   const handleNewCampaign = () => (atFreeLimit ? setShowUpgrade(true) : setShowCreate(true));
 
   const createMutation = useMutation({
-    mutationFn: (data) => Campaign.create(data),
+    mutationFn: (data) => {
+      // Seed the campaign's enabled entity types from the chosen system preset.
+      const sys = SYSTEMS[data.system] || SYSTEMS[DEFAULT_SYSTEM_ID];
+      return Campaign.create({ ...data, enabled_entity_types: sys.defaultEntityTypes });
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['campaigns'] });
       setShowCreate(false);
@@ -374,6 +378,35 @@ export default function CampaignList() {
             <DialogTitle>New Campaign</DialogTitle>
           </DialogHeader>
           <div className="space-y-3 py-2">
+            <div className="space-y-1.5">
+              <label className="text-xs font-medium text-zinc-600 dark:text-zinc-400">Game system</label>
+              <div className="grid grid-cols-2 gap-2">
+                {Object.values(SYSTEMS).map((sys) => {
+                  const active = form.system === sys.id;
+                  return (
+                    <button
+                      key={sys.id}
+                      type="button"
+                      onClick={() => setForm({ ...form, system: sys.id })}
+                      className={cn(
+                        'text-left rounded-lg border px-3 py-2 transition-colors',
+                        active
+                          ? 'border-amber-500 bg-amber-500/10 dark:bg-amber-500/[0.07]'
+                          : 'border-zinc-300 dark:border-zinc-800 hover:border-zinc-400 dark:hover:border-zinc-700'
+                      )}
+                    >
+                      <span className={cn('block text-sm font-semibold', active ? 'text-amber-700 dark:text-amber-400' : 'text-zinc-800 dark:text-zinc-200')}>
+                        {sys.label}
+                      </span>
+                      <span className="block text-[11px] text-zinc-500 dark:text-zinc-500 mt-0.5">
+                        {sys.id === 'dnd5e' ? 'Stat blocks, CR, SRD import' : 'System-agnostic · your own types'}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+              <p className="text-[11px] text-zinc-500 dark:text-zinc-600">You can add custom entity types and change enabled types later in campaign settings.</p>
+            </div>
             <div className="space-y-1">
               <label className="text-xs font-medium text-zinc-600 dark:text-zinc-400">Campaign name</label>
               <Input

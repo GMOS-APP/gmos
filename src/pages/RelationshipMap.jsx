@@ -8,21 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import RelationshipGraph from '@/components/relationships/RelationshipGraph';
 import RelationshipTimeline from '@/components/relationships/RelationshipTimeline';
 import RelationshipDialog from '@/components/relationships/RelationshipDialog';
-
-const ENTITY_TYPES = [
-  { value: 'npc', label: 'NPC' },
-  { value: 'player_character', label: 'PC' },
-  { value: 'creature', label: 'Creature' },
-  { value: 'location', label: 'Location' },
-  { value: 'faction', label: 'Faction' },
-  { value: 'deity', label: 'Deity' },
-  { value: 'item', label: 'Item' },
-  { value: 'shop', label: 'Shop' },
-  { value: 'event', label: 'Event' },
-  { value: 'encounter', label: 'Encounter' },
-  { value: 'lore', label: 'Lore' },
-  { value: 'thread', label: 'Thread' },
-];
+import { useCampaignEntityTypes } from '@/lib/entityTypes';
 
 const RELATIONSHIP_TYPES = [
   'allied_with', 'enemy_of', 'located_in', 'member_of', 'owns', 'seeks',
@@ -52,6 +38,8 @@ export default function RelationshipMap() {
   const [activeRelTypes, setActiveRelTypes] = useState(new Set());
   const [activeStatuses, setActiveStatuses] = useState(new Set());
   const queryClient = useQueryClient();
+  const { types } = useCampaignEntityTypes(campaignId);
+  const entityTypeFilters = types.map((t) => ({ value: t.key, label: t.labelSingular }));
 
   const { data: entities = [] } = useQuery({
     queryKey: ['entities', campaignId, 'all'],
@@ -145,7 +133,7 @@ export default function RelationshipMap() {
           <div>
             <p className="text-xs dark:text-zinc-500 text-zinc-500 mb-1.5">Entity Type</p>
             <div className="flex flex-wrap gap-1.5">
-              {ENTITY_TYPES.map(({ value, label }) => (
+              {entityTypeFilters.map(({ value, label }) => (
                 <button
                   key={value}
                   onClick={() => setActiveEntityTypes(s => toggleInSet(s, value))}

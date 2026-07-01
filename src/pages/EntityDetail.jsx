@@ -28,8 +28,7 @@ import {
 } from '@/components/ui/dialog';
 import { CampaignProvider, useCampaign } from '@/lib/CampaignContext';
 import { getEntityColors } from '@/lib/entityColors';
-
-const entityTypes = ['npc', 'creature', 'location', 'faction', 'thread', 'item', 'player_character', 'event', 'lore', 'deity', 'encounter', 'shop'];
+import { useEntityTypes } from '@/lib/entityTypes';
 const statuses = ['active', 'inactive', 'dead', 'destroyed', 'resolved', 'unknown'];
 const visibilities = ['gm_only', 'players_know', 'players_suspect', 'false_info'];
 
@@ -193,7 +192,8 @@ function LinkedMapSection({ entityId, entityName, campaignId, editMode }) {
 }
 
 function EntityDetailInner() {
-  const { system } = useCampaign();
+  const { system, campaign } = useCampaign();
+  const { types: entityTypes, byKey: entityTypesByKey } = useEntityTypes(campaign);
   const location = useLocation();
   const navigate = useNavigate();
   const params = new URLSearchParams(location.search);
@@ -249,6 +249,16 @@ function EntityDetailInner() {
     enabled: !!form.campaign_id,
     staleTime: 30000,
   });
+
+  // Type metadata for the current entity. Custom types carry a `fields` schema
+  // that drives their editor + read view; built-ins have bespoke components.
+  const currentTypeMeta = entityTypesByKey[form.entity_type];
+  const currentTypeLabel = currentTypeMeta?.labelSingular || form.entity_type.replace('_', ' ');
+  const currentTypeFields = currentTypeMeta?.builtin === false ? currentTypeMeta.fields : null;
+  // Always keep the current type selectable, even if disabled for this campaign.
+  const typeOptions = entityTypes.some((t) => t.key === form.entity_type)
+    ? entityTypes
+    : [currentTypeMeta || { key: form.entity_type, labelSingular: currentTypeLabel }, ...entityTypes];
 
   const { data: relationships = [] } = useQuery({
     queryKey: ['relationships', entityId],
@@ -563,6 +573,7 @@ function EntityDetailInner() {
               extraData={form.extra_data}
               campaignEntities={campaignEntities}
               campaignId={form.campaign_id}
+              fields={currentTypeFields}
             />
           )}
 
@@ -691,9 +702,9 @@ function EntityDetailInner() {
                 <SelectValue />
               </SelectTrigger>
               <SelectContent className="dark:bg-zinc-900 dark:border-zinc-800 bg-white border-zinc-300">
-                {entityTypes.map((t) => (
-                  <SelectItem key={t} value={t} className="text-zinc-300 capitalize text-xs">
-                    {t.replace('_', ' ')}
+                {typeOptions.map((t) => (
+                  <SelectItem key={t.key} value={t.key} className="text-zinc-300 capitalize text-xs">
+                    {t.labelSingular}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -809,12 +820,13 @@ function EntityDetailInner() {
         {form.entity_type && (
           <div>
             <label className="text-xs dark:text-zinc-500 text-zinc-600 uppercase tracking-widest font-semibold mb-3 block capitalize">
-              {form.entity_type.replace('_', ' ')} Details
+              {currentTypeLabel} Details
             </label>
             <TypeSpecificFields
               entityType={form.entity_type}
               extraData={form.extra_data}
               onChange={(data) => setForm({ ...form, extra_data: data })}
+              fields={currentTypeFields}
             />
           </div>
         )}

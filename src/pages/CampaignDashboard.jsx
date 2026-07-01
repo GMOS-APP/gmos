@@ -13,7 +13,7 @@ import {
 import { Button } from '@/components/ui/button';
 import QueryError from '@/components/common/QueryError';
 import { cn } from '@/lib/utils';
-import { ENTITY_TYPE_META } from '@/lib/entityColors';
+import { useEntityTypes } from '@/lib/entityTypes';
 import PassiveStatsHub from '@/components/dashboard/PassiveStatsHub';
 import PartyInventory from '@/components/dashboard/PartyInventory';
 import PrivateScratchpad from '@/components/dashboard/PrivateScratchpad';
@@ -27,12 +27,6 @@ import LinkTile from '@/components/dashboard/LinkTile';
 import DashboardGrid from '@/components/dashboard/DashboardGrid';
 
 // Derived from the single source so colors/icons/labels can't drift.
-const ENTITY_TYPES = ['npc', 'location', 'faction', 'thread', 'item', 'player_character', 'creature', 'event', 'lore', 'deity', 'encounter', 'shop']
-  .map((type) => {
-    const m = ENTITY_TYPE_META[type];
-    return { type, label: m.label, icon: m.Icon, accent: m.text, bg: m.bg };
-  });
-
 const STATUS_COLORS = {
   planned: 'dark:text-zinc-400 dark:bg-zinc-800 text-zinc-600 bg-zinc-200',
   in_progress: 'dark:text-emerald-400 dark:bg-emerald-500/10 text-emerald-700 bg-emerald-100',
@@ -126,6 +120,9 @@ export default function CampaignDashboard() {
     queryFn: () => Session.filter({ campaign_id: campaignId }, '-session_number', 20),
     enabled: !!campaignId,
   });
+
+  const { types: enabledTypes } = useEntityTypes(campaign);
+  const entityTypeTiles = enabledTypes.map((t) => ({ type: t.key, label: t.label, icon: t.Icon, accent: t.text, bg: t.bg }));
 
   const playerCharacters = entities.filter((e) => e.entity_type === 'player_character');
 
@@ -230,7 +227,7 @@ export default function CampaignDashboard() {
     <div>
       <WidgetHead title="World Entities" to={createPageUrl('EntityBrowser') + `?campaign_id=${campaignId}`} action="Browse all →" />
       <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
-        {ENTITY_TYPES.map(({ type, label, icon: Icon, accent, bg }) => (
+        {entityTypeTiles.map(({ type, label, icon: Icon, accent, bg }) => (
           <Link
             key={type}
             to={createPageUrl('EntityBrowser') + `?campaign_id=${campaignId}&type=${type}`}

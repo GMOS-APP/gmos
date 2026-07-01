@@ -3,8 +3,8 @@ import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { WorldEntity, Session } from '@/api/entities';
 import { createPageUrl } from '@/utils';
-import { ENTITY_CREATE_TYPES } from '@/lib/entityCreateTypes';
 import { getEntityColors } from '@/lib/entityColors';
+import { useCampaignEntityTypes } from '@/lib/entityTypes';
 import EntityAvatar from '@/components/entity/EntityAvatar';
 import {
   CommandDialog, CommandInput, CommandList, CommandEmpty,
@@ -88,8 +88,11 @@ export default function CommandPalette({ open, onOpenChange, campaignId, onStart
     ];
   }, [q, entities, sessions, campaignId]);
 
+  const { types: enabledTypes } = useCampaignEntityTypes(campaignId);
   const matches = (label) => !q || label.toLowerCase().includes(q);
-  const createItems = ENTITY_CREATE_TYPES.filter((t) => matches(`new ${t.label}`) || matches(t.label));
+  const createItems = enabledTypes
+    .map((t) => ({ type: t.key, label: t.labelSingular, Icon: t.Icon }))
+    .filter((t) => matches(`new ${t.label}`) || matches(t.label));
   const goToItems = CAMPAIGN_NAV_ITEMS.filter((p) => matches(p.label) || matches(`go to ${p.label}`));
 
   const run = (href) => {

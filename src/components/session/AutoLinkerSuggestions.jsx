@@ -2,8 +2,13 @@ import React, { useMemo, useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Session } from '@/api/entities';
 import { Link2, X, Check } from 'lucide-react';
+import { BUILTIN_TYPE_KEYS } from '@/lib/entityTypes';
 
+// Built-in types worth auto-linking from notes (concrete, named things). Custom
+// user-defined types are always linkable — only built-ins are curated here.
 const LINKABLE_TYPES = ['npc', 'location', 'creature', 'faction', 'item', 'event'];
+const isLinkableType = (type) =>
+  !BUILTIN_TYPE_KEYS.includes(type) || LINKABLE_TYPES.includes(type);
 
 export default function AutoLinkerSuggestions({ notes, entities, session }) {
   const queryClient = useQueryClient();
@@ -18,7 +23,7 @@ export default function AutoLinkerSuggestions({ notes, entities, session }) {
     if (!notes || !entities?.length) return [];
     const lowerNotes = notes.toLowerCase();
     return entities.filter((entity) => {
-      if (!LINKABLE_TYPES.includes(entity.entity_type)) return false;
+      if (!isLinkableType(entity.entity_type)) return false;
       if (alreadyLinkedIds.has(entity.id)) return false;
       if (dismissed.has(entity.id)) return false;
       // Match whole-word occurrences

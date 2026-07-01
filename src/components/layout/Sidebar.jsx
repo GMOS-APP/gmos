@@ -4,64 +4,35 @@ import { createPageUrl } from '@/utils';
 import { auth } from '@/api/entities';
 import ThemeToggle from '@/components/ui/ThemeToggle';
 import {
-  Users,
-  MapPin,
-  Shield,
-  Waypoints,
-  Package,
-  Scroll,
-  Sparkles,
   ChevronLeft,
-  BookOpen,
   HelpCircle,
-  Swords,
-  Church,
-  Flame,
-  ShoppingBag,
   UserCog,
   LogOut,
   LayoutGrid,
 } from 'lucide-react';
 import { CAMPAIGN_NAV_ITEMS, navHref } from '@/lib/navItems';
+import { useEntityTypes } from '@/lib/entityTypes';
 import FeedbackButton from '@/components/layout/FeedbackButton';
 import AlphaBadge from '@/components/common/AlphaBadge';
 import { useWindowManager, pageKeyOf, paramsOf } from '@/lib/WindowManager';
 import { cn } from '@/lib/utils';
 
-const entityGroups = [
-  {
-    label: 'Characters',
-    items: [
-      { type: 'player_character', label: 'PCs', icon: Sparkles },
-      { type: 'npc', label: 'NPCs', icon: Users },
-      { type: 'deity', label: 'Deities', icon: Church },
-    ],
-  },
-  {
-    label: 'Places',
-    items: [
-      { type: 'location', label: 'Locations', icon: MapPin },
-      { type: 'shop', label: 'Shops', icon: ShoppingBag },
-    ],
-  },
-  {
-    label: 'Story',
-    items: [
-      { type: 'thread', label: 'Threads', icon: Waypoints },
-      { type: 'event', label: 'Events', icon: Scroll },
-      { type: 'faction', label: 'Factions', icon: Shield },
-      { type: 'lore', label: 'Lore', icon: BookOpen },
-    ],
-  },
-  {
-    label: 'Combat',
-    items: [
-      { type: 'creature', label: 'Creatures', icon: Swords },
-      { type: 'encounter', label: 'Encounters', icon: Flame },
-      { type: 'item', label: 'Items', icon: Package },
-    ],
-  },
-];
+// Sidebar entity-type groups, ordered. Built-in groups first; any custom-type
+// groups (default "Custom") follow. Built from the campaign's enabled types.
+const GROUP_ORDER = ['Characters', 'Places', 'Story', 'Combat'];
+
+function buildEntityGroups(types) {
+  const byGroup = new Map();
+  for (const t of types) {
+    const g = t.group || 'Custom';
+    if (!byGroup.has(g)) byGroup.set(g, []);
+    byGroup.get(g).push({ type: t.key, label: t.label, icon: t.Icon });
+  }
+  const order = [...GROUP_ORDER, ...[...byGroup.keys()].filter((g) => !GROUP_ORDER.includes(g))];
+  return order
+    .filter((g) => byGroup.has(g))
+    .map((label) => ({ label, items: byGroup.get(label) }));
+}
 
 // Shared style for the compact footer utility icons (matches ThemeToggle).
 const iconBtn = 'p-1.5 rounded-md text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/50';
@@ -70,6 +41,8 @@ export default function Sidebar({ campaign, collapsed, onToggle, onNavClick }) {
   const location = useLocation();
   const wm = useWindowManager();
   const [user, setUser] = useState(null);
+  const { types } = useEntityTypes(campaign);
+  const entityGroups = buildEntityGroups(types);
 
   useEffect(() => {
     auth.me().then(setUser).catch(() => {});

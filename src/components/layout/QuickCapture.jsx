@@ -5,7 +5,7 @@ import { createPageUrl } from '@/utils';
 import { Plus, X } from 'lucide-react';
 import { QuickNote } from '@/api/entities';
 import QuickNoteInput from '@/components/session/QuickNoteInput';
-import { ENTITY_CREATE_TYPES } from '@/lib/entityCreateTypes';
+import { useCampaignEntityTypes } from '@/lib/entityTypes';
 import { useWindowManager, paramsOf } from '@/lib/WindowManager';
 
 export default function QuickCapture({ campaignId, open, onOpenChange }) {
@@ -14,6 +14,8 @@ export default function QuickCapture({ campaignId, open, onOpenChange }) {
   const wm = useWindowManager();
   const queryClient = useQueryClient();
   const [saved, setSaved] = useState(false);
+  const { types: enabledTypes } = useCampaignEntityTypes(campaignId);
+  const createTypes = enabledTypes.map((t) => ({ type: t.key, label: t.labelSingular, Icon: t.Icon }));
 
   const go = (href) => { if (wm) wm.openWindow(href); else navigate(href); };
 
@@ -107,7 +109,7 @@ export default function QuickCapture({ campaignId, open, onOpenChange }) {
           </div>
 
           <div className="grid grid-cols-3 gap-2">
-            {ENTITY_CREATE_TYPES.map(({ type, label, Icon }) => (
+            {createTypes.map(({ type, label, Icon }) => (
               <button
                 key={type}
                 onClick={() => handleSelect(type)}

@@ -4,7 +4,7 @@ import { getSystem } from './systems';
 const CampaignContext = createContext(null);
 
 export function CampaignProvider({ campaign, children }) {
-  const system = getSystem();
+  const system = getSystem(campaign);
   return (
     <CampaignContext.Provider value={{ campaign, system }}>
       {children}

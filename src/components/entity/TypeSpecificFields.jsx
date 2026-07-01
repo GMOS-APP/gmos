@@ -10,6 +10,7 @@ import LoreFields from './LoreFields';
 import DeityFields from './DeityFields';
 import EncounterFields from './EncounterFields';
 import ShopFields from './ShopFields';
+import SchemaFields from './SchemaFields';
 
 const FIELD_MAP = {
   npc: NPCFields,
@@ -26,8 +27,12 @@ const FIELD_MAP = {
   shop: ShopFields,
 };
 
-export default function TypeSpecificFields({ entityType, extraData, onChange }) {
+export default function TypeSpecificFields({ entityType, extraData, onChange, fields }) {
   const Component = FIELD_MAP[entityType];
-  if (!Component) return null;
+  // Custom (user-defined) types have no bespoke component — render from schema.
+  if (!Component) {
+    if (!fields) return null;
+    return <SchemaFields fields={fields} extraData={extraData} onChange={onChange} />;
+  }
   return <Component extraData={extraData} onChange={onChange} />;
 }

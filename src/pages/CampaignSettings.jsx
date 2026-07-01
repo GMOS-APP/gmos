@@ -16,6 +16,8 @@ import { useToast } from '@/components/ui/use-toast';
 import { useHotkeysEnabled, setHotkeysEnabled } from '@/lib/useHotkeysEnabled';
 import { useWindowMode, setWindowModeEnabled } from '@/lib/useWindowMode';
 import { MOD_LABEL } from '@/lib/useHotkeys';
+import { useEntityTypes, BUILTIN_TYPE_KEYS } from '@/lib/entityTypes';
+import { cn } from '@/lib/utils';
 
 const STATUS_OPTIONS = [
   { value: 'active', label: 'Active' },
@@ -42,6 +44,7 @@ export default function CampaignSettings() {
   const [confirmDelete, setConfirmDelete] = useState(false);
   const hotkeysEnabled = useHotkeysEnabled();
   const windowModeOn = useWindowMode();
+  const { allTypes } = useEntityTypes(campaign);
 
   useEffect(() => {
     if (campaign && !form) {
@@ -52,6 +55,7 @@ export default function CampaignSettings() {
         hook: campaign.hook || '',
         system: campaign.system || 'dnd5e',
         status: campaign.status || 'active',
+        enabled_entity_types: campaign.enabled_entity_types || BUILTIN_TYPE_KEYS,
       });
     }
   }, [campaign, form]);
@@ -90,13 +94,21 @@ export default function CampaignSettings() {
     }
   };
 
+  const sortedKeys = (arr) => [...(arr || [])].sort().join(',');
   const isDirty = form && campaign && (
     form.name !== campaign.name ||
     form.background !== (campaign.background || '') ||
     form.setting !== (campaign.setting || '') ||
     form.hook !== (campaign.hook || '') ||
-    form.status !== (campaign.status || 'active')
+    form.status !== (campaign.status || 'active') ||
+    sortedKeys(form.enabled_entity_types) !== sortedKeys(campaign.enabled_entity_types || BUILTIN_TYPE_KEYS)
   );
+
+  const toggleType = (key) => setForm((f) => {
+    const set = new Set(f.enabled_entity_types || []);
+    set.has(key) ? set.delete(key) : set.add(key);
+    return { ...f, enabled_entity_types: [...set] };
+  });
 
   if (isLoading || !form) {
     return (
@@ -176,6 +188,47 @@ export default function CampaignSettings() {
                 ))}
               </SelectContent>
             </Select>
+          </div>
+        </div>
+      </section>
+
+      {/* Entity Types */}
+      <section className="space-y-4">
+        <div className="flex items-center justify-between">
+          <h2 className="text-xs font-semibold uppercase tracking-widest text-zinc-500 dark:text-zinc-500">Entity Types</h2>
+          <button
+            onClick={() => navigate(createPageUrl('EntityTypes'))}
+            className="text-xs text-amber-600 dark:text-amber-400 hover:underline"
+          >
+            Manage custom types →
+          </button>
+        </div>
+        <div className="space-y-3 bg-white dark:bg-zinc-900/40 border border-zinc-200 dark:border-zinc-800/50 rounded-xl p-4">
+          <p className="text-xs text-zinc-500 dark:text-zinc-500">
+            Choose which entity types appear in this campaign. Turning one off hides it everywhere; existing entities of that type are kept.
+          </p>
+          <div className="flex flex-wrap gap-1.5">
+            {allTypes.map((t) => {
+              const on = (form.enabled_entity_types || []).includes(t.key);
+              const Icon = t.Icon;
+              return (
+                <button
+                  key={t.key}
+                  type="button"
+                  onClick={() => toggleType(t.key)}
+                  className={cn(
+                    'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border transition-colors',
+                    on
+                      ? 'bg-amber-500/10 dark:bg-amber-500/[0.08] border-amber-500/40 text-amber-700 dark:text-amber-400'
+                      : 'border-zinc-300 dark:border-zinc-800 text-zinc-400 dark:text-zinc-600 hover:border-zinc-400 dark:hover:border-zinc-700'
+                  )}
+                >
+                  {Icon && <Icon className="w-3 h-3" />}
+                  {t.label}
+                  {!t.builtin && <span className="text-[9px] uppercase tracking-wide opacity-60">custom</span>}
+                </button>
+              );
+            })}
           </div>
         </div>
       </section>

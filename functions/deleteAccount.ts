@@ -26,7 +26,7 @@ const STRIPE_SECRET_KEY = Deno.env.get('STRIPE_SECRET_KEY');
 // Child/content tables deleted before campaigns; all are keyed by created_by.
 const DELETE_ORDER = [
   'world_entities', 'sessions', 'relationships', 'campaign_maps',
-  'quick_notes', 'random_tables', 'campaigns',
+  'quick_notes', 'random_tables', 'entity_types', 'campaigns',
 ];
 
 Deno.serve(async (req) => {

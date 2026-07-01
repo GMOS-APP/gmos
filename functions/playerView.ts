@@ -42,14 +42,14 @@ Deno.serve(async (req) => {
 
     const admin = createClient(SUPABASE_URL, SERVICE_ROLE_KEY);
 
-    // Player-facing entity types only (never creatures/encounters/PCs/shops).
-    const PLAYER_TYPES = ['npc', 'location', 'faction', 'item', 'thread', 'event', 'lore', 'deity'];
+    // Built-in player-facing entity types (never creatures/encounters/PCs/shops).
+    const BUILTIN_PLAYER_TYPES = ['npc', 'location', 'faction', 'item', 'thread', 'event', 'lore', 'deity'];
 
-    // Find campaign by share token where sharing is enabled.
-    // Project to only player-safe columns — never the share token, created_by, etc.
+    // Find campaign by share token where sharing is enabled. created_by is used
+    // server-side to resolve the owner's custom types; it is never returned.
     const { data: campaigns, error: campError } = await admin
       .from('campaigns')
-      .select('id, name, setting')
+      .select('id, name, setting, created_by')
       .eq('player_share_token', token)
       .eq('is_shared', true)
       .limit(1);
@@ -59,6 +59,17 @@ Deno.serve(async (req) => {
     }
 
     const campaign = campaigns[0];
+
+    // The owner's player-visible custom entity types. The public page can't read
+    // entity_types under RLS, so we resolve them here and return display metadata.
+    const { data: customTypes } = await admin
+      .from('entity_types')
+      .select('key, label, label_singular, icon, color')
+      .eq('created_by', campaign.created_by)
+      .eq('player_visible', true);
+
+    const customKeys = (customTypes || []).map((t) => t.key);
+    const PLAYER_TYPES = [...BUILTIN_PLAYER_TYPES, ...customKeys];
 
     // Player-visible entities — safe fields only (no description/extra_data/secrets).
     const { data: entities } = await admin
@@ -82,6 +93,7 @@ Deno.serve(async (req) => {
         campaign: { id: campaign.id, name: campaign.name, setting: campaign.setting },
         entities: entities || [],
         sessions: sessions || [],
+        entityTypes: customTypes || [],
       },
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );

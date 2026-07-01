@@ -9,24 +9,16 @@ import { Button } from '@/components/ui/button';
 import EntityCard from '@/components/entity/EntityCard';
 import QueryError from '@/components/common/QueryError';
 import { cn } from '@/lib/utils';
-
-const entityTypes = [
-  { value: '', label: 'All' },
-  { value: 'npc', label: 'NPCs' },
-  { value: 'location', label: 'Locations' },
-  { value: 'faction', label: 'Factions' },
-  { value: 'thread', label: 'Threads' },
-  { value: 'item', label: 'Items' },
-  { value: 'player_character', label: 'PCs' },
-  { value: 'event', label: 'Events' },
-  { value: 'lore', label: 'Lore' },
-];
+import { useCampaignEntityTypes } from '@/lib/entityTypes';
 
 export default function EntityBrowser() {
   const location = useLocation();
   const params = new URLSearchParams(location.search);
   const campaignId = params.get('campaign_id');
   const initialType = params.get('type') || '';
+
+  const { types } = useCampaignEntityTypes(campaignId);
+  const entityTypes = [{ value: '', label: 'All' }, ...types.map((t) => ({ value: t.key, label: t.label }))];
 
   const [searchQuery, setSearchQuery] = useState('');
   const [typeFilter, setTypeFilter] = useState(initialType);

@@ -13,7 +13,7 @@ import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter,
 } from '@/components/ui/dialog';
 import {
-  User, Mail, Crown, Palette, Download, FileText, Trash2, Loader2, ArrowLeft,
+  User, Mail, Crown, Palette, Download, FileText, Trash2, Loader2, ArrowLeft, Shapes, ChevronRight,
 } from 'lucide-react';
 
 function Section({ icon: Icon, title, description, children }) {
@@ -140,6 +140,17 @@ export default function AccountSettings() {
               {savingName ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Save'}
             </Button>
           </div>
+        </Section>
+
+        {/* Entity Types */}
+        <Section icon={Shapes} title="Entity Types" description="Create custom entity types with your own fields — for any game system.">
+          <button
+            onClick={() => navigate(createPageUrl('EntityTypes'))}
+            className="w-full flex items-center justify-between gap-3 text-left group"
+          >
+            <span className="text-sm text-zinc-700 dark:text-zinc-300">Manage custom entity types</span>
+            <ChevronRight className="w-4 h-4 text-zinc-400 group-hover:text-amber-500 transition-colors flex-shrink-0" />
+          </button>
         </Section>
 
         {/* Email & sign-in */}

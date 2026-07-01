@@ -1,21 +1,33 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { supabase } from '@/api/supabaseClient';
 import { Eye, EyeOff, Loader2, Backpack, MessageSquare } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ENTITY_TYPE_META } from '@/lib/entityColors';
+import { COLOR_PRESETS, resolveIcon } from '@/lib/entityTypes';
 import PlayerEntityModal from '@/components/common/PlayerEntityModal';
 import PartyInventoryManager from '@/components/party/PartyInventoryManager';
 import PartyNotes from '@/components/party/PartyNotes';
 import PlayerBattleMap from '@/components/map/PlayerBattleMap';
 import useDocumentTitle from '@/lib/useDocumentTitle';
 
-// Player-facing types, derived from the single source.
-const TYPE_META = Object.fromEntries(
+// Built-in player-facing types, derived from the single source.
+const BUILTIN_TYPE_META = Object.fromEntries(
   ['npc', 'location', 'faction', 'item', 'thread', 'event', 'lore', 'deity'].map((t) => {
     const m = ENTITY_TYPE_META[t];
     return [t, { label: m.label, icon: m.Icon, accent: m.text, bg: m.bg }];
   })
 );
+
+// Merge built-ins with the campaign's player-visible custom types (returned by
+// the player-view edge function, since the public page can't read them via RLS).
+function buildTypeMeta(customDefs) {
+  const meta = { ...BUILTIN_TYPE_META };
+  for (const d of customDefs || []) {
+    const preset = COLOR_PRESETS[d.color] || COLOR_PRESETS.slate;
+    meta[d.key] = { label: d.label, icon: resolveIcon(d.icon), accent: preset.text, bg: preset.bg };
+  }
+  return meta;
+}
 
 const VISIBILITY_LABELS = {
   players_know:    { label: 'Known',   icon: Eye,    color: 'text-emerald-600 dark:text-emerald-400' },
@@ -31,7 +43,9 @@ export default function PublicPlayerView() {
   const [campaign, setCampaign] = useState(null);
   const [entities, setEntities] = useState([]);
   const [sessions, setSessions] = useState([]);
+  const [customTypeDefs, setCustomTypeDefs] = useState([]);
   const [activeType, setActiveType] = useState('all');
+  const typeMeta = useMemo(() => buildTypeMeta(customTypeDefs), [customTypeDefs]);
   const [selected, setSelected] = useState(null);
   const [inv, setInv] = useState([]);
   const [currency, setCurrency] = useState({});
@@ -61,6 +75,7 @@ export default function PublicPlayerView() {
         setCampaign(data.campaign);
         setEntities(data.entities || []);
         setSessions(data.sessions || []);
+        setCustomTypeDefs(data.entityTypes || []);
         // Party inventory (best-effort — never blocks the page).
         try {
           const { data: invData } = await supabase.functions.invoke('party-inventory', { body: { token, action: 'list' } });
@@ -81,7 +96,7 @@ export default function PublicPlayerView() {
     if (!token) return;
     try {
       const { data } = await supabase.functions.invoke('player-view', { body: { token } });
-      if (data && !data.error) { setEntities(data.entities || []); setSessions(data.sessions || []); }
+      if (data && !data.error) { setEntities(data.entities || []); setSessions(data.sessions || []); setCustomTypeDefs(data.entityTypes || []); }
     } catch { /* non-fatal */ }
   }, [token]);
 
@@ -100,7 +115,7 @@ export default function PublicPlayerView() {
     return () => { clearTimeout(t); supabase.removeChannel(ch); };
   }, [campaign?.id, refreshView]);
 
-  const visible = entities.filter(e => TYPE_META[e.entity_type]);
+  const visible = entities.filter(e => typeMeta[e.entity_type]);
   const types = [...new Set(visible.map(e => e.entity_type))];
   const filtered = activeType === 'all' ? visible : visible.filter(e => e.entity_type === activeType);
   const lastDebriefed = sessions.find(s => s.status === 'debriefed' || s.status === 'completed');
@@ -196,7 +211,7 @@ export default function PublicPlayerView() {
                   All ({visible.length})
                 </button>
                 {types.map((type) => {
-                  const meta = TYPE_META[type];
+                  const meta = typeMeta[type];
                   if (!meta) return null;
                   const count = visible.filter((e) => e.entity_type === type).length;
                   return (
@@ -217,7 +232,7 @@ export default function PublicPlayerView() {
             ) : (
               <div className="grid grid-cols-1 gap-2">
                 {filtered.map((entity) => {
-                  const meta = TYPE_META[entity.entity_type] || {};
+                  const meta = typeMeta[entity.entity_type] || {};
                   const Icon = meta.icon || Eye;
                   const vis = VISIBILITY_LABELS[entity.visibility];
                   const VisIcon = vis?.icon;

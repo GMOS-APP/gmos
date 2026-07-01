@@ -5,15 +5,7 @@ import { Campaign, WorldEntity, Session } from '@/api/entities';
 import PlayerEntityModal from '@/components/common/PlayerEntityModal';
 import { Eye, EyeOff } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { ENTITY_TYPE_META } from '@/lib/entityColors';
-
-// Player-facing types, derived from the single source.
-const TYPE_META = Object.fromEntries(
-  ['npc', 'location', 'faction', 'item', 'thread', 'event', 'lore', 'deity'].map((t) => {
-    const m = ENTITY_TYPE_META[t];
-    return [t, { label: m.label, icon: m.Icon, accent: m.text, bg: m.bg }];
-  })
-);
+import { useEntityTypes } from '@/lib/entityTypes';
 
 const VISIBILITY_LABELS = {
   players_know:    { label: 'Known',    icon: Eye,    color: 'dark:text-emerald-400 text-emerald-600' },
@@ -44,6 +36,13 @@ export default function PlayerView() {
     queryFn: () => Session.filter({ campaign_id: campaignId }, '-session_number', 5),
     enabled: !!campaignId,
   });
+
+  // Player-facing types (built-in player types + player-visible custom types).
+  // Mirrors the public player-view edge function so the GM preview matches.
+  const { allTypes } = useEntityTypes(campaign);
+  const TYPE_META = Object.fromEntries(
+    allTypes.filter((t) => t.playerVisible).map((t) => [t.key, { label: t.label, icon: t.Icon, accent: t.text, bg: t.bg }])
+  );
 
   // Only show player-visible entities (not creatures, encounters, player_characters, shops)
   const visible = entities.filter(e =>

@@ -23,7 +23,7 @@ const ANON_KEY = Deno.env.get('SUPABASE_ANON_KEY')!;
 // Every table that stores user content, keyed by created_by.
 const OWNED_TABLES = [
   'campaigns', 'world_entities', 'sessions', 'relationships',
-  'campaign_maps', 'quick_notes', 'random_tables',
+  'campaign_maps', 'quick_notes', 'random_tables', 'entity_types',
 ];
 
 Deno.serve(async (req) => {
