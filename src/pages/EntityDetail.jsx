@@ -29,6 +29,7 @@ import {
 import { CampaignProvider, useCampaign } from '@/lib/CampaignContext';
 import { getEntityColors } from '@/lib/entityColors';
 import { useEntityTypes } from '@/lib/entityTypes';
+import { useToast } from '@/components/ui/use-toast';
 const statuses = ['active', 'inactive', 'dead', 'destroyed', 'resolved', 'unknown'];
 const visibilities = ['gm_only', 'players_know', 'players_suspect', 'false_info'];
 
@@ -194,6 +195,7 @@ function LinkedMapSection({ entityId, entityName, campaignId, editMode }) {
 function EntityDetailInner() {
   const { system, campaign } = useCampaign();
   const { types: entityTypes, byKey: entityTypesByKey } = useEntityTypes(campaign);
+  const { toast } = useToast();
   const location = useLocation();
   const navigate = useNavigate();
   const params = new URLSearchParams(location.search);
@@ -310,6 +312,13 @@ function EntityDetailInner() {
         navigate(createPageUrl('EntityDetail') + `?id=${result.id}&campaign_id=${form.campaign_id}`, { replace: true });
       }
     },
+    // Surface failures instead of failing silently (this is why a saved entity
+    // could "disappear" — the write errored and nothing told the user).
+    onError: (err) => toast({
+      title: "Couldn't save entity",
+      description: err?.message || 'Something went wrong. Your changes were not saved.',
+      variant: 'destructive',
+    }),
   });
 
   const deleteMutation = useMutation({
@@ -317,6 +326,11 @@ function EntityDetailInner() {
     onSuccess: () => {
       navigate(createPageUrl('EntityBrowser') + `?campaign_id=${form.campaign_id}`);
     },
+    onError: (err) => toast({
+      title: "Couldn't delete entity",
+      description: err?.message || 'Something went wrong.',
+      variant: 'destructive',
+    }),
   });
 
   const addTag = () => {
