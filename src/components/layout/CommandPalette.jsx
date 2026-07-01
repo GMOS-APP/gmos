@@ -10,7 +10,7 @@ import {
   CommandDialog, CommandInput, CommandList, CommandEmpty,
   CommandGroup, CommandItem,
 } from '@/components/ui/command';
-import { CalendarDays, Plus, Dices, Compass, HelpCircle } from 'lucide-react';
+import { CalendarDays, Plus, Dices, Compass, HelpCircle, Shapes } from 'lucide-react';
 import { CAMPAIGN_NAV_ITEMS, navHref } from '@/lib/navItems';
 import { useWindowManager } from '@/lib/WindowManager';
 import { useNotifications } from '@/lib/NotificationContext';
@@ -175,6 +175,19 @@ export default function CommandPalette({ open, onOpenChange, campaignId, onStart
                 <span>New {label}</span>
               </CommandItem>
             ))}
+          </CommandGroup>
+        )}
+
+        {(matches('entity type') || matches('custom type') || matches('new type') ||
+          matches('type builder') || matches('manage types')) && (
+          <CommandGroup heading="Entity types">
+            <CommandItem
+              value="manage-entity-types"
+              onSelect={() => run(createPageUrl('EntityTypes'))}
+            >
+              <Shapes className="text-amber-500" />
+              <span>Manage entity types</span>
+            </CommandItem>
           </CommandGroup>
         )}
 

@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { WorldEntity } from '@/api/entities';
 import { Link, useLocation } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
-import { Search, Plus } from 'lucide-react';
+import { Search, Plus, Shapes } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import EntityCard from '@/components/entity/EntityCard';
@@ -51,12 +51,20 @@ export default function EntityBrowser() {
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-xl font-bold dark:text-zinc-100 text-zinc-900">World Entities</h1>
-        <Link to={createPageUrl('EntityDetail') + `?campaign_id=${campaignId}&new=true${typeFilter ? `&type=${typeFilter}` : ''}`}>
-          <Button size="sm" className="bg-amber-500 hover:bg-amber-400 text-zinc-950 font-semibold">
-            <Plus className="w-4 h-4 mr-1.5" />
-            Add Entity
-          </Button>
-        </Link>
+        <div className="flex items-center gap-2">
+          <Link to={createPageUrl('EntityTypes')}>
+            <Button size="sm" variant="ghost" className="text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200">
+              <Shapes className="w-4 h-4 mr-1.5" />
+              Manage types
+            </Button>
+          </Link>
+          <Link to={createPageUrl('EntityDetail') + `?campaign_id=${campaignId}&new=true${typeFilter ? `&type=${typeFilter}` : ''}`}>
+            <Button size="sm" className="bg-amber-500 hover:bg-amber-400 text-zinc-950 font-semibold">
+              <Plus className="w-4 h-4 mr-1.5" />
+              Add Entity
+            </Button>
+          </Link>
+        </div>
       </div>
 
       {/* Filters */}
