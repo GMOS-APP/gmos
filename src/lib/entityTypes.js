@@ -100,7 +100,8 @@ export function buildCustomMeta(row) {
     group: row.group_label || 'Custom',
     playerVisible: !!row.player_visible,
     builtin: false,
-    source: 'custom',  // account-defined — always available in every campaign
+    source: 'custom',  // account-defined — always available (subject to scope below)
+    campaignId: row.campaign_id || null, // null = every campaign; set = that campaign only
     fields: Array.isArray(row.fields) ? row.fields : [],
   };
 }
@@ -146,7 +147,12 @@ export function useEntityTypes(campaign) {
     staleTime: 60_000,
   });
 
-  const customTypes = useMemo(() => customRows.map(buildCustomMeta), [customRows]);
+  // Account custom types, scoped: account-wide (campaignId null) show everywhere;
+  // campaign-scoped ones only in their campaign.
+  const customTypes = useMemo(
+    () => customRows.map(buildCustomMeta).filter((t) => !t.campaignId || t.campaignId === campaign?.id),
+    [customRows, campaign?.id],
+  );
 
   // The campaign's game system provides its base type set (D&D built-ins, or a
   // pack). getSystem falls back to 5e for legacy/unknown.
