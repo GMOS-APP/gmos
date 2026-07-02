@@ -24,11 +24,12 @@ const CampaignNotes = lazy(() => import('@/pages/CampaignNotes'));
 const CampaignSettings = lazy(() => import('@/pages/CampaignSettings'));
 const PartyInventory = lazy(() => import('@/pages/PartyInventory'));
 const PlayerView = lazy(() => import('@/pages/PlayerView'));
+const EntityTypes = lazy(() => import('@/pages/EntityTypes'));
 
 const PAGES = {
   CampaignDashboard, EntityBrowser, EntityDetail, RelationshipMap, CampaignMap, BattleMap,
   SessionBrowser, SessionPage, RandomTableBrowser, CampaignTimeline,
-  CampaignNotes, CampaignSettings, PartyInventory, PlayerView,
+  CampaignNotes, CampaignSettings, PartyInventory, PlayerView, EntityTypes,
 };
 
 const splitUrl = (url) => {
