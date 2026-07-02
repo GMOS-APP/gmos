@@ -37,10 +37,13 @@ const toastVariants = cva(
   }
 );
 
-const Toast = React.forwardRef(({ className, variant, ...props }, ref) => {
+const Toast = React.forwardRef(({ className, variant, open, onOpenChange, duration, ...props }, ref) => {
+  // open / onOpenChange / duration are toast-state props, not DOM attributes.
+  void open; void onOpenChange; void duration;
   return (
     <div
       ref={ref}
+      data-state={open === false ? "closed" : "open"}
       className={cn(toastVariants({ variant }), className)}
       {...props}
     />

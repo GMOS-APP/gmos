@@ -1,8 +1,12 @@
 // Inspired by react-hot-toast library
 import { useState, useEffect } from "react";
 
-const TOAST_LIMIT = 20;
-const TOAST_REMOVE_DELAY = 1000000;
+const TOAST_LIMIT = 5;
+// Once a toast is dismissed (open:false) it's pulled from state shortly after.
+const TOAST_REMOVE_DELAY = 250;
+// Auto-dismiss timeout for a freshly shown toast (this build renders a plain
+// non-Radix toast, so there's no built-in auto-close — we schedule it here).
+const TOAST_AUTO_DISMISS = 4000;
 
 const actionTypes = {
   ADD_TOAST: "ADD_TOAST",
@@ -133,6 +137,12 @@ function toast({ ...props }) {
       },
     },
   });
+
+  // Auto-dismiss after a few seconds (pass duration: Infinity to keep it up).
+  const duration = props.duration ?? TOAST_AUTO_DISMISS;
+  if (duration !== Infinity) {
+    setTimeout(dismiss, duration);
+  }
 
   return {
     id,
