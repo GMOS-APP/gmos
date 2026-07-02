@@ -125,20 +125,21 @@ export function useEntityTypes(campaign) {
     setCustomTypeRegistry(map);
   }, [customTypes]);
 
-  // Explicit list when set; otherwise (legacy/unconfigured campaigns) default to
-  // all built-ins PLUS every custom type, so a newly created custom type shows up
-  // everywhere without per-campaign setup. Campaigns narrow this via Settings.
-  const enabledKeys = Array.isArray(campaign?.enabled_entity_types)
+  // The per-campaign list only governs which BUILT-IN types are shown (explicit
+  // list when set, else all built-ins). Custom types you've defined are ALWAYS
+  // available in every one of your campaigns — a type you created should never be
+  // un-pickable — so they're never filtered out here.
+  const enabledBuiltins = Array.isArray(campaign?.enabled_entity_types)
     ? campaign.enabled_entity_types
-    : [...BUILTIN_TYPE_KEYS, ...customTypes.map((t) => t.key)];
+    : BUILTIN_TYPE_KEYS;
 
   return useMemo(() => {
     const allTypes = [...BUILTIN_TYPES, ...customTypes];
     const byKey = Object.fromEntries(allTypes.map((t) => [t.key, t]));
-    const types = allTypes.filter((t) => enabledKeys.includes(t.key));
+    const types = allTypes.filter((t) => (t.builtin ? enabledBuiltins.includes(t.key) : true));
     const playerVisibleTypes = types.filter((t) => t.playerVisible);
-    return { types, allTypes, byKey, customTypes, playerVisibleTypes, enabledKeys, isLoading };
-  }, [customTypes, enabledKeys.join(','), isLoading]);
+    return { types, allTypes, byKey, customTypes, playerVisibleTypes, enabledKeys: enabledBuiltins, isLoading };
+  }, [customTypes, enabledBuiltins.join(','), isLoading]);
 }
 
 /**

@@ -205,10 +205,10 @@ export default function CampaignSettings() {
         </div>
         <div className="space-y-3 bg-white dark:bg-zinc-900/40 border border-zinc-200 dark:border-zinc-800/50 rounded-xl p-4">
           <p className="text-xs text-zinc-500 dark:text-zinc-500">
-            Choose which entity types appear in this campaign. Turning one off hides it everywhere; existing entities of that type are kept.
+            Choose which <span className="font-medium text-zinc-600 dark:text-zinc-400">built-in</span> types appear in this campaign. Turning one off hides it everywhere; existing entities of that type are kept.
           </p>
           <div className="flex flex-wrap gap-1.5">
-            {allTypes.map((t) => {
+            {allTypes.filter((t) => t.builtin).map((t) => {
               const on = (form.enabled_entity_types || []).includes(t.key);
               const Icon = t.Icon;
               return (
@@ -225,11 +225,28 @@ export default function CampaignSettings() {
                 >
                   {Icon && <Icon className="w-3 h-3" />}
                   {t.label}
-                  {!t.builtin && <span className="text-[9px] uppercase tracking-wide opacity-60">custom</span>}
                 </button>
               );
             })}
           </div>
+          {allTypes.some((t) => !t.builtin) && (
+            <div className="pt-1">
+              <p className="text-[11px] text-zinc-500 dark:text-zinc-500 mb-1.5">
+                Your custom types are always available in every campaign:
+              </p>
+              <div className="flex flex-wrap gap-1.5">
+                {allTypes.filter((t) => !t.builtin).map((t) => {
+                  const Icon = t.Icon;
+                  return (
+                    <span key={t.key} className={cn('inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border', t.tag)}>
+                      {Icon && <Icon className="w-3 h-3" />}
+                      {t.label}
+                    </span>
+                  );
+                })}
+              </div>
+            </div>
+          )}
         </div>
       </section>
 
