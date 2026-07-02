@@ -16,7 +16,7 @@ export default function UpgradeModal({ open, onOpenChange }) {
   const navigate = useNavigate();
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 sm:max-w-md mx-4">
+      <DialogContent className="bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-zinc-900 dark:text-zinc-100">
             <Sparkles className="w-4 h-4 text-amber-500" /> Upgrade to add more campaigns
