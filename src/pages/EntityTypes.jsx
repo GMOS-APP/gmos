@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import {
-  Plus, Trash2, ArrowLeft, ChevronUp, ChevronDown, Lock, Save, Loader2, Shapes,
+  Plus, Trash2, ArrowLeft, ChevronUp, ChevronDown, Lock, Save, Loader2, Shapes, Copy,
 } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 import { cn } from '@/lib/utils';
@@ -22,6 +22,60 @@ const FIELD_KINDS = [
   { value: 'select', label: 'Dropdown' },
   { value: 'chips', label: 'Tags / list' },
   { value: 'number', label: 'Number' },
+  { value: 'boolean', label: 'Yes / No' },
+  { value: 'url', label: 'Link (URL)' },
+];
+const KINDS_WITH_PLACEHOLDER = ['text', 'textarea', 'number', 'url'];
+
+// Ready-made starting points. Selecting one pre-fills the editor with a sensible
+// icon/color/group and a field set the user can then tweak — so nobody has to
+// build a type from a blank slate.
+const TYPE_TEMPLATES = [
+  { key: 'character', title: 'Character', plural: 'Characters', icon: 'User', color: 'violet', group: 'Characters',
+    fields: [
+      { label: 'Role', kind: 'text', placement: 'spec' },
+      { label: 'Concept', kind: 'text', placement: 'spec' },
+      { label: 'Appearance', kind: 'textarea', placement: 'section' },
+      { label: 'Personality', kind: 'textarea', placement: 'section' },
+      { label: 'Goals & Motives', kind: 'textarea', placement: 'section' },
+      { label: 'Secrets', kind: 'textarea', placement: 'section', gmOnly: true },
+    ] },
+  { key: 'place', title: 'Place', plural: 'Places', icon: 'MapPin', color: 'emerald', group: 'Places',
+    fields: [
+      { label: 'Type', kind: 'text', placement: 'spec' },
+      { label: 'Region', kind: 'text', placement: 'spec' },
+      { label: 'Atmosphere', kind: 'textarea', placement: 'section' },
+      { label: 'Notable Features', kind: 'textarea', placement: 'section' },
+      { label: 'Secrets', kind: 'textarea', placement: 'section', gmOnly: true },
+    ] },
+  { key: 'organization', title: 'Organization', plural: 'Organizations', icon: 'Shield', color: 'rose', group: 'Story',
+    fields: [
+      { label: 'Type', kind: 'text', placement: 'spec' },
+      { label: 'Leadership', kind: 'text', placement: 'spec' },
+      { label: 'Goals', kind: 'textarea', placement: 'section' },
+      { label: 'Resources', kind: 'textarea', placement: 'section' },
+      { label: 'Allies & Enemies', kind: 'textarea', placement: 'section' },
+    ] },
+  { key: 'object', title: 'Object / Item', plural: 'Objects', icon: 'Package', color: 'amber', group: 'Things',
+    fields: [
+      { label: 'Category', kind: 'text', placement: 'spec' },
+      { label: 'Rarity', kind: 'select', options: ['Common', 'Uncommon', 'Rare', 'Legendary'], placement: 'spec' },
+      { label: 'Properties', kind: 'textarea', placement: 'section' },
+      { label: 'History', kind: 'textarea', placement: 'section' },
+    ] },
+  { key: 'creature', title: 'Creature', plural: 'Creatures', icon: 'Skull', color: 'red', group: 'Bestiary',
+    fields: [
+      { label: 'Type', kind: 'text', placement: 'spec' },
+      { label: 'Threat', kind: 'text', placement: 'spec' },
+      { label: 'Notable Traits', kind: 'textarea', placement: 'section' },
+      { label: 'Tactics', kind: 'textarea', placement: 'section', gmOnly: true },
+    ] },
+  { key: 'event', title: 'Event', plural: 'Events', icon: 'Flag', color: 'pink', group: 'Story',
+    fields: [
+      { label: 'When / Trigger', kind: 'text', placement: 'spec' },
+      { label: 'What Happens', kind: 'textarea', placement: 'section' },
+      { label: 'Consequences', kind: 'textarea', placement: 'section' },
+    ] },
 ];
 
 const slugify = (s) => (s || '').toLowerCase().trim().replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '');
@@ -38,7 +92,7 @@ function blankField() {
 }
 
 // ── Type editor ──────────────────────────────────────────────────────────────
-function TypeEditor({ initial, onClose }) {
+function TypeEditor({ initial, existingTypes = [], onClose }) {
   const queryClient = useQueryClient();
   const { toast } = useToast();
   const isNew = !initial.id;
@@ -47,6 +101,33 @@ function TypeEditor({ initial, onClose }) {
 
   const set = (patch) => setForm((f) => ({ ...f, ...patch }));
 
+  // Start-from: pre-fill from a template or by duplicating an existing type.
+  const applyStartFrom = (value) => {
+    if (value === 'blank') { setForm(blankType()); return; }
+    if (value.startsWith('tpl:')) {
+      const t = TYPE_TEMPLATES.find((x) => x.key === value.slice(4));
+      if (t) setForm((f) => ({
+        ...blankType(),
+        label: f.label || t.plural,
+        label_singular: f.label_singular || t.title,
+        icon: t.icon, color: t.color, group_label: t.group,
+        fields: t.fields.map((x) => ({ ...blankField(), ...x })),
+      }));
+      return;
+    }
+    if (value.startsWith('dup:')) {
+      const r = existingTypes.find((x) => x.id === value.slice(4));
+      if (r) setForm({
+        ...blankType(),
+        label: `${r.label} copy`,
+        label_singular: r.label_singular || '',
+        icon: r.icon, color: r.color, group_label: r.group_label || 'Custom',
+        player_visible: !!r.player_visible,
+        fields: (r.fields || []).map((x) => ({ ...blankField(), ...x })),
+      });
+    }
+  };
+
   const setField = (i, patch) => setForm((f) => {
     const fields = f.fields.slice();
     fields[i] = { ...fields[i], ...patch };
@@ -54,6 +135,11 @@ function TypeEditor({ initial, onClose }) {
   });
   const addField = () => setForm((f) => ({ ...f, fields: [...f.fields, blankField()] }));
   const removeField = (i) => setForm((f) => ({ ...f, fields: f.fields.filter((_, idx) => idx !== i) }));
+  const duplicateField = (i) => setForm((f) => {
+    const fields = f.fields.slice();
+    fields.splice(i + 1, 0, { ...f.fields[i], key: '', label: `${f.fields[i].label} copy` });
+    return { ...f, fields };
+  });
   const moveField = (i, dir) => setForm((f) => {
     const j = i + dir;
     if (j < 0 || j >= f.fields.length) return f;
@@ -99,6 +185,7 @@ function TypeEditor({ initial, onClose }) {
           kind: f.kind,
           placement: f.placement,
           gmOnly: !!f.gmOnly,
+          ...(f.placeholder && f.placeholder.trim() ? { placeholder: f.placeholder.trim() } : {}),
           ...(f.kind === 'select' ? { options: (Array.isArray(f.options) ? f.options : String(f.options).split(',')).map((o) => o.trim()).filter(Boolean) } : {}),
         };
       });
@@ -122,6 +209,28 @@ function TypeEditor({ initial, onClose }) {
       <button onClick={onClose} className="inline-flex items-center gap-1.5 text-sm text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-300">
         <ArrowLeft className="w-4 h-4" /> All types
       </button>
+
+      {/* Start from a template / duplicate (new types only) */}
+      {isNew && (
+        <div className="space-y-1.5 rounded-lg border border-zinc-200 dark:border-zinc-800/60 bg-zinc-50 dark:bg-zinc-900/40 p-3">
+          <label className="text-xs font-medium text-zinc-600 dark:text-zinc-400">Start from</label>
+          <Select onValueChange={applyStartFrom}>
+            <SelectTrigger className="w-full sm:w-80 h-9 dark:bg-zinc-950 dark:border-zinc-800">
+              <SelectValue placeholder="Blank — build from scratch" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="blank">Blank — build from scratch</SelectItem>
+              {TYPE_TEMPLATES.map((t) => (
+                <SelectItem key={t.key} value={`tpl:${t.key}`}>Template · {t.title}</SelectItem>
+              ))}
+              {existingTypes.map((r) => (
+                <SelectItem key={r.id} value={`dup:${r.id}`}>Duplicate · {r.label}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <p className="text-[11px] text-zinc-500 dark:text-zinc-500">Pre-fills the icon, color, and fields — tweak anything after.</p>
+        </div>
+      )}
 
       {/* Identity */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -222,7 +331,8 @@ function TypeEditor({ initial, onClose }) {
                 <div className="flex items-center">
                   <button type="button" onClick={() => moveField(i, -1)} className="p-1 text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-300 disabled:opacity-30" disabled={i === 0}><ChevronUp className="w-4 h-4" /></button>
                   <button type="button" onClick={() => moveField(i, 1)} className="p-1 text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-300 disabled:opacity-30" disabled={i === form.fields.length - 1}><ChevronDown className="w-4 h-4" /></button>
-                  <button type="button" onClick={() => removeField(i)} className="p-1 text-zinc-400 hover:text-red-500"><Trash2 className="w-4 h-4" /></button>
+                  <button type="button" title="Duplicate field" onClick={() => duplicateField(i)} className="p-1 text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-300"><Copy className="w-4 h-4" /></button>
+                  <button type="button" title="Remove field" onClick={() => removeField(i)} className="p-1 text-zinc-400 hover:text-red-500"><Trash2 className="w-4 h-4" /></button>
                 </div>
               </div>
               <div className="flex flex-wrap items-center gap-2">
@@ -247,6 +357,14 @@ function TypeEditor({ initial, onClose }) {
                   value={Array.isArray(f.options) ? f.options.join(', ') : (f.options || '')}
                   onChange={(e) => setField(i, { options: e.target.value.split(',').map((o) => o.trimStart()) })}
                   placeholder="Dropdown options, comma-separated"
+                  className="h-8 text-sm dark:bg-zinc-950 dark:border-zinc-800"
+                />
+              )}
+              {KINDS_WITH_PLACEHOLDER.includes(f.kind) && (
+                <Input
+                  value={f.placeholder || ''}
+                  onChange={(e) => setField(i, { placeholder: e.target.value })}
+                  placeholder="Hint text shown in the form (optional)"
                   className="h-8 text-sm dark:bg-zinc-950 dark:border-zinc-800"
                 />
               )}
@@ -311,7 +429,7 @@ export default function EntityTypes() {
       </div>
 
       {editing ? (
-        <TypeEditor initial={editing} onClose={() => setEditing(null)} />
+        <TypeEditor initial={editing} existingTypes={types} onClose={() => setEditing(null)} />
       ) : (
         <>
           <div className="flex justify-end">

@@ -1,6 +1,7 @@
 import React from 'react';
 import { Lock } from 'lucide-react';
 import { Input } from '@/components/ui/input';
+import { Switch } from '@/components/ui/switch';
 import EntityMentionTextarea from '@/components/common/EntityMentionTextarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
@@ -62,12 +63,17 @@ export default function SchemaFields({ fields = [], extraData, onChange }) {
                   ))}
                 </SelectContent>
               </Select>
+            ) : f.kind === 'boolean' ? (
+              <div className="flex items-center gap-2 h-9">
+                <Switch checked={get(f.key) === 'Yes'} onCheckedChange={(v) => set(f.key, v ? 'Yes' : '')} />
+                <span className="text-sm text-zinc-500 dark:text-zinc-400">{get(f.key) === 'Yes' ? 'Yes' : 'No'}</span>
+              </div>
             ) : (
               <Input
-                type={f.kind === 'number' ? 'number' : 'text'}
+                type={f.kind === 'number' ? 'number' : f.kind === 'url' ? 'url' : 'text'}
                 value={get(f.key)}
                 onChange={(e) => set(f.key, e.target.value)}
-                placeholder={f.kind === 'chips' ? 'Comma-separated…' : (f.placeholder || '')}
+                placeholder={f.kind === 'chips' ? 'Comma-separated…' : (f.placeholder || (f.kind === 'url' ? 'https://…' : ''))}
                 className={inputCls}
               />
             )}
