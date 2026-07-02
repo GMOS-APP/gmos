@@ -1,13 +1,14 @@
 import { QueryClient, MutationCache } from '@tanstack/react-query';
 import { toast } from '@/components/ui/use-toast';
 
-// Surface mutation failures to the user instead of failing silently. A mutation
-// can still opt out by handling onError itself and setting meta.silent, or by
-// providing its own toast (this fires in addition, so prefer meta.silent there).
+// Fallback surfacing of mutation failures so they never fail silently. This is
+// ONLY for mutations that don't handle errors themselves — if a mutation defines
+// its own onError (its own friendly toast) or opts out via meta.silent, the
+// generic toast is skipped so the user doesn't see two messages.
 export const queryClientInstance = new QueryClient({
 	mutationCache: new MutationCache({
 		onError: (error, _vars, _ctx, mutation) => {
-			if (mutation?.meta?.silent) return;
+			if (mutation?.meta?.silent || mutation?.options?.onError) return;
 			toast({
 				title: 'Something went wrong',
 				description: error?.message || 'The action could not be completed. Please try again.',
