@@ -216,9 +216,15 @@ function EntityDetailInner() {
   const [newTag, setNewTag] = useState('');
   const [newFact, setNewFact] = useState('');
   const [saved, setSaved] = useState(false);
-  // Skip the "how to create" chooser when we already have a name (e.g. from the
-  // Name Generator) — jump straight to the manual form with the name prefilled.
-  const [entryMode, setEntryMode] = useState(isNew && !nameParam ? null : 'manual'); // null | 'manual' | 'dnd_import' | 'open5e'
+  // The "how to create" chooser only makes sense when there's actually an import
+  // option for this type/system (SRD/D&D Beyond). For custom types — and any type
+  // with no imports — skip it and jump straight to the manual form. Also skipped
+  // when a name is prefilled (e.g. from the Name Generator).
+  const hasImportOptions =
+    (['creature', 'item', 'lore'].includes(defaultType) && system.hasSrdImport) ||
+    (defaultType === 'player_character' && system.hasDndBeyondImport);
+  const initialEntryMode = isNew && !nameParam && hasImportOptions ? null : 'manual';
+  const [entryMode, setEntryMode] = useState(initialEntryMode); // null | 'manual' | 'dnd_import' | 'open5e'
   const [descriptionMode, setDescriptionMode] = useState('edit'); // 'edit' | 'preview'
 
   // Reset all state when navigating to a different entity
@@ -232,7 +238,7 @@ function EntityDetailInner() {
     setNewTag('');
     setNewFact('');
     setSaved(false);
-    setEntryMode(isNew && !nameParam ? null : 'manual');
+    setEntryMode(initialEntryMode);
     setDescriptionMode('edit');
     setPageMode(isNew ? 'edit' : 'view');
     // eslint-disable-next-line react-hooks/exhaustive-deps
