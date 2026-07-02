@@ -16,7 +16,7 @@ import { useToast } from '@/components/ui/use-toast';
 import { useHotkeysEnabled, setHotkeysEnabled } from '@/lib/useHotkeysEnabled';
 import { useWindowMode, setWindowModeEnabled } from '@/lib/useWindowMode';
 import { MOD_LABEL } from '@/lib/useHotkeys';
-import { useEntityTypes, BUILTIN_TYPE_KEYS } from '@/lib/entityTypes';
+import { useEntityTypes } from '@/lib/entityTypes';
 import { cn } from '@/lib/utils';
 
 const STATUS_OPTIONS = [
@@ -44,7 +44,7 @@ export default function CampaignSettings() {
   const [confirmDelete, setConfirmDelete] = useState(false);
   const hotkeysEnabled = useHotkeysEnabled();
   const windowModeOn = useWindowMode();
-  const { allTypes } = useEntityTypes(campaign);
+  const { allTypes, enabledKeys } = useEntityTypes(campaign);
 
   useEffect(() => {
     if (campaign && !form) {
@@ -55,7 +55,7 @@ export default function CampaignSettings() {
         hook: campaign.hook || '',
         system: campaign.system || 'dnd5e',
         status: campaign.status || 'active',
-        enabled_entity_types: campaign.enabled_entity_types || BUILTIN_TYPE_KEYS,
+        enabled_entity_types: campaign.enabled_entity_types || enabledKeys,
       });
     }
   }, [campaign, form]);
@@ -101,7 +101,7 @@ export default function CampaignSettings() {
     form.setting !== (campaign.setting || '') ||
     form.hook !== (campaign.hook || '') ||
     form.status !== (campaign.status || 'active') ||
-    sortedKeys(form.enabled_entity_types) !== sortedKeys(campaign.enabled_entity_types || BUILTIN_TYPE_KEYS)
+    sortedKeys(form.enabled_entity_types) !== sortedKeys(campaign.enabled_entity_types || enabledKeys)
   );
 
   const toggleType = (key) => setForm((f) => {
@@ -205,10 +205,10 @@ export default function CampaignSettings() {
         </div>
         <div className="space-y-3 bg-white dark:bg-zinc-900/40 border border-zinc-200 dark:border-zinc-800/50 rounded-xl p-4">
           <p className="text-xs text-zinc-500 dark:text-zinc-500">
-            Choose which <span className="font-medium text-zinc-600 dark:text-zinc-400">built-in</span> types appear in this campaign. Turning one off hides it everywhere; existing entities of that type are kept.
+            Choose which of this system&rsquo;s types appear in this campaign. Turning one off hides it everywhere; existing entities of that type are kept.
           </p>
           <div className="flex flex-wrap gap-1.5">
-            {allTypes.filter((t) => t.builtin).map((t) => {
+            {allTypes.filter((t) => t.source === 'system').map((t) => {
               const on = (form.enabled_entity_types || []).includes(t.key);
               const Icon = t.Icon;
               return (
@@ -229,13 +229,13 @@ export default function CampaignSettings() {
               );
             })}
           </div>
-          {allTypes.some((t) => !t.builtin) && (
+          {allTypes.some((t) => t.source === 'custom') && (
             <div className="pt-1">
               <p className="text-[11px] text-zinc-500 dark:text-zinc-500 mb-1.5">
                 Your custom types are always available in every campaign:
               </p>
               <div className="flex flex-wrap gap-1.5">
-                {allTypes.filter((t) => !t.builtin).map((t) => {
+                {allTypes.filter((t) => t.source === 'custom').map((t) => {
                   const Icon = t.Icon;
                   return (
                     <span key={t.key} className={cn('inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border', t.tag)}>

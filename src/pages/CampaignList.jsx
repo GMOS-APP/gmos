@@ -20,7 +20,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import QueryError from '@/components/common/QueryError';
 import { DEFAULT_SYSTEM_ID, SYSTEMS } from '@/lib/systems';
-import { useEntityTypes } from '@/lib/entityTypes';
+import { useEntityTypes, systemDefaultTypeKeys } from '@/lib/entityTypes';
 import UpgradeModal from '@/components/billing/UpgradeModal';
 import BetaBadge from '@/components/common/BetaBadge';
 import { FREE_CAMPAIGN_LIMIT, isCampaignLimitError } from '@/lib/plans';
@@ -110,10 +110,10 @@ export default function CampaignList() {
 
   const createMutation = useMutation({
     mutationFn: (data) => {
-      // Seed enabled types from the system preset + every existing custom type,
-      // so custom types show in new campaigns without extra setup.
+      // Seed enabled types from the chosen system's pack (built-ins or a system
+      // pack) + every existing custom type, so nothing needs manual enabling.
       const sys = SYSTEMS[data.system] || SYSTEMS[DEFAULT_SYSTEM_ID];
-      const enabled_entity_types = [...sys.defaultEntityTypes, ...customTypes.map((t) => t.key)];
+      const enabled_entity_types = [...systemDefaultTypeKeys(sys), ...customTypes.map((t) => t.key)];
       return Campaign.create({ ...data, enabled_entity_types });
     },
     onSuccess: () => {
@@ -377,7 +377,7 @@ export default function CampaignList() {
 
       {/* Create Dialog */}
       <Dialog open={showCreate} onOpenChange={setShowCreate}>
-        <DialogContent className="bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 sm:max-w-md mx-4">
+        <DialogContent className="bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 sm:max-w-md mx-4 max-h-[85vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>New Campaign</DialogTitle>
           </DialogHeader>
@@ -403,7 +403,7 @@ export default function CampaignList() {
                         {sys.label}
                       </span>
                       <span className="block text-[11px] text-zinc-500 dark:text-zinc-500 mt-0.5">
-                        {sys.id === 'dnd5e' ? 'Stat blocks, CR, SRD import' : 'System-agnostic · your own types'}
+                        {sys.tagline}
                       </span>
                     </button>
                   );

@@ -11,6 +11,8 @@ import {
 } from 'lucide-react';
 import { EntityType, Campaign } from '@/api/entities';
 import { ENTITY_TYPE_META, setCustomTypeRegistry } from './entityColors';
+import { getSystem } from './systems';
+import { SYSTEM_PACKS } from './systemPacks';
 
 // ── Color presets ───────────────────────────────────────────────────────────
 // Fixed palette for custom types. Class strings are written out LITERALLY so
@@ -80,8 +82,9 @@ export const BUILTIN_TYPES = BUILTIN_CONFIG.map((c) => ({
   labelSingular: c.labelSingular,
   group: c.group,
   playerVisible: c.playerVisible,
-  builtin: true,
-  fields: null, // built-ins use bespoke field components, not a schema
+  builtin: true,      // D&D built-in — has a bespoke edit component / stat block
+  source: 'system',   // provided by the campaign's game system (governed by enabled list)
+  fields: null,
 }));
 
 export const BUILTIN_TYPE_KEYS = BUILTIN_TYPES.map((t) => t.key);
@@ -97,9 +100,36 @@ export function buildCustomMeta(row) {
     group: row.group_label || 'Custom',
     playerVisible: !!row.player_visible,
     builtin: false,
+    source: 'custom',  // account-defined — always available in every campaign
     fields: Array.isArray(row.fields) ? row.fields : [],
   };
 }
+
+// Build meta from a code-defined system-pack type (systemPacks.js). Schema-driven
+// like custom types, but provided by the game system (governed by enabled list).
+export function buildPackMeta(t) {
+  return {
+    ...(COLOR_PRESETS[t.color] || COLOR_PRESETS.slate),
+    key: t.key,
+    label: t.label,
+    labelSingular: t.labelSingular || t.label,
+    Icon: resolveIcon(t.icon),
+    group: t.group || 'Entities',
+    playerVisible: !!t.playerVisible,
+    builtin: false,
+    source: 'system',
+    fields: Array.isArray(t.fields) ? t.fields : [],
+  };
+}
+
+// The entity types a system provides out of the box (before per-campaign edits):
+// the D&D built-ins for dnd5e/pf2e, or the system's pack otherwise.
+export function systemTypeMetas(system) {
+  const pack = system?.packId && SYSTEM_PACKS[system.packId];
+  return pack ? pack.map(buildPackMeta) : BUILTIN_TYPES;
+}
+
+export const systemDefaultTypeKeys = (system) => systemTypeMetas(system).map((t) => t.key);
 
 /**
  * Account custom types + built-ins, filtered to a campaign's enabled set.
@@ -118,28 +148,32 @@ export function useEntityTypes(campaign) {
 
   const customTypes = useMemo(() => customRows.map(buildCustomMeta), [customRows]);
 
-  // Publish custom meta so synchronous getEntityColors() call sites resolve them.
+  // The campaign's game system provides its base type set (D&D built-ins, or a
+  // pack). getSystem falls back to 5e for legacy/unknown.
+  const systemTypes = useMemo(() => systemTypeMetas(getSystem(campaign)), [campaign?.system]);
+
+  // Publish system + custom meta so synchronous getEntityColors() call sites
+  // resolve pack and custom types (built-ins are already in ENTITY_TYPE_META).
   useEffect(() => {
     const map = {};
-    for (const t of customTypes) map[t.key] = t;
+    for (const t of [...systemTypes, ...customTypes]) map[t.key] = t;
     setCustomTypeRegistry(map);
-  }, [customTypes]);
+  }, [systemTypes, customTypes]);
 
-  // The per-campaign list only governs which BUILT-IN types are shown (explicit
-  // list when set, else all built-ins). Custom types you've defined are ALWAYS
-  // available in every one of your campaigns — a type you created should never be
-  // un-pickable — so they're never filtered out here.
-  const enabledBuiltins = Array.isArray(campaign?.enabled_entity_types)
+  // The per-campaign list governs which SYSTEM types are shown (explicit list
+  // when set, else the system's full set). Account custom types are ALWAYS
+  // available — a type you created should never be un-pickable.
+  const enabledSystem = Array.isArray(campaign?.enabled_entity_types)
     ? campaign.enabled_entity_types
-    : BUILTIN_TYPE_KEYS;
+    : systemTypes.map((t) => t.key);
 
   return useMemo(() => {
-    const allTypes = [...BUILTIN_TYPES, ...customTypes];
+    const allTypes = [...systemTypes, ...customTypes];
     const byKey = Object.fromEntries(allTypes.map((t) => [t.key, t]));
-    const types = allTypes.filter((t) => (t.builtin ? enabledBuiltins.includes(t.key) : true));
+    const types = allTypes.filter((t) => (t.source === 'custom' ? true : enabledSystem.includes(t.key)));
     const playerVisibleTypes = types.filter((t) => t.playerVisible);
-    return { types, allTypes, byKey, customTypes, playerVisibleTypes, enabledKeys: enabledBuiltins, isLoading };
-  }, [customTypes, enabledBuiltins.join(','), isLoading]);
+    return { types, allTypes, byKey, systemTypes, customTypes, playerVisibleTypes, enabledKeys: enabledSystem, isLoading };
+  }, [systemTypes, customTypes, enabledSystem.join(','), isLoading]);
 }
 
 /**
