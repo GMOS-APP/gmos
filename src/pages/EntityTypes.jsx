@@ -83,7 +83,7 @@ const slugify = (s) => (s || '').toLowerCase().trim().replace(/[^a-z0-9]+/g, '_'
 function blankType() {
   return {
     key: '', label: '', label_singular: '', icon: 'Shapes', color: 'slate',
-    group_label: 'Custom', player_visible: false, campaign_id: null, fields: [],
+    group_label: 'Custom', player_visible: false, fields: [],
   };
 }
 
@@ -92,7 +92,7 @@ function blankField() {
 }
 
 // ── Type editor ──────────────────────────────────────────────────────────────
-function TypeEditor({ initial, existingTypes = [], campaignId, onClose }) {
+function TypeEditor({ initial, existingTypes = [], onClose }) {
   const queryClient = useQueryClient();
   const { toast } = useToast();
   const isNew = !initial.id;
@@ -197,7 +197,6 @@ function TypeEditor({ initial, existingTypes = [], campaignId, onClose }) {
       color: form.color,
       group_label: form.group_label.trim() || 'Custom',
       player_visible: !!form.player_visible,
-      campaign_id: form.campaign_id || null,
       fields,
     });
   };
@@ -295,38 +294,6 @@ function TypeEditor({ initial, existingTypes = [], campaignId, onClose }) {
               </button>
             );
           })}
-        </div>
-      )}
-
-      {/* Availability scope — only offer "this campaign only" when opened from
-          within a campaign (otherwise there's no campaign to scope to). */}
-      {campaignId && (
-        <div className="space-y-1.5">
-          <label className="text-xs font-medium text-zinc-600 dark:text-zinc-400">Available in</label>
-          <div className="grid grid-cols-2 gap-2 max-w-md">
-            {[
-              { val: null, title: 'Every campaign', sub: 'Shows in all your campaigns' },
-              { val: campaignId, title: 'This campaign only', sub: 'Only in the current campaign' },
-            ].map((opt) => {
-              const active = (form.campaign_id || null) === opt.val;
-              return (
-                <button
-                  key={opt.title}
-                  type="button"
-                  onClick={() => set({ campaign_id: opt.val })}
-                  className={cn(
-                    'text-left rounded-lg border px-3 py-2 transition-colors',
-                    active
-                      ? 'border-amber-500 bg-amber-500/10 dark:bg-amber-500/[0.07]'
-                      : 'border-zinc-300 dark:border-zinc-800 hover:border-zinc-400 dark:hover:border-zinc-700'
-                  )}
-                >
-                  <span className={cn('block text-sm font-medium', active ? 'text-amber-700 dark:text-amber-400' : 'text-zinc-800 dark:text-zinc-200')}>{opt.title}</span>
-                  <span className="block text-[11px] text-zinc-500 dark:text-zinc-500 mt-0.5">{opt.sub}</span>
-                </button>
-              );
-            })}
-          </div>
         </div>
       )}
 
@@ -463,7 +430,7 @@ export default function EntityTypes() {
       </div>
 
       {editing ? (
-        <TypeEditor initial={editing} existingTypes={types} campaignId={campaignId} onClose={() => setEditing(null)} />
+        <TypeEditor initial={editing} existingTypes={types} onClose={() => setEditing(null)} />
       ) : (
         <>
           <div className="flex justify-end">
@@ -495,7 +462,6 @@ export default function EntityTypes() {
                       <p className="text-sm font-semibold text-zinc-800 dark:text-zinc-200">{t.label}</p>
                       <p className="text-xs text-zinc-500 dark:text-zinc-500">
                         {fieldCount} field{fieldCount === 1 ? '' : 's'}
-                        {' · '}{t.campaign_id ? 'this campaign only' : 'every campaign'}
                         {t.player_visible && ' · player-visible'}
                         {t.group_label && t.group_label !== 'Custom' && ` · ${t.group_label}`}
                       </p>

@@ -100,8 +100,7 @@ export function buildCustomMeta(row) {
     group: row.group_label || 'Custom',
     playerVisible: !!row.player_visible,
     builtin: false,
-    source: 'custom',  // account-defined — always available (subject to scope below)
-    campaignId: row.campaign_id || null, // null = every campaign; set = that campaign only
+    source: 'custom',  // account-defined — available in every campaign unless disabled there
     fields: Array.isArray(row.fields) ? row.fields : [],
   };
 }
@@ -147,12 +146,9 @@ export function useEntityTypes(campaign) {
     staleTime: 60_000,
   });
 
-  // Account custom types, scoped: account-wide (campaignId null) show everywhere;
-  // campaign-scoped ones only in their campaign.
-  const customTypes = useMemo(
-    () => customRows.map(buildCustomMeta).filter((t) => !t.campaignId || t.campaignId === campaign?.id),
-    [customRows, campaign?.id],
-  );
+  // Account custom types are available in every campaign (subject to the
+  // per-campaign OFF switch applied below).
+  const customTypes = useMemo(() => customRows.map(buildCustomMeta), [customRows]);
 
   // The campaign's game system provides its base type set (D&D built-ins, or a
   // pack). getSystem falls back to 5e for legacy/unknown.
@@ -172,14 +168,20 @@ export function useEntityTypes(campaign) {
   const enabledSystem = Array.isArray(campaign?.enabled_entity_types)
     ? campaign.enabled_entity_types
     : systemTypes.map((t) => t.key);
+  // Custom types are ON by default; keys here are switched OFF for this campaign.
+  const disabledCustom = Array.isArray(campaign?.disabled_entity_types)
+    ? campaign.disabled_entity_types
+    : [];
 
   return useMemo(() => {
     const allTypes = [...systemTypes, ...customTypes];
     const byKey = Object.fromEntries(allTypes.map((t) => [t.key, t]));
-    const types = allTypes.filter((t) => (t.source === 'custom' ? true : enabledSystem.includes(t.key)));
+    const types = allTypes.filter((t) => (
+      t.source === 'custom' ? !disabledCustom.includes(t.key) : enabledSystem.includes(t.key)
+    ));
     const playerVisibleTypes = types.filter((t) => t.playerVisible);
-    return { types, allTypes, byKey, systemTypes, customTypes, playerVisibleTypes, enabledKeys: enabledSystem, isLoading };
-  }, [systemTypes, customTypes, enabledSystem.join(','), isLoading]);
+    return { types, allTypes, byKey, systemTypes, customTypes, playerVisibleTypes, enabledKeys: enabledSystem, disabledCustom, isLoading };
+  }, [systemTypes, customTypes, enabledSystem.join(','), disabledCustom.join(','), isLoading]);
 }
 
 /**

@@ -56,6 +56,7 @@ export default function CampaignSettings() {
         system: campaign.system || 'dnd5e',
         status: campaign.status || 'active',
         enabled_entity_types: campaign.enabled_entity_types || enabledKeys,
+        disabled_entity_types: campaign.disabled_entity_types || [],
       });
     }
   }, [campaign, form]);
@@ -101,13 +102,21 @@ export default function CampaignSettings() {
     form.setting !== (campaign.setting || '') ||
     form.hook !== (campaign.hook || '') ||
     form.status !== (campaign.status || 'active') ||
-    sortedKeys(form.enabled_entity_types) !== sortedKeys(campaign.enabled_entity_types || enabledKeys)
+    sortedKeys(form.enabled_entity_types) !== sortedKeys(campaign.enabled_entity_types || enabledKeys) ||
+    sortedKeys(form.disabled_entity_types) !== sortedKeys(campaign.disabled_entity_types || [])
   );
 
+  // System/pack types: allowlist (enabled_entity_types). Custom types: denylist
+  // (disabled_entity_types) — on by default, listed = off for this campaign.
   const toggleType = (key) => setForm((f) => {
     const set = new Set(f.enabled_entity_types || []);
     set.has(key) ? set.delete(key) : set.add(key);
     return { ...f, enabled_entity_types: [...set] };
+  });
+  const toggleCustom = (key) => setForm((f) => {
+    const set = new Set(f.disabled_entity_types || []);
+    set.has(key) ? set.delete(key) : set.add(key);
+    return { ...f, disabled_entity_types: [...set] };
   });
 
   if (isLoading || !form) {
@@ -232,16 +241,27 @@ export default function CampaignSettings() {
           {allTypes.some((t) => t.source === 'custom') && (
             <div className="pt-1">
               <p className="text-[11px] text-zinc-500 dark:text-zinc-500 mb-1.5">
-                Your custom types are always available in every campaign:
+                Your custom types are available everywhere by default — turn any off just for this campaign:
               </p>
               <div className="flex flex-wrap gap-1.5">
                 {allTypes.filter((t) => t.source === 'custom').map((t) => {
+                  const on = !(form.disabled_entity_types || []).includes(t.key);
                   const Icon = t.Icon;
                   return (
-                    <span key={t.key} className={cn('inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border', t.tag)}>
+                    <button
+                      key={t.key}
+                      type="button"
+                      onClick={() => toggleCustom(t.key)}
+                      className={cn(
+                        'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border transition-colors',
+                        on
+                          ? 'bg-amber-500/10 dark:bg-amber-500/[0.08] border-amber-500/40 text-amber-700 dark:text-amber-400'
+                          : 'border-zinc-300 dark:border-zinc-800 text-zinc-400 dark:text-zinc-600 hover:border-zinc-400 dark:hover:border-zinc-700'
+                      )}
+                    >
                       {Icon && <Icon className="w-3 h-3" />}
                       {t.label}
-                    </span>
+                    </button>
                   );
                 })}
               </div>
