@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from 'react';
+import { getEntityTypeLabel } from '@/lib/entityColors';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Session } from '@/api/entities';
 import { Link2, X, Check } from 'lucide-react';
@@ -61,7 +62,7 @@ export default function AutoLinkerSuggestions({ notes, entities, session }) {
             className="flex items-center gap-1.5 bg-zinc-900 border border-zinc-700 rounded-md px-2 py-1 text-xs"
           >
             <span className="text-zinc-300">{entity.name}</span>
-            <span className="text-zinc-600 capitalize">{entity.entity_type}</span>
+            <span className="text-zinc-600">{getEntityTypeLabel(entity.entity_type)}</span>
             <button
               onClick={() => linkMutation.mutate(entity)}
               className="ml-1 text-emerald-400 hover:text-emerald-300"

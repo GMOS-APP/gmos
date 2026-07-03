@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
+import { getEntityTypeLabel } from '@/lib/entityColors';
 import { useQuery } from '@tanstack/react-query';
 import { WorldEntity } from '@/api/entities';
 import { AtSign, Plus, Loader2 } from 'lucide-react';
@@ -202,7 +203,7 @@ export default function EntityMentionTextarea({
                     {entity.name}
                   </p>
                   <p className="text-[11px] dark:text-zinc-500 text-zinc-600 capitalize truncate">
-                    {entity.entity_type}{entity.summary ? ` · ${entity.summary}` : ''}
+                    {getEntityTypeLabel(entity.entity_type)}{entity.summary ? ` · ${entity.summary}` : ''}
                   </p>
                 </div>
               </button>

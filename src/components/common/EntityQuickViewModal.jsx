@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { ExternalLink, X } from 'lucide-react';
-import { getEntityColors } from '@/lib/entityColors';
+import { getEntityColors, getEntityTypeLabel } from '@/lib/entityColors';
 
 const POPUP_WIDTH = 300;
 
@@ -68,7 +68,7 @@ export default function EntityQuickViewModal({ entity, campaignId, open, onOpenC
         <div className="flex-1 min-w-0">
           <p className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 leading-tight truncate">{entity.name}</p>
           <span className={`inline-block text-[10px] font-medium px-1.5 py-0.5 rounded-full border mt-0.5 capitalize ${colors}`}>
-            {entity.entity_type?.replace('_', ' ')}
+            {getEntityTypeLabel(entity.entity_type)}
           </span>
         </div>
         <button onClick={() => onOpenChange(false)} className="text-zinc-400 dark:text-zinc-500 hover:text-zinc-600 dark:hover:text-zinc-300 flex-shrink-0 mt-0.5">

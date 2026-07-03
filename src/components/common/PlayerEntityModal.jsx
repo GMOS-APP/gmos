@@ -48,7 +48,7 @@ export default function PlayerEntityModal({ entity, open, onOpenChange, onAddToI
         <div className="p-5">
           <div className="flex flex-wrap items-center gap-2 mb-2">
             <span className={cn('inline-flex items-center gap-1 text-[11px] font-medium px-2 py-0.5 rounded-full border capitalize', meta.tag)}>
-              <Icon className="w-3 h-3" /> {typeLabel(entity.entity_type)}
+              <Icon className="w-3 h-3" /> {meta.labelSingular || typeLabel(entity.entity_type)}
             </span>
             {vis && (
               <span className={cn('inline-flex items-center gap-1 text-[11px] font-medium', vis.color)}>

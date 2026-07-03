@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { cn } from '@/lib/utils';
-import { getEntityColors } from '@/lib/entityColors';
+import { getEntityColors, getEntityTypeLabel } from '@/lib/entityColors';
 import EntityAvatar from '@/components/entity/EntityAvatar';
 
 export default function RecentEntities({ entities = [] }) {
@@ -34,7 +34,7 @@ export default function RecentEntities({ entities = [] }) {
               )}
             </div>
             <span className={cn("text-[10px] uppercase tracking-wider font-medium", color)}>
-              {entity.entity_type?.replace('_', ' ')}
+              {getEntityTypeLabel(entity.entity_type)}
             </span>
           </Link>
         );

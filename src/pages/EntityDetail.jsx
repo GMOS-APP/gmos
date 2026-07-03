@@ -27,7 +27,7 @@ import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter,
 } from '@/components/ui/dialog';
 import { CampaignProvider, useCampaign } from '@/lib/CampaignContext';
-import { getEntityColors } from '@/lib/entityColors';
+import { getEntityColors, getEntityTypeLabel } from '@/lib/entityColors';
 import { useEntityTypes } from '@/lib/entityTypes';
 import { useToast } from '@/components/ui/use-toast';
 const statuses = ['active', 'inactive', 'dead', 'destroyed', 'resolved', 'unknown'];
@@ -261,7 +261,7 @@ function EntityDetailInner() {
   // Type metadata for the current entity. Custom types carry a `fields` schema
   // that drives their editor + read view; built-ins have bespoke components.
   const currentTypeMeta = entityTypesByKey[form.entity_type];
-  const currentTypeLabel = currentTypeMeta?.labelSingular || form.entity_type.replace('_', ' ');
+  const currentTypeLabel = currentTypeMeta?.labelSingular || getEntityTypeLabel(form.entity_type);
   const currentTypeFields = currentTypeMeta?.builtin === false ? currentTypeMeta.fields : null;
   // Always keep the current type selectable, even if disabled for this campaign.
   const typeOptions = entityTypes.some((t) => t.key === form.entity_type)
@@ -493,7 +493,7 @@ function EntityDetailInner() {
             </h1>
             <div className="flex flex-wrap items-center gap-2">
               <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border capitalize ${getEntityColors(form.entity_type).tag}`}>
-                {form.entity_type.replace('_', ' ')}
+                {currentTypeLabel}
               </span>
               <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border capitalize ${STATUS_COLORS[form.status] || 'bg-zinc-500/15 text-zinc-400 border-zinc-500/30'}`}>
                 {form.status}

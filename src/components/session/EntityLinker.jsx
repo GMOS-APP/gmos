@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { getEntityTypeLabel } from '@/lib/entityColors';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { WorldEntity, Session } from '@/api/entities';
 import { Link as LinkIcon, X, Plus } from 'lucide-react';
@@ -115,7 +116,7 @@ export default function EntityLinker({ session, campaignId }) {
                         <span className="text-2xl">{ENTITY_ICONS[entity.entity_type] || '📌'}</span>
                         <div className="flex-1">
                           <div className="font-medium text-zinc-200">{entity.name}</div>
-                          <div className="text-xs text-zinc-500 capitalize">{entity.entity_type.replace('_', ' ')}</div>
+                          <div className="text-xs text-zinc-500 capitalize">{getEntityTypeLabel(entity.entity_type)}</div>
                         </div>
                       </button>
                     ))}
@@ -127,7 +128,7 @@ export default function EntityLinker({ session, campaignId }) {
                     <span className="text-2xl">{ENTITY_ICONS[selectedEntity.entity_type] || '📌'}</span>
                     <div className="flex-1">
                       <div className="font-medium text-zinc-200">{selectedEntity.name}</div>
-                      <div className="text-xs text-zinc-500 capitalize">{selectedEntity.entity_type.replace('_', ' ')}</div>
+                      <div className="text-xs text-zinc-500 capitalize">{getEntityTypeLabel(selectedEntity.entity_type)}</div>
                     </div>
                     <button
                       onClick={() => setSelectedEntity(null)}
@@ -182,7 +183,7 @@ export default function EntityLinker({ session, campaignId }) {
                       {le.entity_name}
                     </span>
                     <Badge variant="outline" className="text-[10px] border-zinc-700 text-zinc-500 capitalize">
-                      {le.entity_type.replace('_', ' ')}
+                      {getEntityTypeLabel(le.entity_type)}
                     </Badge>
                   </div>
                   {le.context && (

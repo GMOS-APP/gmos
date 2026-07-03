@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { WorldEntity, Session } from '@/api/entities';
 import { createPageUrl } from '@/utils';
-import { getEntityColors } from '@/lib/entityColors';
+import { getEntityColors, getEntityTypeLabel } from '@/lib/entityColors';
 import { useCampaignEntityTypes } from '@/lib/entityTypes';
 import { useAuth } from '@/lib/AuthContext';
 import EntityAvatar from '@/components/entity/EntityAvatar';
@@ -69,7 +69,7 @@ export default function CommandPalette({ open, onOpenChange, campaignId, onStart
         .map((e) => ({
           id: e.id,
           label: e.name,
-          sub: e.summary || e.entity_type,
+          sub: e.summary || getEntityTypeLabel(e.entity_type),
           type: e.entity_type,
           image_url: e.image_url || null,
           href: createPageUrl('EntityDetail') + `?id=${e.id}&campaign_id=${campaignId}`,
@@ -156,7 +156,7 @@ export default function CommandPalette({ open, onOpenChange, campaignId, onStart
                     <p className="text-[11px] text-muted-foreground truncate capitalize">{r.sub}</p>
                   </div>
                   <span className="text-[10px] text-muted-foreground capitalize flex-shrink-0">
-                    {isSession ? 'session' : r.type?.replace('_', ' ')}
+                    {isSession ? 'session' : getEntityTypeLabel(r.type)}
                   </span>
                 </CommandItem>
               );

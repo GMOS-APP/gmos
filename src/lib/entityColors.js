@@ -109,3 +109,11 @@ export function setCustomTypeRegistry(map) {
 
 export const getEntityColors = (type) =>
   ENTITY_TYPE_META[type] ?? CUSTOM_TYPE_REGISTRY[type] ?? ENTITY_TYPE_META.npc;
+
+// Human-readable singular label for an entity type. Resolves through the
+// published registry (covers built-in, system-pack, and custom types — pack
+// keys like `coc_investigator` would otherwise render half-humanized as
+// "Coc investigator"); falls back to humanizing the raw key.
+export const getEntityTypeLabel = (type) =>
+  CUSTOM_TYPE_REGISTRY[type]?.labelSingular ||
+  String(type || '').replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());

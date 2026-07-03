@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { getEntityTypeLabel } from '@/lib/entityColors';
 import { useQuery } from '@tanstack/react-query';
 import { WorldEntity } from '@/api/entities';
 import { Search, X } from 'lucide-react';
@@ -50,7 +51,7 @@ export default function EntityLookup({ campaignId }) {
               className="block px-3 py-2 hover:bg-zinc-800/50 border-b border-zinc-800/50 last:border-0"
             >
               <p className="text-sm text-zinc-200">{e.name}</p>
-              <p className="text-[10px] text-zinc-600 capitalize">{e.entity_type?.replace('_', ' ')}{e.summary ? ` · ${e.summary}` : ''}</p>
+              <p className="text-[10px] text-zinc-600 capitalize">{getEntityTypeLabel(e.entity_type)}{e.summary ? ` · ${e.summary}` : ''}</p>
             </Link>
           ))}
         </div>
