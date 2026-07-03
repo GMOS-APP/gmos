@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 
 const DICE = [4, 6, 8, 10, 12, 20, 100];
+const TUMBLE_MS = 600;   // how long the "spin" lasts
+const TUMBLE_TICK = 55;  // how fast the numbers cycle
 
 function rollDie(sides) {
   return Math.floor(Math.random() * sides) + 1;
@@ -13,28 +15,45 @@ export default function DiceRoller() {
   const [modifier, setModifier] = useState(0);
   const [rolling, setRolling] = useState(false);
   const [adv, setAdv] = useState(null); // 'adv' | 'dis' | null
+  // While rolling, the result box "tumbles" — cycles random plausible totals
+  // slot-machine style — then settles on the real result with a pop.
+  const [tumble, setTumble] = useState(null); // { value, label } | null
+  const timers = useRef([]);
+  useEffect(() => () => timers.current.forEach(clearTimeout), []);
 
   const roll = (sides) => {
+    if (rolling) return;
+    // The real result is decided up front; the tumble is pure theater.
+    const rolls = Array.from({ length: count }, () => rollDie(sides));
+    let pair = null;
+    let finalRoll = rolls[0];
+    if (adv && sides === 20 && count === 1) {
+      const second = rollDie(20);
+      pair = [rolls[0], second];
+      finalRoll = adv === 'adv' ? Math.max(rolls[0], second) : Math.min(rolls[0], second);
+    }
+    const usedRolls = pair ? [finalRoll] : rolls;
+    const total = usedRolls.reduce((a, b) => a + b, 0) + modifier;
+    const modStr = modifier !== 0 ? (modifier > 0 ? `+${modifier}` : `${modifier}`) : '';
+    const advLabel = adv && sides === 20 && count === 1 ? (adv === 'adv' ? ' (adv)' : ' (dis)') : '';
+    const label = `${count}d${sides}${modStr}${advLabel}`;
+    const entry = { id: Date.now(), label, rolls: usedRolls, pair, total, sides, adv: adv && sides === 20 && count === 1 ? adv : null };
+
+    const min = count + modifier;
+    const max = count * sides + modifier;
     setRolling(true);
-    setTimeout(() => {
-      const rolls = Array.from({ length: count }, () => rollDie(sides));
-      let pair = null;
-      let finalRoll = rolls[0];
-      if (adv && sides === 20 && count === 1) {
-        const second = rollDie(20);
-        pair = [rolls[0], second];
-        finalRoll = adv === 'adv' ? Math.max(rolls[0], second) : Math.min(rolls[0], second);
+    const t0 = Date.now();
+    const tick = () => {
+      if (Date.now() - t0 >= TUMBLE_MS) {
+        setTumble(null);
+        setResults((prev) => [entry, ...prev.slice(0, 9)]);
+        setRolling(false);
+        return;
       }
-      const usedRolls = pair ? [finalRoll] : rolls;
-      const total = usedRolls.reduce((a, b) => a + b, 0) + modifier;
-      const modStr = modifier !== 0 ? (modifier > 0 ? `+${modifier}` : `${modifier}`) : '';
-      const advLabel = adv && sides === 20 && count === 1 ? (adv === 'adv' ? ' (adv)' : ' (dis)') : '';
-      setResults((prev) => [
-        { id: Date.now(), label: `${count}d${sides}${modStr}${advLabel}`, rolls: usedRolls, pair, total, sides, adv: adv && sides === 20 && count === 1 ? adv : null },
-        ...prev.slice(0, 9),
-      ]);
-      setRolling(false);
-    }, 120);
+      setTumble({ value: Math.floor(Math.random() * (max - min + 1)) + min, label });
+      timers.current.push(setTimeout(tick, TUMBLE_TICK));
+    };
+    tick();
   };
 
   const lastResult = results[0];
@@ -107,14 +126,22 @@ export default function DiceRoller() {
           ))}
         </div>
 
-        {/* Latest result */}
-        {lastResult && (
-          <div className={cn(
-            "rounded-lg px-3 py-2.5 text-center transition-all",
+        {/* Latest result (or the in-flight tumble) */}
+        {tumble && (
+          <div className="rounded-lg px-3 py-2.5 text-center dark:bg-zinc-800/80 dark:border dark:border-zinc-700 bg-zinc-50 border border-zinc-200 animate-dice-shake">
+            <div className="text-2xl font-black dark:text-zinc-400 text-zinc-500 blur-[0.5px] tabular-nums">
+              {tumble.value}
+            </div>
+            <div className="text-[10px] dark:text-zinc-600 text-zinc-400 mt-0.5">{tumble.label}…</div>
+          </div>
+        )}
+        {!tumble && lastResult && (
+          <div key={lastResult.id} className={cn(
+            "rounded-lg px-3 py-2.5 text-center transition-all animate-in fade-in zoom-in-90 duration-300",
             "dark:bg-zinc-800/80 dark:border dark:border-zinc-700 bg-zinc-50 border border-zinc-200"
           )}>
             <div className={cn(
-              "text-2xl font-black",
+              "text-2xl font-black animate-in zoom-in-50 duration-300",
               lastResult.total === lastResult.sides * count + modifier ? "text-amber-400" :
               lastResult.total === count + modifier ? "text-red-500" : "dark:text-zinc-100 text-zinc-900"
             )}>

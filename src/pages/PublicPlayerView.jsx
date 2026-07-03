@@ -34,21 +34,45 @@ const VISIBILITY_LABELS = {
   players_suspect: { label: 'Rumored', icon: EyeOff, color: 'text-amber-600 dark:text-amber-400' },
 };
 
-// Table dice for the shared page — local rolls, big result, no account needed.
+// Table dice for the shared page — local rolls with a slot-machine tumble
+// before the result lands. No account needed.
 function DiceRoller() {
   const [res, setRes] = useState(null);
-  const roll = (sides) => setRes({ sides, v: 1 + Math.floor(Math.random() * sides), id: Date.now() });
+  const [tumble, setTumble] = useState(null);
+  const timers = React.useRef([]);
+  useEffect(() => () => timers.current.forEach(clearTimeout), []);
+
+  const roll = (sides) => {
+    if (tumble) return;
+    const v = 1 + Math.floor(Math.random() * sides); // decided up front
+    const t0 = Date.now();
+    const tick = () => {
+      if (Date.now() - t0 >= 550) {
+        setTumble(null);
+        setRes({ sides, v, id: Date.now() });
+        return;
+      }
+      setTumble({ sides, v: 1 + Math.floor(Math.random() * sides) });
+      timers.current.push(setTimeout(tick, 50));
+    };
+    tick();
+  };
+
   return (
     <div className="flex items-center gap-1.5 flex-wrap">
       {[4, 6, 8, 10, 12, 20, 100].map((s) => (
         <button key={s} onClick={() => roll(s)}
-          className="px-2 py-1 rounded-md border border-zinc-800 text-xs font-mono text-zinc-400 hover:border-amber-500/50 hover:text-amber-400 transition-colors">
+          className="px-2 py-1 rounded-md border border-zinc-800 text-xs font-mono text-zinc-400 hover:border-amber-500/50 hover:text-amber-400 transition-colors active:scale-95">
           d{s}
         </button>
       ))}
-      {res && (
-        <span key={res.id} className="ml-auto text-sm font-mono text-amber-400 animate-in fade-in zoom-in-95">
-          d{res.sides} → <span className="text-lg font-bold">{res.v}</span>
+      {tumble ? (
+        <span className="ml-auto text-sm font-mono text-zinc-500 animate-dice-shake tabular-nums">
+          d{tumble.sides} → <span className="text-lg font-bold blur-[0.5px]">{tumble.v}</span>
+        </span>
+      ) : res && (
+        <span key={res.id} className="ml-auto text-sm font-mono text-amber-400 animate-in fade-in zoom-in-50 duration-300">
+          d{res.sides} → <span className={cn('text-lg font-bold', res.v === res.sides && 'text-amber-300', res.v === 1 && 'text-red-400')}>{res.v}</span>
         </span>
       )}
     </div>

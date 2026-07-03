@@ -133,7 +133,7 @@ export default function CommandPalette({ open, onOpenChange, campaignId, onStart
             >
               <Dices className="text-amber-500" />
               <span>Roll {dice.label}</span>
-              <span className="ml-auto font-mono text-sm tabular-nums">
+              <span key={`${dice.label}:${diceRoll.total}`} className="ml-auto font-mono text-sm tabular-nums animate-in zoom-in-75 duration-200">
                 {diceRoll.total}
                 <span className="text-[10px] text-muted-foreground ml-1.5">({diceRoll.rolls.join(', ')})</span>
               </span>
