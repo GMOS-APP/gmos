@@ -1,11 +1,13 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { X, Minus, Square, Copy } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useWindowManager, titleOf } from '@/lib/WindowManager';
+import { useWindowManager, titleOf, iconOf } from '@/lib/WindowManager';
 import WindowContent from './WindowContent';
 
 const MIN_W = 360;
 const MIN_H = 240;
+const SNAP_EDGE = 12; // px from a desktop edge that arms snapping while dragging
 
 // Edge + corner drag zones. Edges are inset so the corners own the ends.
 const RESIZE_HANDLES = [
@@ -22,6 +24,10 @@ const RESIZE_HANDLES = [
 export default function Window({ win, containerRef }) {
   const wm = useWindowManager();
   const dragState = useRef(null);
+  // Aero-style snapping: dragging against the left/right edge previews a half-
+  // screen tile, the top edge previews maximize; releasing applies it.
+  const [snap, setSnap] = useState(null); // 'left' | 'right' | 'top' | null
+  const snapRef = useRef(null);
   const focused = wm.focusedId === win.id;
   const mobile = wm.isMobile;
   const maximized = win.maximized || mobile;
@@ -55,6 +61,14 @@ export default function Window({ win, containerRef }) {
       const nx = Math.min(Math.max(0, s.x + (e.clientX - s.startX)), Math.max(0, b.w - 80));
       const ny = Math.min(Math.max(0, s.y + (e.clientY - s.startY)), Math.max(0, b.h - 40));
       wm.setRect(win.id, { x: nx, y: ny });
+      // Snap zones follow the POINTER, not the window rect.
+      const rect = containerRef?.current?.getBoundingClientRect();
+      if (rect) {
+        const px = e.clientX - rect.left;
+        const py = e.clientY - rect.top;
+        const zone = py <= SNAP_EDGE ? 'top' : px <= SNAP_EDGE ? 'left' : px >= rect.width - SNAP_EDGE ? 'right' : null;
+        if (zone !== snapRef.current) { snapRef.current = zone; setSnap(zone); }
+      }
     } else {
       const dx = e.clientX - s.startX;
       const dy = e.clientY - s.startY;
@@ -72,7 +86,23 @@ export default function Window({ win, containerRef }) {
       wm.setRect(win.id, { x, y, w, h });
     }
   };
-  const onUp = () => { dragState.current = null; detach(); };
+  const onUp = () => {
+    const zone = snapRef.current;
+    dragState.current = null;
+    snapRef.current = null;
+    setSnap(null);
+    detach();
+    if (!zone) return;
+    const b = bounds();
+    if (zone === 'top') {
+      if (!win.maximized) wm.toggleMaximize(win.id);
+    } else {
+      const half = Math.round(b.w / 2);
+      wm.setRect(win.id, zone === 'left'
+        ? { x: 0, y: 0, w: half, h: b.h }
+        : { x: b.w - half, y: 0, w: half, h: b.h });
+    }
+  };
   const attach = () => {
     window.addEventListener('pointermove', onMove);
     window.addEventListener('pointerup', onUp, { once: true });
@@ -99,12 +129,18 @@ export default function Window({ win, containerRef }) {
     </button>
   );
 
+  const AppIcon = iconOf(win.url);
+
   return (
     <div
       className={cn(
         'absolute flex flex-col overflow-hidden rounded-lg border bg-white dark:bg-zinc-950',
-        'shadow-xl shadow-black/20 dark:shadow-black/50',
-        focused ? 'border-amber-500/60 dark:border-amber-500/50' : 'border-zinc-300 dark:border-zinc-800',
+        // Mount pop — replays on restore-from-minimize since minimized windows unmount.
+        'animate-in fade-in zoom-in-95 duration-200',
+        // Focused windows sit visibly "above" the stack.
+        focused
+          ? 'border-amber-500/60 dark:border-amber-500/50 shadow-2xl shadow-black/30 dark:shadow-black/60'
+          : 'border-zinc-300 dark:border-zinc-800 shadow-lg shadow-black/10 dark:shadow-black/40',
         maximized && 'rounded-none',
       )}
       style={style}
@@ -135,6 +171,7 @@ export default function Window({ win, containerRef }) {
               hover="hover:bg-zinc-300 dark:hover:bg-zinc-600 hover:text-zinc-900 dark:hover:text-zinc-100" />
           )}
         </div>
+        <AppIcon className={cn('w-3.5 h-3.5 shrink-0', focused ? 'text-amber-500' : 'text-zinc-400 dark:text-zinc-600')} />
         <span className={cn('text-xs font-semibold uppercase tracking-widest truncate',
           focused ? 'text-zinc-700 dark:text-zinc-300' : 'text-zinc-400 dark:text-zinc-600')}>
           {titleOf(win.url)}
@@ -157,6 +194,19 @@ export default function Window({ win, containerRef }) {
       ))}
       {!maximized && (
         <div className="absolute bottom-1 right-1 w-2 h-2 border-r-2 border-b-2 border-zinc-400 dark:border-zinc-600 pointer-events-none z-20" />
+      )}
+
+      {/* Snap preview ghost — rendered onto the desktop so it can span the tile */}
+      {snap && containerRef?.current && createPortal(
+        <div
+          className="absolute z-[9990] rounded-lg border-2 border-amber-500/60 bg-amber-500/10 pointer-events-none animate-in fade-in duration-150"
+          style={snap === 'top'
+            ? { left: 6, top: 6, right: 6, bottom: 6 }
+            : snap === 'left'
+              ? { left: 6, top: 6, bottom: 6, width: 'calc(50% - 9px)' }
+              : { right: 6, top: 6, bottom: 6, width: 'calc(50% - 9px)' }}
+        />,
+        containerRef.current,
       )}
     </div>
   );

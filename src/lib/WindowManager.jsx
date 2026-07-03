@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useCallback, useEffect, useRef, useState } from 'react';
 import { CAMPAIGN_NAV_ITEMS } from '@/lib/navItems';
+import { FileText, CalendarDays, Shapes, AppWindow } from 'lucide-react';
 
 // Pages that live *inside* the campaign desktop as windows. Anything else
 // (CampaignList, AccountSettings, About) escapes the window manager and
@@ -12,6 +13,8 @@ export const WINDOW_PAGES = [
 
 const LABELS = Object.fromEntries(CAMPAIGN_NAV_ITEMS.map((i) => [i.page, i.label]));
 const EXTRA_LABELS = { EntityDetail: 'Entity', SessionPage: 'Session', EntityTypes: 'Entity Types' };
+const ICONS = Object.fromEntries(CAMPAIGN_NAV_ITEMS.map((i) => [i.page, i.Icon]));
+const EXTRA_ICONS = { EntityDetail: FileText, SessionPage: CalendarDays, EntityTypes: Shapes };
 
 export function pageKeyOf(url) {
   return (url || '').replace(/^\//, '').split('?')[0] || 'CampaignDashboard';
@@ -23,6 +26,11 @@ export function paramsOf(url) {
 export function titleOf(url) {
   const key = pageKeyOf(url);
   return LABELS[key] || EXTRA_LABELS[key] || key;
+}
+// The page's "app icon" — shown in window title bars and taskbar buttons.
+export function iconOf(url) {
+  const key = pageKeyOf(url);
+  return ICONS[key] || EXTRA_ICONS[key] || AppWindow;
 }
 // Stable identity so reopening the same logical page focuses its window instead
 // of stacking duplicates, while distinct records (entity ids, sessions) each

@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { LayoutGrid, Search, LogOut, HelpCircle, AppWindow } from 'lucide-react';
 import { Session, auth } from '@/api/entities';
 import { createPageUrl } from '@/utils';
-import { useWindowManager, titleOf } from '@/lib/WindowManager';
+import { useWindowManager, titleOf, iconOf } from '@/lib/WindowManager';
 import { useWindowMode, setWindowModeEnabled } from '@/lib/useWindowMode';
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription,
@@ -161,7 +161,12 @@ export default function Taskbar({ campaign, currentPageName, startActive, onStar
           </span>
         )}
         <ThemeToggle className="hidden md:flex h-7 w-7 items-center justify-center" />
-        <span className="hidden md:inline px-2 font-mono text-[11px] tabular-nums text-zinc-600 dark:text-zinc-400">{time}</span>
+        <span
+          title={now.toLocaleDateString([], { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}
+          className="hidden md:inline px-2 font-mono text-[11px] tabular-nums text-zinc-600 dark:text-zinc-400 cursor-default"
+        >
+          {time}
+        </span>
         <button
           onClick={signOut}
           title="Sign out"
@@ -211,13 +216,14 @@ function WindowStrip({ wm }) {
     <div className="flex-1 min-w-0 flex items-center gap-1 overflow-x-auto pl-1" style={{ scrollbarWidth: 'none' }}>
       {wm.windows.map((w) => {
         const active = wm.focusedId === w.id && !w.minimized;
+        const AppIcon = iconOf(w.url);
         return (
           <button
             key={w.id}
             onClick={() => (active ? wm.minimizeWindow(w.id) : wm.focusWindow(w.id))}
             title={titleOf(w.url)}
             className={cn(
-              'group flex items-center gap-1.5 h-9 sm:h-7 px-2 rounded-md text-[11px] font-medium whitespace-nowrap transition-colors max-w-[160px] flex-shrink-0',
+              'group relative flex items-center gap-1.5 h-9 sm:h-7 px-2 rounded-md text-[11px] font-medium whitespace-nowrap transition-colors max-w-[160px] flex-shrink-0',
               active
                 ? 'bg-amber-500/15 text-amber-600 dark:text-amber-400'
                 : w.minimized
@@ -225,8 +231,11 @@ function WindowStrip({ wm }) {
                   : 'text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800/60'
             )}
           >
-            <span className={cn('w-1.5 h-1.5 rounded-full shrink-0', active ? 'bg-amber-500' : 'bg-zinc-400 dark:bg-zinc-600')} />
+            <AppIcon className={cn('w-3.5 h-3.5 shrink-0', active ? 'text-amber-500' : w.minimized ? 'text-zinc-400 dark:text-zinc-700' : 'text-zinc-500 dark:text-zinc-500')} />
             <span className="truncate">{titleOf(w.url)}</span>
+            {/* running indicator, OS-dock style */}
+            <span className={cn('absolute left-1/2 -translate-x-1/2 bottom-0 h-0.5 rounded-full transition-all',
+              active ? 'w-4 bg-amber-500' : w.minimized ? 'w-0' : 'w-1.5 bg-zinc-400 dark:bg-zinc-600')} />
             <span
               role="button"
               tabIndex={-1}
