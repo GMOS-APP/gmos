@@ -177,7 +177,10 @@ export default function BattleMap() {
 
   // ── Turn order ──────────────────────────────────────────────────────────────
   const startTurns = () => {
-    const order = tokensRef.current.filter((t) => t.kind !== 'object').map((t) => t.id);
+    // Prefer combatants (PCs/NPCs/monsters); if the board only has plain
+    // tokens, use them all rather than silently doing nothing.
+    const combatants = tokensRef.current.filter((t) => t.kind !== 'object');
+    const order = (combatants.length ? combatants : tokensRef.current).map((t) => t.id);
     if (!order.length) return;
     patchMap({ turn: { order, active: 0, round: 1 } });
   };

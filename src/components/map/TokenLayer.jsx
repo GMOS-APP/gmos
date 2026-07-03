@@ -110,7 +110,7 @@ export default function TokenLayer({
       e.preventDefault();
       const cell = fogCellAt(e);
       // alt/right-drag hides; normal drag reveals
-      fogDrag.current = { reveal: !(e.altKey || e.button === 2), cells: new Set(cell != null ? [cell] : []) };
+      fogDrag.current = { reveal: !(e.altKey || e.button === 2), cells: new Set(cell != null ? [cell] : []), last: cell };
       window.addEventListener('pointermove', onFogMove);
       window.addEventListener('pointerup', onFogUp, { once: true });
     } else if (tool === 'ruler') {
@@ -125,7 +125,21 @@ export default function TokenLayer({
     const d = fogDrag.current;
     if (!d) return;
     const cell = fogCellAt(e);
-    if (cell != null) d.cells.add(cell);
+    if (cell == null) return;
+    // Interpolate between the previous sample and this one so a fast swipe
+    // paints a contiguous strip instead of scattered cells.
+    if (d.last != null && d.last !== cell) {
+      let c0 = d.last % FOG_COLS, r0 = Math.floor(d.last / FOG_COLS);
+      const c1 = cell % FOG_COLS, r1 = Math.floor(cell / FOG_COLS);
+      const steps = Math.max(Math.abs(c1 - c0), Math.abs(r1 - r0));
+      for (let i = 1; i <= steps; i++) {
+        const c = Math.round(c0 + ((c1 - c0) * i) / steps);
+        const r = Math.round(r0 + ((r1 - r0) * i) / steps);
+        d.cells.add(r * FOG_COLS + c);
+      }
+    }
+    d.cells.add(cell);
+    d.last = cell;
   };
   const onFogUp = () => {
     window.removeEventListener('pointermove', onFogMove);
