@@ -33,6 +33,12 @@ export default defineConfig({
         ],
       },
       workbox: {
+        // Providing a custom workbox block suppresses the skipWaiting/clientsClaim
+        // defaults that registerType:'autoUpdate' implies — without these two,
+        // a new SW sits in "waiting" forever and users keep running stale code
+        // until they manually clear site data. Keep them explicit.
+        skipWaiting: true,
+        clientsClaim: true,
         globPatterns: ['**/*.{js,css,html,svg,png,ico,woff2,webmanifest}'],
         // SPA fallback for app routes; keep server-rendered/marketing endpoints
         // (sitemap, rss, edge functions) on the network.
