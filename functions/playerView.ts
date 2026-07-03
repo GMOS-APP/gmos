@@ -45,11 +45,39 @@ Deno.serve(async (req) => {
     // Built-in player-facing entity types (never creatures/encounters/PCs/shops).
     const BUILTIN_PLAYER_TYPES = ['npc', 'location', 'faction', 'item', 'thread', 'event', 'lore', 'deity'];
 
+    // Player-visible types from the game-system packs (subset of
+    // src/lib/systemPacks.js — keep in sync when pack playerVisible flags change;
+    // key = campaigns.system). Shaped like entity_types rows so the client can
+    // treat pack and custom defs identically.
+    const PACK_PLAYER_TYPES: Record<string, Array<{ key: string; label: string; label_singular: string; icon: string; color: string }>> = {
+      coc: [
+        { key: 'coc_npc', label: 'NPCs', label_singular: 'NPC', icon: 'Users', color: 'violet' },
+        { key: 'coc_tome', label: 'Tomes & Artifacts', label_singular: 'Tome / Artifact', icon: 'BookOpen', color: 'orange' },
+        { key: 'coc_location', label: 'Locations', label_singular: 'Location', icon: 'MapPin', color: 'emerald' },
+      ],
+      blades: [
+        { key: 'blades_faction', label: 'Factions', label_singular: 'Faction', icon: 'Crown', color: 'purple' },
+        { key: 'blades_district', label: 'Districts', label_singular: 'District', icon: 'MapPin', color: 'emerald' },
+        { key: 'blades_npc', label: 'NPCs', label_singular: 'NPC', icon: 'Users', color: 'violet' },
+      ],
+      vtm: [
+        { key: 'vtm_mortal', label: 'Mortals & Ghouls', label_singular: 'Mortal / Ghoul', icon: 'User', color: 'green' },
+        { key: 'vtm_domain', label: 'Domains', label_singular: 'Domain', icon: 'MapPin', color: 'emerald' },
+        { key: 'vtm_faction', label: 'Sects & Factions', label_singular: 'Sect / Faction', icon: 'Crown', color: 'purple' },
+        { key: 'vtm_npc', label: 'NPCs', label_singular: 'NPC', icon: 'Users', color: 'violet' },
+      ],
+      daggerheart: [
+        { key: 'dh_environment', label: 'Environments', label_singular: 'Environment', icon: 'Mountain', color: 'emerald' },
+        { key: 'dh_faction', label: 'Factions', label_singular: 'Faction', icon: 'Shield', color: 'rose' },
+        { key: 'dh_npc', label: 'NPCs', label_singular: 'NPC', icon: 'Users', color: 'violet' },
+      ],
+    };
+
     // Find campaign by share token where sharing is enabled. created_by is used
     // server-side to resolve the owner's custom types; it is never returned.
     const { data: campaigns, error: campError } = await admin
       .from('campaigns')
-      .select('id, name, setting, created_by')
+      .select('id, name, setting, system, created_by')
       .eq('player_share_token', token)
       .eq('is_shared', true)
       .limit(1);
@@ -68,8 +96,9 @@ Deno.serve(async (req) => {
       .eq('created_by', campaign.created_by)
       .eq('player_visible', true);
 
-    const customKeys = (customTypes || []).map((t) => t.key);
-    const PLAYER_TYPES = [...BUILTIN_PLAYER_TYPES, ...customKeys];
+    const packTypes = PACK_PLAYER_TYPES[campaign.system] || [];
+    const extraTypeDefs = [...packTypes, ...(customTypes || [])];
+    const PLAYER_TYPES = [...BUILTIN_PLAYER_TYPES, ...extraTypeDefs.map((t) => t.key)];
 
     // Player-visible entities — safe fields only (no description/extra_data/secrets).
     const { data: entities } = await admin
@@ -93,7 +122,8 @@ Deno.serve(async (req) => {
         campaign: { id: campaign.id, name: campaign.name, setting: campaign.setting },
         entities: entities || [],
         sessions: sessions || [],
-        entityTypes: customTypes || [],
+        // Pack + custom type defs together — the client renders both the same way.
+        entityTypes: extraTypeDefs,
       },
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );

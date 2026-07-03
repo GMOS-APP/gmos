@@ -12,6 +12,10 @@
 // types (PF2e just relabels character fields); see systems.js.
 //
 // Field lists are grounded in each system's SRD / character sheet.
+//
+// KEEP IN SYNC: functions/playerView.ts holds a compact copy of the
+// player-visible types (PACK_PLAYER_TYPES) for the public share link — update
+// it when adding packs or changing a type's playerVisible flag.
 
 const T = (key, label, kind, placement, extra = {}) => ({ key, label, kind, placement, ...extra });
 
