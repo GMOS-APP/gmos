@@ -152,6 +152,9 @@ export default function BattleMap() {
     const next = tokensRef.current.map((t) => (t.id === id ? { ...t, ...patch } : t));
     setTokens(next);
     persistTokens(next);
+    // Players don't get postgres_changes (no anon read on battle_maps) — nudge
+    // them to re-pull via the edge fn so HP/size/condition edits show live.
+    channel.sendSync();
   };
   const removeToken = (id) => {
     const next = tokensRef.current.filter((t) => t.id !== id);
