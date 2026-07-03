@@ -1,12 +1,15 @@
 import React, { useState } from 'react';
 import { UploadFile } from '@/api/entities';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Upload, Link2, Loader2 } from 'lucide-react';
+import { Upload, Link2, Loader2, Map } from 'lucide-react';
+import DysonLogosImporter from './DysonLogosImporter';
 
-// Set a battle-map background by uploading a file or pasting an image URL.
+// Set a battle-map background by uploading a file, pasting an image URL, or
+// browsing the Dyson Logos map library.
 export default function BackgroundPicker({ open, onOpenChange, onSelect }) {
   const [uploading, setUploading] = useState(false);
   const [linkUrl, setLinkUrl] = useState('');
+  const [dysonOpen, setDysonOpen] = useState(false);
 
   const pick = (url) => { if (url) { onSelect(url); onOpenChange(false); } };
 
@@ -54,6 +57,25 @@ export default function BackgroundPicker({ open, onOpenChange, onSelect }) {
             <Link2 className="w-4 h-4" /> Use
           </button>
         </div>
+
+        <div className="flex items-center gap-2 my-1">
+          <span className="h-px flex-1 bg-zinc-200 dark:bg-zinc-800" />
+          <span className="text-[10px] uppercase tracking-wider text-zinc-400 dark:text-zinc-600">or</span>
+          <span className="h-px flex-1 bg-zinc-200 dark:bg-zinc-800" />
+        </div>
+
+        <button
+          onClick={() => setDysonOpen(true)}
+          className="inline-flex items-center justify-center gap-1.5 text-sm px-3 py-2 rounded-md border border-zinc-300 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-800 dark:text-zinc-200"
+        >
+          <Map className="w-4 h-4" /> Browse Dyson Logos maps
+        </button>
+
+        <DysonLogosImporter
+          open={dysonOpen}
+          onClose={() => setDysonOpen(false)}
+          onImport={({ image_url }) => { setDysonOpen(false); pick(image_url); }}
+        />
       </DialogContent>
     </Dialog>
   );

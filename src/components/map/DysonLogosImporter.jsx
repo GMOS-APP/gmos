@@ -110,7 +110,7 @@ export default function DysonLogosImporter({ open, onClose, onImport, isImportin
           </div>
           {total > 0 && (
             <p className="text-[11px] dark:text-zinc-600 text-zinc-500 mt-1.5">
-              {total.toLocaleString()} maps · click to add to campaign
+              {total.toLocaleString()} maps · click a map to use it
             </p>
           )}
         </div>
