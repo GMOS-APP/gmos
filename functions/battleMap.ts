@@ -17,10 +17,11 @@ const json = (b: unknown, status = 200) =>
   new Response(JSON.stringify(b), { status, headers: { ...CORS, 'Content-Type': 'application/json' } });
 const pct = (v: unknown) => Math.max(0, Math.min(100, Number(v)));
 
-// What players are allowed to see of a map.
+// What players are allowed to see of a map. Fog is needed client-side to render
+// the overlay + hide fogged tokens; turn powers the read-only turn strip.
 const project = (m: Record<string, unknown>) => ({
   id: m.id, name: m.name, image_url: m.image_url, grid_cols: m.grid_cols,
-  locked: m.locked, tokens: m.tokens || [],
+  locked: m.locked, tokens: m.tokens || [], fog: m.fog || null, turn: m.turn || null,
 });
 
 Deno.serve(async (req) => {
@@ -41,7 +42,7 @@ Deno.serve(async (req) => {
     if (action === 'get') {
       const { data: maps } = await admin
         .from('battle_maps')
-        .select('id, name, image_url, grid_cols, locked, tokens')
+        .select('id, name, image_url, grid_cols, locked, tokens, fog, turn')
         .eq('campaign_id', campaignId).eq('active', true)
         .order('updated_date', { ascending: false }).limit(1);
       return json({ map: maps && maps.length ? project(maps[0]) : null });

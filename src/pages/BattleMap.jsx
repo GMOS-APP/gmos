@@ -2,16 +2,24 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { usePageParams } from '@/lib/usePageParams';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { BattleMap as BattleMapEntity, WorldEntity, Campaign } from '@/api/entities';
-import { Plus, Image as ImageIcon, Grid3x3, Lock, Unlock, Eye, Trash2, Users, Swords, Link2, Check, Share2 } from 'lucide-react';
-import TokenLayer from '@/components/map/TokenLayer';
+import {
+  Plus, Image as ImageIcon, Grid3x3, Lock, Unlock, Eye, Users, Swords, Link2, Check, Share2,
+  MousePointer2, Cloud, CloudOff, Ruler, Play, SkipForward, SkipBack, Square,
+} from 'lucide-react';
+import TokenLayer, { FOG_COLS } from '@/components/map/TokenLayer';
+import TokenMenu from '@/components/map/TokenMenu';
 import BackgroundPicker from '@/components/map/BackgroundPicker';
 import { useBattleMapChannel } from '@/lib/useBattleMapChannel';
 import { getEntityColors } from '@/lib/entityColors';
 import AlphaBadge from '@/components/common/AlphaBadge';
+import { cn } from '@/lib/utils';
 
 const TYPE_HEX = { player_character: '#22d3ee', npc: '#a78bfa', creature: '#f87171' };
 const KIND_OF = { player_character: 'pc', npc: 'npc', creature: 'monster' };
 const newId = () => `t_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 6)}`;
+// "Reveal all" marks every cell of the virtual fog grid (40 rows covers any
+// realistic map aspect).
+const ALL_FOG_CELLS = Array.from({ length: FOG_COLS * 40 }, (_, i) => i);
 
 export default function BattleMap() {
   const params = usePageParams();
@@ -24,6 +32,8 @@ export default function BattleMap() {
   const [bgOpen, setBgOpen] = useState(false);
   const [showAdd, setShowAdd] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [tool, setTool] = useState('select'); // 'select' | 'fog' | 'ruler'
+  const [pings, setPings] = useState([]);
   const tokensRef = useRef(tokens);
   tokensRef.current = tokens;
   const draggingRef = useRef(null);
@@ -60,6 +70,9 @@ export default function BattleMap() {
   });
 
   const map = useMemo(() => maps.find((m) => m.id === mapId) || null, [maps, mapId]);
+  const fog = map?.fog || null;
+  const turn = map?.turn || null;
+  const activeTokenId = turn?.order?.[turn.active] || null;
 
   // Default to the active map (or the most recent) once maps load.
   useEffect(() => {
@@ -69,9 +82,16 @@ export default function BattleMap() {
   // Sync working tokens from the selected map (resets on structural refetches).
   useEffect(() => { setTokens(map?.tokens || []); }, [mapId, map?.updated_date]); // eslint-disable-line
 
+  const addPing = (p) => {
+    setPings((prev) => [...prev, p]);
+    setTimeout(() => setPings((prev) => prev.filter((x) => x.id !== p.id)), 2200);
+  };
+
   const channel = useBattleMapChannel(mapId, (msg) => {
     if (msg.type === 'move') {
       setTokens((prev) => prev.map((t) => (t.id === msg.tokenId ? { ...t, x: msg.x, y: msg.y } : t)));
+    } else if (msg.type === 'ping') {
+      addPing(msg);
     } else if (msg.type === 'db') {
       if (!Array.isArray(msg.tokens)) return;
       setTokens((prev) => {
@@ -128,9 +148,54 @@ export default function BattleMap() {
     }))];
     setTokens(next); persistTokens(next); channel.sendSync();
   };
+  const updateToken = (id, patch) => {
+    const next = tokensRef.current.map((t) => (t.id === id ? { ...t, ...patch } : t));
+    setTokens(next);
+    persistTokens(next);
+  };
   const removeToken = (id) => {
     const next = tokensRef.current.filter((t) => t.id !== id);
     setTokens(next); setSelectedToken(null); persistTokens(next); channel.sendSync();
+    // Keep the turn order consistent if the token was in it.
+    if (turn?.order?.includes(id)) {
+      const order = turn.order.filter((x) => x !== id);
+      patchMap({ turn: order.length ? { ...turn, order, active: Math.min(turn.active, order.length - 1) } : null });
+    }
+  };
+
+  // ── Fog of war ──────────────────────────────────────────────────────────────
+  const onFogPaint = (cells, reveal) => {
+    if (!fog?.enabled) return;
+    const revealed = new Set(fog.revealed || []);
+    cells.forEach((c) => (reveal ? revealed.add(c) : revealed.delete(c)));
+    patchMap({ fog: { ...fog, revealed: [...revealed] } });
+  };
+  const toggleFog = () => {
+    if (fog?.enabled) { patchMap({ fog: { ...fog, enabled: false } }); if (tool === 'fog') setTool('select'); }
+    else { patchMap({ fog: { enabled: true, revealed: fog?.revealed || [] } }); setTool('fog'); }
+  };
+
+  // ── Turn order ──────────────────────────────────────────────────────────────
+  const startTurns = () => {
+    const order = tokensRef.current.filter((t) => t.kind !== 'object').map((t) => t.id);
+    if (!order.length) return;
+    patchMap({ turn: { order, active: 0, round: 1 } });
+  };
+  const stepTurn = (dir) => {
+    if (!turn?.order?.length) return;
+    let active = turn.active + dir;
+    let round = turn.round || 1;
+    if (active >= turn.order.length) { active = 0; round += 1; }
+    if (active < 0) { active = turn.order.length - 1; round = Math.max(1, round - 1); }
+    patchMap({ turn: { ...turn, active, round } });
+  };
+  const endTurns = () => patchMap({ turn: null });
+
+  // ── Ping ────────────────────────────────────────────────────────────────────
+  const onPing = (x, y) => {
+    const p = { id: `p_${Date.now().toString(36)}`, x, y, color: '#f59e0b' };
+    addPing(p); // broadcast self=false → render our own locally
+    channel.sendPing(x, y, p.color);
   };
 
   // ── Map management ──────────────────────────────────────────────────────────
@@ -145,6 +210,22 @@ export default function BattleMap() {
   };
 
   if (!campaignId) return <div className="p-6 text-sm text-zinc-500">No campaign.</div>;
+
+  const toolBtn = (key, Icon, label, extra = '') => (
+    <button
+      onClick={() => setTool(key)}
+      title={label}
+      className={cn('inline-flex items-center gap-1.5 text-sm px-2.5 py-1.5 rounded-md border',
+        tool === key
+          ? 'border-amber-500 bg-amber-500/15 text-amber-700 dark:text-amber-400'
+          : 'border-zinc-300 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800',
+        extra)}
+    >
+      <Icon className="w-4 h-4" /> <span className="hidden sm:inline">{label}</span>
+    </button>
+  );
+
+  const selected = tokens.find((t) => t.id === selectedToken) || null;
 
   return (
     <div className="min-h-full p-4 sm:p-6 max-w-6xl mx-auto">
@@ -214,14 +295,74 @@ export default function BattleMap() {
             ))}
           </div>
 
+          {/* Tools row: pointer / ruler / fog + turn order */}
+          <div className="flex flex-wrap items-center gap-2 mb-3">
+            {toolBtn('select', MousePointer2, 'Select')}
+            {toolBtn('ruler', Ruler, 'Ruler')}
+            {fog?.enabled && toolBtn('fog', Cloud, 'Reveal')}
+
+            <button onClick={toggleFog}
+              className={cn('inline-flex items-center gap-1.5 text-sm px-2.5 py-1.5 rounded-md border',
+                fog?.enabled ? 'border-amber-500/50 text-amber-600 dark:text-amber-400' : 'border-zinc-300 dark:border-zinc-700',
+                'hover:bg-zinc-100 dark:hover:bg-zinc-800')}>
+              {fog?.enabled ? <Cloud className="w-4 h-4" /> : <CloudOff className="w-4 h-4" />} Fog {fog?.enabled ? 'on' : 'off'}
+            </button>
+            {fog?.enabled && (
+              <>
+                <button onClick={() => patchMap({ fog: { ...fog, revealed: ALL_FOG_CELLS } })}
+                  className="text-xs px-2 py-1 rounded-md border border-zinc-300 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800">Reveal all</button>
+                <button onClick={() => patchMap({ fog: { ...fog, revealed: [] } })}
+                  className="text-xs px-2 py-1 rounded-md border border-zinc-300 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800">Hide all</button>
+              </>
+            )}
+
+            <span className="w-px h-5 bg-zinc-200 dark:bg-zinc-800 mx-1" />
+
+            {!turn ? (
+              <button onClick={startTurns} disabled={!tokens.length}
+                className="inline-flex items-center gap-1.5 text-sm px-2.5 py-1.5 rounded-md border border-zinc-300 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800 disabled:opacity-40">
+                <Play className="w-4 h-4" /> Turn order
+              </button>
+            ) : (
+              <>
+                <button onClick={() => stepTurn(-1)} title="Previous turn"
+                  className="p-1.5 rounded-md border border-zinc-300 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800"><SkipBack className="w-4 h-4" /></button>
+                <button onClick={() => stepTurn(1)} title="Next turn"
+                  className="p-1.5 rounded-md bg-amber-500 hover:bg-amber-400 text-zinc-950"><SkipForward className="w-4 h-4" /></button>
+                <span className="text-xs text-zinc-500">Round {turn.round || 1}</span>
+                <button onClick={endTurns} title="End turn order"
+                  className="inline-flex items-center gap-1 text-xs px-2 py-1 rounded-md border border-red-500/40 text-red-600 dark:text-red-400 hover:bg-red-500/10">
+                  <Square className="w-3 h-3" /> End
+                </button>
+              </>
+            )}
+          </div>
+
+          {/* Turn strip */}
+          {turn?.order?.length > 0 && (
+            <div className="flex items-center gap-1.5 mb-3 overflow-x-auto pb-1">
+              {turn.order.map((id, i) => {
+                const t = tokens.find((x) => x.id === id);
+                if (!t) return null;
+                const isUp = i === turn.active;
+                return (
+                  <button key={id} onClick={() => patchMap({ turn: { ...turn, active: i } })}
+                    className={cn('flex items-center gap-1.5 px-2 py-1 rounded-full text-xs whitespace-nowrap border',
+                      isUp ? 'border-amber-500 bg-amber-500/15 text-amber-700 dark:text-amber-300 font-semibold'
+                           : 'border-zinc-300 dark:border-zinc-700 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800')}>
+                    <span className="w-2.5 h-2.5 rounded-full" style={{ background: t.color || '#f59e0b' }} />
+                    {t.label || 'Token'}
+                  </button>
+                );
+              })}
+            </div>
+          )}
+
           {/* Token palette */}
           <div className="flex flex-wrap items-center gap-2 mb-3">
             <button onClick={addBlank} className="inline-flex items-center gap-1.5 text-xs px-2 py-1 rounded-md border border-zinc-300 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800"><Plus className="w-3.5 h-3.5" /> Token</button>
             <button onClick={importParty} className="inline-flex items-center gap-1.5 text-xs px-2 py-1 rounded-md border border-zinc-300 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800"><Users className="w-3.5 h-3.5" /> Import party</button>
             <button onClick={() => setShowAdd((v) => !v)} className="inline-flex items-center gap-1.5 text-xs px-2 py-1 rounded-md border border-zinc-300 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800"><Plus className="w-3.5 h-3.5" /> From entity</button>
-            {selectedToken && (
-              <button onClick={() => removeToken(selectedToken)} className="inline-flex items-center gap-1.5 text-xs px-2 py-1 rounded-md border border-red-500/40 text-red-600 dark:text-red-400 hover:bg-red-500/10"><Trash2 className="w-3.5 h-3.5" /> Remove token</button>
-            )}
           </div>
 
           {showAdd && (
@@ -239,6 +380,16 @@ export default function BattleMap() {
             </div>
           )}
 
+          {/* Selected token controls */}
+          {selected && tool === 'select' && (
+            <TokenMenu
+              token={selected}
+              onChange={(patch) => updateToken(selected.id, patch)}
+              onRemove={() => removeToken(selected.id)}
+              onClose={() => setSelectedToken(null)}
+            />
+          )}
+
           {/* The board */}
           <TokenLayer
             imageUrl={map.image_url}
@@ -249,10 +400,22 @@ export default function BattleMap() {
             onSelect={setSelectedToken}
             onMoveLive={onMoveLive}
             onMoveEnd={onMoveEnd}
+            tool={tool}
+            fog={fog}
+            fogMode="gm"
+            onFogPaint={onFogPaint}
+            pings={pings}
+            onPing={onPing}
+            activeTokenId={activeTokenId}
             className="rounded-lg border border-zinc-200 dark:border-zinc-800 overflow-hidden"
           />
           <p className="mt-2 text-xs text-zinc-500">
-            Drag tokens to move them. {map.active ? 'Players viewing the share link see this board live.' : 'Click “Show to players” to make it the live board.'}
+            {tool === 'fog'
+              ? 'Drag to reveal · hold ⌥/Alt (or right-drag) to hide again.'
+              : tool === 'ruler'
+                ? 'Drag to measure (5 ft per square).'
+                : 'Drag tokens to move · click a token to edit it · double-click the map to ping.'}
+            {' '}{map.active ? 'Players viewing the share link see this board live.' : 'Click “Show to players” to make it the live board.'}
           </p>
         </>
       ) : (
