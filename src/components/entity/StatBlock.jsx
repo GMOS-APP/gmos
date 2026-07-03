@@ -273,25 +273,25 @@ function ParsedStatBlock({ description }) {
       <div className="pt-2 border-t dark:border-zinc-800 border-zinc-200 space-y-1.5 text-sm">
         {stats.saves && (
           <div className="flex gap-2">
-            <span className="dark:text-zinc-500 text-zinc-500 font-semibold min-w-[120px]">Saving Throws</span>
+            <span className="dark:text-zinc-500 text-zinc-500 font-semibold flex-shrink-0 sm:min-w-[120px]">Saving Throws</span>
             <span className="dark:text-zinc-300 text-zinc-700">{stats.saves}</span>
           </div>
         )}
         {stats.skills && (
           <div className="flex gap-2">
-            <span className="dark:text-zinc-500 text-zinc-500 font-semibold min-w-[120px]">Skills</span>
+            <span className="dark:text-zinc-500 text-zinc-500 font-semibold flex-shrink-0 sm:min-w-[120px]">Skills</span>
             <span className="dark:text-zinc-300 text-zinc-700">{stats.skills}</span>
           </div>
         )}
         {stats.senses && (
           <div className="flex gap-2">
-            <span className="dark:text-zinc-500 text-zinc-500 font-semibold min-w-[120px]">Senses</span>
+            <span className="dark:text-zinc-500 text-zinc-500 font-semibold flex-shrink-0 sm:min-w-[120px]">Senses</span>
             <span className="dark:text-zinc-300 text-zinc-700">{stats.senses}</span>
           </div>
         )}
         {stats.languages && (
           <div className="flex gap-2">
-            <span className="dark:text-zinc-500 text-zinc-500 font-semibold min-w-[120px]">Languages</span>
+            <span className="dark:text-zinc-500 text-zinc-500 font-semibold flex-shrink-0 sm:min-w-[120px]">Languages</span>
             <span className="dark:text-zinc-300 text-zinc-700">{stats.languages}</span>
           </div>
         )}

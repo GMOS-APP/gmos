@@ -89,8 +89,11 @@ export default function PublicPlayerView() {
           const { data: invData } = await supabase.functions.invoke('party-inventory', { body: { token, action: 'list' } });
           if (invData && !invData.error) { setInv(invData.items || []); setCurrency(invData.currency || {}); setPnotes(invData.notes || []); }
         } catch { /* non-fatal */ }
-      } catch (e) {
-        setError(e.message || 'This campaign is not shared or the link is invalid.');
+      } catch {
+        // Don't surface raw API errors ("Edge Function returned a non-2xx…")
+        // to players — the practical causes are the same: bad/expired link
+        // or sharing turned off.
+        setError('This campaign is not shared or the link is invalid. Ask your GM for a fresh link.');
       } finally {
         setLoading(false);
       }

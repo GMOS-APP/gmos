@@ -14,6 +14,7 @@ import GMScreen from '@/components/session/GMScreen';
 import SessionDebrief from '@/components/session/SessionDebrief';
 import SessionHeader from '@/components/session/SessionHeader';
 import { CampaignProvider } from '@/lib/CampaignContext';
+import QueryError from '@/components/common/QueryError';
 import { Maximize2 } from 'lucide-react';
 
 const PREP_FIELD_MAP = [
@@ -139,7 +140,13 @@ export default function SessionPage() {
     return prev.next_session_primer || prev.summary || '';
   };
 
-  const { data: session } = useQuery({
+  const {
+    data: session,
+    isLoading: sessionLoading,
+    isError: sessionError,
+    error: sessionErr,
+    refetch: refetchSession,
+  } = useQuery({
     queryKey: ['session', sessionId || `${campaignId}-${sessionNum}`],
     queryFn: () => sessionId
       ? Session.filter({ id: sessionId })
@@ -251,6 +258,23 @@ export default function SessionPage() {
     if (isRunMode && activeTab === 'prep') setActiveTab('run');
     if (isRunMode) setGmScreenOpen(true);
   }, [isRunMode]);
+
+  // Guard the main session load — otherwise a network failure renders a blank
+  // prep form and looks like the user's prep vanished.
+  if (!isNewSession && sessionLoading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <Loader2 className="w-6 h-6 animate-spin text-zinc-500" />
+      </div>
+    );
+  }
+  if (!isNewSession && sessionError) {
+    return (
+      <div className="p-6">
+        <QueryError error={sessionErr} onRetry={refetchSession} title="Couldn't load this session" />
+      </div>
+    );
+  }
 
   return (
     <CampaignProvider campaign={campaign}>

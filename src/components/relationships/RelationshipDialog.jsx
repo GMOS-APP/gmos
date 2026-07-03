@@ -219,7 +219,8 @@ export default function RelationshipDialog({ open, onOpenChange, relationship, c
         <DialogFooter className="flex justify-between">
           {isEdit && (
             <Button
-              onClick={() => deleteMutation.mutate()}
+              onClick={() => { if (window.confirm("Delete this relationship? This can't be undone.")) deleteMutation.mutate(); }}
+              disabled={deleteMutation.isPending}
               variant="ghost"
               className="text-red-400 hover:text-red-300 hover:bg-red-500/10"
             >

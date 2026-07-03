@@ -47,15 +47,19 @@ export default function EntityMentionTextarea({
     (e) => e.name?.toLowerCase() === query.toLowerCase()
   );
 
-  // Use fixed positioning so the dropdown escapes any overflow:hidden ancestors
+  // Use fixed positioning so the dropdown escapes any overflow:hidden ancestors.
+  // Flip above the textarea when there isn't room below (dropdown ≈ 280px tall),
+  // otherwise it clips off the bottom of the viewport on short/mobile screens.
   const computeDropdownPos = useCallback(() => {
     const ta = textareaRef.current;
     if (!ta) return;
     const rect = ta.getBoundingClientRect();
-    setDropdownPos({
-      top: rect.bottom + 4,
-      left: rect.left,
-    });
+    const DROPDOWN_H = 280;
+    const below = rect.bottom + 4;
+    const top = below + DROPDOWN_H > window.innerHeight && rect.top > DROPDOWN_H
+      ? rect.top - DROPDOWN_H - 4
+      : below;
+    setDropdownPos({ top, left: rect.left });
   }, []);
 
   const handleKeyDown = (e) => {

@@ -344,7 +344,7 @@ export default function SessionNotesPanel({ session, entities, campaignId, sessi
               entities={entities}
               campaignId={campaignId}
               onUpdate={(id, payload) => updateMutation.mutate({ id, payload })}
-              onDelete={(id) => deleteMutation.mutate(id)}
+              onDelete={(id) => { if (window.confirm("Delete this note? This can't be undone.")) deleteMutation.mutate(id); }}
             />
           </div>
         ))}

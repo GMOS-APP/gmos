@@ -166,7 +166,9 @@ export default function CampaignNotes() {
     enabled: !!campaignId,
   });
 
-  const invalidate = () => queryClient.invalidateQueries({ queryKey: ['quick-notes'] });
+  // Scope to this campaign — a bare ['quick-notes'] prefix would refetch every
+  // campaign's cached notes on each edit.
+  const invalidate = () => queryClient.invalidateQueries({ queryKey: ['quick-notes', campaignId] });
 
   const addMutation = useMutation({
     mutationFn: (content) => QuickNote.create({
@@ -352,7 +354,7 @@ export default function CampaignNotes() {
                   <NoteCard key={note.id} note={note} entities={entities} campaignId={campaignId}
                     sessionLabel={note.session_id ? sessionLabel(sessionMap[note.session_id]) : null}
                     onUpdate={(id, payload) => updateMutation.mutate({ id, payload })}
-                    onDelete={(id) => deleteMutation.mutate(id)} />
+                    onDelete={(id) => { if (window.confirm("Delete this note? This can't be undone.")) deleteMutation.mutate(id); }} />
                 ))}
               </NoteColumns>
             </div>
@@ -387,7 +389,7 @@ export default function CampaignNotes() {
                 {groupNotes.map(note => (
                   <NoteCard key={note.id} note={note} entities={entities} campaignId={campaignId}
                     onUpdate={(id, payload) => updateMutation.mutate({ id, payload })}
-                    onDelete={(id) => deleteMutation.mutate(id)} />
+                    onDelete={(id) => { if (window.confirm("Delete this note? This can't be undone.")) deleteMutation.mutate(id); }} />
                 ))}
               </NoteColumns>
             </div>
