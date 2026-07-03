@@ -1,16 +1,59 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { usePageParams } from '@/lib/usePageParams';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Campaign, WorldEntity, Session } from '@/api/entities';
 import PlayerEntityModal from '@/components/common/PlayerEntityModal';
-import { Eye, EyeOff } from 'lucide-react';
+import { Eye, EyeOff, Megaphone, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useEntityTypes } from '@/lib/entityTypes';
+import { useToast } from '@/components/ui/use-toast';
 
 const VISIBILITY_LABELS = {
   players_know:    { label: 'Known',    icon: Eye,    color: 'dark:text-emerald-400 text-emerald-600' },
   players_suspect: { label: 'Rumored',  icon: EyeOff, color: 'dark:text-amber-400 text-amber-600' },
 };
+
+// GM-side editor for the pinned message shown on the player share page.
+function NoticeEditor({ campaignId, campaign }) {
+  const qc = useQueryClient();
+  const { toast } = useToast();
+  const [text, setText] = useState('');
+  useEffect(() => { setText(campaign?.player_notice || ''); }, [campaign?.player_notice]);
+
+  const save = useMutation({
+    mutationFn: () => Campaign.update(campaignId, { player_notice: text.trim() || null }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['campaign', campaignId] });
+      toast({ title: 'Notice updated', description: text.trim() ? 'Players will see it on the share page.' : 'Notice cleared.' });
+    },
+    onError: (err) => toast({ title: "Couldn't save notice", description: err?.message, variant: 'destructive' }),
+  });
+
+  const dirty = text.trim() !== (campaign?.player_notice || '');
+  return (
+    <div className="mb-6 rounded-xl border dark:border-zinc-800 border-zinc-200 p-3">
+      <div className="flex items-center gap-2 mb-2">
+        <Megaphone className="w-3.5 h-3.5 text-amber-500" />
+        <span className="text-xs font-semibold uppercase tracking-widest dark:text-zinc-500 text-zinc-500">Pinned notice for players</span>
+      </div>
+      <div className="flex gap-2">
+        <input
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+          placeholder="e.g. Next game starts at 7 — bring snacks!"
+          className="flex-1 text-sm rounded-md border dark:border-zinc-800 border-zinc-300 dark:bg-zinc-900/60 bg-zinc-100 dark:text-zinc-200 text-zinc-900 px-2.5 py-1.5"
+        />
+        <button
+          onClick={() => save.mutate()}
+          disabled={!dirty || save.isPending}
+          className="px-3 py-1.5 rounded-md bg-amber-500 hover:bg-amber-400 text-zinc-950 text-sm font-medium disabled:opacity-40"
+        >
+          {save.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Save'}
+        </button>
+      </div>
+    </div>
+  );
+}
 
 export default function PlayerView() {
   const params = usePageParams();
@@ -68,6 +111,9 @@ export default function PlayerView() {
           <p className="text-sm dark:text-zinc-500 text-zinc-500 mt-1">{campaign.setting}</p>
         )}
       </div>
+
+      {/* Pinned notice (GM edits; players see it on the share page) */}
+      <NoticeEditor campaignId={campaignId} campaign={campaign} />
 
       {/* Last session recap */}
       {lastDebriefed?.previous_session_recap && (

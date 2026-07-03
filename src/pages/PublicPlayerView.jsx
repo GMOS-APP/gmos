@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { supabase } from '@/api/supabaseClient';
-import { Eye, EyeOff, Loader2, Backpack, MessageSquare } from 'lucide-react';
+import { Eye, EyeOff, Loader2, Backpack, MessageSquare, Megaphone, CalendarDays, Users as UsersIcon, BookOpen, Dices } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ENTITY_TYPE_META } from '@/lib/entityColors';
 import { COLOR_PRESETS, resolveIcon, buildCustomMeta } from '@/lib/entityTypes';
@@ -34,6 +34,35 @@ const VISIBILITY_LABELS = {
   players_suspect: { label: 'Rumored', icon: EyeOff, color: 'text-amber-600 dark:text-amber-400' },
 };
 
+// Table dice for the shared page — local rolls, big result, no account needed.
+function DiceRoller() {
+  const [res, setRes] = useState(null);
+  const roll = (sides) => setRes({ sides, v: 1 + Math.floor(Math.random() * sides), id: Date.now() });
+  return (
+    <div className="flex items-center gap-1.5 flex-wrap">
+      {[4, 6, 8, 10, 12, 20, 100].map((s) => (
+        <button key={s} onClick={() => roll(s)}
+          className="px-2 py-1 rounded-md border border-zinc-800 text-xs font-mono text-zinc-400 hover:border-amber-500/50 hover:text-amber-400 transition-colors">
+          d{s}
+        </button>
+      ))}
+      {res && (
+        <span key={res.id} className="ml-auto text-sm font-mono text-amber-400 animate-in fade-in zoom-in-95">
+          d{res.sides} → <span className="text-lg font-bold">{res.v}</span>
+        </span>
+      )}
+    </div>
+  );
+}
+
+// Dates may arrive as 'YYYY-MM-DD' or a full timestamptz — format the date
+// part only (parsing the timestamp directly can shift a day across timezones).
+const fmtDate = (d, opts = { weekday: 'long', month: 'long', day: 'numeric' }) => {
+  try {
+    return new Date(`${String(d).slice(0, 10)}T00:00:00`).toLocaleDateString('en-US', opts);
+  } catch { return d; }
+};
+
 export default function PublicPlayerView() {
   const params = new URLSearchParams(window.location.search);
   const token = params.get('token');
@@ -43,6 +72,7 @@ export default function PublicPlayerView() {
   const [campaign, setCampaign] = useState(null);
   const [entities, setEntities] = useState([]);
   const [sessions, setSessions] = useState([]);
+  const [party, setParty] = useState([]);
   const [customTypeDefs, setCustomTypeDefs] = useState([]);
   const [activeType, setActiveType] = useState('all');
   const typeMeta = useMemo(() => buildTypeMeta(customTypeDefs), [customTypeDefs]);
@@ -83,6 +113,7 @@ export default function PublicPlayerView() {
         setCampaign(data.campaign);
         setEntities(data.entities || []);
         setSessions(data.sessions || []);
+        setParty(data.party || []);
         setCustomTypeDefs(data.entityTypes || []);
         // Party inventory (best-effort — never blocks the page).
         try {
@@ -107,7 +138,13 @@ export default function PublicPlayerView() {
     if (!token) return;
     try {
       const { data } = await supabase.functions.invoke('player-view', { body: { token } });
-      if (data && !data.error) { setEntities(data.entities || []); setSessions(data.sessions || []); setCustomTypeDefs(data.entityTypes || []); }
+      if (data && !data.error) {
+        setCampaign(data.campaign);
+        setEntities(data.entities || []);
+        setSessions(data.sessions || []);
+        setParty(data.party || []);
+        setCustomTypeDefs(data.entityTypes || []);
+      }
     } catch { /* non-fatal */ }
   }, [token]);
 
@@ -130,6 +167,14 @@ export default function PublicPlayerView() {
   const types = [...new Set(visible.map(e => e.entity_type))];
   const filtered = activeType === 'all' ? visible : visible.filter(e => e.entity_type === activeType);
   const lastDebriefed = sessions.find(s => s.status === 'debriefed' || s.status === 'completed');
+  // Soonest planned session with a date (sessions arrive newest-first).
+  const nextSession = sessions
+    .filter((s) => s.status === 'planned' && s.date)
+    .sort((a, b) => (a.date < b.date ? -1 : 1))[0] || null;
+  // The campaign story so far — every player-facing recap, newest first.
+  const journal = sessions.filter(
+    (s) => s.previous_session_recap && (s.status === 'debriefed' || s.status === 'completed')
+  );
 
   // Party inventory mutations via the token-authenticated edge function.
   const invCall = (payload) => supabase.functions.invoke('party-inventory', { body: { token, ...payload } });
@@ -204,11 +249,52 @@ export default function PublicPlayerView() {
 
         {/* RIGHT — stacked frames */}
         <div className="space-y-6 min-w-0">
+          {/* Pinned GM notice */}
+          {campaign?.player_notice && (
+            <div className="rounded-xl border border-amber-500/40 bg-amber-500/10 p-4 flex items-start gap-2.5">
+              <Megaphone className="w-4 h-4 text-amber-400 flex-shrink-0 mt-0.5" />
+              <p className="text-sm text-amber-100 leading-relaxed whitespace-pre-wrap">{campaign.player_notice}</p>
+            </div>
+          )}
+
+          {/* Next session */}
+          {nextSession && (
+            <div className="rounded-xl border border-emerald-500/30 bg-emerald-500/5 p-4 flex items-center gap-2.5">
+              <CalendarDays className="w-4 h-4 text-emerald-400 flex-shrink-0" />
+              <p className="text-sm text-zinc-200">
+                <span className="text-emerald-400 font-semibold">Next session:</span> {fmtDate(nextSession.date)}
+                {nextSession.title && <span className="text-zinc-400"> — {nextSession.title}</span>}
+              </p>
+            </div>
+          )}
+
           {/* Previously… */}
           {lastDebriefed?.previous_session_recap && (
             <div className="rounded-xl border border-amber-500/20 bg-amber-500/5 p-4">
               <p className="text-xs font-semibold uppercase tracking-wider text-amber-500 mb-2">Previously…</p>
               <p className="text-sm text-zinc-300 leading-relaxed italic">{lastDebriefed.previous_session_recap}</p>
+            </div>
+          )}
+
+          {/* The party */}
+          {party.length > 0 && (
+            <div className={frame}>
+              <div className={frameHeading}><UsersIcon className="w-4 h-4 text-amber-400" /> The Party</div>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                {party.map((p) => (
+                  <div key={p.id} className="rounded-lg border border-zinc-800 bg-zinc-900/40 p-2.5 text-center">
+                    {p.image_url ? (
+                      <img src={p.image_url} alt="" className="w-12 h-12 rounded-full object-cover mx-auto mb-1.5 border border-zinc-700" />
+                    ) : (
+                      <div className="w-12 h-12 rounded-full bg-cyan-500/15 border border-cyan-500/30 mx-auto mb-1.5 flex items-center justify-center text-cyan-400 font-bold text-sm">
+                        {(p.name || '?').slice(0, 2).toUpperCase()}
+                      </div>
+                    )}
+                    <p className="text-xs font-semibold text-zinc-200 truncate">{p.name}</p>
+                    {p.meta && <p className="text-[10px] text-zinc-500 truncate">{p.meta}</p>}
+                  </div>
+                ))}
+              </div>
             </div>
           )}
 
@@ -282,6 +368,29 @@ export default function PublicPlayerView() {
             <div className={frameHeading}><MessageSquare className="w-4 h-4 text-amber-400" /> Party Notes</div>
             <PartyNotes notes={pnotes} onAdd={addNote} onDelete={delNote} />
           </div>
+
+          {/* Dice */}
+          <div className={frame}>
+            <div className={frameHeading}><Dices className="w-4 h-4 text-amber-400" /> Dice</div>
+            <DiceRoller />
+          </div>
+
+          {/* Campaign journal */}
+          {journal.length > 1 && (
+            <div className={frame}>
+              <div className={frameHeading}><BookOpen className="w-4 h-4 text-amber-400" /> The Story So Far</div>
+              <div className="space-y-4 max-h-96 overflow-y-auto pr-1">
+                {journal.map((s) => (
+                  <div key={s.session_number}>
+                    <p className="text-[11px] font-semibold uppercase tracking-wider text-zinc-500 mb-1">
+                      Session {s.session_number}{s.title ? ` · ${s.title}` : ''}{s.date ? ` · ${fmtDate(s.date, { month: 'short', day: 'numeric', year: 'numeric' })}` : ''}
+                    </p>
+                    <p className="text-sm text-zinc-400 leading-relaxed">{s.previous_session_recap}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
           <div className="pt-2 text-center">
             <p className="text-xs text-zinc-600">

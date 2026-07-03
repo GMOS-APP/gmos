@@ -71,6 +71,24 @@ export default function PlayerEntityModal({ entity, open, onOpenChange, onAddToI
             </p>
           )}
 
+          {/* Player-safe details (composed + GM-filtered server-side) */}
+          {entity.details?.specs?.length > 0 && (
+            <div className="flex flex-wrap gap-x-5 gap-y-2 mt-4 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900/40 px-3 py-2.5">
+              {entity.details.specs.map((s) => (
+                <div key={s.label} className="min-w-0">
+                  <span className="block text-[10px] uppercase tracking-widest text-zinc-500 font-semibold">{s.label}</span>
+                  <span className="block text-sm font-medium text-zinc-800 dark:text-zinc-200">{s.value}</span>
+                </div>
+              ))}
+            </div>
+          )}
+          {entity.details?.sections?.map((s) => (
+            <div key={s.label} className="mt-4">
+              <h4 className="text-[10px] uppercase tracking-widest text-zinc-500 font-semibold mb-1">{s.label}</h4>
+              <p className="text-sm text-zinc-600 dark:text-zinc-300 leading-relaxed whitespace-pre-wrap">{s.value}</p>
+            </div>
+          ))}
+
           {canAdd && (
             <button
               onClick={addToInventory}
