@@ -14,13 +14,32 @@ export const PRICING_BLURB = 'GM/OS is free for one fully-featured campaign (no 
 // Hub-page metadata (shared by the hub components and the build prerender).
 export const COMPARE_HUB = {
   path: '/compare',
-  title: 'GM/OS vs World Anvil, Kanka, LegendKeeper & More | Compare',
-  description: 'See how GM/OS compares to World Anvil, Kanka, LegendKeeper, Notion, and Obsidian as a D&D campaign manager and dungeon master toolkit. Free to start.',
+  title: 'GM/OS vs Other Campaign Managers | Compare',
+  description: 'See how GM/OS compares to other TTRPG campaign managers — World Anvil, Kanka, LegendKeeper, Notion, and Obsidian — for D&D 5e and any tabletop RPG. Free to start.',
 };
 export const FEATURES_HUB = {
   path: '/features',
   title: 'Dungeon Master Tools & Features | GM/OS',
   description: 'Every tool GM/OS gives a game master: an initiative tracker, a live battle map, a relationship map, guided session prep, an online DM screen, NPC tracking, and a player view. Free to start.',
+};
+
+// Generic "GM/OS vs Others" comparison — a category-level table for the compare
+// hub that does not single out one competitor. Rows describe how GM/OS differs
+// from typical campaign managers / worldbuilding wikis as a whole.
+export const GENERIC_COMPARISON = {
+  competitorLabel: 'Typical tools',
+  rows: [
+    { feature: 'Worldbuilding wiki (NPCs, locations, lore)', gmos: 'Yes — 12 linked entity types', others: 'Usually' },
+    { feature: 'System-agnostic (any tabletop RPG)', gmos: 'Yes — D&D 5e + custom types', others: 'Often D&D-only' },
+    { feature: 'Guided session prep', gmos: 'Yes — Lazy GM method', others: 'Rarely' },
+    { feature: 'Initiative / combat tracker', gmos: 'Built in', others: 'Separate tool' },
+    { feature: 'Live shared battle map (VTT)', gmos: 'Built in — real-time', others: 'Separate VTT' },
+    { feature: 'Dice at the table', gmos: 'Built in', others: 'Separate tool' },
+    { feature: 'Player view with secrets hidden', gmos: 'Yes — per-entity control', others: 'Limited' },
+    { feature: 'Focus', gmos: 'Prepping and running sessions', others: 'Mostly a wiki' },
+    { feature: 'Free plan', gmos: 'Yes — 1 full campaign', others: 'Varies' },
+    { feature: 'Lifetime option', gmos: 'Yes — $49.99 once', others: 'Rare' },
+  ],
 };
 
 // ---------------------------------------------------------------------------
@@ -32,7 +51,7 @@ export const COMPARISONS = [
     competitor: 'World Anvil',
     metaTitle: 'A World Anvil Alternative for Running Sessions | GM/OS',
     metaDescription:
-      'Looking for a World Anvil alternative? GM/OS is a faster, table-first D&D campaign manager — worldbuilding plus a live battle map, initiative, dice, and a player view. Free to start.',
+      'Looking for a World Anvil alternative? GM/OS is a faster, table-first TTRPG campaign manager (D&D 5e and beyond) — worldbuilding plus a live battle map, initiative, dice, and a player view. Free to start.',
     h1: 'The World Anvil alternative built for the table',
     intro:
       "World Anvil is a deep worldbuilding and publishing suite — and that depth is also its reputation for a steep, button-heavy interface. GM/OS takes the opposite stance: keep your world organised, but put the tools you actually use while running a session one keystroke away. If you want less setup and more play, GM/OS is the World Anvil alternative to try.",

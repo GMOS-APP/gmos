@@ -203,8 +203,8 @@ export default function LandingPage() {
       .then(({ data }) => setLatestPosts(data || []));
   }, []);
   useSeo({
-    title: 'GM/OS — Game Master Operating System & D&D Campaign Manager',
-    description: 'GM/OS is a D&D campaign manager and dungeon master toolkit in one — worldbuilding, guided session prep, a live battle map, initiative, dice, and a player view you control. Free to start.',
+    title: 'GM/OS — TTRPG & D&D Campaign Manager | Game Master OS',
+    description: 'GM/OS is a TTRPG campaign manager and dungeon master toolkit — built for D&D 5e and any tabletop RPG: worldbuilding, guided session prep, a live battle map, initiative, dice, and a player view you control. Free to start.',
     path: '/',
     jsonLd: [
       {
@@ -215,7 +215,7 @@ export default function LandingPage() {
         applicationCategory: 'GameApplication',
         operatingSystem: 'Web',
         url: 'https://gmos.app/',
-        description: 'GM/OS is a campaign manager and dungeon master toolkit for tabletop RPGs — worldbuilding, guided session prep, a live battle map, an initiative tracker, dice, a relationship map, and a player view you control.',
+        description: 'GM/OS is a TTRPG campaign manager and dungeon master toolkit — built for D&D 5e and any tabletop RPG: worldbuilding, guided session prep, a live battle map, an initiative tracker, dice, a relationship map, and a player view you control.',
         offers: [
           { '@type': 'Offer', price: '0', priceCurrency: 'USD', name: 'Free' },
           { '@type': 'Offer', price: '3.99', priceCurrency: 'USD', name: 'Monthly' },
@@ -273,7 +273,7 @@ export default function LandingPage() {
               Prep less.<br />Run better.
             </h1>
             <p className="mt-5 text-lg text-zinc-600 dark:text-zinc-400 max-w-lg">
-              GM/OS is a D&amp;D campaign manager and a full set of dungeon master tools in one — and unlike a wiki or a stack of docs, it's built for the table: guided session prep, a live battle map, an initiative tracker, and a player view you control.
+              GM/OS is a TTRPG campaign manager and a full set of dungeon master tools in one — built for D&amp;D 5e and any tabletop RPG. Unlike a wiki or a stack of docs, it's built for the table: guided session prep, a live battle map, an initiative tracker, and a player view you control.
             </p>
             <ul className="mt-6 space-y-2">
               {['Your world: NPCs, locations, factions, lore', 'Guided session prep', 'Notes, initiative, and dice at the table', 'A player-facing view you control'].map((t) => (
