@@ -4,8 +4,10 @@ import { createPageUrl } from '@/utils';
 import { ArrowLeft, AlertTriangle } from 'lucide-react';
 
 // Standalone wrapper for the public legal pages (Privacy, Terms). Works both
-// pre-auth (linked from the landing page) and in-app.
-export default function LegalShell({ title, updated, children }) {
+// pre-auth (linked from the landing page) and in-app. Pass `draft` to show the
+// "pending legal review / replace placeholders" banner — only for pages that
+// still contain unfilled [bracketed] placeholders, not finalised live pages.
+export default function LegalShell({ title, updated, draft = false, children }) {
   return (
     <div className="min-h-screen bg-white dark:bg-zinc-950 text-zinc-800 dark:text-zinc-200">
       <header className="border-b border-zinc-200 dark:border-zinc-800/70">
@@ -23,14 +25,16 @@ export default function LegalShell({ title, updated, children }) {
         <h1 className="text-3xl font-bold text-zinc-900 dark:text-zinc-100">{title}</h1>
         <p className="text-xs text-zinc-500 dark:text-zinc-500 mt-1">Last updated: {updated}</p>
 
-        <div className="mt-5 flex items-start gap-2.5 rounded-lg border border-amber-500/30 bg-amber-500/10 px-4 py-3">
-          <AlertTriangle className="w-4 h-4 text-amber-500 flex-shrink-0 mt-0.5" />
-          <p className="text-xs text-amber-700 dark:text-amber-300/90 leading-relaxed">
-            <strong>Draft — pending legal review.</strong> This template is provided to support compliance and is not
-            legal advice. Replace the <span className="font-mono">[bracketed]</span> placeholders and have it reviewed by
-            qualified counsel for your jurisdiction(s) before relying on it.
-          </p>
-        </div>
+        {draft && (
+          <div className="mt-5 flex items-start gap-2.5 rounded-lg border border-amber-500/30 bg-amber-500/10 px-4 py-3">
+            <AlertTriangle className="w-4 h-4 text-amber-500 flex-shrink-0 mt-0.5" />
+            <p className="text-xs text-amber-700 dark:text-amber-300/90 leading-relaxed">
+              <strong>Draft — pending legal review.</strong> This template is provided to support compliance and is not
+              legal advice. Replace the <span className="font-mono">[bracketed]</span> placeholders and have it reviewed by
+              qualified counsel for your jurisdiction(s) before relying on it.
+            </p>
+          </div>
+        )}
 
         <div className="legal-body mt-8 space-y-6 text-sm leading-relaxed text-zinc-700 dark:text-zinc-300">
           {children}

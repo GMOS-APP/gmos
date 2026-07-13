@@ -3,7 +3,7 @@ import LegalShell, { H2, P, UL } from '@/components/layout/LegalShell';
 
 export default function PrivacyPolicy() {
   return (
-    <LegalShell title="Privacy Policy" updated="June 4, 2026">
+    <LegalShell title="Privacy Policy" updated="July 13, 2026">
       <P>
         This Privacy Policy explains how GM/OS (“we”, “us”) collects, uses, and protects your personal information,
         and the rights you have over it. GM/OS is operated by <strong>Hook &amp; Quill LLC</strong> (Pennsylvania,
@@ -15,13 +15,15 @@ export default function PrivacyPolicy() {
         <li><strong>Account identity</strong> — your email address and display name, provided when you sign up with email &amp; password or via Google sign-in.</li>
         <li><strong>Content you create</strong> — campaigns and everything in them: world entities (NPCs, locations, etc.), sessions and prep, notes, relationships, maps, and random tables.</li>
         <li><strong>Billing identifiers</strong> — if you subscribe, a Stripe customer ID and subscription ID. Card details are handled by Stripe and never stored by us.</li>
-        <li><strong>Essential technical data</strong> — an authentication session and small preferences (e.g. theme) stored in your browser. We do <strong>not</strong> use analytics, advertising, or third-party tracking.</li>
+        <li><strong>Essential technical data</strong> — an authentication session and small preferences (e.g. theme, layout) stored in your browser.</li>
+        <li><strong>Usage analytics</strong> — privacy-friendly, <strong>cookieless</strong> product analytics (via Vercel) that record aggregate page views and feature events to help us understand how GM/OS is used. This sets no cookies, does not track you across other websites, and is never used for advertising.</li>
       </UL>
 
       <H2>How we use your information</H2>
       <UL>
         <li>To provide and operate the service (store and display your campaigns, authenticate you).</li>
         <li>To process subscriptions and billing, where applicable.</li>
+        <li>To understand aggregate usage and improve the service.</li>
         <li>To secure the service and prevent abuse.</li>
         <li>To comply with legal obligations.</li>
       </UL>
@@ -38,7 +40,7 @@ export default function PrivacyPolicy() {
         <li><strong>Supabase</strong> — database, authentication, and hosting of your content (US region).</li>
         <li><strong>Stripe</strong> — payment processing, for subscribers.</li>
         <li><strong>Google</strong> — optional sign-in (OAuth).</li>
-        <li><strong>GitHub Pages</strong> — static hosting of the web application.</li>
+        <li><strong>Vercel</strong> — hosting of the web application and privacy-friendly, cookieless usage analytics.</li>
       </UL>
 
       <H2>Where your data is processed</H2>
@@ -78,7 +80,8 @@ export default function PrivacyPolicy() {
       <H2>Cookies &amp; local storage</H2>
       <P>
         We use only strictly necessary browser storage: your authentication session and interface preferences (such as
-        theme and layout). We do not set advertising or analytics cookies, so no consent banner is required.
+        theme and layout). Our usage analytics are cookieless and store no identifiers in your browser, and we set no
+        advertising or analytics cookies — so no consent banner is required.
       </P>
 
       <H2>Children</H2>

@@ -5,10 +5,12 @@ import LegalShell, { H2, P, UL } from '@/components/layout/LegalShell';
 
 export default function Terms() {
   return (
-    <LegalShell title="Terms of Service" updated="June 4, 2026">
+    <LegalShell title="Terms of Service" updated="July 13, 2026">
       <P>
         These Terms govern your use of GM/OS, operated by <strong>Hook &amp; Quill LLC</strong> (Pennsylvania, USA)
-        (“we”, “us”). By creating an account or using the service, you agree to these Terms.
+        (“we”, “us”). By creating an account or using the service, you agree to these Terms. Our{' '}
+        <Link to={createPageUrl('PrivacyPolicy')} className="text-amber-600 dark:text-amber-400 hover:underline">Privacy Policy</Link>{' '}
+        explains how we handle your personal information.
       </P>
 
       <H2>The service</H2>
@@ -46,11 +48,28 @@ export default function Terms() {
       <H2>Our intellectual property</H2>
       <P>The GM/OS name, interface, and software are owned by us or our licensors and are protected by applicable law.</P>
 
-      <H2>Subscriptions, lifetime licences &amp; billing</H2>
+      <H2>Plans, billing &amp; renewals</H2>
       <P>
-        GM/OS is currently free to use. We intend to offer two paid options: a recurring <strong>subscription</strong>
-        and a one-time <strong>lifetime licence</strong>. Paid plans are billed through Stripe, and the price and any
-        plan-specific terms are presented to you at the time of purchase.
+        GM/OS offers a <strong>free plan</strong> (one campaign) and <strong>paid plans</strong> that remove the
+        campaign limit. Paid plans are offered as a recurring <strong>subscription</strong> (billed monthly or yearly)
+        and as a one-time <strong>lifetime licence</strong>. Prices are shown at the time of purchase, and all payments
+        are processed by <strong>Stripe</strong> — we never receive or store your card details.
+      </P>
+      <P>
+        <strong>Auto-renewal &amp; cancellation.</strong> Monthly and yearly subscriptions renew automatically at the
+        then-current price at the end of each billing period until you cancel. You can cancel at any time from Account
+        settings (“Manage billing”), which opens the Stripe customer portal. When you cancel, your paid access continues
+        until the end of the period you have already paid for and is not renewed afterward.
+      </P>
+      <P>
+        <strong>Refunds.</strong> Except where required by law, payments are non-refundable, including for partial
+        subscription periods after a cancellation. If you believe you were charged in error, contact us and we will
+        review it in good faith.
+      </P>
+      <P>
+        <strong>Price changes.</strong> We may change our prices. Changes apply to future billing periods, and we will
+        give reasonable advance notice for active subscriptions; your continued use after a change takes effect
+        constitutes acceptance.
       </P>
       <P>
         <strong>Lifetime licences.</strong> “Lifetime” refers to the operational lifetime of the GM/OS service — it is
