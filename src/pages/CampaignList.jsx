@@ -112,8 +112,11 @@ export default function CampaignList() {
     queryFn: () => Campaign.list('-created_date'),
   });
 
-  // Free plan is capped at FREE_CAMPAIGN_LIMIT campaigns; the server enforces it too.
-  const atFreeLimit = !isPlus && campaigns.length >= FREE_CAMPAIGN_LIMIT;
+  // Free plan is capped at FREE_CAMPAIGN_LIMIT campaigns; the server enforces it
+  // too. The bundled demo doesn't count, so a new user always gets one real
+  // campaign of their own on top of it.
+  const realCampaignCount = campaigns.filter((c) => !c.is_demo).length;
+  const atFreeLimit = !isPlus && realCampaignCount >= FREE_CAMPAIGN_LIMIT;
   const handleNewCampaign = () => (atFreeLimit ? setShowUpgrade(true) : setShowCreate(true));
 
   const createMutation = useMutation({
@@ -214,7 +217,7 @@ export default function CampaignList() {
                   From File
                 </DropdownMenuItem>
                 <DropdownMenuItem
-                  onClick={() => (atFreeLimit ? setShowUpgrade(true) : handleLoadDemo())}
+                  onClick={handleLoadDemo}
                   disabled={loadingDemo}
                   className="text-zinc-700 dark:text-zinc-300 focus:text-zinc-900 dark:focus:text-zinc-100"
                 >
