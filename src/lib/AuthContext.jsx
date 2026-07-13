@@ -27,7 +27,11 @@ async function fetchOrCreateProfile(userId, setProfile) {
     .upsert({ id: userId }, { onConflict: 'id', ignoreDuplicates: true })
     .select();
   if (inserted && inserted.length > 0) {
-    supabase.functions.invoke('create-demo').catch(console.error);
+    // Seed the demo, then refresh the campaign list so a brand-new user sees it
+    // appear instead of the empty state (the invoke lands after first render).
+    supabase.functions.invoke('create-demo')
+      .then(() => queryClientInstance.invalidateQueries({ queryKey: ['campaigns'] }))
+      .catch(console.error);
   }
 }
 

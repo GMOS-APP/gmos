@@ -24,6 +24,7 @@ import { useEntityTypes, systemDefaultTypeKeys } from '@/lib/entityTypes';
 import UpgradeModal from '@/components/billing/UpgradeModal';
 import BetaBadge from '@/components/common/BetaBadge';
 import { FREE_CAMPAIGN_LIMIT, isCampaignLimitError } from '@/lib/plans';
+import { useToast } from '@/components/ui/use-toast';
 
 // True when a thrown error — from a direct insert or from a functions.invoke
 // (FunctionsHttpError carries the body in .context) — is the campaign-limit signal.
@@ -39,6 +40,7 @@ async function isLimitError(err) {
 
 export default function CampaignList() {
   const queryClient = useQueryClient();
+  const { toast } = useToast();
   const { user, isPlus, isAdmin, logout } = useAuth();
   const [showCreate, setShowCreate] = useState(false);
   const [showUpgrade, setShowUpgrade] = useState(false);
@@ -69,16 +71,22 @@ export default function CampaignList() {
   const handleExport = async (e, campaign) => {
     e.preventDefault();
     setExportingId(campaign.id);
-    const response = await functions.invoke('exportCampaign', { campaign_id: campaign.id });
-    const data = response.data;
-    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `${campaign.name.replace(/\s+/g, '_')}_backup.json`;
-    a.click();
-    URL.revokeObjectURL(url);
-    setExportingId(null);
+    try {
+      const response = await functions.invoke('exportCampaign', { campaign_id: campaign.id });
+      if (response.error || !response.data) throw response.error || new Error('No data returned');
+      const blob = new Blob([JSON.stringify(response.data, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${campaign.name.replace(/\s+/g, '_')}_backup.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error('Export failed:', err);
+      toast({ title: 'Export failed', description: 'Could not export this campaign. Please try again.', variant: 'destructive' });
+    } finally {
+      setExportingId(null);
+    }
   };
 
   const [loadingDemo, setLoadingDemo] = useState(false);
