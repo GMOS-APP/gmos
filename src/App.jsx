@@ -17,6 +17,10 @@ const AdminConsole = lazy(() => import('@/pages/AdminConsole'));
 const Blog = lazy(() => import('@/pages/Blog'));
 const BlogPost = lazy(() => import('@/pages/BlogPost'));
 const Login = lazy(() => import('@/pages/Login'));
+const CompareHub = lazy(() => import('@/pages/CompareHub'));
+const ComparisonPage = lazy(() => import('@/pages/ComparisonPage'));
+const FeaturesHub = lazy(() => import('@/pages/FeaturesHub'));
+const FeaturePage = lazy(() => import('@/pages/FeaturePage'));
 import AccentSync from '@/lib/AccentSync';
 import ChangelogDialog from '@/components/layout/ChangelogDialog';
 import EasterEggHost from '@/components/easter/EasterEggHost';
@@ -95,6 +99,10 @@ function App() {
                 <Route path="/Help" element={<Help />} />
                 <Route path="/blog" element={<Blog />} />
                 <Route path="/blog/:slug" element={<BlogPost />} />
+                <Route path="/compare" element={<CompareHub />} />
+                <Route path="/compare/:slug" element={<ComparisonPage />} />
+                <Route path="/features" element={<FeaturesHub />} />
+                <Route path="/features/:slug" element={<FeaturePage />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/admin/*" element={<AdminConsole />} />
                 <Route path="/*" element={<AuthenticatedApp />} />

@@ -203,9 +203,36 @@ export default function LandingPage() {
       .then(({ data }) => setLatestPosts(data || []));
   }, []);
   useSeo({
-    title: 'GM/OS — Prep less. Run better. | The Game Master’s operating system',
-    description: 'GM/OS keeps your whole tabletop campaign in one place — worldbuilding, guided session prep, a live battle map, initiative, dice, and a player view you control. Free to start.',
+    title: 'GM/OS — Game Master Operating System & D&D Campaign Manager',
+    description: 'GM/OS is a D&D campaign manager and dungeon master toolkit in one — worldbuilding, guided session prep, a live battle map, initiative, dice, and a player view you control. Free to start.',
     path: '/',
+    jsonLd: [
+      {
+        '@context': 'https://schema.org',
+        '@type': 'SoftwareApplication',
+        name: 'GM/OS',
+        alternateName: ['Game Master Operating System', 'GM OS', 'DM OS'],
+        applicationCategory: 'GameApplication',
+        operatingSystem: 'Web',
+        url: 'https://gmos.app/',
+        description: 'GM/OS is a campaign manager and dungeon master toolkit for tabletop RPGs — worldbuilding, guided session prep, a live battle map, an initiative tracker, dice, a relationship map, and a player view you control.',
+        offers: [
+          { '@type': 'Offer', price: '0', priceCurrency: 'USD', name: 'Free' },
+          { '@type': 'Offer', price: '3.99', priceCurrency: 'USD', name: 'Monthly' },
+          { '@type': 'Offer', price: '37.99', priceCurrency: 'USD', name: 'Yearly' },
+          { '@type': 'Offer', price: '49.99', priceCurrency: 'USD', name: 'Lifetime' },
+        ],
+      },
+      {
+        '@context': 'https://schema.org',
+        '@type': 'FAQPage',
+        mainEntity: FAQ.map(({ q, a }) => ({
+          '@type': 'Question',
+          name: q,
+          acceptedAnswer: { '@type': 'Answer', text: a },
+        })),
+      },
+    ],
   });
   return (
     <div className="min-h-screen flex flex-col">
@@ -218,6 +245,12 @@ export default function LandingPage() {
           <BetaBadge />
         </span>
         <div className="ml-auto flex items-center gap-3">
+          <Link to="/features" className="hidden sm:inline text-sm font-medium text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors">
+            Features
+          </Link>
+          <Link to="/compare" className="hidden sm:inline text-sm font-medium text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors">
+            Compare
+          </Link>
           <Link to="/blog" className="hidden sm:inline text-sm font-medium text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors">
             Blog
           </Link>
@@ -240,7 +273,7 @@ export default function LandingPage() {
               Prep less.<br />Run better.
             </h1>
             <p className="mt-5 text-lg text-zinc-600 dark:text-zinc-400 max-w-lg">
-              GM/OS holds your whole campaign in one place — and unlike a wiki or a stack of docs, it's built for the table: guided prep, a live battle map, initiative, and a player view you control.
+              GM/OS is a D&amp;D campaign manager and a full set of dungeon master tools in one — and unlike a wiki or a stack of docs, it's built for the table: guided session prep, a live battle map, an initiative tracker, and a player view you control.
             </p>
             <ul className="mt-6 space-y-2">
               {['Your world: NPCs, locations, factions, lore', 'Guided session prep', 'Notes, initiative, and dice at the table', 'A player-facing view you control'].map((t) => (
@@ -366,6 +399,10 @@ export default function LandingPage() {
           the D&D SRD 5.1 (CC BY 4.0, Wizards of the Coast), and Open5e content.
         </p>
         <p className="text-[11px] text-zinc-400 dark:text-zinc-600 text-center mt-2">
+          <Link to="/features" className="hover:text-zinc-600 dark:hover:text-zinc-400 hover:underline">Features</Link>
+          <span className="mx-2" aria-hidden>·</span>
+          <Link to="/compare" className="hover:text-zinc-600 dark:hover:text-zinc-400 hover:underline">Compare</Link>
+          <span className="mx-2" aria-hidden>·</span>
           <Link to="/blog" className="hover:text-zinc-600 dark:hover:text-zinc-400 hover:underline">Blog</Link>
           <span className="mx-2" aria-hidden>·</span>
           <Link to={createPageUrl('Help')} className="hover:text-zinc-600 dark:hover:text-zinc-400 hover:underline">User Manual</Link>

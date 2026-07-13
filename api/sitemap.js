@@ -9,7 +9,14 @@ const SUPABASE_URL = clean(process.env.VITE_SUPABASE_URL) || 'https://suofaewpbr
 const ANON_KEY = clean(process.env.VITE_SUPABASE_ANON_KEY) ||
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN1b2ZhZXdwYnJ6Yml4cGx3enZzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMxODg0MzUsImV4cCI6MjA4ODc2NDQzNX0.ziB-ol7U-RCbTFti38CnAbLYRBneucoFRtxO1flHKSo';
 
-const STATIC = ['/', '/blog', '/Help', '/PrivacyPolicy', '/Terms'];
+import { COMPARISONS, FEATURE_PAGES } from '../src/lib/seoPages.js';
+
+const STATIC = [
+  '/', '/blog', '/Help', '/PrivacyPolicy', '/Terms',
+  '/features', '/compare',
+  ...FEATURE_PAGES.map((f) => `/features/${f.slug}`),
+  ...COMPARISONS.map((c) => `/compare/${c.slug}`),
+];
 
 export default async function handler(req, res) {
   let posts = [];
