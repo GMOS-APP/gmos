@@ -334,6 +334,11 @@ export default function LandingPage() {
             ctaLabel="Get started"
           />
           <p className="mt-8 text-center text-xs text-zinc-500 dark:text-zinc-500">{RISK_REVERSAL}</p>
+          <p className="mt-2 text-center text-[11px] text-zinc-400 dark:text-zinc-600 max-w-xl mx-auto leading-relaxed">
+            Monthly and yearly plans renew automatically until you cancel; lifetime is a one-time payment. Payments via Stripe. See our{' '}
+            <Link to={createPageUrl('Terms')} className="hover:underline">Terms</Link> and{' '}
+            <Link to={createPageUrl('PrivacyPolicy')} className="hover:underline">Privacy Policy</Link>.
+          </p>
         </div>
       </section>
 

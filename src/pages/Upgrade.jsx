@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams, Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { ArrowLeft, Loader2, CreditCard } from 'lucide-react';
 import { functions } from '@/api/entities';
@@ -97,6 +97,17 @@ export default function Upgrade() {
         loadingTier={loadingTier}
         ctaLabel="Upgrade"
       />
+
+      {!isPlus && (
+        <p className="mt-6 text-xs text-zinc-500 dark:text-zinc-500 leading-relaxed text-center max-w-xl mx-auto">
+          By subscribing, you agree that <strong>monthly and yearly plans renew automatically</strong> at the
+          then-current price until you cancel — cancel anytime from Manage&nbsp;billing. Lifetime is a one-time payment.
+          Payments are processed securely by Stripe. See our{' '}
+          <Link to={createPageUrl('Terms')} className="text-amber-600 dark:text-amber-400 hover:underline">Terms</Link>{' '}
+          and{' '}
+          <Link to={createPageUrl('PrivacyPolicy')} className="text-amber-600 dark:text-amber-400 hover:underline">Privacy Policy</Link>.
+        </p>
+      )}
     </div>
   );
 }
