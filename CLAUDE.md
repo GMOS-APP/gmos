@@ -4,11 +4,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-GM-OS is a Dungeon Master management tool for tabletop RPG campaigns, built as a React SPA backed by Supabase. All application code lives in `~/gm-os/` (sibling directory to this repo).
+GM-OS is a Dungeon Master management tool for tabletop RPG campaigns, built as a React SPA backed by Supabase. All application code lives at the repository root (`src/`, `api/`, `functions/`, `scripts/`, `supabase/`).
 
 ## Commands
 
-All commands run from `~/gm-os/`:
+All commands run from the repository root:
 
 ```bash
 npm run dev          # Start Vite dev server
@@ -120,7 +120,13 @@ ESLint flat config (`eslint.config.js`), scoped to `src/components`, `src/pages`
 - No prop-types required (JSDoc type checking via `jsconfig.json` with `checkJs: true`).
 
 ## Deployment
-Pushes to `main` auto-deploy to GitHub Pages via `.github/workflows/deploy.yml` (Node 22; runs lint + build with `VITE_SUPABASE_URL`/`VITE_SUPABASE_ANON_KEY` secrets). Base path is `/GM-OS/`. Internal navigation must use `useNavigate()` rather than `window.location.href` (the base path otherwise breaks links).
+Pushes to `main` trigger **two** deploys. Vercel is the canonical production host; the GitHub Pages workflow is a legacy mirror that still runs.
+
+**Vercel (production).** Team `gm-os`, project `gm-os`, linked to `trisdenc/GM-OS` via the Git integration — no workflow file, Vercel builds on push to `main` itself. Serves `gmos.app`, `gm-os.app`, and `gamemasteros.com`. Build config is `vercel.json`: `npm run build` → `dist`, rewrites `/sitemap.xml` → `/api/sitemap` and `/rss.xml` → `/api/rss` with an SPA fallback for everything else, plus the security headers and CSP (the CSP `connect-src` must be widened before calling any new external origin). Node 24.x. Base path is `/` here, so `VITE_BASE_PATH` is unset.
+
+**GitHub Pages (legacy mirror).** `.github/workflows/deploy.yml` — Node 22, runs lint + build with the `VITE_SUPABASE_URL`/`VITE_SUPABASE_ANON_KEY` secrets and `VITE_BASE_PATH=/GM-OS/`. It is the only thing that runs lint in CI, so a lint failure fails this workflow while the Vercel deploy still ships.
+
+Because the Pages build runs under a `/GM-OS/` base path, internal navigation must use `useNavigate()` rather than `window.location.href` (a hardcoded absolute path breaks links there). `vite.config.js` reads `VITE_BASE_PATH` into `base` and the service worker's `navigateFallback`.
 
 ## Changelog (keep it current)
 Whenever you ship an **end-user / customer-impacting** change, add a curated entry to the `changelog` table — it powers the in-app "What's new" dialog (`ChangelogDialog.jsx`). Treat this as part of shipping, not an afterthought.
