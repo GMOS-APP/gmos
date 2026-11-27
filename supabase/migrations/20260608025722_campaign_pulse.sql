@@ -1,0 +1,4 @@
+-- baseline: applied to production before the CI/CD pipeline existed.
+-- This file only marks version 20260608025722 as present so `supabase db push` matches the remote
+-- history. The statements that ran are in supabase_migrations.schema_migrations (version 20260608025722);
+-- some are documented in supabase/migrations-history/. Never edit, delete or reuse this version.

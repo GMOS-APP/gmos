@@ -33,10 +33,13 @@ export function parsePending(dryRunOutput) {
   return [...new Set(dryRunOutput.match(/\d{14}_[a-z0-9_]+\.sql/g) || [])].sort()
 }
 
-export function comparePending(pending, added) {
+/** A baseline stub marks a version applied before the pipeline; it is expected to be already applied. */
+export const BASELINE = /^-- baseline:/
+
+export function comparePending(pending, added, baseline = []) {
   const a = [...added].sort()
   const extra = pending.filter((p) => !a.includes(p))
-  const missing = a.filter((p) => !pending.includes(p))
+  const missing = a.filter((p) => !pending.includes(p) && !baseline.includes(p))
   const errors = []
   if (extra.length) errors.push(`would apply migrations not added by this push (history drift): ${extra.join(', ')}`)
   if (missing.length) errors.push(`added migrations not pending remotely (already applied by hand?): ${missing.join(', ')}`)
@@ -56,7 +59,8 @@ function main(argv) {
     const added = execFileSync('git', ['diff', '--name-only', '--diff-filter=A', from, 'HEAD', '--', 'supabase/migrations'], { cwd: ROOT, encoding: 'utf8' })
       .split('\n').filter((f) => f.endsWith('.sql')).map((f) => f.split('/').pop())
     const pending = parsePending(readFileSync(0, 'utf8'))
-    const errors = comparePending(pending, added)
+    const baseline = added.filter((f) => BASELINE.test(readFileSync(join(dir, f), 'utf8')))
+    const errors = comparePending(pending, added, baseline)
     errors.forEach((e) => console.error(`✗ ${e}`))
     if (errors.length) process.exit(1)
     return console.log(pending.length ? `pending ok: ${pending.join(', ')}` : 'no migrations pending')

@@ -61,9 +61,9 @@ Approval is a label rather than a review because agents push as your GitHub acco
    - require branches to be up to date
    - allow auto-merge
    - allow squash merging only
-4. **Reconcile the migration history once.** Production's `supabase_migrations.schema_migrations` holds versions created by MCP that have no matching files here, so the first `db push` would stop on history drift. Run `supabase migration list` and mark the remote-only versions with `supabase migration repair --status reverted <version>`. Repair edits only the history table, never the schema. Then `supabase db push --dry-run` should report nothing to push.
-5. **Confirm the edge-function slugs.** Run `supabase functions list` and check that every slug in `scripts/functions.map.json` exists. Older docs list `export-campaign`, `import-campaign` and `delete-account`, but the app calls `exportCampaign`, `importCampaign` and `deleteAccount`.
-6. **Check the Vercel project.** Make sure it's Git-linked to `GMOS-APP/gmos` (the repo moved from `trisdenc/GM-OS`) and that PRs get Preview deployments.
+4. **Migration history: already reconciled.** Production's `supabase_migrations.schema_migrations` has 54 versions applied by hand before the pipeline. Each has a `-- baseline:` stub in `supabase/migrations/`, so `supabase db push` sees matching history and only applies new files; `check-migrations.mjs` accepts a stub only if it's already applied. No `migration repair` is needed. If someone applies a migration by hand again, add a stub for it the same way.
+5. **Edge-function slugs: checked.** `scripts/functions.map.json` uses the live slugs (`export-campaign`, `create-checkout`, `stripe-webhook`, …), the same ones `FUNCTION_MAP` in `src/api/entities.js` calls. A test checks the two agree. `unsplash` is live but has no source here, so it is never deployed from this repo.
+6. **Vercel: linked.** Project `gm-os` builds a Preview for each PR and Production on `main`. Preview URLs sit behind Vercel's login (Deployment Protection), so open them while logged in.
 7. **Retire GitHub Pages.** Turn it off under Settings → Pages. The old copy at `trisdenc.github.io/GM-OS` is otherwise left up, stale.
 8. **Log in on the PC that runs Agents-GMOS:** `gh auth login` as an account with write access, so the bridge can push branches and open PRs.
 

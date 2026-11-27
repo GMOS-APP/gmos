@@ -104,8 +104,8 @@ src/components/
 Entity types: NPCs, Player Characters, Creatures, Locations, Factions, Deities, Items, Shops, Events, Encounters, Lore, Threads.
 
 ### Serverless Functions
-`functions/` contains TypeScript/Deno Edge Functions deployed to Supabase. **`scripts/functions.map.json` is the authoritative slug → file map used by the deploy pipeline** (slugs as the app calls them via `functions.invoke`). The list below predates it, and some slugs here (e.g. `export-campaign` vs the app's `exportCampaign`) disagree with what the app calls, so trust the map and confirm against the live project before relying on this list:
-- `create-demo-for-user` (`createDemoForUser.ts`) — seeds a demo campaign for a user
+`functions/` contains TypeScript/Deno Edge Functions deployed to Supabase. **`scripts/functions.map.json` is the authoritative slug → file map used by the deploy pipeline** (live Supabase slugs; the app's camelCase names are mapped to them by `FUNCTION_MAP` in `src/api/entities.js`, so add both when creating a function). Live slugs, checked against production on 2026-11-26:
+- `create-demo` (`supabase/functions/create-demo/index.ts`) — seeds a demo campaign for a user. `functions/createDemoForUser.ts` is not deployed (skipped in the map).
 - `export-campaign` (`exportCampaign.ts`) — full campaign backup (all tables) using service role
 - `import-campaign` (`importCampaign.ts`) — full campaign restore with ID remapping; new records owned by importing user; CORS + transactional rollback on partial failure (`verify_jwt=false`)
 - `import-dndbeyond` (`importDndBeyondCharacter.ts`) — fetches public D&D Beyond character (numeric-ID validated) and maps to WorldEntity shape
@@ -128,7 +128,7 @@ ESLint flat config (`eslint.config.js`), scoped to `src/components`, `src/pages`
 Nothing is deployed by hand. Every change reaches `main` through a PR that passes the required checks (`verify`, `functions`, `risk-gate`), and merging deploys it:
 - **CI** (`.github/workflows/ci.yml`): `npm run verify` and the edge-function `deno check` ratchet on every PR and push to `main`.
 - **Risk gate** (`.github/workflows/automerge.yml`, rules in `scripts/risk-check.mjs`): risky PRs (migrations, billing/auth/account functions, `vercel.json`, CI, dependencies, pipeline scripts) fail `risk-gate` until the owner adds the `owner-approved` label; new commits clear it. Safe `agent/*` PRs auto-merge once green.
-- **Supabase** (`.github/workflows/deploy-supabase.yml`, on merge): applies new `supabase/migrations/*` (fail-closed dry-run check via `scripts/check-migrations.mjs`), redeploys changed edge functions via `scripts/deploy-functions.mjs` (keeps each function's live `verify_jwt`; refuses unknown slugs), and publishes `changelog/` entries.
+- **Supabase** (`.github/workflows/deploy-supabase.yml`, on merge): applies new `supabase/migrations/*` (the `-- baseline:` stubs there mark the 54 versions applied before the pipeline and are never run) (fail-closed dry-run check via `scripts/check-migrations.mjs`), redeploys changed edge functions via `scripts/deploy-functions.mjs` (keeps each function's live `verify_jwt`; refuses unknown slugs), and publishes `changelog/` entries.
 - **Smoke test** (`.github/workflows/smoke.yml`): after each Vercel production deploy, checks `gmos.app`, `/sitemap.xml`, `/rss.xml`; opens a `prod-incident` issue on failure.
 
 **Migrations.** New files only, named `supabase/migrations/YYYYMMDDHHMMSS_snake_case.sql`, additive and backward compatible (the app and DB deploy independently). The older files in `supabase/migrations-history/` document changes applied by hand and are **never** run — some intentionally differ from prod.

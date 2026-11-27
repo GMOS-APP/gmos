@@ -1,4 +1,5 @@
 import { describe, it, expect } from 'vitest'
+import { existsSync, readdirSync, readFileSync } from 'node:fs'
 import { planDeploy } from './deploy-functions.mjs'
 import { lintMigrations, parsePending, comparePending } from './check-migrations.mjs'
 import { validateFile, mergeEntries, friendlyDate } from './changelog.mjs'
@@ -42,6 +43,28 @@ describe('migration guard', () => {
     expect(pending).toEqual(['20261101000000_old.sql', '20261126120000_a.sql'])
     expect(comparePending(pending, ['20261126120000_a.sql'])[0]).toMatch(/history drift/)
     expect(comparePending(['20261126120000_a.sql'], ['20261126120000_a.sql'])).toEqual([])
+  })
+
+  it('accepts baseline stubs that are already applied, but not other non-pending files', () => {
+    const added = ['20260313024143_security_hardening.sql', '20261126120000_a.sql']
+    expect(comparePending(['20261126120000_a.sql'], added, ['20260313024143_security_hardening.sql'])).toEqual([])
+    expect(comparePending([], added, ['20260313024143_security_hardening.sql'])[0]).toMatch(/20261126120000_a\.sql/)
+  })
+
+  it('every applied migration in supabase/migrations is a baseline stub or a real file', () => {
+    const files = readdirSync('supabase/migrations').filter((f) => f.endsWith('.sql'))
+    expect(lintMigrations(files)).toEqual([])
+  })
+})
+
+describe('functions.map.json', () => {
+  it('maps every app-facing name in src/api/entities.js to a mapped slug', () => {
+    const real = JSON.parse(readFileSync('scripts/functions.map.json', 'utf8'))
+    const src = readFileSync('src/api/entities.js', 'utf8')
+    const slugs = [...src.matchAll(/^\s+\w+: '([a-z-]+)',$/gm)].map((m) => m[1])
+    expect(slugs.length).toBeGreaterThan(5)
+    for (const s of slugs) expect(Object.keys(real.functions)).toContain(s)
+    for (const file of Object.values(real.functions)) expect(existsSync(file)).toBe(true)
   })
 })
 

@@ -9,11 +9,37 @@
       "title": "Automated pipeline",
       "description": "CI gates, gated auto-merge, automatic Supabase deploys, agent missions.",
       "tasks": [
-        { "id": "P1.1", "title": "CI: lint, typecheck ratchet, vitest, build on every PR", "owner": "gmos-platform", "status": "in_progress" },
-        { "id": "P1.2", "title": "Deploy migrations, edge functions and changelog on merge", "owner": "gmos-platform", "status": "in_progress" },
-        { "id": "P1.3", "title": "Risk gate and auto-merge for agent PRs", "owner": "gmos-platform", "status": "in_progress" },
-        { "id": "P1.4", "title": "Reconcile Supabase migration history and confirm edge-function slugs", "owner": "lead", "status": "todo", "note": "needs_user: needs Supabase access as the project owner" },
-        { "id": "P1.5", "title": "Pay down typecheck baseline (app 729, functions 13)", "owner": "gmos-ui", "status": "todo" }
+        {
+          "id": "P1.1",
+          "title": "CI: lint, typecheck ratchet, vitest, build on every PR",
+          "owner": "gmos-platform",
+          "status": "in_progress"
+        },
+        {
+          "id": "P1.2",
+          "title": "Deploy migrations, edge functions and changelog on merge",
+          "owner": "gmos-platform",
+          "status": "in_progress"
+        },
+        {
+          "id": "P1.3",
+          "title": "Risk gate and auto-merge for agent PRs",
+          "owner": "gmos-platform",
+          "status": "in_progress"
+        },
+        {
+          "id": "P1.4",
+          "title": "Reconcile Supabase migration history and confirm edge-function slugs",
+          "owner": "lead",
+          "status": "done",
+          "note": "Baseline stubs for the 54 applied versions; map uses live slugs (checked 2026-11-26)."
+        },
+        {
+          "id": "P1.5",
+          "title": "Pay down typecheck baseline (app 729, functions 13)",
+          "owner": "gmos-ui",
+          "status": "todo"
+        }
       ]
     }
   ]
