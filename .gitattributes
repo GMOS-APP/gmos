@@ -1,0 +1,11 @@
+# Keep LF everywhere: a CRLF after a #! line breaks Node/Vitest imports on Windows checkouts.
+* text=auto eol=lf
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.webp binary
+*.ico binary
+*.woff binary
+*.woff2 binary
+*.pdf binary

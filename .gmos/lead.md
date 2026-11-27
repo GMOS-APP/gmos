@@ -29,6 +29,7 @@ JSON:
 {
   "id": "m-2026-11-27-abc12",
   "goal": "the user's goal, verbatim",
+  "title": "Fix JSDoc type errors in src/lib",
   "steps": [
     {
       "id": "s1",
@@ -47,10 +48,12 @@ JSON:
 }
 ```
 
+- `title` is the pull request title: short and imperative, at most 72 characters, describing what the
+  mission changes (not the goal verbatim).
 - `owner` is the specialist whose paths the step changes, from the "You own" line in `.claude/agents/`:
   - `gmos-ui`: `src/components`, `src/pages`, `src/Layout.jsx`, `src/lib`, `src/hooks`, styles.
   - `gmos-data`: `supabase/`, `functions/`, `api/`, `src/api`.
-  - `gmos-platform`: `scripts/`, build and test config, `.github/`.
+  - `gmos-platform`: `scripts/`, build and test config, `e2e/`, `.github/`.
   - `gmos-docs`: Markdown docs and `changelog/`.
 
   Use `lead` only for genuinely cross-cutting work such as `CLAUDE.md` or `.gmos/`. A step that spans two
@@ -141,7 +144,10 @@ CI failed on the PR. The prompt includes the failing job's log.
   - Write it in plain language for users, benefit first. Internal-only changes get no entry.
   - The deploy publishes it to the in-app "What's new". Never write SQL for it.
 - **Typecheck ratchet:** CI fails if `.typecheck-baseline` (app) or `.deno-check-baseline` (functions) is
-  exceeded. New code adds no type errors. If you fix some, lower the baseline in the same commit.
+  exceeded. New code adds no type errors. If you fix some, lower the baseline in the same commit with
+  `npm run typecheck:baseline`. A lowered baseline is safe and auto-merges; a raised one needs the owner.
+- **CI also runs:** browser smoke tests (`npm run test:e2e`, Playwright, in `e2e/`) and, when migrations
+  change, a `db` job that applies them to a copy of the production schema.
 - **Things only the user can do** become `needs_user` steps and don't stop the mission:
   - credentials and secrets;
   - Stripe dashboard or price changes;
@@ -151,7 +157,9 @@ CI failed on the PR. The prompt includes the failing job's log.
 - **Never stop to ask.** When something is ambiguous, choose the option that best fits `CLAUDE.md` and the
   goal, and write the choice into the step's note.
 - **Commands:**
-  - One command per Bash call.
+  - One simple command per Bash call: no `&&`, `;`, `|`, redirects, `$(…)` or `<(…)`. Compound commands are
+    refused automatically. Tell every agent you delegate to the same.
+  - Scratch files go in the system temp directory, never in the repo.
   - Use the Edit and Write tools for files.
   - Never `cd` before `git`: use `git -C <folder> …`.
   - Never switch branches, push or rebase: the bridge owns the branch.

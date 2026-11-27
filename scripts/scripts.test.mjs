@@ -106,9 +106,20 @@ describe('risk-check', () => {
   })
   it('flags migrations, billing, auth, CI and gate edits', () => {
     for (const f of ['supabase/migrations/20261126000000_x.sql', 'functions/stripeWebhook.ts', 'src/lib/AuthContext.jsx',
-      '.github/workflows/ci.yml', 'scripts/risk-check.mjs', 'vercel.json', '.typecheck-baseline']) {
+      '.github/workflows/ci.yml', 'scripts/risk-check.mjs', 'vercel.json', '.typecheck-baseline',
+      'supabase/schema/prod-schema.sql', '.claude/settings.json']) {
       expect(classify({ files: [f] }).length, f).toBe(1)
     }
+  })
+  it('lets a lowered typecheck baseline through, but not a raised, deleted or odd one', () => {
+    const tc = (base, head) => classify({ files: ['.typecheck-baseline'], baselines: { '.typecheck-baseline': { base, head } } })
+    expect(tc('729\n', '698\n')).toEqual([])
+    expect(tc('729', '729')).toEqual([])
+    expect(tc('698', '729')[0]).toMatch(/baseline raised/)
+    expect(tc('729', undefined)).toHaveLength(1)
+    expect(tc('729', '700 # ok')).toHaveLength(1)
+    expect(classify({ files: ['.deno-check-baseline'], baselines: { '.deno-check-baseline': { base: '13', head: '9' } } })).toEqual([])
+    expect(classify({ files: ['.deno-check-baseline'] })).toHaveLength(1)
   })
   it('flags dependency and script changes but not a version bump', () => {
     const base = { version: '0.0.0', dependencies: { a: '1' }, scripts: { t: 'x' } }

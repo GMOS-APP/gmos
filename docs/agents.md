@@ -23,7 +23,9 @@ GM/OS ships continuously. Every change goes from a PR, through CI and a risk gat
 | `functions` | `ci.yml` | `deno check` on all edge functions, ratcheted against `.deno-check-baseline` |
 | `risk-gate` | `automerge.yml` | `scripts/risk-check.mjs`, run from the **base** branch so a PR can't weaken it |
 
-**Typecheck ratchets.** The app had 729 JSDoc type errors and the functions had 13 before the gate existed. CI fails only if those counts go up. When you fix errors, lower the baseline (`npm run typecheck:baseline`). Never raise it.
+`verify` also runs the browser smoke tests (`npm run test:e2e`: Playwright, `e2e/`, against the production build). The `db` job in `ci.yml` loads `supabase/schema/prod-schema.sql` (a schema-only snapshot of production) into a local Supabase stack and applies every newer migration, so broken SQL fails on the PR instead of in the deploy. It always reports a result, so it can be added to the required checks. Refresh the snapshot after migrations merge with **Actions → Schema snapshot → Run workflow**; it opens a PR that needs your approval (this repo is public, so review what it publishes).
+
+**Typecheck ratchets.** The app had 729 JSDoc type errors and the functions had 13 before the gate existed. CI fails only if those counts go up. When you fix errors, lower the baseline (`npm run typecheck:baseline`) in the same PR: the risk gate treats a **lowered** baseline as safe, so it still auto-merges. Never raise it.
 
 ## Risk gate
 These are risky (see `scripts/risk-check.mjs` for the exact rules):
@@ -33,7 +35,8 @@ These are risky (see `scripts/risk-check.mjs` for the exact rules):
 - auth and plan code (`AuthContext`, `plans.js`, `AuthPanel`, `Upgrade`, `AccountSettings`)
 - `vercel.json` (the CSP)
 - `.github/`, `.claude/` and the pipeline scripts
-- the typecheck baselines
+- raising, deleting or rewriting a typecheck baseline (lowering it is safe)
+- the production schema snapshot (`supabase/schema/`)
 - the lockfile, and dependency or script changes in `package.json`
 
 A risky PR fails `risk-gate` and gets the `needs-approval` label plus a comment listing why. To approve it, review the PR and add the **`owner-approved`** label. A new push removes the label, so the approval always matches the code you reviewed. The gate applies to every PR, including your own. Only `agent/*` branches auto-merge.
@@ -42,8 +45,8 @@ Approval is a label rather than a review because agents push as your GitHub acco
 
 ## Deploys on merge
 - **Web app:** the Vercel Git integration builds `main`, and builds previews for PRs.
-- **Migrations:** only new files in `supabase/migrations/` named `YYYYMMDDHHMMSS_snake_case.sql`. The workflow runs `supabase db push --dry-run` first. It **fails closed** if anything other than this push's new files would be applied (history drift). The files in `supabase/migrations-history/` document hand-applied changes and are never run.
-- **Edge functions:** `scripts/deploy-functions.mjs` deploys only the changed files, using the slug map in `scripts/functions.map.json`. Each function keeps its **live** `verify_jwt` setting. A slug that doesn't exist yet is refused unless it's listed in `allowCreate`. To redeploy everything, run the workflow manually with `all_functions`.
+- **Migrations:** only new files in `supabase/migrations/` named `YYYYMMDDHHMMSS_snake_case.sql`. The workflow runs `supabase db push --remote --dry-run` first (CLI 3.x targets the local database without `--remote`). It **fails closed** if anything other than this push's new files would be applied (history drift). The files in `supabase/migrations-history/` document hand-applied changes and are never run.
+- **Edge functions:** `scripts/deploy-functions.mjs` deploys only the changed files, using the slug map in `scripts/functions.map.json`. Each function keeps its **live** `verify_jwt` setting. A slug that doesn't exist yet is refused unless it's listed in `allowCreate`. To redeploy everything, run the workflow manually with `all_functions`. To check migration history against production without applying anything, run it with `check_migrations`.
 - **Changelog:** `changelog/<YYYY-MM-DD>-<slug>.json` files are merged into that day's row in the `changelog` table.
 - **Rollback:** use Vercel's Instant Rollback for the app. For a bad migration, ship a new migration that reverts it. The pipeline never rolls back the database on its own.
 
@@ -57,7 +60,7 @@ Approval is a label rather than a review because agents push as your GitHub acco
    - `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` should already exist.
 3. **Branch protection on `main`:**
    - require a PR
-   - require the status checks `verify`, `functions` and `risk-gate`
+   - require the status checks `verify`, `functions` and `risk-gate` (and `db`, once a schema snapshot exists)
    - require branches to be up to date
    - allow auto-merge
    - allow squash merging only

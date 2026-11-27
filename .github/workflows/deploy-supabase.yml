@@ -19,6 +19,10 @@ on:
         description: Redeploy every mapped edge function
         type: boolean
         default: false
+      check_migrations:
+        description: Run the read-only migration dry-run against production even if no migration was added
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -38,13 +42,13 @@ jobs:
       SUPABASE_URL: https://suofaewpbrzbixplwzvs.supabase.co
       SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           fetch-depth: 0
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
           node-version: '22'
-      - uses: supabase/setup-cli@v1
+      - uses: supabase/setup-cli@v3
         with:
           version: 3.4.0
 
@@ -63,13 +67,16 @@ jobs:
           SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
         run: |
           ADDED="$(git diff --name-only --diff-filter=A ${{ steps.base.outputs.sha }} HEAD -- supabase/migrations | grep '\.sql$' || true)"
-          if [ -z "$ADDED" ]; then echo "No new migrations."; exit 0; fi
+          CHECK_ONLY="${{ inputs.check_migrations }}"
+          if [ -z "$ADDED" ] && [ "$CHECK_ONLY" != "true" ]; then echo "No new migrations."; exit 0; fi
           supabase link --project-ref "$SUPABASE_PROJECT_REF"
-          # Fail closed: apply only if the pending set is exactly what this push added.
+          # CLI 3.x targets the LOCAL database unless --remote is given. Fail closed: apply only if the
+          # pending set is exactly what this push added (the -- baseline: stubs must never be pending).
           set -o pipefail
-          supabase db push --dry-run --password "$SUPABASE_DB_PASSWORD" 2>&1 | tee dry-run.txt
+          supabase db push --remote --dry-run --password "$SUPABASE_DB_PASSWORD" 2>&1 | tee dry-run.txt
           node scripts/check-migrations.mjs pending --changed-from ${{ steps.base.outputs.sha }} < dry-run.txt
-          supabase db push --password "$SUPABASE_DB_PASSWORD"
+          if [ -z "$ADDED" ]; then echo "Check only: nothing to apply."; exit 0; fi
+          supabase db push --remote --yes --password "$SUPABASE_DB_PASSWORD"
 
       - name: Edge functions
         run: |

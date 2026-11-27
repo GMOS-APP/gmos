@@ -2,7 +2,8 @@
 // Classify a pull request as safe to auto-merge or needing the owner's approval.
 //
 //   node scripts/risk-check.mjs < pr.json
-//     pr.json: { "files": ["path", ...], "basePkg": {...}, "headPkg": {...} }
+//     pr.json: { "files": ["path", ...], "basePkg": {...}, "headPkg": {...},
+//                "baselines": { ".typecheck-baseline": { "base": "729", "head": "698" }, ... } }
 //     Prints a JSON array of reasons. An empty array means safe.
 //
 // automerge.yml runs this from the BASE branch (pull_request_target), so a PR
@@ -24,15 +25,28 @@ export const RISKY = [
   { pattern: /^\.github\//, reason: 'CI/CD workflow' },
   { pattern: /^\.claude\//, reason: 'agent permissions' },
   { pattern: /^scripts\/(risk-check|deploy-functions|check-migrations|changelog|typecheck-ratchet)\.mjs$/, reason: 'pipeline script' },
-  { pattern: /^\.(typecheck|deno-check)-baseline$/, reason: 'typecheck baseline' },
+  { pattern: /^supabase\/schema\//, reason: 'production schema snapshot' },
   { pattern: /^package-lock\.json$/, reason: 'dependency lockfile' },
 ]
 
+// Lowering a typecheck baseline only tightens the ratchet, so it is safe. Raising it, deleting it or
+// writing anything that isn't a plain count is risky.
+export const BASELINES = ['.typecheck-baseline', '.deno-check-baseline']
+const count = (v) => (typeof v === 'string' && /^\s*\d+\s*$/.test(v) ? Number(v) : NaN)
+export function baselineLowered({ base, head } = {}) {
+  const b = count(base), h = count(head)
+  return Number.isFinite(b) && Number.isFinite(h) && h <= b
+}
+
 const DEP_FIELDS = ['dependencies', 'devDependencies', 'optionalDependencies', 'peerDependencies', 'overrides']
 
-export function classify({ files = [], basePkg = {}, headPkg = {} }) {
+export function classify({ files = [], basePkg = {}, headPkg = {}, baselines = {} }) {
   const reasons = new Set()
   for (const f of files) {
+    if (BASELINES.includes(f)) {
+      if (!baselineLowered(baselines[f])) reasons.add(`typecheck baseline raised or rewritten (${f})`)
+      continue
+    }
     for (const r of RISKY) if (r.pattern.test(f)) reasons.add(`${r.reason} (${f})`)
   }
   if (files.includes('package.json')) {

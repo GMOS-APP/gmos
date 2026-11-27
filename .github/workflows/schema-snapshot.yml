@@ -1,0 +1,65 @@
+name: Schema snapshot
+
+# Dumps the production database SCHEMA (no data) to supabase/schema/prod-schema.sql and opens a PR with it.
+# CI's `db` job loads that file and applies newer migrations on top, so it should be refreshed after
+# migrations merge. Run by hand: Actions -> Schema snapshot -> Run workflow. The PR is risky by design
+# (the owner reviews what becomes public in this repo).
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: schema-snapshot
+  cancel-in-progress: false
+
+jobs:
+  snapshot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment: production
+    env:
+      SUPABASE_PROJECT_REF: suofaewpbrzbixplwzvs
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: main
+          # A token other than GITHUB_TOKEN, so the PR it opens runs CI.
+          token: ${{ secrets.AUTOMERGE_TOKEN }}
+      - uses: supabase/setup-cli@v3
+        with:
+          version: 3.4.0
+      - name: Dump the production schema
+        env:
+          SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+        run: |
+          supabase link --project-ref "$SUPABASE_PROJECT_REF"
+          VERSION="$(ls supabase/migrations/*.sql | sed -E 's#.*/([0-9]{14})_.*#\1#' | sort | tail -n 1)"
+          supabase db dump --remote --password "$SUPABASE_DB_PASSWORD" -f dump.sql
+          mkdir -p supabase/schema
+          {
+            echo "-- snapshot-version: $VERSION"
+            echo "-- Production schema only (no data), dumped by .github/workflows/schema-snapshot.yml on $(date -u +%F)."
+            echo "-- Loaded by CI's db job to test new migrations. Never applied to production. Do not edit by hand."
+            cat dump.sql
+          } > supabase/schema/prod-schema.sql
+          rm dump.sql
+      - name: Open a pull request
+        env:
+          GH_TOKEN: ${{ secrets.AUTOMERGE_TOKEN }}
+        run: |
+          if git diff --quiet -- supabase/schema && ! git ls-files --others --exclude-standard supabase/schema | grep -q .; then
+            echo "Snapshot unchanged."
+            exit 0
+          fi
+          BRANCH="chore/schema-snapshot-$(date -u +%Y%m%d%H%M%S)"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git switch -c "$BRANCH"
+          git add supabase/schema/prod-schema.sql
+          git commit -m "Refresh production schema snapshot"
+          git push origin "$BRANCH"
+          gh pr create --base main --head "$BRANCH" --title "Refresh production schema snapshot" \
+            --body "Schema-only dump of production for CI's \`db\` job (no data). Review before merging: this repo is public."

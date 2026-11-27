@@ -21,6 +21,11 @@ You run after the owner and before `gmos-qa`. Find out what changed from `git st
    - Purely internal changes get **no** entry. That covers refactors, tests, infra and admin-only tools.
 3. **Run the check:** `node scripts/changelog.mjs check`.
 
+## Shell
+- **One simple command per Bash call.** No `&&`, `;`, `|`, redirects (`>`, `2>&1`), `$(…)` or `<(…)`: compound commands are refused automatically and waste a turn. Read the command's output directly; to search it, run the command again with narrower arguments or use Grep on a file.
+- **Scratch files** go in the system temp directory (`os.tmpdir()`), never inside the repo.
+- Use `git -C <folder> …` instead of `cd`.
+
 ## Rules
 - Change only documentation and `changelog/`. Report code problems to the lead instead of fixing them.
 - Don't edit `.gmos/tasks.json`. The lead updates it from the QA verdict.

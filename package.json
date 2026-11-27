@@ -15,6 +15,7 @@
     "typecheck:baseline": "node scripts/typecheck-ratchet.mjs --update",
     "test": "vitest run",
     "test:watch": "vitest",
+    "test:e2e": "playwright test",
     "check:repo": "node scripts/check-migrations.mjs lint && node scripts/changelog.mjs check",
     "verify": "npm run lint && npm run typecheck:ratchet && npm test && npm run check:repo && npm run build"
   },
@@ -88,6 +89,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.19.0",
+    "@playwright/test": "1.65.0",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.3",
     "@types/node": "^22.13.5",

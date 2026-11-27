@@ -67,7 +67,7 @@ function main(argv) {
 
   const map = JSON.parse(readFileSync(join(ROOT, 'scripts/functions.map.json'), 'utf8'))
   const changedFiles = all ? [] : sh('git', ['diff', '--name-only', argv[fromIdx + 1], 'HEAD']).split('\n').filter(Boolean)
-  const remote = JSON.parse(sh('supabase', ['functions', 'list', '--project-ref', ref, '--output', 'json']))
+  const remote = JSON.parse(sh('supabase', ['functions', 'list', `--remote=${ref}`, '--output', 'json']))
 
   const { deploy, errors } = planDeploy({ map, changedFiles, remote, all })
   if (errors.length) {
@@ -86,7 +86,7 @@ function main(argv) {
       mkdirSync(join(ROOT, dirname(target)), { recursive: true })
       copyFileSync(join(ROOT, d.file), join(ROOT, target))
     }
-    const args = ['functions', 'deploy', d.slug, '--project-ref', ref, '--use-api']
+    const args = ['functions', 'deploy', d.slug, `--remote=${ref}`, '--use-api', '--yes']
     if (!d.verifyJwt) args.push('--no-verify-jwt')
     sh('supabase', args, { stdio: 'inherit' })
   }

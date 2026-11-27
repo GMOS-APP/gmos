@@ -36,10 +36,10 @@ jobs:
       HEAD_REPO: ${{ github.event.pull_request.head.repo.full_name }}
       HEAD_REF: ${{ github.event.pull_request.head.ref }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           ref: ${{ github.event.pull_request.base.sha }}
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
           node-version: '22'
 
@@ -54,11 +54,20 @@ jobs:
           pkg() { gh api "repos/$1/contents/package.json?ref=$2" --jq .content 2>/dev/null | base64 -d 2>/dev/null || echo '{}'; }
           pkg "$REPO" "$BASE_SHA" > base-pkg.json
           pkg "$HEAD_REPO" "$HEAD_SHA" > head-pkg.json
+          # Baseline counts at both ends, so a lowered baseline can pass (a missing file reads as empty).
+          raw() { gh api "repos/$1/contents/$3?ref=$2" --jq .content 2>/dev/null | base64 -d 2>/dev/null || true; }
+          for f in .typecheck-baseline .deno-check-baseline; do
+            raw "$REPO" "$BASE_SHA" "$f" > "base$f"
+            raw "$HEAD_REPO" "$HEAD_SHA" "$f" > "head$f"
+          done
           node -e '
             const fs = require("fs");
             const read = (f) => { try { return JSON.parse(fs.readFileSync(f, "utf8")) } catch { return {} } };
+            const text = (f) => { try { return fs.readFileSync(f, "utf8") } catch { return undefined } };
             const files = fs.readFileSync("files.txt", "utf8").split("\n").filter(Boolean);
-            process.stdout.write(JSON.stringify({ files, basePkg: read("base-pkg.json"), headPkg: read("head-pkg.json") }));
+            const baselines = {};
+            for (const f of [".typecheck-baseline", ".deno-check-baseline"]) baselines[f] = { base: text("base" + f), head: text("head" + f) };
+            process.stdout.write(JSON.stringify({ files, basePkg: read("base-pkg.json"), headPkg: read("head-pkg.json"), baselines }));
           ' | node scripts/risk-check.mjs > reasons.json
           echo "Reasons: $(cat reasons.json)"
           if [ "$(cat reasons.json)" = "[]" ]; then echo "risky=false" >> "$GITHUB_OUTPUT"; else echo "risky=true" >> "$GITHUB_OUTPUT"; fi
