@@ -30,7 +30,7 @@ Read `CLAUDE.md`, especially these gotchas:
   - Put pure logic in `src/lib` and test it with vitest (`*.test.js` next to the module).
   - Test components with `@testing-library/react`.
   - Give every bug fix a regression test where that's practical.
-- **No new type errors:** `node scripts/typecheck-ratchet.mjs` must not go above the baseline. If you fixed existing errors, run `npm run typecheck:baseline`.
+- **No new type errors:** `node scripts/typecheck-ratchet.mjs` must not go above the baseline. If you fixed existing errors, lower the baseline in the same step with `npm run typecheck:baseline`. Lowering it is safe and doesn't need the owner's approval; never raise it.
 - **Risky paths:** change these only when the step needs it, and say so in your report:
   - `src/lib/AuthContext.jsx`
   - `src/lib/plans.js`
@@ -39,12 +39,17 @@ Read `CLAUDE.md`, especially these gotchas:
   - `src/pages/AccountSettings.jsx`
 - **New dependencies:** allowed when the step needs them. Use a version released at least two weeks ago, and mention it in your report, because a dependency change makes the PR risky.
 
+## Shell
+- **One simple command per Bash call.** No `&&`, `;`, `|`, redirects (`>`, `2>&1`), `$(…)` or `<(…)`: compound commands are refused automatically and waste a turn. Read the command's output directly; to search it, run the command again with narrower arguments or use Grep on a file.
+- **Scratch files** go in the system temp directory (`os.tmpdir()`), never inside the repo.
+- Use `git -C <folder> …` instead of `cd`.
+
 ## Track your task
 If the work matches a task in `.gmos/tasks.json` that you own, set it to `in_progress` when you start. Set it to `done` only after your checks pass.
 
 ## Before you return
-1. Run `npm run lint`, `node scripts/typecheck-ratchet.mjs`, `npm test` and `npm run build`.
-2. If the change is user-facing, add `changelog/<YYYY-MM-DD>-<slug>.json` (format in `.gmos/lead.md`).
+1. Run `npm run lint`, `node scripts/typecheck-ratchet.mjs`, `npm test` and `npm run build`. For changes to pages, routing or the shell, also run `npm run test:e2e`.
+2. Don't write changelog entries: `gmos-docs` does that. Say whether the change is user-facing, and how a user would describe it.
 3. Report:
    - what you changed
    - the results of each check

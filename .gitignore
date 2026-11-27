@@ -33,3 +33,13 @@ securitychecklist.md
 
 # Agent mission run state (owned by the Agents-GMOS bridge)
 .gmos/missions/*.run.json
+
+# Agent scratch files (agents should use the system temp dir; this is a backstop)
+.tmp-*
+tmp-*
+
+# Playwright
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/

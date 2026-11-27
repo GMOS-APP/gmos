@@ -20,6 +20,7 @@ npm run typecheck    # Raw JSDoc/TS type check via jsconfig.json (has a known ba
 npm run typecheck:ratchet  # What CI runs: fails only if the error count exceeds .typecheck-baseline
 npm run typecheck:baseline # Lower the baseline after fixing errors (never raise it)
 npm test             # Vitest (src/**/*.test.js, scripts/*.test.mjs)
+npm run test:e2e     # Playwright smoke tests (e2e/) against the build; run `npm run build` first
 npm run check:repo   # Migration names + changelog/ file validation
 npm run verify       # Everything CI's `verify` job runs: lint → typecheck ratchet → test → check:repo → build
 npm run seed:demo    # Seed a demo campaign (reads .env.local)
@@ -126,8 +127,8 @@ ESLint flat config (`eslint.config.js`), scoped to `src/components`, `src/pages`
 
 ## Deployment (fully automated — see `docs/agents.md`)
 Nothing is deployed by hand. Every change reaches `main` through a PR that passes the required checks (`verify`, `functions`, `risk-gate`), and merging deploys it:
-- **CI** (`.github/workflows/ci.yml`): `npm run verify` and the edge-function `deno check` ratchet on every PR and push to `main`.
-- **Risk gate** (`.github/workflows/automerge.yml`, rules in `scripts/risk-check.mjs`): risky PRs (migrations, billing/auth/account functions, `vercel.json`, CI, dependencies, pipeline scripts) fail `risk-gate` until the owner adds the `owner-approved` label; new commits clear it. Safe `agent/*` PRs auto-merge once green.
+- **CI** (`.github/workflows/ci.yml`): `npm run verify` plus the Playwright smoke tests, the edge-function `deno check` ratchet, and a `db` job that applies new migrations on top of a production schema snapshot (`supabase/schema/prod-schema.sql`, refreshed by `schema-snapshot.yml`).
+- **Risk gate** (`.github/workflows/automerge.yml`, rules in `scripts/risk-check.mjs`): risky PRs (migrations, billing/auth/account functions, `vercel.json`, CI, dependencies, pipeline scripts, a raised typecheck baseline) fail `risk-gate` until the owner adds the `owner-approved` label; new commits clear it. Safe `agent/*` PRs auto-merge once green.
 - **Supabase** (`.github/workflows/deploy-supabase.yml`, on merge): applies new `supabase/migrations/*` (the `-- baseline:` stubs there mark the 54 versions applied before the pipeline and are never run) (fail-closed dry-run check via `scripts/check-migrations.mjs`), redeploys changed edge functions via `scripts/deploy-functions.mjs` (keeps each function's live `verify_jwt`; refuses unknown slugs), and publishes `changelog/` entries.
 - **Smoke test** (`.github/workflows/smoke.yml`): after each Vercel production deploy, checks `gmos.app`, `/sitemap.xml`, `/rss.xml`; opens a `prod-incident` issue on failure.
 

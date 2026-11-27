@@ -46,6 +46,11 @@ Then read the existing function or migration closest to what you're changing.
   - edge functions with vitest or Deno tests
 - `node scripts/typecheck-ratchet.mjs --target functions` must not go above `.deno-check-baseline`. It needs `deno`; if `deno` isn't installed, say so in your report and CI will run the check.
 
+## Shell
+- **One simple command per Bash call.** No `&&`, `;`, `|`, redirects (`>`, `2>&1`), `$(…)` or `<(…)`: compound commands are refused automatically and waste a turn. Read the command's output directly; to search it, run the command again with narrower arguments or use Grep on a file.
+- **Scratch files** go in the system temp directory (`os.tmpdir()`), never inside the repo.
+- Use `git -C <folder> …` instead of `cd`.
+
 ## Track your task
 If the work matches a task in `.gmos/tasks.json` that you own, set it to `in_progress` when you start. Set it to `done` only after your checks pass.
 
