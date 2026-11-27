@@ -62,7 +62,10 @@ async function apply(from) {
     byVersion.set(version, [...(byVersion.get(version) || []), ...load(f).entries])
   }
 
-  const headers = { apikey: key, Authorization: `Bearer ${key}`, 'Content-Type': 'application/json', Prefer: 'return=representation' }
+  // A legacy service_role key is a JWT and also goes in Authorization; a new `sb_secret_…` key is not a JWT
+  // and must be sent as `apikey` only.
+  const headers = { apikey: key, 'Content-Type': 'application/json', Prefer: 'return=representation' }
+  if (key.startsWith('eyJ')) headers.Authorization = `Bearer ${key}`
   for (const [version, incoming] of byVersion) {
     const res = await fetch(`${url}/rest/v1/changelog?version=eq.${version}&select=id,entries`, { headers })
     if (!res.ok) throw new Error(`read ${version}: ${res.status} ${await res.text()}`)
