@@ -1,0 +1,85 @@
+name: Deploy Supabase
+
+# On merge to main: apply new migrations, redeploy changed edge functions and
+# publish changelog entries. Vercel deploys the web app separately through its
+# Git integration, so migrations must stay backward compatible (expand first,
+# contract in a later PR).
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'supabase/migrations/**'
+      - 'functions/**'
+      - 'supabase/functions/**'
+      - 'scripts/functions.map.json'
+      - 'changelog/**'
+  workflow_dispatch:
+    inputs:
+      all_functions:
+        description: Redeploy every mapped edge function
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-supabase
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    # Holds SUPABASE_ACCESS_TOKEN, SUPABASE_DB_PASSWORD, SUPABASE_SERVICE_ROLE_KEY.
+    environment: production
+    env:
+      SUPABASE_PROJECT_REF: suofaewpbrzbixplwzvs
+      SUPABASE_URL: https://suofaewpbrzbixplwzvs.supabase.co
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Resolve diff base
+        id: base
+        run: |
+          BASE="${{ github.event.before }}"
+          if [ -z "$BASE" ] || [ "$BASE" = "0000000000000000000000000000000000000000" ] || ! git cat-file -e "$BASE" 2>/dev/null; then
+            BASE="$(git rev-parse HEAD~1)"
+          fi
+          echo "sha=$BASE" >> "$GITHUB_OUTPUT"
+          echo "Diffing $BASE..HEAD"
+
+      - name: Migrations
+        env:
+          SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+        run: |
+          ADDED="$(git diff --name-only --diff-filter=A ${{ steps.base.outputs.sha }} HEAD -- supabase/migrations | grep '\.sql$' || true)"
+          if [ -z "$ADDED" ]; then echo "No new migrations."; exit 0; fi
+          supabase link --project-ref "$SUPABASE_PROJECT_REF" --password "$SUPABASE_DB_PASSWORD"
+          # Fail closed: apply only if the pending set is exactly what this push added.
+          set -o pipefail
+          supabase db push --dry-run --password "$SUPABASE_DB_PASSWORD" 2>&1 | tee dry-run.txt
+          node scripts/check-migrations.mjs pending --changed-from ${{ steps.base.outputs.sha }} < dry-run.txt
+          supabase db push --password "$SUPABASE_DB_PASSWORD"
+
+      - name: Edge functions
+        run: |
+          if [ "${{ inputs.all_functions }}" = "true" ]; then
+            node scripts/deploy-functions.mjs --all
+          else
+            node scripts/deploy-functions.mjs --changed-from ${{ steps.base.outputs.sha }}
+          fi
+
+      - name: Changelog
+        env:
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: node scripts/changelog.mjs apply --changed-from ${{ steps.base.outputs.sha }}

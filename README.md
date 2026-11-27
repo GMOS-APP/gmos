@@ -2,7 +2,7 @@
 
 A Dungeon Master operating system for tabletop RPG campaigns. Track your world, prep smarter, and run sessions without juggling a dozen browser tabs — all wrapped in a desktop-OS-style interface.
 
-**Live app:** https://trisdenc.github.io/GM-OS/ &nbsp;·&nbsp; **[User Tutorial](TUTORIAL.md)** &nbsp;·&nbsp; **[Developer Guide / Architecture](ARCHITECTURE.md)**
+**Live app:** https://gmos.app &nbsp;·&nbsp; **[User Tutorial](TUTORIAL.md)** &nbsp;·&nbsp; **[Developer Guide / Architecture](ARCHITECTURE.md)**
 
 ---
 
@@ -65,7 +65,7 @@ The UI takes its visual language from Teenage Engineering hardware (the K.O. II 
 | Auth | Supabase Auth — Google OAuth + email/password |
 | Edge Functions | TypeScript/Deno on Supabase |
 | External Data | Open5e API (monsters, magic items, spells), D&D Beyond |
-| Deployment | GitHub Pages via GitHub Actions |
+| Deployment | Vercel (app) + Supabase (DB, edge functions), fully automated from `main` |
 
 ---
 
@@ -75,8 +75,8 @@ The UI takes its visual language from Teenage Engineering hardware (the K.O. II 
 
 1. Clone the repo:
    ```bash
-   git clone https://github.com/trisdenc/GM-OS.git
-   cd GM-OS
+   git clone https://github.com/GMOS-APP/gmos.git
+   cd gmos
    ```
 
 2. Install dependencies:
@@ -128,11 +128,9 @@ Shortcuts are suppressed while you're typing in a text field.
 
 ## Deployment
 
-Pushes to `main` automatically deploy to GitHub Pages via `.github/workflows/deploy.yml` (Node 22). The workflow runs lint, builds with Supabase credentials from repository secrets, and uploads the `dist/` folder. The app is served from the `/GM-OS/` base path.
+Every change lands through a pull request. CI (`npm run verify` plus an edge-function type check) must pass, and risky changes (migrations, billing, auth, CI) need the owner's `owner-approved` label. Merging to `main` deploys everything: Vercel builds the app, and `.github/workflows/deploy-supabase.yml` applies new migrations, redeploys changed edge functions and publishes changelog entries. A smoke test then checks the live site.
 
-Required repository secrets:
-- `VITE_SUPABASE_URL`
-- `VITE_SUPABASE_ANON_KEY`
+See [docs/agents.md](docs/agents.md) for the full pipeline, the required secrets, and how agent missions use it.
 
 ---
 

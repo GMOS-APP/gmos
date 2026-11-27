@@ -10,7 +10,13 @@
     "lint:fix": "eslint . --fix",
     "typecheck": "tsc -p ./jsconfig.json",
     "preview": "vite preview",
-    "seed:demo": "node --env-file=.env.local scripts/seed-demo.js"
+    "seed:demo": "node --env-file=.env.local scripts/seed-demo.js",
+    "typecheck:ratchet": "node scripts/typecheck-ratchet.mjs",
+    "typecheck:baseline": "node scripts/typecheck-ratchet.mjs --update",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "check:repo": "node scripts/check-migrations.mjs lint && node scripts/changelog.mjs check",
+    "verify": "npm run lint && npm run typecheck:ratchet && npm test && npm run check:repo && npm run build"
   },
   "dependencies": {
     "@hello-pangea/dnd": "^17.0.0",
@@ -82,6 +88,8 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.19.0",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.3",
     "@types/node": "^22.13.5",
     "@types/react": "^18.2.66",
     "@types/react-dom": "^18.2.22",
@@ -94,10 +102,12 @@
     "eslint-plugin-react-refresh": "^0.4.18",
     "eslint-plugin-unused-imports": "^4.3.0",
     "globals": "^15.14.0",
+    "jsdom": "^25.0.1",
     "postcss": "^8.5.3",
     "tailwindcss": "^3.4.17",
     "typescript": "^5.8.2",
     "vite": "^6.1.0",
-    "vite-plugin-pwa": "^0.21.2"
+    "vite-plugin-pwa": "^0.21.2",
+    "vitest": "^3.2.7"
   }
 }

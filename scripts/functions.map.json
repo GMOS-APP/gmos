@@ -1,0 +1,21 @@
+{
+  "$comment": "Deployed edge-function slug -> source file. Slugs are the names the app calls (functions.invoke). verify_jwt is NOT set here: deploy-functions.mjs reads it from the live project so a redeploy can never flip it. A slug that does not already exist remotely is refused unless listed in allowCreate.",
+  "functions": {
+    "admin-api": "functions/adminApi.ts",
+    "battle-map": "functions/battleMap.ts",
+    "create-demo": "supabase/functions/create-demo/index.ts",
+    "create-demo-for-user": "functions/createDemoForUser.ts",
+    "createBillingPortal": "functions/createBillingPortal.ts",
+    "createCheckout": "functions/createCheckout.ts",
+    "deleteAccount": "functions/deleteAccount.ts",
+    "exportAccount": "functions/exportAccount.ts",
+    "exportCampaign": "functions/exportCampaign.ts",
+    "importCampaign": "functions/importCampaign.ts",
+    "importDndBeyondCharacter": "functions/importDndBeyondCharacter.ts",
+    "party-inventory": "functions/partyInventory.ts",
+    "player-view": "functions/playerView.ts",
+    "stripeWebhook": "functions/stripeWebhook.ts"
+  },
+  "skip": ["functions/invoke-llm.ts"],
+  "allowCreate": []
+}

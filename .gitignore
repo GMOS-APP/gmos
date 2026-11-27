@@ -30,3 +30,6 @@ dist-ssr
 .env
 # local security notes (not for the repo)
 securitychecklist.md
+
+# Agent mission run state (owned by the Agents-GMOS bridge)
+.gmos/missions/*.run.json

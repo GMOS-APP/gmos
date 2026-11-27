@@ -1,0 +1,102 @@
+name: Risk gate
+
+# Required check `risk-gate`, on every PR.
+#  - Safe PRs pass. On agent/* branches, auto-merge is enabled: squash once CI is green.
+#  - Risky PRs (scripts/risk-check.mjs) fail and get `needs-approval`
+#    until the owner adds the `owner-approved` label. A new push removes the
+#    approval, so the label always applies to the commits that were reviewed.
+#
+# Runs under pull_request_target, so this workflow and risk-check.mjs come from
+# the BASE branch: a PR can't weaken its own gate. It never checks out or runs PR
+# code. It only reads the file list and package.json through the API.
+on:
+  pull_request_target:
+    types: [opened, synchronize, reopened, labeled, unlabeled, ready_for_review]
+
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+
+concurrency:
+  group: risk-gate-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  risk-gate:
+    name: risk-gate
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      GH_TOKEN: ${{ github.token }}
+      REPO: ${{ github.repository }}
+      PR: ${{ github.event.pull_request.number }}
+      BASE_SHA: ${{ github.event.pull_request.base.sha }}
+      HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+      HEAD_REPO: ${{ github.event.pull_request.head.repo.full_name }}
+      HEAD_REF: ${{ github.event.pull_request.head.ref }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.base.sha }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Drop stale approval on new commits
+        if: github.event.action == 'synchronize' && contains(github.event.pull_request.labels.*.name, 'owner-approved')
+        run: gh pr edit "$PR" -R "$REPO" --remove-label owner-approved
+
+      - name: Classify changes
+        id: classify
+        run: |
+          gh api --paginate "repos/$REPO/pulls/$PR/files" --jq '.[].filename' > files.txt
+          pkg() { gh api "repos/$1/contents/package.json?ref=$2" --jq .content 2>/dev/null | base64 -d 2>/dev/null || echo '{}'; }
+          pkg "$REPO" "$BASE_SHA" > base-pkg.json
+          pkg "$HEAD_REPO" "$HEAD_SHA" > head-pkg.json
+          node -e '
+            const fs = require("fs");
+            const read = (f) => { try { return JSON.parse(fs.readFileSync(f, "utf8")) } catch { return {} } };
+            const files = fs.readFileSync("files.txt", "utf8").split("\n").filter(Boolean);
+            process.stdout.write(JSON.stringify({ files, basePkg: read("base-pkg.json"), headPkg: read("head-pkg.json") }));
+          ' | node scripts/risk-check.mjs > reasons.json
+          echo "Reasons: $(cat reasons.json)"
+          if [ "$(cat reasons.json)" = "[]" ]; then echo "risky=false" >> "$GITHUB_OUTPUT"; else echo "risky=true" >> "$GITHUB_OUTPUT"; fi
+
+      - name: Gate
+        env:
+          RISKY: ${{ steps.classify.outputs.risky }}
+          AUTOMERGE_TOKEN: ${{ secrets.AUTOMERGE_TOKEN }}
+        run: |
+          LABELS="$(gh pr view "$PR" -R "$REPO" --json labels --jq '[.labels[].name] | join(",")')"
+          DRAFT="$(gh pr view "$PR" -R "$REPO" --json isDraft --jq .isDraft)"
+          has() { case ",$LABELS," in *",$1,"*) return 0;; *) return 1;; esac; }
+
+          if [ "$RISKY" = "true" ] && ! has owner-approved; then
+            gh label create needs-approval -R "$REPO" --color D93F0B --description "Risky change: owner must add owner-approved" 2>/dev/null || true
+            if ! has needs-approval; then
+              gh pr edit "$PR" -R "$REPO" --add-label needs-approval
+              {
+                echo "**Risk gate: owner approval needed before merge.** This PR touches:"
+                node -e 'for (const r of JSON.parse(require("fs").readFileSync("reasons.json","utf8"))) console.log("- " + r)'
+                echo
+                echo "Review it, then add the \`owner-approved\` label to release it. Pushing new commits clears the approval."
+              } > comment.md
+              gh pr comment "$PR" -R "$REPO" --body-file comment.md
+            fi
+            gh pr merge "$PR" -R "$REPO" --disable-auto 2>/dev/null || true
+            echo "::error::Risky change awaiting owner-approved label"
+            exit 1
+          fi
+
+          if has needs-approval; then gh pr edit "$PR" -R "$REPO" --remove-label needs-approval; fi
+
+          case "$HEAD_REF" in agent/*) ;; *) echo "Not an agent branch: leaving the merge to a human."; exit 0;; esac
+          if [ "$HEAD_REPO" != "$REPO" ] || [ "$DRAFT" = "true" ]; then echo "Fork or draft: no auto-merge."; exit 0; fi
+          if [ -z "$AUTOMERGE_TOKEN" ]; then
+            # A GITHUB_TOKEN merge would not trigger deploy-supabase.yml on main.
+            echo "::warning::AUTOMERGE_TOKEN secret not set; auto-merge skipped"
+            exit 0
+          fi
+          GH_TOKEN="$AUTOMERGE_TOKEN" gh pr merge "$PR" -R "$REPO" --auto --squash --delete-branch
+          echo "Auto-merge enabled: merges when required checks pass."

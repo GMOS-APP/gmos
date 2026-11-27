@@ -21,7 +21,7 @@ server — the "backend" is Supabase plus a set of Deno edge functions.
 - **Misc**: framer-motion, cmdk (command palette), react-leaflet (world map),
   recharts, canvas-confetti, lucide-react (icons)
 - **Backend**: Supabase project `suofaewpbrzbixplwzvs` (us-east-1)
-- **Hosting**: GitHub Pages (static), auto-deployed from `main`
+- **Hosting**: Vercel (`gmos.app`), auto-deployed from `main` through CI; see §12
 
 Language is **JavaScript with JSDoc** type-checking (not TypeScript) for app code;
 edge functions are TypeScript/Deno. `npm run typecheck` runs `tsc` over
@@ -270,7 +270,9 @@ Threads.
 
 ---
 
-## 11. Verifying changes (no test suite)
+## 11. Verifying changes
+
+Automated: `npm run verify` (lint → typecheck ratchet → vitest → migration/changelog checks → build) is what CI runs on every PR; add vitest tests next to the code (`*.test.js`). For behavior the unit tests can't reach, use the manual patterns below.
 
 Validate by running the app and observing the surface that changed. Pattern used
 throughout:
@@ -291,13 +293,13 @@ throughout:
 
 ## 12. Deployment
 
-Pushes to `main` auto-deploy via `.github/workflows/deploy.yml` (Node 22; runs
-lint + build with `VITE_SUPABASE_URL`/`VITE_SUPABASE_ANON_KEY` secrets, publishes
-`dist/` to GitHub Pages). **Base path is `/GM-OS/`** in CI (set via
-`VITE_BASE_PATH`); locally it's `/`. Because of the base path, **always navigate
-with `useNavigate()` / `createPageUrl()`, never `window.location.href`** for
-internal routes. Edge functions and DB migrations are deployed to Supabase
-separately (MCP/CLI), not by the Pages workflow.
+Fully automated; see [docs/agents.md](docs/agents.md). PRs must pass `verify`,
+`functions` and `risk-gate`. Merging to `main` deploys the app on Vercel and runs
+`.github/workflows/deploy-supabase.yml` (new migrations, changed edge functions,
+`changelog/` entries). A smoke test checks production after each deploy.
+`VITE_BASE_PATH` is still honored by `vite.config.js`, so **always navigate with
+`useNavigate()` / `createPageUrl()`, never `window.location.href`** for internal
+routes.
 
 ---
 
