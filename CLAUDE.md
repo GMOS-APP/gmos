@@ -4,11 +4,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-GM-OS is a Dungeon Master management tool for tabletop RPG campaigns, built as a React SPA backed by Supabase. All application code lives in `~/gm-os/` (sibling directory to this repo).
+GM-OS is a Dungeon Master management tool for tabletop RPG campaigns, built as a React SPA backed by Supabase. All application code lives at the repository root (`src/`, `api/`, `functions/`, `scripts/`, `supabase/`).
 
 ## Commands
 
-All commands run from `~/gm-os/`:
+All commands run from the repository root:
 
 ```bash
 npm run dev          # Start Vite dev server
@@ -16,11 +16,16 @@ npm run build        # Production build
 npm run preview      # Preview production build
 npm run lint         # ESLint (quiet mode)
 npm run lint:fix     # Auto-fix ESLint issues
-npm run typecheck    # JSDoc/TS type checking via jsconfig.json
+npm run typecheck    # Raw JSDoc/TS type check via jsconfig.json (has a known backlog of errors)
+npm run typecheck:ratchet  # What CI runs: fails only if the error count exceeds .typecheck-baseline
+npm run typecheck:baseline # Lower the baseline after fixing errors (never raise it)
+npm test             # Vitest (src/**/*.test.js, scripts/*.test.mjs)
+npm run check:repo   # Migration names + changelog/ file validation
+npm run verify       # Everything CI's `verify` job runs: lint → typecheck ratchet → test → check:repo → build
 npm run seed:demo    # Seed a demo campaign (reads .env.local)
 ```
 
-There is no test suite configured.
+Edge functions are checked in CI with `node scripts/typecheck-ratchet.mjs --target functions` (`deno check`, baseline in `.deno-check-baseline`; needs `deno` locally).
 
 ## Architecture
 
@@ -99,8 +104,8 @@ src/components/
 Entity types: NPCs, Player Characters, Creatures, Locations, Factions, Deities, Items, Shops, Events, Encounters, Lore, Threads.
 
 ### Serverless Functions
-`functions/` contains TypeScript/Deno Edge Functions deployed to Supabase. Deployed slugs → local files:
-- `create-demo-for-user` (`createDemoForUser.ts`) — seeds a demo campaign for a user
+`functions/` contains TypeScript/Deno Edge Functions deployed to Supabase. **`scripts/functions.map.json` is the authoritative slug → file map used by the deploy pipeline** (live Supabase slugs; the app's camelCase names are mapped to them by `FUNCTION_MAP` in `src/api/entities.js`, so add both when creating a function). Live slugs, checked against production on 2026-11-26:
+- `create-demo` (`supabase/functions/create-demo/index.ts`) — seeds a demo campaign for a user. `functions/createDemoForUser.ts` is not deployed (skipped in the map).
 - `export-campaign` (`exportCampaign.ts`) — full campaign backup (all tables) using service role
 - `import-campaign` (`importCampaign.ts`) — full campaign restore with ID remapping; new records owned by importing user; CORS + transactional rollback on partial failure (`verify_jwt=false`)
 - `import-dndbeyond` (`importDndBeyondCharacter.ts`) — fetches public D&D Beyond character (numeric-ID validated) and maps to WorldEntity shape
@@ -119,12 +124,28 @@ ESLint flat config (`eslint.config.js`), scoped to `src/components`, `src/pages`
 - React hooks rules enforced.
 - No prop-types required (JSDoc type checking via `jsconfig.json` with `checkJs: true`).
 
-## Deployment
-Pushes to `main` auto-deploy to GitHub Pages via `.github/workflows/deploy.yml` (Node 22; runs lint + build with `VITE_SUPABASE_URL`/`VITE_SUPABASE_ANON_KEY` secrets). Base path is `/GM-OS/`. Internal navigation must use `useNavigate()` rather than `window.location.href` (the base path otherwise breaks links).
+## Deployment (fully automated — see `docs/agents.md`)
+Nothing is deployed by hand. Every change reaches `main` through a PR that passes the required checks (`verify`, `functions`, `risk-gate`), and merging deploys it:
+- **CI** (`.github/workflows/ci.yml`): `npm run verify` and the edge-function `deno check` ratchet on every PR and push to `main`.
+- **Risk gate** (`.github/workflows/automerge.yml`, rules in `scripts/risk-check.mjs`): risky PRs (migrations, billing/auth/account functions, `vercel.json`, CI, dependencies, pipeline scripts) fail `risk-gate` until the owner adds the `owner-approved` label; new commits clear it. Safe `agent/*` PRs auto-merge once green.
+- **Supabase** (`.github/workflows/deploy-supabase.yml`, on merge): applies new `supabase/migrations/*` (the `-- baseline:` stubs there mark the 54 versions applied before the pipeline and are never run) (fail-closed dry-run check via `scripts/check-migrations.mjs`), redeploys changed edge functions via `scripts/deploy-functions.mjs` (keeps each function's live `verify_jwt`; refuses unknown slugs), and publishes `changelog/` entries.
+- **Smoke test** (`.github/workflows/smoke.yml`): after each Vercel production deploy, checks `gmos.app`, `/sitemap.xml`, `/rss.xml`; opens a `prod-incident` issue on failure.
+
+**Migrations.** New files only, named `supabase/migrations/YYYYMMDDHHMMSS_snake_case.sql`, additive and backward compatible (the app and DB deploy independently). The older files in `supabase/migrations-history/` document changes applied by hand and are **never** run — some intentionally differ from prod.
+
+**Vercel (production).** Team `gm-os`, project `gm-os`, linked to the GitHub repo via the Git integration — no workflow file, Vercel builds previews for PRs and production on push to `main` itself. Serves `gmos.app`, `gm-os.app`, and `gamemasteros.com`. Build config is `vercel.json`: `npm run build` → `dist`, rewrites `/sitemap.xml` → `/api/sitemap` and `/rss.xml` → `/api/rss` with an SPA fallback for everything else, plus the security headers and CSP (the CSP `connect-src` must be widened before calling any new external origin). Node 24.x. Base path is `/` here, so `VITE_BASE_PATH` is unset.
+
+**GitHub Pages** was a legacy mirror and its workflow has been removed. `vite.config.js` still honors `VITE_BASE_PATH` (into `base` and the service worker's `navigateFallback`), so keep internal navigation on `useNavigate()` rather than `window.location.href`.
 
 ## Changelog (keep it current)
 Whenever you ship an **end-user / customer-impacting** change, add a curated entry to the `changelog` table — it powers the in-app "What's new" dialog (`ChangelogDialog.jsx`). Treat this as part of shipping, not an afterthought.
 - **Skip purely internal changes** (refactors, admin-only tooling, infra, tests) — they don't get an entry.
 - **One release per ship-day**: `version` = ISO date `YYYY-MM-DD` (sorts the dialog); `date` = friendly label like `Jun 27, 2026`. If a row already exists for today, append to its `entries` instead of creating a second.
 - `entries` is `[{type, text}]` where `type` is `new` | `improved` | `fixed`. Write **for users**: plain language, benefit-first, no jargon or internal names.
-- Author it directly (SQL/MCP on the `changelog` table, or Admin → Changelog at `/admin/changelog`). Keep it easy to read and digest.
+- **Author it as a file:** `changelog/<YYYY-MM-DD>-<slug>.json` containing `{ "entries": [{ "type": "new", "text": "..." }] }`. The release version is the date in the file name; all files for one day merge into one row. `deploy-supabase.yml` publishes it on merge, and `npm run check:repo` validates it. (Admin → Changelog at `/admin/changelog` still works for edits.) Keep it easy to read and digest.
+
+## Agent Pipeline
+Agent missions run from **Agents-GMOS** (`E:\Code\Agents-GMOS`, a fork of the HiROM mission control). Agents: `gmos-ui`, `gmos-data`, `gmos-platform`, `gmos-docs`, `gmos-qa` (read-only) in `.claude/agents/`. Each step runs owner → `gmos-docs` → `gmos-qa` → commit. The lead follows `.gmos/lead.md` and keeps the plan in `.gmos/missions/<id>.json`; the tracker is `.gmos/tasks.json`.
+- The **bridge** (not the agents) creates the `agent/<mission>` branch, pushes it, opens the PR, watches CI, and runs a FIX iteration if CI fails. GitHub merges.
+- `.claude/settings.json` lets agents run npm/node/git locally and **denies** `git push`, `gh`, `supabase`, `vercel`, `stripe`, `.env*` reads, and the Supabase/Vercel/Stripe/GitHub MCP tools — agents never touch production.
+- Run commands from the repo root, one per Bash call; use `git -C <folder>` rather than `cd`.

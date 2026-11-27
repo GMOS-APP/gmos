@@ -1,0 +1,20 @@
+{
+  "$comment": "Deployed edge-function slug -> source file. Slugs are the live Supabase slugs; the app maps its camelCase names to them in src/api/entities.js (FUNCTION_MAP). verify_jwt is NOT set here: deploy-functions.mjs reads it from the live project so a redeploy can never flip it. A slug that does not already exist remotely is refused unless listed in allowCreate. Live functions with no source in this repo (unsplash) are never deployed from here.",
+  "functions": {
+    "admin-api": "functions/adminApi.ts",
+    "battle-map": "functions/battleMap.ts",
+    "create-billing-portal": "functions/createBillingPortal.ts",
+    "create-checkout": "functions/createCheckout.ts",
+    "create-demo": "supabase/functions/create-demo/index.ts",
+    "delete-account": "functions/deleteAccount.ts",
+    "export-account": "functions/exportAccount.ts",
+    "export-campaign": "functions/exportCampaign.ts",
+    "import-campaign": "functions/importCampaign.ts",
+    "import-dndbeyond": "functions/importDndBeyondCharacter.ts",
+    "party-inventory": "functions/partyInventory.ts",
+    "player-view": "functions/playerView.ts",
+    "stripe-webhook": "functions/stripeWebhook.ts"
+  },
+  "skip": ["functions/invoke-llm.ts", "functions/createDemoForUser.ts"],
+  "allowCreate": []
+}
