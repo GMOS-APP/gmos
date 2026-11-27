@@ -7,8 +7,16 @@ import { cn } from '@/lib/utils';
 import { useCampaign } from '@/lib/CampaignContext';
 
 /**
- * A textarea that supports @-mentions for WorldEntity records.
- * Stores content as plain text with [[entity_id|entity_name]] markers.
+ * A textarea that supports entity mentions (type "@" to link) for WorldEntity
+ * records. Stores content as plain text with [[entity_id|entity_name]] markers.
+ *
+ * @param {object} props
+ * @param {string} props.value Current text, including any mention markers.
+ * @param {(value: string) => void} props.onChange Called with the new text.
+ * @param {string} [props.campaignId] Campaign to search; defaults to the current campaign from context.
+ * @param {string} [props.placeholder]
+ * @param {number} [props.rows] Visible rows (defaults to 8).
+ * @param {string} [props.className] Extra classes merged onto the textarea.
  */
 export default function EntityMentionTextarea({
   value,

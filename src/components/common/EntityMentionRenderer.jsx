@@ -4,6 +4,12 @@ import EntityQuickViewModal from '@/components/common/EntityQuickViewModal';
 /**
  * Parses [[entity_id|entity_name]] markers in text and renders them as
  * hoverable, clickable links with a tooltip showing summary + key facts.
+ *
+ * @param {object} props
+ * @param {string} [props.text] Text containing mention markers; renders nothing when empty.
+ * @param {any[]} [props.entities] Campaign entities used to resolve mentions by id.
+ * @param {string} [props.campaignId]
+ * @param {string} [props.className] Classes for the wrapping span.
  */
 export default function EntityMentionRenderer({ text, entities = [], campaignId, className }) {
   if (!text) return null;
@@ -50,6 +56,16 @@ export default function EntityMentionRenderer({ text, entities = [], campaignId,
   );
 }
 
+/**
+ * A single rendered mention. Shows a struck-through label when the entity no
+ * longer exists, otherwise a button that opens the quick-view modal.
+ *
+ * @param {object} props
+ * @param {string} props.entityId Id from the mention marker (not used for rendering yet).
+ * @param {string} props.entityName Name from the mention marker, shown if the entity is gone.
+ * @param {any} [props.entity] The resolved entity, or undefined if deleted.
+ * @param {string} [props.campaignId]
+ */
 function EntityMentionLink({ entityName, entity, campaignId }) {
   const [open, setOpen] = useState(false);
   const [anchorRect, setAnchorRect] = useState(null);

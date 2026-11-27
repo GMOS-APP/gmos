@@ -2,7 +2,7 @@
   "version": 1,
   "project": "GM/OS",
   "source": "Agent pipeline bootstrap (2026-11-26). The lead adds milestones and tasks as missions need them.",
-  "updatedAt": "2026-11-26T00:00:00+00:00",
+  "updatedAt": "2026-11-27T00:00:00+00:00",
   "milestones": [
     {
       "id": "P1",
@@ -38,7 +38,8 @@
           "id": "P1.5",
           "title": "Pay down typecheck baseline (app 729, functions 13)",
           "owner": "gmos-ui",
-          "status": "todo"
+          "status": "in_progress",
+          "note": "Slice 1 (mission m-2026-11-27-2w8cn, entity-mention JSDoc): app typecheck errors 729 -> 698. .typecheck-baseline was intentionally left at 729 because the mission said not to edit it; a later slice or the owner should lower it with 'npm run typecheck:baseline'. Next: autoFocus not forwarded by EntityMentionTextarea (TS2322 at SessionNotesPanel:138, CampaignNotes:81)."
         }
       ]
     }
