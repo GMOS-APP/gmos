@@ -1,0 +1,25 @@
+{
+  "id": "m-2026-11-27-2w8cn",
+  "goal": "Task P1.5 (first slice): fix 10-20 JSDoc/TypeScript errors reported by 'npm run typecheck' in a few files under src/components (owner gmos-ui). Pick small, mechanical fixes (missing JSDoc types, wrong prop types, unused/incorrect params). Do NOT edit .typecheck-baseline, src/lib/AuthContext.jsx, src/lib/plans.js, src/api/*, src/pages/Upgrade.jsx, src/pages/AccountSettings.jsx, src/components/layout/AuthPanel.jsx, package.json or anything under .github/.claude/supabase. Behaviour must not change. Acceptance: npm run typecheck reports fewer errors than 729, npm run verify passes. No changelog entry (internal change). Update P1.5 in .gmos/tasks.json with the new count in its note.",
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Add JSDoc prop types to the entity-mention components",
+      "owner": "gmos-ui",
+      "acceptance": "Only JSDoc/comment changes in src/components/common/EntityMentionTextarea.jsx and src/components/common/EntityMentionRenderer.jsx, with no runtime or behaviour change. (1) EntityMentionTextarea: reword the header comment so '@-mentions' is no longer parsed as a JSDoc tag (TS1003 at 10,30), and add an @param props typedef that marks campaignId, placeholder, rows and className as optional. This clears roughly 25 TS2741 'campaignId is missing' errors in the *Fields.jsx, SchemaFields, RelationshipDialog, EntityLinker, NewSessionDialog and SessionDebrief call sites. (2) EntityMentionRenderer: type its props so className is optional (clears TS2741 at EntityStatBlockView 156 and EntityTypeView 205), and type the inner mention component's props to accept the entityId it is passed (clears TS2322 at 42,13). Count from 'npx tsc -p ./jsconfig.json --pretty false' must drop below 729 (target about 700 or fewer). Lint, tests and build pass. Do not touch .typecheck-baseline, src/components/ui or any forbidden path. No changelog.",
+      "status": "in_progress",
+      "note": "Plan baseline: 729 app errors. Leverage comes from props being inferred as required because the destructured params have no defaults. Prefer JSDoc (@param {{...}} props with optional ? fields) over adding defaults so runtime stays identical. Scope was widened past '10-20' errors because a single JSDoc fix clears about 28. The goal says no more than that is needed."
+    },
+    {
+      "id": "s2",
+      "title": "Record the new typecheck count on P1.5 in the tracker",
+      "owner": "lead",
+      "acceptance": "Re-run the type check after s1. Set P1.5 in .gmos/tasks.json to in_progress, with a note giving the new app error count (was 729) and saying .typecheck-baseline was left at 729 on purpose because the user said not to edit it, so a later slice or the owner should lower it with 'npm run typecheck:baseline'. Bump updatedAt. The file must stay valid JSON. npm run verify passes.",
+      "status": "todo",
+      "note": "The lead.md rule 'lower the baseline in the same commit' conflicts with the user's explicit 'do NOT edit .typecheck-baseline'. The user instruction wins. The ratchet only fails when the baseline is exceeded, so CI stays green."
+    }
+  ],
+  "risky": false,
+  "done": false,
+  "summary": ""
+}
