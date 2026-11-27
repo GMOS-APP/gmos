@@ -46,7 +46,7 @@ jobs:
           node-version: '22'
       - uses: supabase/setup-cli@v1
         with:
-          version: latest
+          version: 3.4.0
 
       - name: Resolve diff base
         id: base
@@ -64,7 +64,7 @@ jobs:
         run: |
           ADDED="$(git diff --name-only --diff-filter=A ${{ steps.base.outputs.sha }} HEAD -- supabase/migrations | grep '\.sql$' || true)"
           if [ -z "$ADDED" ]; then echo "No new migrations."; exit 0; fi
-          supabase link --project-ref "$SUPABASE_PROJECT_REF" --password "$SUPABASE_DB_PASSWORD"
+          supabase link --project-ref "$SUPABASE_PROJECT_REF"
           # Fail closed: apply only if the pending set is exactly what this push added.
           set -o pipefail
           supabase db push --dry-run --password "$SUPABASE_DB_PASSWORD" 2>&1 | tee dry-run.txt
