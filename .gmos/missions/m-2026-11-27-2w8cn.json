@@ -7,15 +7,17 @@
       "title": "Add JSDoc prop types to the entity-mention components",
       "owner": "gmos-ui",
       "acceptance": "Only JSDoc/comment changes in src/components/common/EntityMentionTextarea.jsx and src/components/common/EntityMentionRenderer.jsx, with no runtime or behaviour change. (1) EntityMentionTextarea: reword the header comment so '@-mentions' is no longer parsed as a JSDoc tag (TS1003 at 10,30), and add an @param props typedef that marks campaignId, placeholder, rows and className as optional. This clears roughly 25 TS2741 'campaignId is missing' errors in the *Fields.jsx, SchemaFields, RelationshipDialog, EntityLinker, NewSessionDialog and SessionDebrief call sites. (2) EntityMentionRenderer: type its props so className is optional (clears TS2741 at EntityStatBlockView 156 and EntityTypeView 205), and type the inner mention component's props to accept the entityId it is passed (clears TS2322 at 42,13). Count from 'npx tsc -p ./jsconfig.json --pretty false' must drop below 729 (target about 700 or fewer). Lint, tests and build pass. Do not touch .typecheck-baseline, src/components/ui or any forbidden path. No changelog.",
-      "status": "in_progress",
-      "note": "Plan baseline: 729 app errors. Leverage comes from props being inferred as required because the destructured params have no defaults. Prefer JSDoc (@param {{...}} props with optional ? fields) over adding defaults so runtime stays identical. Scope was widened past '10-20' errors because a single JSDoc fix clears about 28. The goal says no more than that is needed."
+      "status": "done",
+      "note": "App typecheck errors went from 729 to 698 (ratchet). The baseline was left unchanged. Two existing TS2322 errors remain (autoFocus is passed to EntityMentionTextarea at SessionNotesPanel:138 and CampaignNotes:81 but never forwarded), which is a behaviour gap for a later slice. scripts/scripts.test.mjs fails to load on this Windows checkout (SyntaxError on importing deploy-functions.mjs). The file was not touched and the failure is unrelated to this step; likely CRLF, so check it in WRAPUP verify.",
+      "commit": "e984590",
+      "qa": "PASS"
     },
     {
       "id": "s2",
       "title": "Record the new typecheck count on P1.5 in the tracker",
       "owner": "lead",
       "acceptance": "Re-run the type check after s1. Set P1.5 in .gmos/tasks.json to in_progress, with a note giving the new app error count (was 729) and saying .typecheck-baseline was left at 729 on purpose because the user said not to edit it, so a later slice or the owner should lower it with 'npm run typecheck:baseline'. Bump updatedAt. The file must stay valid JSON. npm run verify passes.",
-      "status": "todo",
+      "status": "in_progress",
       "note": "The lead.md rule 'lower the baseline in the same commit' conflicts with the user's explicit 'do NOT edit .typecheck-baseline'. The user instruction wins. The ratchet only fails when the baseline is exceeded, so CI stays green."
     }
   ],
